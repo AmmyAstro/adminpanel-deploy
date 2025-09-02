@@ -17,11 +17,6 @@ export default function Kundlipage() {
    razordash: <Razordash />,
 
   };
-
-  
-
- 
-
   let Componentrender = null;
 
   if (path.length === 1) {
