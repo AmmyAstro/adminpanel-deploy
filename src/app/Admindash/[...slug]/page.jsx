@@ -2,26 +2,43 @@
 
 import { useParams } from "next/navigation";
 import Razordash from "@/components/DashPages/Razor/Razordash";
+import ManageCMS from "@/components/DashPages/SideBar/HomesidePage/manageCMS";
+
+import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannermanager";
+import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
 
 export default function Kundlipage() {
   const params = useParams();
   const path = (params.slug || []).map((p) => p.toLowerCase());
 
-
-
   if (!path || path.length === 0) {
     return <div>Invalid URL structure</div>;
   }
 
+
   const admindash = {
-   razordash: <Razordash />,
+    razordash: <Razordash />,
+    managecms: <ManageCMS />,
+        giftpage: <Giftpage />,
 
   };
+
+ 
+  const secondLevel = {
+    banner: <BannerManager />,
+  };
+
   let Componentrender = null;
 
   if (path.length === 1) {
+  
     Componentrender = admindash[path[0]];
-  } 
+  } else if (path.length === 2) {
+  
+    if (path[0] === "managecms") {
+      Componentrender = secondLevel[path[1]];
+    }
+  }
 
   return (
     <>

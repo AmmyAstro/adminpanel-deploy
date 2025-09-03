@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 
+@layer components {
+  .heading-banner {
+    @apply text-xl text-[#2c0a4d] p-2 font-bold;
+  }
+}
 
 
 
@@ -14,6 +19,7 @@
             /* position: relative; */
             display: flex;
             flex-direction: column;
+            gap:10px;
         }
         .floating-item {
             /* position: absolute; */
@@ -26,7 +32,7 @@
         }
  
         .floating-item:hover {
-            transform: scale(1.2) rotate(5deg);
+            transform: scale(1.1) rotate(3deg);
             box-shadow: 0 12px 35px rgba(0,0,0,0.4);
             z-index: 10;
         }

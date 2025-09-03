@@ -1,6 +1,6 @@
 "use client";
 
-export default function Razorside() {
+export default function RazorSidebar() {
   const menuItems = [
     "razor1 ",
     "razor2 ",

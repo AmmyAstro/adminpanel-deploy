@@ -137,11 +137,11 @@ const cards = [
 
 export default function AdminCards() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 p-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-7 pt-6 h-full px-15 ">
       {cards.map((card, idx) => (
-        <Link key={idx} href={card.link}>
+        <Link className="mb-5" key={idx} href={card.link}>
           <div
-            className={`flex flex-col items-center justify-center rounded-xl p-6 h-35 text-white shadow-lg cursor-pointer transition-transform hover:scale-105 ${card.bg}`}
+            className={`h-full flex flex-col items-center justify-center rounded-xl p-6  text-white shadow-lg cursor-pointer transition-transform hover:scale-105 ${card.bg}`}
           >
             <div className="mb-3">
               <Image
