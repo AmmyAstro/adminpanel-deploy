@@ -19,7 +19,7 @@ export default function Homeside() {
     <aside
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
-      className={`h-screen bg-[#2c0a4d] text-yellow-400 flex flex-col py-6 rounded-r-xl transition-all duration-300 
+      className={` bg-[#2c0a4d] text-yellow-400 flex flex-col py-6 rounded-r-xl transition-all duration-300 
         ${isOpen ? "w-20" : "w-20"} 
       `}
     >
