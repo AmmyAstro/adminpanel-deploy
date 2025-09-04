@@ -6,6 +6,9 @@ import ManageCMS from "@/components/DashPages/SideBar/HomesidePage/manageCMS";
 
 import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannermanager";
 import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
+import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/addTestimonial";
+import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
+import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
 
 export default function Kundlipage() {
   const params = useParams();
@@ -19,11 +22,14 @@ export default function Kundlipage() {
   const admindash = {
     razordash: <Razordash />,
     managecms: <ManageCMS />,
-        giftpage: <Giftpage />,
+    giftpage: <Giftpage />,
+    addtesti: <AddTestimonial />,
+    couponmain: <CouponMain/>,
+    pacakagemain: <PacakageMain/>,
 
   };
 
- 
+
   const secondLevel = {
     banner: <BannerManager />,
   };
@@ -31,10 +37,10 @@ export default function Kundlipage() {
   let Componentrender = null;
 
   if (path.length === 1) {
-  
+
     Componentrender = admindash[path[0]];
   } else if (path.length === 2) {
-  
+
     if (path[0] === "managecms") {
       Componentrender = secondLevel[path[1]];
     }

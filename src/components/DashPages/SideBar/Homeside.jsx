@@ -7,11 +7,11 @@ export default function Homeside() {
   const [isOpen, setIsOpen] = useState(false);
 
   const menuItems = [
-    { href: "#", title: "Coupons", src: "/admin-img/badge-percent.png" },
-    { href: "#", title: "Add Packages", src: "/admin-img/boxo.png" },
+    { href: "/Admindash/couponmain", title: "Coupons", src: "/admin-img/badge-percent.png" },
+    { href: "/Admindash/pacakagemain", title: "Add Packages", src: "/admin-img/boxo.png" },
     { href: "/Admindash/giftpage", title: "Add Gifts", src: "/admin-img/gift.png" },
     { href: "/Admindash/managecms", title: "Manage CMS", src: "/admin-img/lead.png" },
-    { href: "#", title: "Testimonials", src: "/admin-img/testimonials.png" },
+    { href: "/Admindash/addtesti", title: "Testimonials", src: "/admin-img/testimonials.png" },
     { href: "#", title: "Meditation", src: "/admin-img/blog.png" },
   ];
 
