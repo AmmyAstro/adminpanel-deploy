@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { TbEdit } from "react-icons/tb";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdCancel  } from "react-icons/md";
 export default function BannerManager() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,12 +43,7 @@ export default function BannerManager() {
             <div className="flex justify-between items-center border-b pb-2 mb-4">
               <h6 className="text-lg font-semibold">Add Banner Image</h6>
               <button onClick={() => setIsOpen(false)}>
-                <Image
-                  src="/img/square-x.png"
-                  alt="close"
-                  width={20}
-                  height={20}
-                />
+                <MdCancel className="text-2xl text-gray-600 hover:text-red-500" />
               </button>
             </div>
 
