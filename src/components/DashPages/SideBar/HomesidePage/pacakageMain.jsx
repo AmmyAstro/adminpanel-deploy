@@ -11,7 +11,7 @@ export default function PacakageMain() {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="w-full bg-[rgba(184,174,186,0.327)] p-6">
+        <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
             <div className="max-w-5xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-semibold">Manage Wallet Packages</h3>

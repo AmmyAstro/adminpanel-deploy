@@ -5,7 +5,7 @@ import CustomInput from "@/components/Custom/CustomInput";
 
 export default function AddTestimonial() {
   return (
-    <div className="bg-[#928f8f34] w-full  ml-0 p-6">
+    <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div className="m-4 bg-white shadow-md rounded-lg p-6">
    
         <h2 className="text-xl font-bold text-[#2c0a4d] mb-6">

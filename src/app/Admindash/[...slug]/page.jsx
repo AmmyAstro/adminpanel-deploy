@@ -9,6 +9,7 @@ import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
 import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/addTestimonial";
 import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
 import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
+import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
 
 export default function Kundlipage() {
   const params = useParams();
@@ -26,6 +27,7 @@ export default function Kundlipage() {
     addtesti: <AddTestimonial />,
     couponmain: <CouponMain/>,
     pacakagemain: <PacakageMain/>,
+    blogmain: <BlogMain/>,
 
   };
 
