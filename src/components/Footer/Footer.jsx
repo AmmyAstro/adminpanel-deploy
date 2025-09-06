@@ -9,16 +9,16 @@ const Footer = () => {
       </div>
       <div className="mt-2 w-full md:mt-0">
         <ul className="text-[.6rem] md:text-[.8rem] font-semibold flex gap-4 text-yellow-400 justify-center  md:text-right">
-          <li>
+          <li className='hover:scale-103 transition'>
             <Link href="https://dhwaniastro.com/about-us">About Us</Link>
           </li>
-          <li>
+          <li className='hover:scale-103 transition'>
             <Link href="https://dhwaniastro.com/terms-and-conditions-for-astrologer">Terms & Conditions</Link>
           </li>
-          <li>
+          <li className='hover:scale-103 transition'>
             <Link href="https://dhwaniastro.com/privacy-policy">Privacy Policy</Link>
           </li>
-          <li>
+          <li className='hover:scale-103 transition'>
             <Link href="https://dhwaniastro.com/contact-us">Support</Link>
           </li>
         </ul>

@@ -35,7 +35,7 @@ export default function SideBarMain({ type }) {
           <Link
             key={index}
             href={item.href}
-            className={`flex items-center md:justify-start justify-center gap-3 px-2 md:px-4 py-2  transition ${
+            className={`flex items-center md:justify-start justify-center gap-3 px-2 md:px-3 py-2  transition ${
               isActive
                 ? "bg-yellow-500 rounded-full text-black scale-105"
                 : "hover:bg-[#ffffff14] hover:scale-105 hover:text-white"

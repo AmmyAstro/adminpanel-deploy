@@ -20,7 +20,7 @@ const cards = [
   {
     title: "Astrologers",
     img: "/admin-img/gif/ast.gif",
-    link: "/astrologer",
+    link: "/Admindash/astromain",
     bg: "bg-[#C683D7]",
   },
   {
@@ -90,7 +90,7 @@ const cards = [
   {
     title: "Privilege Manager",
     img: "/admin-img/prm.gif",
-    link: "/priviman",
+    link: "/Admindash/privilegemain",
     bg: "bg-[#7569b6da]",
     rounded: true,
   },

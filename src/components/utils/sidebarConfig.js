@@ -43,6 +43,21 @@ const sidebarConfig = {
         { name: "Create Blog", href: "#", img: <MdOutlineContactPage /> },
         { name: "Edit Blog", href: "#", img: <MdOutlineContactPage /> },
     ],
+    previlegeSide: [
+        { name: "Previlege Manager", href: "#", img: <PiListBulletsBold /> },
+        { name: "Staff Manager", href: "/Admindash/privilegemain/staffmain", img: <MdOutlineContactPage /> },
+    ],
+    astrologerSide: [
+        { name: "Astrologer List", href: "#", img: <PiListBulletsBold /> },
+        { name: "New Astrologer List", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Add Astrologer", href: "/Admindash/astromain/addastro", img: <MdOutlineContactPage /> },
+        { name: "Astrologer Revenue", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Astrologer Reviews", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Online History", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Offline History", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Call Logs", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Chat Logs", href: "#", img: <MdOutlineContactPage /> },
+    ],
 };
 
 export default sidebarConfig;
