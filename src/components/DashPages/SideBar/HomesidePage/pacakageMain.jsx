@@ -2,6 +2,7 @@
 
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
+import Link from "next/link";
 import { useState } from "react";
 import { MdDelete, MdCancel } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
@@ -9,7 +10,7 @@ import { TbEdit } from "react-icons/tb";
 
 export default function PacakageMain() {
     const [open, setOpen] = useState(false);
-
+    // const offers = ["₹50", "₹100", "₹200", "More"];
     return (
         <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
             <div className="max-w-5xl mx-auto">
@@ -17,7 +18,7 @@ export default function PacakageMain() {
                     <h3 className="text-xl font-semibold">Manage Wallet Packages</h3>
                     <CustomButton variant={"green"}
                         onClick={() => setOpen(true)}
-                        className="">
+                        className="px-3 py-1">
                         Add Package
                     </CustomButton>
                 </div>
@@ -118,6 +119,7 @@ export default function PacakageMain() {
                             </div>
                         </div>
                     </div>
+                  
                 )}
 
                 <div className="mt-10">
