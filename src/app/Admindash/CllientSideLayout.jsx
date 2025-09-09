@@ -55,5 +55,5 @@ export default function ClientSideLayout({ children }) {
             <main className={`${isDashboardRoot ? "ml-0" : "ml-20 md:ml-48"} flex-1 h-[calc(100vh-3.5rem-2.5rem)] mt-0 mb-0 overflow-y-auto p-5`}>{children}</main>
         </div>
 
-    );
+    );  
 }
