@@ -5,8 +5,12 @@ import {
   fetchAstroFailure,
 } from "../slices/astroSlice";
 
-function fetchAstroApi() {
-  return fetch("/api/astro").then((res) => res.json());
+// function fetchAstroApi() {
+//   return fetch("/api/astro").then((res) => res.json());
+// }
+async function fetchAstroApi() {
+  const res = await fetch("/api/astro");
+  return res.json();
 }
 
 function* fetchAstroWorker() {
