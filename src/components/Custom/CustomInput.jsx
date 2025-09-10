@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 export default function CustomInput({ label, type, error, ...props }) {

@@ -1,17 +1,16 @@
+'use client';
 import React, { useEffect, useState } from "react";
-// import { localStorageHelper } from "../../src/helpers/localStorageHelper";
-// import toast from "react-hot-toast";
+
 
 const variantClasses = {
-  purple:
-    "bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 hover:bg-purple-600 text-white rounded-full px-8 py-2",
-  green:
-    "bg-green-500 hover:bg-green-700 text-white md:px-4 md:py-2 px-2 py-2 rounded-full",
-  gray: "bg-gray-400 hover:bg-gray-700 text-white md:px-4 md:py-2 px-2 py-2 rounded-full",
+  green: 
+    "bg-green-500 hover:bg-green-700 text-white  rounded-full transition",
+  gray: "bg-gray-400 hover:bg-gray-700 text-white  rounded-full transition",
+  red: "bg-red-400 hover:bg-red-700 text-white  rounded-full transition",
   yellow:
-    " text-xs justify-end items-end self-end bg-yellow-500 text-white md:px-4 md:py-2 px-2 py-1 rounded-full",
+    "  bg-yellow-500 hover:bg-yellow-600 rounded-full transition",
 
- 
+
 };
 export default function CustomButton({
   type = "button",
@@ -19,7 +18,7 @@ export default function CustomButton({
   className = "",
   children,
   variant,
-  ...props
+  ...props 
 }) {
   const [isMounted, setIsMounted] = useState(false);
 

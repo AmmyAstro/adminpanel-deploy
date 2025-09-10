@@ -12,7 +12,7 @@ export default function Homeside() {
     { href: "/Admindash/giftpage", title: "Add Gifts", src: "/admin-img/gift.png" },
     { href: "/Admindash/managecms", title: "Manage CMS", src: "/admin-img/lead.png" },
     { href: "/Admindash/addtesti", title: "Testimonials", src: "/admin-img/testimonials.png" },
-    { href: "#", title: "Meditation", src: "/admin-img/blog.png" },
+    { href: "/Admindash/blogmain", title: "Blog", src: "/admin-img/blog.png" },
   ];
 
   return (

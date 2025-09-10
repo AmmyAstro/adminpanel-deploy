@@ -30,7 +30,7 @@ export default function Giftpage() {
   };
 
   return (
-    <div className="w-full bg-purple-100/30 p-6 rounded-lg">
+    <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="heading-banner">Gifts</h3>

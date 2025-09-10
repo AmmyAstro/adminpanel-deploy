@@ -1,4 +1,4 @@
-// components/Header.jsx
+
 "use client";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,7 +10,7 @@ export default function Header() {
   const [isNotifMenuOpen, setNotifMenuOpen] = useState(false);
 
   return (
-    <header className="flex items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
+    <header className="fixed top-0 w-full left-0 flex h-[3.5rem] items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
 
       <div className="flex items-center gap-2">
         <Link href="/">

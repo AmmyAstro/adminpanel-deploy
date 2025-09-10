@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { TbEdit } from "react-icons/tb";
 import { MdDelete, MdCancel  } from "react-icons/md";
+import CustomButton from "@/components/Custom/CustomButtom";
 export default function BannerManager() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -35,7 +36,7 @@ export default function BannerManager() {
   ]);
 
   return (
-    <div className=" bg-gray-100 rounded-lg mt-10">
+    <div className=" ml-0 bg-[#928f8f34] p-6 rounded-lg">
 
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -131,11 +132,11 @@ export default function BannerManager() {
       {/* Top Section */}
       <div className="flex justify-between items-center p-4">
         <h3 className="heading-banner">Manage Banners</h3>
-        <button
+        <CustomButton variant={"green"}
           onClick={() => setIsOpen(true)}
-          className="px-4 py-2 bg-green-600 text-white rounded-full" >
+          className="px-3 py-1" >
           Add New Banner
-        </button>
+        </CustomButton>
       </div>
 
       {/* Banner List */}

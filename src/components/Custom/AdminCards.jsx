@@ -1,4 +1,3 @@
-// components/DashboardCards.jsx
 "use client";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +20,7 @@ const cards = [
   {
     title: "Astrologers",
     img: "/admin-img/gif/ast.gif",
-    link: "/astrologer",
+    link: "/Admindash/astromain",
     bg: "bg-[#C683D7]",
   },
   {
@@ -91,7 +90,7 @@ const cards = [
   {
     title: "Privilege Manager",
     img: "/admin-img/prm.gif",
-    link: "/priviman",
+    link: "/Admindash/privilegemain",
     bg: "bg-[#7569b6da]",
     rounded: true,
   },
@@ -139,9 +138,9 @@ export default function AdminCards() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-7 pt-6 h-full px-15 ">
       {cards.map((card, idx) => (
-        <Link className="mb-5" key={idx} href={card.link}>
+        <Link className="" key={idx} href={card.link}>
           <div
-            className={`h-full flex flex-col items-center justify-center rounded-xl p-6  text-white shadow-lg cursor-pointer transition-transform hover:scale-105 ${card.bg}`}
+            className={`h-full flex flex-col items-center justify-center rounded-xl p-5  text-white shadow-lg cursor-pointer transition-transform hover:scale-105 ${card.bg}`}
           >
             <div className="mb-3">
               <Image
@@ -149,6 +148,7 @@ export default function AdminCards() {
                 alt={card.title}
                 width={60}
                 height={60}
+                unoptimized
                 className={card.rounded ? "rounded-full" : ""}
               />
             </div>

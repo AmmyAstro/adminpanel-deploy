@@ -12,7 +12,7 @@ export default function CouponMain() {
         console.log("Form submitted!");
     };
     return (
-        <div className=" ml-0 bg-[#928f8f34] p-6">
+        <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
             {isCoupOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
                     <div className="bg-white rounded-lg flex flex-col gap-3 shadow-lg w-[60%] p-6">
@@ -168,13 +168,13 @@ export default function CouponMain() {
                             <div className="flex gap-6 items-center justify-center mt-6">
                                 <CustomButton variant={"green"}
                                     type="submit"
-                                    className=""
+                                    className="px-3 py-1"
                                 >
                                     Submit
                                 </CustomButton>
                                 <CustomButton variant={"gray"}
                                     type="reset"
-                                    className=""
+                                    className="px-3 py-1"
                                 >
                                     Reset
                                 </CustomButton>
@@ -186,7 +186,7 @@ export default function CouponMain() {
             <div className="bg-white shadow-md rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">Manage Coupons</h3>
-                    <CustomButton variant={"green"} href="/admindash/couponmain" onClick={() => setCoupOpen(true)} className="">
+                    <CustomButton variant={"green"} href="/admindash/couponmain" onClick={() => setCoupOpen(true)} className="px-3 py-1">
 
                         Add New Coupon
 

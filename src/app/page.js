@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
@@ -90,12 +91,12 @@ export default function LoginForm() {
 
         <p className="text-center text-sm text-gray-600 mt-4">
           Don’t have an account?{" "}
-          <a
+          <Link
             href="#"
             className="text-purple-600 font-semibold hover:underline"
           >
             Sign Up
-          </a>
+          </Link>
         </p>
       </div>
     </div>

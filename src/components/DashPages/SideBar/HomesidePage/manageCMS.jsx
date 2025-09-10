@@ -2,7 +2,7 @@
 
 export default function ManageCMS() { 
   return (
-    <section className="w-full px-6 py-8">
+    <section className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div>
         <h3 className="text-2xl font-bold mb-6">Welcome to manage cms </h3>
 
