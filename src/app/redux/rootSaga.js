@@ -1,6 +1,7 @@
+// redux/sagas/rootSaga.js
 import { all } from "redux-saga/effects";
-import astroSaga from "./sagas/astroSaga";
+import loginSaga from "./saga/loginSaga";
 
 export default function* rootSaga() {
-  yield all([astroSaga()]);
+  yield all([loginSaga()]);
 }

@@ -136,7 +136,7 @@ const cards = [
 
 export default function AdminCards() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-7 pt-6 h-full px-15 ">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-7 pt-6 h-full px-15 z-50">
       {cards.map((card, idx) => (
         <Link className="" key={idx} href={card.link}>
           <div
@@ -155,7 +155,7 @@ export default function AdminCards() {
             <div className="text-center text-[#5a146f]">
               <p className="font-semibold ">{card.title}</p>
               {card.subtitle && (
-                <span className="block  text-sm opacity-90">{card.subtitle}</span>
+                <span className="block  text-sm ">{card.subtitle}</span>
               )}
             </div>
           </div>

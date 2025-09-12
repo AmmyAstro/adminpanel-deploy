@@ -1,8 +1,9 @@
-import { combineReducers } from "redux";
-import astroReducer from "./slices/astroSlice";
+// redux/rootReducer.js
+import { combineReducers } from "@reduxjs/toolkit";
+import loginReducer from "./slices/loginSlice";
 
 const rootReducer = combineReducers({
-  astro: astroReducer,
+  login: loginReducer,
 });
 
 export default rootReducer;

@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { loginRequest } from "./redux/slices/loginSlice";
+
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const { loading, user, token, error } = useSelector((state) => state.login);
 
   const handleMobileChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
@@ -16,12 +22,14 @@ export default function LoginForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login attempt:", { mobile, password });
-
+    dispatch(loginRequest({ mobile, password }));
   };
-  const goToDashboard = () => {
-    router.push('/Admindash')
-  }
+
+  useEffect(() => {
+    if (token) {
+      router.push("/Admindash");
+    }
+  }, [token, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -82,12 +90,17 @@ export default function LoginForm() {
           </div>
 
           <button
-            type="submit" onClick={goToDashboard}
-            className="w-full rounded-lg bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition"
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
           >
-            Sign In
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
+
+        {error && (
+          <p className="text-center text-red-500 text-sm mt-2">{error}</p>
+        )}
 
         <p className="text-center text-sm text-gray-600 mt-4">
           Don’t have an account?{" "}
