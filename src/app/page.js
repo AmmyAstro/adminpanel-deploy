@@ -92,7 +92,7 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-fit place-self-center px-10  rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
+            className="w-fit place-self-center px-10 self-center justify-self-center   rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
           >
           {loading ? "Signing in..." : "Sign In"}
           </button>
