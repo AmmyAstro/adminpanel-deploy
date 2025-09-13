@@ -5,11 +5,34 @@ import Link from "next/link";
 import { useState } from "react";
 import { PiChatTeardropTextFill } from "react-icons/pi";
 import { IoNotifications } from "react-icons/io5";
-import Pricing from "../Custom/Pricing";
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/redux/slices/loginSlice";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import CustomButton from "../Custom/CustomButtom";
+
 export default function Header() {
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const [isNotifMenuOpen, setNotifMenuOpen] = useState(false);
   const [isPricingOpen, setPricing] = useState(false);
+
+
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+
+    Cookies.remove("accessToken");
+
+
+    localStorage.removeItem("accessToken");
+
+    dispatch(logout());
+
+
+    router.push("/login");
+  };
+
 
   return (
     <header className="fixed top-0 z-100 w-full left-0 flex h-[3.5rem] items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
@@ -77,26 +100,20 @@ export default function Header() {
               >
                 Profile
               </Link>
-                      <Link
+              <Link
                 href="#"
                 className="block px-4 py-2 text-sm hover:bg-gray-100"
               >
                 Settings
               </Link>
-              <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+              <CustomButton onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" >
                 Logout
-              </button>
+              </CustomButton>
+
             </div>
           )}
         </div>
-
-
       </div>
-      {/* {isPricingOpen && (
-        <div className="absolute bg-[#000] right-30 top-10 z-999999 w-7xl p-5   border rounded-2xl shadow-md">
-          <Pricing />
-        </div>
-      )} */}
     </header>
   );
 }

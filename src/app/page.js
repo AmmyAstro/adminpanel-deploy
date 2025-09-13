@@ -57,7 +57,7 @@ export default function LoginForm() {
               inputMode="numeric"
               required
               placeholder="Enter phone number"
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="mt-1 w-full rounded-full border border-gray-200  px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
 
@@ -77,14 +77,14 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter password"
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="mt-1 w-full rounded-full border border-gray-200 px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                className="absolute inset-y-0 right-3 flex items-center text-xs text-purple-500 font-semibold"
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
@@ -92,9 +92,9 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
+            className="w-fit place-self-center px-10  rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign In"}
+          {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
