@@ -99,7 +99,7 @@ export default function LoginForm() {
         </form>
 
         {error && (
-          <p className="text-center text-red-500 text-sm mt-2">{error}</p>
+          <p className="text-center text-red-600  text-sm mt-2">{error}</p>
         )}
 
         <p className="text-center text-sm text-gray-600 mt-4">
