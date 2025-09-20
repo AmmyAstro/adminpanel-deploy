@@ -51,6 +51,7 @@ const sidebarConfig = {
         { name: "Astrologer List", href: "#", img: <PiListBulletsBold /> },
         { name: "New Astrologer List", href: "#", img: <MdOutlineContactPage /> },
         { name: "Add Astrologer", href: "/Admindash/astromain/addastro", img: <MdOutlineContactPage /> },
+        { name: "Astrologer Profile", href: "/Admindash/astromain/astroprofile", img: <MdOutlineContactPage /> },
         { name: "Astrologer Revenue", href: "#", img: <MdOutlineContactPage /> },
         { name: "Astrologer Reviews", href: "#", img: <MdOutlineContactPage /> },
         { name: "Online History", href: "#", img: <MdOutlineContactPage /> },

@@ -13,6 +13,7 @@ import PrivilegeMain from "@/components/DashPages/PrivilegeManager/PrivilegeMain
 import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
 import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
+import AstroProfile from "@/components/DashPages/Astrologer/AstroProfile";
 
 export default function Kundlipage() {
   const params = useParams();
@@ -41,6 +42,8 @@ export default function Kundlipage() {
     banner: <BannerManager />,
     staffmain: <Staffmain />,
     addastro: <AddAstro />,
+    astroprofile: <AstroProfile />,
+
   };
 
   let Componentrender = null;

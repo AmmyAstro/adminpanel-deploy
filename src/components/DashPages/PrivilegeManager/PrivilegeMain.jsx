@@ -60,6 +60,7 @@ export default function PrivilegeMain() {
   };
 
   return (
+    <div className="min-h-screen ">
     <div className="mx-auto my-6 bg-white shadow-lg rounded-xl p-6">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold text-gray-800">Privilege Manager</h3>
@@ -163,6 +164,7 @@ export default function PrivilegeMain() {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 }

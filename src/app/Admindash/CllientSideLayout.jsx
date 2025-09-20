@@ -52,7 +52,7 @@ export default function ClientSideLayout({ children }) {
             {showBlog && <SideBarMain type="blogSide" />}
             {showPrevilege && <SideBarMain type="previlegeSide" />}
             {showAstrologer && <SideBarMain type="astrologerSide" />}
-            <main className={`${isDashboardRoot ? "ml-0" : "ml-20 md:ml-48"} flex-1 h-[calc(100vh-3.5rem-2.5rem)] mt-0 mb-0 overflow-y-auto p-5`}>{children}</main>
+            <main className={`${isDashboardRoot ? "ml-0" : "ml-20 md:ml-48"} flex-1 h-[calc(100vh-3.5rem-2.5rem)] mt-0 mb-0 overflow-y-auto bg-gray-100  py-6 px-8`}>{children}</main>
         </div>
 
     );  

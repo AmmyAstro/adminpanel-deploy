@@ -5,11 +5,9 @@ import { loginRequest, loginSuccess, loginFailure } from "../slices/loginSlice";
 
 function* loginUser(action) {
   try {
-    const response = yield call(axios.post, "http://localhost:5000/auth/login", action.payload);
+    const response = yield call(axios.post, "http://localhost:5000/api/login", action.payload);
 
     const data = response.data;
-
-    console.log("Login Response:", data);
 
     localStorage.setItem("accessToken", data.accessToken);
     Cookies.set("accessToken", data.accessToken, { expires: 1 }); 

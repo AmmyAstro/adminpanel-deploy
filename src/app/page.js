@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { loginRequest } from "./redux/slices/loginSlice";
+import Image from "next/image";
 
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
@@ -32,15 +32,22 @@ export default function LoginForm() {
   }, [token, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0000004b] px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+        <Image
+          src="/admin-img/adlogo.png"
+          alt="logo"
+          width={140}
+          height={140}
+          className="mx-auto mb-6"
+        />
         <h2 className="text-2xl font-bold text-center mb-2">Sign In</h2>
         <p className="text-center text-gray-600 mb-6">
           Enter your credentials to continue
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col items-center justify-center">
+          <div className="w-full">
             <label
               htmlFor="mobile"
               className="block text-sm font-medium text-gray-700"
@@ -61,7 +68,7 @@ export default function LoginForm() {
             />
           </div>
 
-          <div>
+          <div className="w-full relative">
             <label
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
@@ -99,18 +106,9 @@ export default function LoginForm() {
         </form>
 
         {error && (
-          <p className="text-center text-red-600  text-sm mt-2">{error}</p>
+          <p className="err-blink text-center  text-red-600  text-sm mt-2">{error}</p>
         )}
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          Don’t have an account?{" "}
-          <Link
-            href="#"
-            className="text-purple-600 font-semibold hover:underline"
-          >
-            Sign Up
-          </Link>
-        </p>
       </div>
     </div>
   );

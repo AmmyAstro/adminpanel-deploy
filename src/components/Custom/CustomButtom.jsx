@@ -6,23 +6,16 @@ const variantClasses = {
   green: 
     "bg-green-500 hover:bg-green-700 text-white  rounded-full transition",
   gray: "bg-gray-400 hover:bg-gray-700 text-white  rounded-full transition",
+  black: "bg-black hover:bg-gray-700 text-white  rounded-full transition",
+
   red: "bg-red-400 hover:bg-red-700 text-white  rounded-full transition",
   yellow:
     "  bg-yellow-500 hover:bg-yellow-600 rounded-full transition",
 
 
 };
-export default function CustomButton({
-  type = "button",
-  onClick,
-  className = "",
-  children,
-  variant,
-  ...props 
-}) {
+export default function CustomButton({ type = "button", onClick,className = "",children,variant,...props }) {
   const [isMounted, setIsMounted] = useState(false);
-
-
 
   const loginpopup = () => {
     toast.error("Your Are Offline Please Connect to Login");
