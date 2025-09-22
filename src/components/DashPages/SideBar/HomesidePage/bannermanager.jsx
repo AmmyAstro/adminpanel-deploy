@@ -23,8 +23,7 @@ export default function BannerManager() {
     bannerlink: "",
     // image: null,
     language: "en",
-    imageUrl:"hello"
-    
+    imageUrl: "hello"
   });
 
 
@@ -35,13 +34,17 @@ export default function BannerManager() {
       ...prev,
       [name]: type === "file" ? files[0] : value,
     }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "sortorder" ? Number(value) : value, 
+    }));
   };
 
-const handleSubmit = () => {
-dispatch(sendbannerRequest({formData})); 
-   console.log("asaS",formData);
+  const handleSubmit = () => {
+    dispatch(sendbannerRequest({ formData }));
+    console.log("asaS", formData);
 
-};
+  };
 
 
 
@@ -146,8 +149,8 @@ dispatch(sendbannerRequest({formData}));
               <div className="flex justify-center">
                 <CustomButton
                   variant="green"
-              onClick={handleSubmit}
-              
+                  onClick={handleSubmit}
+
                   className="w-fit px-10 rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
                 >
                   Submit

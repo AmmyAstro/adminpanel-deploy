@@ -13,7 +13,7 @@ export default function LoginForm() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { loading, user, token, error } = useSelector((state) => state.login);
+  const { loading, user, token, error } = useSelector((state) => state.login || {});
 
   const handleMobileChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
@@ -46,7 +46,10 @@ export default function LoginForm() {
           Enter your credentials to continue
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col items-center justify-center">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 flex flex-col items-center justify-center"
+        >
           <div className="w-full">
             <label
               htmlFor="mobile"
@@ -99,16 +102,15 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-fit place-self-center px-10 self-center justify-self-center   rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
+            className="w-fit place-self-center px-10 self-center justify-self-center rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
           >
-          {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         {error && (
-          <p className="err-blink text-center  text-red-600  text-sm mt-2">{error}</p>
+          <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>
         )}
-
       </div>
     </div>
   );
