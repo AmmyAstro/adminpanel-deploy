@@ -69,7 +69,7 @@ const CSC = () => {
   }, [cityQuery, cities]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid col-span-3 grid-cols-1 md:grid-cols-3 gap-6">
       <div>
         <label className="block text-sm font-medium text-gray-500 mb-1">Country</label>
         <select

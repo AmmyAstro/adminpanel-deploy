@@ -57,7 +57,7 @@ export default function AstrologerMain() {
     };
 
     return (
-        <div className="w-full bg-gray-100 p-6 rounded-lg">
+        <div className="w-full ">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-center bg-[#7a5ba3] p-4 rounded-lg mb-6">
                 <span className="text-xl font-semibold text-white">

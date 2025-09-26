@@ -5,12 +5,37 @@ import Link from "next/link";
 import { useState } from "react";
 import { PiChatTeardropTextFill } from "react-icons/pi";
 import { IoNotifications } from "react-icons/io5";
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/redux/slices/loginSlice";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import CustomButton from "../Custom/CustomButtom";
+
 export default function Header() {
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const [isNotifMenuOpen, setNotifMenuOpen] = useState(false);
+  const [isPricingOpen, setPricing] = useState(false);
+
+
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+
+    Cookies.remove("accessToken");
+
+
+    localStorage.removeItem("accessToken");
+
+    dispatch(logout());
+
+
+    router.push("/login");
+  };
+
 
   return (
-    <header className="fixed top-0 w-full left-0 flex h-[3.5rem] items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
+    <header className="fixed top-0 z-100 w-full left-0 flex h-[3.5rem] items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
 
       <div className="flex items-center gap-2">
         <Link href="/">
@@ -34,6 +59,21 @@ export default function Header() {
 
 
       <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 relative rounded-full bg-[#ffffff1d] px-3 py-2 border-1 border-[#ffffff36]">
+          <button onClick={() => setNotifMenuOpen(!isNotifMenuOpen)}>
+            <PiChatTeardropTextFill className="text-2xl text-white" />
+          </button>
+          <button onClick={() => setPricing(!isPricingOpen)}>
+            <IoNotifications className="text-2xl text-white" />
+          </button>
+
+
+          {isNotifMenuOpen && (
+            <div className="absolute right-0 top-8 w-48 bg-white border rounded-lg shadow-md">
+              <p className="px-4 py-2 text-sm text-gray-600">No new messages</p>
+            </div>
+          )}
+        </div>
 
         <div className="relative">
           <button
@@ -53,32 +93,23 @@ export default function Header() {
             />
           </button>
           {isUserMenuOpen && (
-            <div className="absolute text-black right-0 mt-2 w-40 bg-white border rounded-lg shadow-md">
+            <div className="absolute text-black right-0 mt-2 w-40 bg-white border overflow-hidden rounded-lg shadow-md">
               <Link
-                href="#"
+                href="/Admindash/astroprofile"
                 className="block px-4 py-2 text-sm hover:bg-gray-100"
               >
                 Profile
               </Link>
-              <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+              <Link
+                href="#"
+                className="block px-4 py-2 text-sm hover:bg-gray-100"
+              >
+                Settings
+              </Link>
+              <CustomButton onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" >
                 Logout
-              </button>
-            </div>
-          )}
-        </div>
+              </CustomButton>
 
-        <div className="flex items-center gap-4 relative rounded-full bg-[#ffffff1d] px-3 py-2 border-1 border-[#ffffff36]">
-          <button onClick={() => setNotifMenuOpen(!isNotifMenuOpen)}>
-            <PiChatTeardropTextFill className="text-2xl text-white" />
-          </button>
-          <button>
-            <IoNotifications className="text-2xl text-white" />
-          </button>
-
-
-          {isNotifMenuOpen && (
-            <div className="absolute right-0 top-8 w-48 bg-white border rounded-lg shadow-md">
-              <p className="px-4 py-2 text-sm text-gray-600">No new messages</p>
             </div>
           )}
         </div>

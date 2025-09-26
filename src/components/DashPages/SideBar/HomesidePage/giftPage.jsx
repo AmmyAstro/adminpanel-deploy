@@ -1,37 +1,44 @@
 "use client";
-
+import { useDispatch } from "react-redux";
+import { addGiftRequest } from "@/app/redux/slices/addGiftSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
+import CustomDropdown from "@/components/Custom/CustomDropdown";
+import CustomInput from "@/components/Custom/CustomInput";
 import { useState } from "react";
 
+
 export default function Giftpage() {
+    const dispatch = useDispatch();
+
   const [showForm, setShowForm] = useState(false);
   const [gifts, setGifts] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    amount: "",
+    amount: 0,
     status: "",
-    image: null,
+    // image: null,
   });
 
   const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "image") {
-      setFormData({ ...formData, image: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    // if (name === "image") {
+    //   setFormData({ ...formData, image: files[0] });
+    // } else {
+    //   setFormData({ ...formData, [name]: value });
+    // }
+        setFormData((prev) => ({
+      ...prev,
+      [name]: name === "amount" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setGifts([...gifts, formData]);
-    setFormData({ title: "", amount: "", status: "", image: null });
-    setShowForm(false);
+    dispatch(addGiftRequest({ formData }));
+       console.log("asaS", formData);
   };
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="heading-banner">Gifts</h3>
         <CustomButton variant={"green"}
@@ -42,90 +49,84 @@ export default function Giftpage() {
         </CustomButton>
       </div>
 
-      {/* Gift Form */}
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-lg shadow-md mb-6"
-        >
+        <div className="bg-white p-6 rounded-lg flex flex-col gap-5 shadow-md mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">Title</label>
-              <input
+              <CustomInput
+                label="Title"
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="border rounded-md p-2 outline-none"
+                className=" p-2 outline-none"
                 placeholder="Enter gift title"
                 required
               />
             </div>
 
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">Amount</label>
-              <input
-                type="text"
+              <CustomInput
+                label="Amount"
+                  type="number"
                 name="amount"
                 value={formData.amount}
                 onChange={handleInputChange}
-                className="border rounded-md p-2 outline-none"
+                className="  p-2 outline-none"
                 placeholder="Enter amount"
                 required
               />
             </div>
 
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">Status</label>
-              <select
+
+              <CustomDropdown
+                label="Status"
+                id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
-                className="border rounded-md p-2 outline-none"
                 required
-              >
-                <option value="" hidden>
-                  Select Status
-                </option>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Image Upload + Buttons */}
-          <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Upload Image
-              </label>
-              <input
-                type="file"
-                name="image"
-                onChange={handleInputChange}
-                className="border p-2 rounded-md"
+                options={[
+                  { value: "ac", label: "Active" },
+                  { value: "in", label: "Inactive" },
+                ]}
               />
             </div>
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                Submit
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
+            {/* <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Upload Image
+                </label>
+                <input
+                  type="file"
+                  name="image"
+                  onChange={handleInputChange}
+                  className="border p-2 rounded-md"
+                />
+              </div>
+
+            </div> */}
           </div>
-        </form>
+
+
+          <div className="flex gap-4">
+            <CustomButton variant={"green"}
+              type="submit" 
+              onClick={handleSubmit}
+              className="px-4 py-2  hover:bg-green-700" >
+              Submit
+            </CustomButton>
+            <CustomButton variant={"gray"}
+              type="button"
+              // onClick={handleSubmit}
+              className="px-4 py-2  hover:bg-gray-500" >
+              Cancel
+            </CustomButton>
+          </div>
+        </div>
       )}
 
-      {/* Gift List */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h5 className="text-lg font-semibold mb-4">Gift List</h5>
         {gifts.length === 0 ? (

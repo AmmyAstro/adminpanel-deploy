@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { loginRequest } from "./redux/slices/loginSlice";
+import Image from "next/image";
+
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const { loading, user, token, error } = useSelector((state) => state.login || {});
 
   const handleMobileChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
@@ -16,23 +22,35 @@ export default function LoginForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login attempt:", { mobile, password });
-
+    dispatch(loginRequest({ mobile, password }));
   };
-  const goToDashboard = () => {
-    router.push('/Admindash')
-  }
+
+  useEffect(() => {
+    if (token) {
+      router.push("/Admindash");
+    }
+  }, [token, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0000004b] px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+        <Image
+          src="/admin-img/adlogo.png"
+          alt="logo"
+          width={140}
+          height={140}
+          className="mx-auto mb-6"
+        />
         <h2 className="text-2xl font-bold text-center mb-2">Sign In</h2>
         <p className="text-center text-gray-600 mb-6">
           Enter your credentials to continue
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 flex flex-col items-center justify-center"
+        >
+          <div className="w-full">
             <label
               htmlFor="mobile"
               className="block text-sm font-medium text-gray-700"
@@ -49,11 +67,11 @@ export default function LoginForm() {
               inputMode="numeric"
               required
               placeholder="Enter phone number"
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="mt-1 w-full rounded-full border border-gray-200  px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
 
-          <div>
+          <div className="w-full relative">
             <label
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
@@ -69,35 +87,30 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter password"
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="mt-1 w-full rounded-full border border-gray-200 px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                className="absolute inset-y-0 right-3 flex items-center text-xs text-purple-500 font-semibold"
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
 
           <button
-            type="submit" onClick={goToDashboard}
-            className="w-full rounded-lg bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition"
+            type="submit"
+            disabled={loading}
+            className="w-fit place-self-center px-10 self-center justify-self-center rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
           >
-            Sign In
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          Don’t have an account?{" "}
-          <Link
-            href="#"
-            className="text-purple-600 font-semibold hover:underline"
-          >
-            Sign Up
-          </Link>
-        </p>
+        {error && (
+          <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>
+        )}
       </div>
     </div>
   );
