@@ -3,9 +3,16 @@ import CustomToggle from "@/components/Custom/CustomToggle";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa6";
+import AstroProfiledata from "@/components/Data/AstroProifledata";
+import CustomInput from "@/components/Custom/CustomInput";
+import { MdCancel } from "react-icons/md";
 
 export default function AstroProfile() {
-
+    const [activeTab, setActiveTab] = useState("call");
+    const [openPopup, setOpenPopUp] = useState(false)
+    const openWallet = openPopup => {
+        setOpenPopUp(true);
+    }
     const [availability, setAvailability] = useState({
         call: false,
         chat: false,
@@ -30,21 +37,21 @@ export default function AstroProfile() {
     const stats = [
         {
             id: 1,
-            img: "/img/earnings.png",
+            img: "/admin-img/earnings.png",
             amount: "65,000",
             label: "Total Revenue",
             prefix: "₹ ",
         },
         {
             id: 2,
-            img: "/img/investment.png",
+            img: "/admin-img/investment.png",
             amount: "5,000",
             label: "Total Earnings",
             prefix: "₹ ",
         },
         {
             id: 3,
-            img: "/img/reward.png",
+            img: "/admin-img/reward.png",
             amount: "165",
             label: "Reviews",
             prefix: "",
@@ -57,8 +64,50 @@ export default function AstroProfile() {
                 <h2 className="text-xl font-bold text-purple-900">
                     Astrologer Profile
                 </h2>
-                <CustomButton variant={"gray"} className="px-3 py-1" onClick={() => openPopup()}>Manage Wallet</CustomButton>
+                <CustomButton variant={"gray"} className="px-3 py-1" onClick={openWallet}>Manage Wallet</CustomButton>
             </div>
+            {openPopup && (
+                <div className="fixed inset-0 bg-[#00000062] bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-lg">
+
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold mb-4 text-purple-700">Manage Wallet</h3>
+                            <button
+                                onClick={() => setOpenPopUp(false)}
+                                className=" text-lg justify-start self-start text-gray-500 hover:text-gray-700 ">
+                                <MdCancel />
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-3 mb-5">
+                            <CustomInput
+                                type="text"
+                                placeholder="Enter Amount"
+                                className="  px-3 py-2 text-sm "
+                            />
+                            <CustomInput
+                                type="text"
+                                placeholder="Transaction ID / Notes"
+                                className=" px-3 py-2 text-sm "
+                            />
+                        </div>
+
+                        <div className="flex justify-center gap-3">
+                            <CustomButton variant={"green"}
+                                className="  text-white   py-2 px-5 text-sm font-semibold"
+                                onClick={() => alert("Add Money clicked")}>
+                                Add Gems
+                            </CustomButton>
+                            <CustomButton variant={"red"}
+                                className="  text-whitepx-4 py-2 px-5 text-sm font-semibold"
+                                onClick={() => alert("Withdraw clicked")}>
+                                Deduct Gems
+                            </CustomButton>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
 
             <div className="grid grid-cols-8 gap-4">
                 <div className="col-span-3 bg-white rounded-lg p-4 flex flex-col gap-2">
@@ -67,6 +116,7 @@ export default function AstroProfile() {
                         <h5 className="text-sm font-bold">Astrologers Details</h5>
                         <CustomButton variant={"black"} className="text-sm px-3 py-1 text-black" onClick={() => xy()}>Edit</CustomButton>
                     </div>
+
 
                     <div className="flex w-full flex-col py-2 px-4">
 
@@ -111,22 +161,66 @@ export default function AstroProfile() {
                         <hr className="text-gray-300" />
 
                         <div className="flex flex-col gap-2 py-3">
-                            <h6 className="text-sm font-semibold">Online Availability:</h6>
+                            <div className="flex items-center justify-between">
+                                <h6 className="text-sm font-semibold">Online Availability:</h6>     
+                                <div className="flex items-center gap-3">
+                                <CustomButton
+                                    variant={"black"}
+                                    onClick={() => alert("Edit clicked")}
+                                    className="px-2 py-[2px] text-[10px] transition"
+                                >
+                                    Edit
+                                </CustomButton>
 
-                            <CustomToggle
-                                id="call"
-                                label="Call"
-                                checked={availability.call}
-                                onChange={(val) => setAvailability({ ...availability, call: val })}
-                            />
+                            </div></div>
 
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Call
+                                </label>
+                                <div className="flex items-center gap-5">
+                                    <label className="text-sm font-semibold text-gray-700">
+                                        ₹ 30
+                                    </label>
+                                    <CustomToggle
+                                        id="chat"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, chat: val })}
+                                    />
+                                </div>
+                            </div>
 
-                            <CustomToggle
-                                id="chat"
-                                label="Chat"
-                                checked={availability.chat}
-                                onChange={(val) => setAvailability({ ...availability, chat: val })}
-                            />
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Chat
+                                </label>
+                                <div className="flex items-center gap-5">
+                                    <label className="text-sm font-semibold text-gray-700">
+                                        ₹ 20
+                                    </label>
+                                    <CustomToggle
+                                        id="chat"
+                                        checked={availability.chat}
+                                        onChange={(val) => setAvailability({ ...availability, chat: val })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Video
+                                </label>
+                                <div className="flex items-center gap-5">
+                                    <label className="text-sm font-semibold text-gray-700">
+                                        ₹ 50
+                                    </label>
+                                    <CustomToggle
+                                        id="chat"
+                                        checked={availability.video}
+                                        onChange={(val) => setAvailability({ ...availability, chat: val })}
+                                    />
+                                </div>
+                            </div>
 
 
                             <div className="grid grid-cols-2 items-center gap-3">
@@ -251,30 +345,152 @@ export default function AstroProfile() {
 
                 </div>
 
-                <div className="col-span-5 bg-white rounded-lg p-4 flex flex-col gap-2">
-                   <div className="flex items-center gap-3">
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {stats.map((item) => (
-                            <div
-                                key={item.id}
-                                className="flex flex-col items-center justify-center bg-white shadow-md rounded-xl p-6 hover:shadow-lg transition"
-                            >
-                                <Image
-                                    src={item.img}
-                                    alt={item.label}
-                                    width={50}
-                                    height={50}
-                                    className="mb-3"
-                                />
-                                <p className="text-2xl font-bold text-gray-800">
-                                    {item.prefix}
-                                    <span className="rupee">{item.amount}</span>
-                                </p>
-                                <span className="text-gray-500 text-sm">{item.label}</span>
-                            </div>
-                        ))}
+                <div className="col-span-5 bg-white rounded-lg p-4 flex flex-col gap-5">
+
+                    <div className="flex items-center gap-3 w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                            {stats.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="flex flex-col items-center justify-center bg-purple-200  shadow-2xl rounded-xl p-2 hover:shadow-lg transition"
+                                >
+                                    <Image
+                                        src={item.img}
+                                        alt={item.label}
+                                        width={40}
+                                        height={40}
+                                        className="mb-1"
+                                    />
+                                    <p className="text-xl font-bold text-gray-800">
+                                        {item.prefix}
+                                        <span className="rupee">{item.amount}</span>
+                                    </p>
+                                    <span className="text-gray-500 text-xs">{item.label}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                   </div>
+
+                    <div className="flex w-full ">
+                        <div className="p-4 rounded-2xl flex flex-col gap-3 shadow-xl   bg-white w-full">
+                            <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                                <h2 className="font-semibold text-sm text-center ">Astrologer Activities</h2>
+                                <div className="flex items-center justify-between gap-2">
+                                    <CustomButton variant={"black"} className="text-xs px-4 py-2"> Export </CustomButton>
+                                    <CustomInput placeholder="Search here...." className="px-2 py-1 placeholder:text-xs" />
+                                </div>
+                            </div>
+                            <div className="flex gap-3 justify-start">
+                                {AstroProfiledata.map((tab) => (
+                                    <button
+                                        type="button"
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`px-4 py-1 text-sm font-medium rounded-full transition ${activeTab === tab.id
+                                            ? "bg-purple-400 text-white"
+                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                            }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+
+                            <div className="p-4 shadow rounded-lg bg-purple-100">
+                                {AstroProfiledata.map(
+                                    (tab) =>
+                                        activeTab === tab.id && (
+                                            <table key={tab.id} className="w-full text-sm">
+                                                <tbody className="space-y-2">
+                                                    {tab.fields.map((field, idx) => (
+                                                        <tr key={idx} className="mb-2">
+                                                            <td className="py-2 pr-4">{field.label} :</td>
+                                                            <td>
+                                                                {field.prefix}
+                                                                <input
+                                                                    type="text"
+                                                                    name={field.name}
+                                                                    defaultValue="0"
+                                                                    maxLength="3"
+                                                                    max={field.max}
+                                                                    className="border rounded-md px-2 py-1 w-20 ml-1 text-center"
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        )
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex w-full ">
+                        <div className="p-4 rounded-2xl flex flex-col gap-3 shadow-xl   bg-white w-full">
+                            <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                                <h2 className="font-semibold text-sm text-center ">Manage Availability</h2>
+
+                            </div>
+
+                            <div className="flex items-center gap-6 ">
+                                <div className="flex flex-col gap-1 items-start justify-start">
+                                    <span className="text-xs font-semibold">LA</span>
+                                    <CustomToggle
+                                        id="call"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, call: val })}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-xs font-semibold">LA</span>
+                                    <CustomToggle
+                                        id="call"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, call: val })}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-xs font-semibold">LA</span>
+                                    <CustomToggle
+                                        id="call"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, call: val })}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-xs font-semibold">LA</span>
+                                    <CustomToggle
+                                        id="call"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, call: val })}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-xs font-semibold">LA</span>
+                                    <CustomToggle
+                                        id="call"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, call: val })}
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-xs font-semibold">LA</span>
+                                    <CustomToggle
+                                        id="call"
+                                        checked={availability.call}
+                                        onChange={(val) => setAvailability({ ...availability, call: val })}
+                                    />
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

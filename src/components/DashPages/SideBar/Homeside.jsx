@@ -11,7 +11,7 @@ export default function Homeside() {
     { href: "/Admindash/pacakagemain", title: "Add Packages", src: "/admin-img/boxo.png" },
     { href: "/Admindash/giftpage", title: "Add Gifts", src: "/admin-img/gift.png" },
     { href: "/Admindash/managecms", title: "Manage CMS", src: "/admin-img/lead.png" },
-    { href: "/Admindash/testimonialList", title: "Testimonials", src: "/admin-img/testimonials.png" },
+    { href: "/Admindash/testimonialmain", title: "Testimonials", src: "/admin-img/testimonials.png" },
     { href: "/Admindash/blogmain", title: "Blog", src: "/admin-img/blog.png" },
   ];
 

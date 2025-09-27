@@ -34,7 +34,7 @@ export default function Kundlipage() {
     blogmain: <BlogMain />,
     privilegemain: <PrivilegeMain />,
     astromain: <AstrologerMain />,
-    testimonialList: <TestimonialList />
+    testimonialmain: <TestimonialList />
 
   };
 
@@ -64,7 +64,7 @@ export default function Kundlipage() {
     if (path[0] === "astromain") {
       Componentrender = secondLevel[path[1]];
     }
-      if (path[0] === "testimonialList") {
+    if (path[0] === "testimonialmain") {
       Componentrender = secondLevel[path[1]];
     }
   }
