@@ -48,7 +48,7 @@ const sidebarConfig = {
         { name: "Staff Manager", href: "/Admindash/privilegemain/staffmain", img: <MdOutlineContactPage /> },
     ],
     astrologerSide: [
-        { name: "Astrologer List", href: "#", img: <PiListBulletsBold /> },
+        { name: "Astrologer List", href: "/Admindash/astromain/astrolist", img: <PiListBulletsBold /> },
         { name: "New Astrologer List", href: "#", img: <MdOutlineContactPage /> },
         { name: "Add Astrologer", href: "/Admindash/astromain/addastro", img: <MdOutlineContactPage /> },
         { name: "Astrologer Profile", href: "/Admindash/astromain/astroprofile", img: <MdOutlineContactPage /> },

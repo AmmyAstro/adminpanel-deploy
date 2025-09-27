@@ -7,7 +7,7 @@ export default function CustomToggle({ checked, onChange }) {
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`relative place-self-end inline-flex h-5 w-11 items-center rounded-full transition cursor-pointer ${
+        className={`relative place-self-center inline-flex h-5 w-11 items-center rounded-full transition cursor-pointer ${
           checked ? "bg-green-500" : "bg-gray-300"
         }`}
       >
