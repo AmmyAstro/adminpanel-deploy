@@ -269,6 +269,7 @@ export default function AddAstro() {
                                 </div>
                             ))}
                         </div>
+                        
                         <div className="flex w-full ">
                             <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-400  bg-white w-full">
                                 <h2 className="font-semibold text-sm text-center ">Astrologer Charges</h2>

@@ -1,11 +1,9 @@
 "use client";
 
-export default function CustomToggle({ id, label, checked, onChange }) {
+export default function CustomToggle({ checked, onChange }) {
   return (
-    <div className="grid grid-cols-2 ">
-      <label htmlFor={id} className="text-sm font-medium text-gray-700">
-        {label}
-      </label>
+    <div className="grid grid-cols-1 ">
+    
       <button
         type="button"
         onClick={() => onChange(!checked)}
