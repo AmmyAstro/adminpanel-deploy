@@ -11,7 +11,7 @@ export default function ClientSideLayout({ children }) {
         "/Admindash/razordash",
         "/Admindash/managecms",
         "/Admindash/giftpage",
-        "/Admindash/addtesti",
+        "/Admindash/testimonialmain",
         "/Admindash/couponmain",
         "/Admindash/pacakagemain",
         "/Admindash/blogmain",
@@ -21,7 +21,7 @@ export default function ClientSideLayout({ children }) {
     const showRazorRoutes = ["/Admindash/razordash"];
     const showCMSRoutes = ["/Admindash/managecms"];
     const showGiftRoutes = ["/Admindash/giftpage"];
-    const showTestimonialRoutes = ["/Admindash/addtesti"];
+    const showTestimonialRoutes = ["/Admindash/testimonialmain"];
     const showCouponRoutes = ["/Admindash/couponmain"];
     const showPackageRoutes = ["/Admindash/pacakagemain"];
     const showBlogRoutes = ["/Admindash/blogmain"];
