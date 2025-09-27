@@ -5,7 +5,7 @@ import Razordash from "@/components/DashPages/Razor/Razordash";
 import ManageCMS from "@/components/DashPages/SideBar/HomesidePage/manageCMS";
 import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannermanager";
 import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
-import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/addTestimonial";
+import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/Testimonial/addTestimonial";
 import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
 import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
 import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
@@ -14,6 +14,7 @@ import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
 import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
 import AstroProfile from "@/components/DashPages/Astrologer/AstroProfile";
+import TestimonialList from "../../../components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
 
 export default function Kundlipage() {
   const params = useParams();
@@ -28,12 +29,12 @@ export default function Kundlipage() {
     razordash: <Razordash />,
     managecms: <ManageCMS />,
     giftpage: <Giftpage />,
-    addtesti: <AddTestimonial />,
     couponmain: <CouponMain />,
     pacakagemain: <PacakageMain />,
     blogmain: <BlogMain />,
     privilegemain: <PrivilegeMain />,
     astromain: <AstrologerMain />,
+    testimonialList: <TestimonialList />
 
   };
 
@@ -43,6 +44,7 @@ export default function Kundlipage() {
     staffmain: <Staffmain />,
     addastro: <AddAstro />,
     astroprofile: <AstroProfile />,
+    addtesti: <AddTestimonial />,
 
   };
 
@@ -62,6 +64,9 @@ export default function Kundlipage() {
     if (path[0] === "astromain") {
       Componentrender = secondLevel[path[1]];
     }
+      if (path[0] === "testimonialList") {
+      Componentrender = secondLevel[path[1]];
+    }
   }
 
   return (
@@ -69,7 +74,7 @@ export default function Kundlipage() {
       {Componentrender ? (
         Componentrender
       ) : (
-        <div className="text-center text-red-600 font-semibold py-10">
+        <div className="text-center  text-red-600 font-semibold py-10">
           Page not found: <code>{path.join(" / ")}</code>
         </div>
       )}

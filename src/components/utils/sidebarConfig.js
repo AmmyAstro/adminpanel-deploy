@@ -24,9 +24,9 @@ const sidebarConfig = {
 
     ],
     testimonialSide: [
-        { name: "Testimonial List", href: "#", img: <PiListBulletsBold /> },
+        // { name: "Testimonial List", href: "/Admindash", img: <PiListBulletsBold /> },
         { name: "Video Testimonial", href: "#", img: <MdOutlineContactPage /> },
-        { name: "Add Testimonial", href: "#", img: <MdOutlineContactPage /> },
+        { name: "Add Testimonial", href: "/Admindash/testimonialList/addtesti", img: <MdOutlineContactPage /> },
     ],
     couponSide: [
         { name: "Coupon List", href: "#", img: <PiListBulletsBold /> },
