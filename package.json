@@ -10,6 +10,7 @@
     "docs": "next dev -p 4000"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.2",
     "@reduxjs/toolkit": "^2.9.0",
     "axios": "^1.12.1",
     "js-cookie": "^3.0.5",
@@ -29,6 +30,7 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
+    "prisma": "^6.16.2",
     "tailwindcss": "^4"
   }
 }
