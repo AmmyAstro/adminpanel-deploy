@@ -1,6 +1,8 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import axios from "axios";
 import Cookies from "js-cookie";   
+
+
 import { loginRequest, loginSuccess, loginFailure } from "../slices/loginSlice";
 
 function* loginUser(action) {
@@ -18,6 +20,7 @@ function* loginUser(action) {
         token: data.accessToken,
       })
     );
+
   } catch (err) {
     yield put(loginFailure(err.response?.data?.error || err.message));
   }
