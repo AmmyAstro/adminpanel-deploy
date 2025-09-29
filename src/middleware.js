@@ -1,7 +1,9 @@
+// middleware.js
 import { NextResponse } from "next/server";
+import Cookies from "js-cookie"; // ❌ yaha direct Cookies use mat kar
 
 export function middleware(req) {
-  const token = req.cookies.get("token"); 
+  const token = req.cookies.get("token"); // ✅ yahi sahi hai
   const url = req.nextUrl.pathname;
 
   if (!token && url.startsWith("/Admindash")) {
@@ -12,5 +14,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/admindash/:path*"],
+  matcher: ["/Admindash/:path*"],
 };

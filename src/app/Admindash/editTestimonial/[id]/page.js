@@ -12,6 +12,7 @@ export default function EditTestimonial({ testimonial }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { loading, error } = useSelector((s) => s.testimonials || {});
+const [isUpdated, setIsUpdated] = useState(false);
 
   const [form, setForm] = useState({
     name: testimonial?.name || "",
@@ -25,27 +26,26 @@ export default function EditTestimonial({ testimonial }) {
     status: testimonial?.status || "active",
   });
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) setForm({ ...form, [name]: files[0] });
     else setForm({ ...form, [name]: value });
   };
 
-  // Submit update
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    const formData = new FormData();
-    Object.keys(form).forEach((key) => {
-      if (form[key]) formData.append(key, form[key]);
-    });
+  const formData = new FormData();
+  Object.keys(form).forEach((key) => {
+    if (form[key]) formData.append(key, form[key]);
+  });
 
-    dispatch(updateTestimonialRequest({ id: testimonial.id, formData }));
-  };
+  dispatch(updateTestimonialRequest({ id: testimonial.id, formData }));
+  setIsUpdated(true); 
+};
 
-  // Reset form
-  const handleReset = () => {
+
+  const handleReset = (id) => {
     setForm({
       name: testimonial?.name || "",
       location: testimonial?.location || "",
@@ -59,20 +59,20 @@ export default function EditTestimonial({ testimonial }) {
     });
   };
 
-  // Show success toast & redirect after update
-  useEffect(() => {
-    if (!loading && !error) {
-      toast.success("Testimonial updated successfully!");
-      router.push("/Admindash/testimonialmain");
-    }
-  }, [loading, error, router]);
+useEffect(() => {
+  if (isUpdated && !loading && !error) {
+    toast.success("Testimonial updated successfully!");
+    router.push("/Admindash/testimonialmain");
+  }
+}, [isUpdated, loading, error, router]);
+
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div className="m-4 bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-bold text-[#2c0a4d] mb-6">Edit Testimonial</h2>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
-          {/* Name */}
+
           <div className="flex flex-col md:flex-row gap-6 mb-6">
             <div className="flex flex-col w-full">
               <label className="text-sm font-medium mb-1">Name</label>
@@ -89,7 +89,7 @@ export default function EditTestimonial({ testimonial }) {
               </div>
             </div>
 
-            {/* Location */}
+  
             <div className="flex flex-col w-full">
               <label className="text-sm font-medium mb-1">Location</label>
               <div className="flex items-center gap-2 border border-gray-400 rounded-xl p-1">
@@ -106,7 +106,7 @@ export default function EditTestimonial({ testimonial }) {
             </div>
           </div>
 
-          {/* Description */}
+
           <div className="mb-6">
             <label className="text-sm font-medium mb-1">Testimonial Description</label>
             <div className="flex items-start gap-2 border border-gray-400 rounded-xl p-1">
@@ -122,7 +122,6 @@ export default function EditTestimonial({ testimonial }) {
             </div>
           </div>
 
-          {/* File / Video Link */}
           <div className="flex flex-col md:flex-row gap-6 mb-6">
             <div className="flex flex-col w-full">
               <label className="text-sm font-medium mb-1">File Type</label>
@@ -161,7 +160,7 @@ export default function EditTestimonial({ testimonial }) {
             </div>
           </div>
 
-          {/* Youtube Link */}
+        
           <div className="mb-6">
             <label className="text-sm font-medium mb-1">Youtube Link</label>
             <CustomInput
@@ -173,7 +172,7 @@ export default function EditTestimonial({ testimonial }) {
             />
           </div>
 
-          {/* Rating & Status */}
+ 
           <div className="flex flex-col md:flex-row gap-6 mb-6">
             <div className="flex flex-col w-full">
               <label className="text-sm font-medium mb-1">Rating</label>
@@ -203,7 +202,7 @@ export default function EditTestimonial({ testimonial }) {
             </div>
           </div>
 
-          {/* Buttons */}
+
           <div className="flex gap-4 items-center justify-center mt-4">
             <CustomButton type="submit" variant="green" className="bg-[#2c0a4d] text-white px-6 py-2">
               {loading ? "Updating..." : "Update"}

@@ -26,14 +26,22 @@ export default function LoginForm() {
     dispatch(loginRequest({ mobile, password }));
   };
 
-  useEffect(() => {
-    if (token) {
+  
+useEffect(() => {
+  const savedToken = Cookies.get("token");
+  if (savedToken && !token) {
+  
+    dispatch({ type: "login/loginSuccess", payload: savedToken });
+  }
+}, [dispatch, token]);
 
-    console.log("asdasdsad",token);
- Cookies.set("token", token, { expires: 1/24, path: "/" }); 
-      router.push("/Admindash");
-    }
-  }, [token, router]);
+useEffect(() => {
+  if (token) {
+    Cookies.set("token", token, { expires: 1 / 24, path: "/" });
+    router.push("/Admindash");
+  }
+}, [token, router]);
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0000004b] px-4">

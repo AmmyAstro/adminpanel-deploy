@@ -2,26 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 
 export default function ProtectedRoute({ children }) {
   const router = useRouter();
-  const { token } = useSelector((state) => state.login);
-  const [isAuth, setIsAuth] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const cookieToken = Cookies.get("accessToken");
+    const token = Cookies.get("token");
 
-    if (!cookieToken && !token) {
-      router.push("/");  
+    if (!token) {
+      router.replace("/login"); 
     } else {
-      setIsAuth(true);
-    }
-  }, [token, router]);
 
-  if (!isAuth) {
-    return null; 
+      setIsChecking(false);
+    }
+  }, [router]);
+
+  if (isChecking) {
+    return <div className="h-screen flex items-center justify-center">Loading...</div>;
   }
 
   return <>{children}</>;

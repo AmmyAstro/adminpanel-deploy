@@ -22,7 +22,8 @@ yield put(loginSuccess({
     );
 
   } catch (err) {
-    yield put(loginFailure(err.response?.data?.error || err.message));
+    yield put(loginFailure(
+      "res", err.response?.data?.error || err.message));
   }
 }
 

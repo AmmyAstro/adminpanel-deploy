@@ -17,6 +17,7 @@ export default function ClientSideLayout({ children }) {
         "/Admindash/blogmain",
         "/Admindash/privilegemain",
         "/Admindash/astromain",
+        "/Admindash/editTestimonial",
     ];
     const showRazorRoutes = ["/Admindash/razordash"];
     const showCMSRoutes = ["/Admindash/managecms"];
@@ -27,6 +28,8 @@ export default function ClientSideLayout({ children }) {
     const showBlogRoutes = ["/Admindash/blogmain"];
     const showPrivilegeRoutes = ["/Admindash/privilegemain"];
     const showAstrologerRoutes = ["/Admindash/astromain"];
+    const showTestiRoutes = ["/Admindash/editTestimonial"];
+
 
     const showHomeside = !hideHomeside.some(route => pathname?.startsWith(route));
     const showRazorside = showRazorRoutes.some(route => pathname?.startsWith(route));
@@ -38,6 +41,7 @@ export default function ClientSideLayout({ children }) {
     const showBlog = showBlogRoutes.some(route => pathname?.startsWith(route));
     const showPrevilege = showPrivilegeRoutes.some(route => pathname?.startsWith(route));
     const showAstrologer = showAstrologerRoutes.some(route => pathname?.startsWith(route));
+    const showTesti = showTestiRoutes.some(route => pathname?.startsWith(route));
 
     return (
 
@@ -52,6 +56,7 @@ export default function ClientSideLayout({ children }) {
             {showBlog && <SideBarMain type="blogSide" />}
             {showPrevilege && <SideBarMain type="previlegeSide" />}
             {showAstrologer && <SideBarMain type="astrologerSide" />}
+            {showTesti && <SideBarMain type="testimonialSide"/>}
             <main className={`${isDashboardRoot ? "ml-0" : "ml-20 md:ml-48"} flex-1 h-[calc(100vh-3.5rem-2.5rem)] mt-0 mb-0 overflow-y-auto bg-gray-100  py-6 px-8`}>{children}</main>
         </div>
 

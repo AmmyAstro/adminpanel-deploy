@@ -13,35 +13,31 @@ export default function TestimonialList() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { testimonials, loading, error } = useSelector(
-    (state) => state.testimonial 
+    (state) => state.testimonial
   );
 
   const [filter, setFilter] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
-  // Fetch testimonials on mount
   useEffect(() => {
     dispatch(fetchTestimonialsRequest());
   }, [dispatch]);
 
-  // Edit handler
   const handleEdit = (id) => {
-  router.push(`/Admindash/testimonialmain/editTestimonial/${id}`);
+    router.push(`/Admindash/editTestimonial/${id}`);
   };
 
-  // Delete handler
+
   const handleDelete = (id) => {
     dispatch(deleteTestimonialRequest(id));
     toast.success("Testimonial deleted successfully!");
   };
 
-  // Apply filter
   const filtered = testimonials.filter((t) =>
     t.name.toLowerCase().includes(filter.toLowerCase())
   );
 
-  // Pagination
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
 
@@ -89,7 +85,7 @@ export default function TestimonialList() {
                   src={`http://localhost:5000/${(t.fileUrl || "").replace(/\\/g, "/")}`}
                   alt={t.name}
                   className="w-10 h-10 rounded-full object-cover"
-                  onError={e => { e.target.onerror=null; e.target.src="/admin-img/user.png"; }}
+                  onError={e => { e.target.onerror = null; e.target.src = "/admin-img/user.png"; }}
                 />
               ) : (
                 <a
@@ -104,16 +100,15 @@ export default function TestimonialList() {
             </div>
             <div>
               <span
-                className={`px-3 py-1 rounded-full text-xs ${
-                  t.status === "active"
+                className={`px-3 py-1 rounded-full text-xs ${t.status === "active"
                     ? "bg-green-200 text-green-800"
                     : "bg-red-200 text-red-800"
-                }`}
+                  }`}
               >
                 {t.status}
               </span>
             </div>
-            
+
             <div className="flex gap-2">
               <button
                 className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
@@ -121,6 +116,7 @@ export default function TestimonialList() {
               >
                 Edit
               </button>
+
               <button
                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
                 onClick={() => handleDelete(t.id)}

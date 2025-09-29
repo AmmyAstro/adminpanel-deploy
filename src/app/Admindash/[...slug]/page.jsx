@@ -15,9 +15,9 @@ import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
 import AstroProfile from "@/components/DashPages/Astrologer/AstroProfile";
 import TestimonialList from "../../../components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
-import EditTestimonial from  "../../../components/DashPages/SideBar/HomesidePage/Testimonial/editTestimonial";
+import EditTestimonial from "../editTestimonial/[id]/page";
 
-export default function Kundlipage() {
+export default function AdminPanel() {
   const params = useParams();
   const path = (params.slug || []).map((p) => p.toLowerCase());
 
@@ -35,7 +35,8 @@ export default function Kundlipage() {
     blogmain: <BlogMain />,
     privilegemain: <PrivilegeMain />,
     astromain: <AstrologerMain />,
-    testimonialmain: <TestimonialList />
+    testimonialmain: <TestimonialList />,
+    edittestimonial: <EditTestimonial />,
 
   };
 
@@ -46,8 +47,8 @@ export default function Kundlipage() {
     addastro: <AddAstro />,
     astroprofile: <AstroProfile />,
     addtesti: <AddTestimonial />,
-    astrolist: <AstroList/>,
-    editTestimonial: <EditTestimonial/>,
+    // astrolist: <AstroList/>,
+    edittestimonial: <EditTestimonial />,
 
   };
 
