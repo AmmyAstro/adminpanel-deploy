@@ -6,9 +6,9 @@ import { updateTestimonialRequest } from "@/app/redux/slices/testimonialSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-
+toast
 export default function EditTestimonial({ testimonial }) {
+  alert("Editing testimonial:", testimonial);
   const router = useRouter();
   const dispatch = useDispatch();
   const { loading, error } = useSelector((s) => s.testimonials || {});
