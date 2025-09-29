@@ -12,10 +12,11 @@ import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+
 export default function AddTestimonial() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const BASE_URL = "http://localhost:5000/api/testimonials";
+
 
   const [form, setForm] = useState({
     name: "",
@@ -49,8 +50,7 @@ export default function AddTestimonial() {
         formData.append(key, form[key]);
       }
     });
-
-    const serializableData = {
+   const serializableData = {
       name: form.name,
       location: form.location,
       description: form.description,
@@ -61,22 +61,10 @@ export default function AddTestimonial() {
       fileName: form.file ? form.file.name : null,
     };
 
-    try {
-      // Optional: dispatch request action for loading state
-      dispatch(addTestimonialRequest(serializableData));
 
-      const response = await axios.post(
-        `${BASE_URL}/add`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+    dispatch(addTestimonialRequest({ formData, ...serializableData }));
 
-      dispatch(addTestimonialSuccess(response.data.testimonial));
-      handleReset();
-      router.push("/Admindash/testimonialmain");
-    } catch (err) {
-      dispatch(addTestimonialFailure(err.response?.data?.message || err.message));
-    }
+   
   };
 
   const handleReset = () => {

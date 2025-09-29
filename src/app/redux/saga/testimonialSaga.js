@@ -14,27 +14,26 @@ import {
   deleteTestimonialSuccess,
   deleteTestimonialFailure,
 } from "../slices/testimonialSlice";
+import { apiroute } from "../config";
 
-// Base API URL
-const BASE_URL = "http://localhost:5000/api/testimonials";
 
-// ---------------- Add Testimonial ----------------
+
+
+
+const apiCall = (formData) =>{
+  return axios.post(apiroute.addTestimonial, formData, { headers: { "Content-Type": "multipart/form-data" } });
+
+}
+
 function* addTestimonialSaga(action) {
   try {
     console.log("Saga triggered with payload:", action.payload);
-    // Extract formData and serializable data from action payload
-    const { formData, ...serializableData } = action.payload;
-    const response = yield call(
-      axios.post,
-      `${BASE_URL}/add`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-
-    // Dispatch only serializable data
+ 
+const response= yield call(apiCall.action.payload);
+ 
     yield put(addTestimonialSuccess({
       ...response.data.testimonial,
-      fileName: serializableData.fileName, // Include fileName if needed
+      fileName: serializableData.fileName, 
     }));
   } catch (err) {
     console.error("Error in addTestimonialSaga:", err);

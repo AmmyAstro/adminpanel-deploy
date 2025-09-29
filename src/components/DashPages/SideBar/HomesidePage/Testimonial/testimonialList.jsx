@@ -84,9 +84,10 @@ export default function TestimonialList() {
             <div>
               {t.fileType === "profile-image" ? (
                 <img
-                  src={`http://localhost:5000/${t.fileUrl}`}
+                  src={`http://localhost:5000/${(t.fileUrl || "").replace(/\\/g, "/")}`}
                   alt={t.name}
                   className="w-10 h-10 rounded-full object-cover"
+                  onError={e => { e.target.onerror=null; e.target.src="/admin-img/user.png"; }}
                 />
               ) : (
                 <a
@@ -110,6 +111,7 @@ export default function TestimonialList() {
                 {t.status}
               </span>
             </div>
+            
             <div className="flex gap-2">
               <button
                 className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
