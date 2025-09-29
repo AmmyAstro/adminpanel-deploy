@@ -7,8 +7,10 @@ import {
   deleteTestimonialRequest,
 } from "@/app/redux/slices/testimonialSlice";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function TestimonialList() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { testimonials, loading, error } = useSelector(
     (state) => state.testimonial 
@@ -25,7 +27,7 @@ export default function TestimonialList() {
 
   // Edit handler
   const handleEdit = (id) => {
-    alert(`Edit testimonial with ID: ${id}`);
+  router.push(`/Admindash/testimonialmain/editTestimonial/${id}`);
   };
 
   // Delete handler
@@ -84,9 +86,10 @@ export default function TestimonialList() {
             <div>
               {t.fileType === "profile-image" ? (
                 <img
-                  src={`http://localhost:5000/${t.fileUrl}`}
+                  src={`http://localhost:5000/${(t.fileUrl || "").replace(/\\/g, "/")}`}
                   alt={t.name}
                   className="w-10 h-10 rounded-full object-cover"
+                  onError={e => { e.target.onerror=null; e.target.src="/admin-img/user.png"; }}
                 />
               ) : (
                 <a
@@ -110,6 +113,7 @@ export default function TestimonialList() {
                 {t.status}
               </span>
             </div>
+            
             <div className="flex gap-2">
               <button
                 className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
