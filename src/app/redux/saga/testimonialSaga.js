@@ -14,29 +14,28 @@ import {
   deleteTestimonialSuccess,
   deleteTestimonialFailure,
 } from "../slices/testimonialSlice";
-import { apiroute } from "../config";
 
+// Base API URL
+const BASE_URL = "http://localhost:5000/api/testimonials";
 
-
-
-
-const apiCall = (formData) =>{
-  return axios.post(apiroute.addTestimonial, formData, { headers: { "Content-Type": "multipart/form-data" } });
-
-}
-
+// ---------------- Add Testimonial ----------------
 function* addTestimonialSaga(action) {
   try {
-    console.log("Saga triggered with payload:", action.payload);
- 
-const response= yield call(apiCall.action.payload);
- 
-    yield put(addTestimonialSuccess({
-      ...response.data.testimonial,
-      fileName: serializableData.fileName, 
-    }));
+    const { formData, fileName } = action.payload;
+    const response = yield call(
+      axios.post,
+      `${BASE_URL}/add`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    // Dispatch success with serialized info if needed
+    yield put(
+      addTestimonialSuccess({
+        ...response.data.testimonial,
+        fileName: fileName || null,
+      })
+    );
   } catch (err) {
-    console.error("Error in addTestimonialSaga:", err);
     yield put(addTestimonialFailure(err.response?.data?.message || err.message));
   }
 }
@@ -56,12 +55,9 @@ function* updateTestimonialSaga(action) {
   try {
     const { id, data } = action.payload;
     const formData = data instanceof FormData ? data : new FormData();
-    
-    // If data is not FormData, append key-value pairs
+
     if (!(data instanceof FormData)) {
-      Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
-      });
+      Object.keys(data).forEach((key) => formData.append(key, data[key]));
     }
 
     const response = yield call(

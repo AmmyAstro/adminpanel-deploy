@@ -7,8 +7,10 @@ import {
   deleteTestimonialRequest,
 } from "@/app/redux/slices/testimonialSlice";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function TestimonialList() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { testimonials, loading, error } = useSelector(
     (state) => state.testimonial 
@@ -25,7 +27,7 @@ export default function TestimonialList() {
 
   // Edit handler
   const handleEdit = (id) => {
-    alert(`Edit testimonial with ID: ${id}`);
+  router.push(`/Admindash/testimonialmain/editTestimonial/${id}`);
   };
 
   // Delete handler

@@ -2,42 +2,37 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addTestimonialRequest } from "@/app/redux/slices/testimonialSlice";
+import { updateTestimonialRequest } from "@/app/redux/slices/testimonialSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-export default function AddTestimonial() {
+export default function EditTestimonial({ testimonial }) {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { loading, testimonials, error } = useSelector((s) => s.testimonials || {});
+  const { loading, error } = useSelector((s) => s.testimonials || {});
 
   const [form, setForm] = useState({
-    name: "",
-    location: "",
-    description: "",
-    fileType: "profile-image",
+    name: testimonial?.name || "",
+    location: testimonial?.location || "",
+    description: testimonial?.description || "",
+    fileType: testimonial?.fileType || "profile-image",
     file: null,
-    videoLink: "",
-    youtubeLink: "",
-    rating: 1,
-    status: "active",
+    videoLink: testimonial?.videoLink || "",
+    youtubeLink: testimonial?.youtubeLink || "",
+    rating: testimonial?.rating || 1,
+    status: testimonial?.status || "active",
   });
 
-  useEffect(() => {
-    if (!loading && Array.isArray(testimonials) && testimonials.length) {
-      toast.success("Testimonial added successfully!");
-      router.push("/Admindash/testimonialmain");
-    }
-  }, [loading, testimonials, router]);
-
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) setForm({ ...form, [name]: files[0] });
     else setForm({ ...form, [name]: value });
   };
 
+  // Submit update
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -46,30 +41,36 @@ export default function AddTestimonial() {
       if (form[key]) formData.append(key, form[key]);
     });
 
-    const serializableData = {
-      fileName: form.file ? form.file.name : null,
-    };
-    dispatch(addTestimonialRequest({ formData, ...serializableData }));
+    dispatch(updateTestimonialRequest({ id: testimonial.id, formData }));
   };
 
+  // Reset form
   const handleReset = () => {
     setForm({
-      name: "",
-      location: "",
-      description: "",
-      fileType: "profile-image",
+      name: testimonial?.name || "",
+      location: testimonial?.location || "",
+      description: testimonial?.description || "",
+      fileType: testimonial?.fileType || "profile-image",
       file: null,
-      videoLink: "",
-      youtubeLink: "",
-      rating: 1,
-      status: "active",
+      videoLink: testimonial?.videoLink || "",
+      youtubeLink: testimonial?.youtubeLink || "",
+      rating: testimonial?.rating || 1,
+      status: testimonial?.status || "active",
     });
   };
+
+  // Show success toast & redirect after update
+  useEffect(() => {
+    if (!loading && !error) {
+      toast.success("Testimonial updated successfully!");
+      router.push("/Admindash/testimonialmain");
+    }
+  }, [loading, error, router]);
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div className="m-4 bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-bold text-[#2c0a4d] mb-6">Add New Testimonial</h2>
+        <h2 className="text-xl font-bold text-[#2c0a4d] mb-6">Edit Testimonial</h2>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           {/* Name */}
           <div className="flex flex-col md:flex-row gap-6 mb-6">
@@ -82,7 +83,6 @@ export default function AddTestimonial() {
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Enter your name here"
                   className="w-full outline-none border-0 bg-transparent"
                   required
                 />
@@ -99,7 +99,6 @@ export default function AddTestimonial() {
                   name="location"
                   value={form.location}
                   onChange={handleChange}
-                  placeholder="Enter your location here"
                   className="w-full outline-none border-0 bg-transparent"
                   required
                 />
@@ -118,13 +117,12 @@ export default function AddTestimonial() {
                 onChange={handleChange}
                 className="w-full outline-none bg-transparent resize-none"
                 rows="3"
-                placeholder="Enter Description"
                 required
               ></textarea>
             </div>
           </div>
 
-          {/* File Type */}
+          {/* File / Video Link */}
           <div className="flex flex-col md:flex-row gap-6 mb-6">
             <div className="flex flex-col w-full">
               <label className="text-sm font-medium mb-1">File Type</label>
@@ -139,7 +137,6 @@ export default function AddTestimonial() {
               </select>
             </div>
 
-            {/* File / Video Link */}
             <div className="flex flex-col w-full">
               <label className="text-sm font-medium mb-1">
                 {form.fileType === "video-link" ? "Video Link" : "Profile Image"}
@@ -149,17 +146,16 @@ export default function AddTestimonial() {
                   type="file"
                   name="file"
                   onChange={handleChange}
-                  className="w-full border border-gray-400 rounded-xl p-1 outline-none bg-transparent"
                   accept="image/*"
+                  className="w-full border border-gray-400 rounded-xl p-1 outline-none bg-transparent"
                 />
               ) : (
                 <CustomInput
                   type="text"
                   name="videoLink"
-                  value={form.videoLink || ""}
+                  value={form.videoLink}
                   onChange={handleChange}
                   className="w-full border border-gray-400 rounded-xl p-1 outline-none bg-transparent"
-                  placeholder="Enter video link here"
                 />
               )}
             </div>
@@ -173,7 +169,6 @@ export default function AddTestimonial() {
               name="youtubeLink"
               value={form.youtubeLink}
               onChange={handleChange}
-              placeholder="Enter youtube link here"
               className="w-full border border-gray-400 rounded-xl p-1 outline-none"
             />
           </div>
@@ -211,7 +206,7 @@ export default function AddTestimonial() {
           {/* Buttons */}
           <div className="flex gap-4 items-center justify-center mt-4">
             <CustomButton type="submit" variant="green" className="bg-[#2c0a4d] text-white px-6 py-2">
-              {loading ? "Submitting..." : "SUBMIT"}
+              {loading ? "Updating..." : "Update"}
             </CustomButton>
             <CustomButton
               type="button"
