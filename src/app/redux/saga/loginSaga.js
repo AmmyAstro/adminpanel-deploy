@@ -3,19 +3,19 @@ import axios from "axios";
 import Cookies from "js-cookie";   
 
 
+
 import { loginRequest, loginSuccess, loginFailure } from "../slices/loginSlice";
+import { apiroute } from "../config";
 
 function* loginUser(action) {
+
+  console.log("XAAx",action.payload);
   try {
-    const response = yield call(axios.post, "http://localhost:5000/api/login", action.payload);
+    const response = yield call(axios.post,apiroute.AdminLogin, action.payload);  
 
     const data = response.data;
-
-    localStorage.setItem("accessToken", data.accessToken);
-    Cookies.set("accessToken", data.accessToken, { expires: 1 }); 
-
-    yield put(
-      loginSuccess({
+  
+yield put(loginSuccess({
         user: data.user,
         token: data.accessToken,
       })

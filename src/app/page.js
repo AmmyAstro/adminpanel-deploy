@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { loginRequest } from "./redux/slices/loginSlice";
 import Image from "next/image";
+import Cookies from "js-cookie";
 
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
@@ -13,7 +14,7 @@ export default function LoginForm() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { loading, user, token, error } = useSelector((state) => state.login || {});
+  const { loading, token, error } = useSelector((state) => state.login || {});
 
   const handleMobileChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
@@ -27,6 +28,9 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (token) {
+
+    console.log("asdasdsad",token);
+ Cookies.set("token", token, { expires: 1/24, path: "/" }); 
       router.push("/Admindash");
     }
   }, [token, router]);
