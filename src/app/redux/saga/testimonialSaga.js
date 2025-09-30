@@ -7,6 +7,9 @@ import {
   fetchTestimonialsRequest,
   fetchTestimonialsSuccess,
   fetchTestimonialsFailure,
+  fetchTestimonialRequest,
+  fetchTestimonialSuccess,
+  fetchTestimonialFailure,
   updateTestimonialRequest,
   updateTestimonialSuccess,
   updateTestimonialFailure,
@@ -28,7 +31,7 @@ function* addTestimonialSaga(action) {
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
-    // Dispatch success with serialized info if needed
+
     yield put(
       addTestimonialSuccess({
         ...response.data.testimonial,
@@ -50,23 +53,27 @@ function* fetchTestimonialsSaga() {
   }
 }
 
+// ---------------- Fetch Single Testimonial ----------------
+function* fetchTestimonialSaga(action) {
+  try {
+    const id = action.payload;
+    const response = yield call(axios.get, `${BASE_URL}/${id}`);
+    yield put(fetchTestimonialSuccess(response.data.testimonial));
+  } catch (err) {
+    yield put(fetchTestimonialFailure(err.response?.data?.message || err.message));
+  }
+}
+
 // ---------------- Update Testimonial ----------------
 function* updateTestimonialSaga(action) {
   try {
-    const { id, data } = action.payload;
-    const formData = data instanceof FormData ? data : new FormData();
-
-    if (!(data instanceof FormData)) {
-      Object.keys(data).forEach((key) => formData.append(key, data[key]));
-    }
-
+    const { id, formData } = action.payload;
     const response = yield call(
       axios.put,
       `${BASE_URL}/${id}`,
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
-
     yield put(updateTestimonialSuccess(response.data.testimonial));
   } catch (err) {
     yield put(updateTestimonialFailure(err.response?.data?.message || err.message));
@@ -86,6 +93,7 @@ function* deleteTestimonialSaga(action) {
 
 // ---------------- Watcher Saga ----------------
 export default function* testimonialSaga() {
+  yield takeLatest(fetchTestimonialRequest.type, fetchTestimonialSaga);
   yield takeLatest(addTestimonialRequest.type, addTestimonialSaga);
   yield takeLatest(fetchTestimonialsRequest.type, fetchTestimonialsSaga);
   yield takeLatest(updateTestimonialRequest.type, updateTestimonialSaga);
