@@ -17,6 +17,7 @@ export default function TestimonialList() {
   const [filter, setFilter] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 5;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   // Fetch testimonials on mount
   useEffect(() => {
@@ -95,15 +96,15 @@ export default function TestimonialList() {
             <div>{testimonial.location}</div>
             <div>
               {testimonial.fileType === "profile-image" ? (
-                <img
-                  src={`http://localhost:5000/${(testimonial.fileUrl || "").replace(/\\/g, "/")}`}
-                  alt={testimonial.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/admin-img/user.png";
-                  }}
-                />
+               <img
+                src={`${BASE_URL}/${(testimonial.fileUrl || "").replace(/\\/g, "/")}`}
+                alt={testimonial.name}
+                className="w-10 h-10 rounded-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/admin-img/user.png";
+                }}
+              />
               ) : (
                 <a
                   href={testimonial.fileUrl}

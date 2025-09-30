@@ -12,6 +12,7 @@ import { useRouter, useParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function EditTestimonialPage() {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -62,7 +63,7 @@ export default function EditTestimonialPage() {
 
     if (testimonial.fileType === "profile-image" && testimonial.fileUrl) {
       const fileUrl = testimonial.fileUrl.replace(/\\/g, "/");
-      setPreview(`http://localhost:5000/${fileUrl}`);
+     setPreview(`${BASE_URL}/${fileUrl}`);
     } else {
       setPreview(null);
     }
