@@ -4,8 +4,10 @@ import loginSaga from "./saga/loginSaga";
 import bannerSaga from "./saga/bannerSaga";
 import addGiftSaga from "./saga/addGiftSaga";
 import testimonialSaga from "./saga/testimonialSaga";
+import couponSaga from "./saga/couponSaga";
+
 
 export default function* rootSaga() {
-  yield all([loginSaga(),bannerSaga(), addGiftSaga(),testimonialSaga()]);
+  yield all([loginSaga(),bannerSaga(), addGiftSaga(),testimonialSaga(),couponSaga()]);
 
 }
