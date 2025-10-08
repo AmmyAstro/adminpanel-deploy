@@ -5,7 +5,7 @@ import { apiroute } from "../config";
 import { bannerAddSuccessfully, banneraddfail, sendbannerRequest } from "../slices/bannerSlice";
 
 const apidata = (payload) => {
-    return axios.post(apiroute, payload)
+    return axios.post(apiroute.banneradd, payload)
 } 
 
 function* createBannerSaga(action) {

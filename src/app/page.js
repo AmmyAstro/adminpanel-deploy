@@ -22,6 +22,7 @@ export default function LoginForm() {
   };
 
   const handleSubmit = (e) => {
+    // alert("Login button clicked");
     e.preventDefault();
     dispatch(loginRequest({ mobile, password }));
   };
@@ -32,15 +33,16 @@ useEffect(() => {
   if (savedToken && !token) {
   
     dispatch({ type: "login/loginSuccess", payload: savedToken });
-  }
+  } 
 }, [dispatch, token]);
 
 useEffect(() => {
   if (token) {
     Cookies.set("token", token, { expires: 1 / 24, path: "/" });
     router.push("/Admindash");
-  }
-}, [token, router]);
+  } 
+}, [token, router])
+      console.log("errrrrrrrrrrrrrrrrrr", error);
 
 
   return (
@@ -120,10 +122,11 @@ useEffect(() => {
           </button>
         </form>
 
-        {error && (
-          <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>
-        )}
+        {error && (          
+          <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>             
+        )} 
       </div>
+      
     </div>
   );
 }

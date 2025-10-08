@@ -17,37 +17,29 @@ import {
   deleteTestimonialSuccess,
   deleteTestimonialFailure,
 } from "../slices/testimonialSlice";
+import { apiroute } from "../config";
 
 // Base API URL
 
-const BASE_URL = "http://localhost:5000/api/testimonials";
+const apidata = (payload) => {
+  return axios.post(apiroute.addTestimonial, payload)
+}
 
-// ---------------- Add Testimonial ----------------
 function* addTestimonialSaga(action) {
   try {
     const { formData, fileName } = action.payload;
-    const response = yield call(
-      axios.post,
-      `${BASE_URL}/add`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+    console.log("payload", action.payload.formData);
+    const response = yield call(apidata, action.payload.formData);
 
-    yield put(
-      addTestimonialSuccess({
-        ...response.data.testimonial,
-        fileName: fileName || null,
-      })
-    );
+    yield put(addTestimonialSuccess(response?.data));
   } catch (err) {
     yield put(addTestimonialFailure(err.response?.data?.message || err.message));
   }
 }
 
-// ---------------- Fetch All Testimonials ----------------
 function* fetchTestimonialsSaga() {
   try {
-    const response = yield call(axios.get, `${BASE_URL}`);
+    const response = yield call(axios.get, apiroute.addTestimonial);
     yield put(fetchTestimonialsSuccess(response.data.testimonials));
   } catch (err) {
     yield put(fetchTestimonialsFailure(err.response?.data?.message || err.message));

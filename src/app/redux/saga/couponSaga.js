@@ -17,18 +17,18 @@ import {
   deleteCouponSuccess,
   deleteCouponFailure,
 } from "../slices/couponSlice";
+import { apiroute } from "../config";
 
-const BASE_URL = "http://localhost:5000/api"; // your backend URL
+const apidata = (payload) => {
+  return axios.post(apiroute.couponAdd, payload)
+}
 
 // Create
 function* createCouponSaga(action) {
-  console.log("Payload received:", action.payload); // confirm payload
+  console.log("Payload received:", action.payload);
   try {
-    const response = yield call(
-      axios.post,
-      `${BASE_URL}/coupons/add`,
-      action.payload
-    );
+    console.log("payload", action.payload.formData);
+    const response = yield call(apidata, action.payload.formData);
     yield put(createCouponSuccess(response.data.coupon));
   } catch (error) {
     console.error("Create coupon error:", error);
