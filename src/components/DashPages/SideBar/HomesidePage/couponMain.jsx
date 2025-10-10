@@ -13,6 +13,7 @@ import {
 } from "@/app/redux/slices/couponSlice";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import toast from "react-hot-toast";
+import CustomToggle from "@/components/Custom/CustomToggle";
 
 export default function CouponMain() {
   const [isCoupOpen, setCoupOpen] = useState(false);
@@ -167,6 +168,16 @@ export default function CouponMain() {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
+  const [statusMap, setStatusMap] = useState({});
+  useEffect(() => {
+    if (coupons) {
+      const map = {};
+      coupons.forEach(c => map[c.id] = c.status === "active");
+      setStatusMap(map);
+    }
+  }, [coupons]);
+
+
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       {isCoupOpen && (
@@ -182,7 +193,6 @@ export default function CouponMain() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Coupon Code & Description */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">Coupon Code</label>
@@ -210,7 +220,6 @@ export default function CouponMain() {
                 </div>
               </div>
 
-              {/* Apply On & Coupon Type */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">Applicable On</label>
@@ -230,7 +239,7 @@ export default function CouponMain() {
                   <select
                     name="coupon_type"
                     required
-                  value={form.coupon_type}
+                    value={form.coupon_type}
                     onChange={handleChange}
                     className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm"
                   >
@@ -240,7 +249,6 @@ export default function CouponMain() {
                 </div>
               </div>
 
-              {/* Discount & Max Discount */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">Cashback / Flat Discount</label>
@@ -267,7 +275,6 @@ export default function CouponMain() {
                 </div>
               </div>
 
-              {/* Redeem Limit & Coupon Validity */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">Redeem Limit Per User</label>
@@ -296,7 +303,7 @@ export default function CouponMain() {
               {/* Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium">Coupon Start Date</label>
+                  <label className="block text-sm font-medium"> Start Date</label>
                   <CustomInput
                     type="date"
                     name="coupon_start_date"
@@ -306,7 +313,7 @@ export default function CouponMain() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium">Coupon End Date</label>
+                  <label className="block text-sm font-medium"> End Date</label>
                   <CustomInput
                     type="date"
                     name="coupon_end_date"
@@ -331,18 +338,7 @@ export default function CouponMain() {
                     <option value="not_visible">Not Visible</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium">Status</label>
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
+
               </div>
 
               {/* Buttons */}
@@ -375,86 +371,72 @@ export default function CouponMain() {
             placeholder="Search by code, description, or type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-200 rounded-full placeholder:text-sm p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
         <div className="couplist text-gray-600">
           {filteredCoupons.length > 0 ? (
             <>
-              <table className="w-full border border-gray-300 rounded-lg text-left">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="p-2 border-b">Sr No</th>
-                    <th className="p-2 border-b">Code</th>
-                    <th className="p-2 border-b">Description</th>
-                    <th className="p-2 border-b">Type</th>
-                    <th className="p-2 border-b">Apply On</th>
-                    <th className="p-2 border-b">Discount</th>
-                    <th className="p-2 border-b">Max Discount</th>
-                    <th className="p-2 border-b">Coupon Start Date</th>
-                    <th className="p-2 border-b">Coupon End Date</th>
-                    <th className="p-2 border-b">Validity</th>
-                    <th className="p-2 border-b">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedCoupons.map((coupon, index) => (
-                    <tr key={coupon.id} className="hover:bg-gray-50">
-                      <td className="p-2 border-b">
-                        {(currentPage - 1) * itemsPerPage + index + 1}
-                      </td>
-                      <td className="p-2 border-b">{coupon.coupon_code}</td>
-                      <td className="p-2 border-b">{coupon.coupon_desc}</td>
-                      <td className="p-2 border-b">{coupon.coupon_type}</td>
-                      <td className="p-2 border-b">{coupon.apply_on}</td>
-                      <td className="p-2 border-b">{coupon.flat_discount}</td>
-                      <td className="p-2 border-b">{coupon.max_discount}</td>
-                      <td className="p-2 border-b">
-                        {coupon.coupon_start_date
-                            ? new Date(coupon.coupon_start_date).toLocaleString("en-IN", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true,
-                                timeZone: "Asia/Kolkata",
-                            })
-                            : "-"}
-                        </td>
-                        <td className="p-2 border-b">
-                        {coupon.coupon_end_date
-                            ? new Date(coupon.coupon_end_date).toLocaleString("en-IN", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true,
-                                timeZone: "Asia/Kolkata",
-                            })
-                            : "-"}
-                        </td>
-                      <td className="p-2 border-b">{coupon.coupon_validity} days</td>
-                      <td className="p-2 border-b flex gap-2">
-                        <button
-                          className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500"
-                          onClick={() => handleEdit(coupon)}
-                        >
-                          <FiEdit size={18} />
-                        </button>
-                        <button
-                          className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                          onClick={() => handleDelete(coupon.id)}
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="grid grid-cols-8 gap-2 font-semibold text-sm rounded-2xl border-b bg-purple-300 p-2 text-gray-600">
+                <div className="col-span-1 text-center">Sr No</div>
+                <div className="col-span-1 text-center">Code</div>
+                <div className="col-span-1 text-center">Description</div>
+                <div className="col-span-1 text-center">Type</div>
+                <div className="col-span-1 text-center">Discount</div>
+                <div className="col-span-1 text-center">Start Date</div>
+                <div className="col-span-1 text-center">End Date</div>
+                <div className="col-span-1 text-center">Actions</div>
+              </div>
+
+              {/* Rows */}
+              {paginatedCoupons.map((coupon, index) => (
+                <div
+                  key={coupon.id}
+                  className="grid grid-cols-8 gap-2 border-b p-2 text-sm items-center hover:bg-gray-50 text-gray-600"
+                >
+                  <div className="col-span-1 text-center">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </div>
+                  <div className="col-span-1 text-center">{coupon.coupon_code}</div>
+                  <div className="col-span-1 text-center">{coupon.coupon_desc}</div>
+                  <div className="col-span-1 text-center">{coupon.coupon_type}</div>
+                  <div className="col-span-1 text-center">{coupon.flat_discount}</div>
+                  <div className="col-span-1 text-center">
+                    {coupon.coupon_start_date
+                      ? new Date(coupon.coupon_start_date).toLocaleDateString("en-IN")
+                      : "-"}
+                  </div>
+                  <div className="col-span-1">
+                    {coupon.coupon_end_date
+                      ? new Date(coupon.coupon_end_date).toLocaleDateString("en-IN")
+                      : "-"}
+                  </div>
+                  <div className="col-span-1 flex gap-4 text-center items-center justify-center">
+                    <button
+                      className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                      onClick={() => handleEdit(coupon)}
+                    >
+                      <FiEdit size={18} />
+                    </button>
+                    <CustomToggle
+                      checked={statusMap[coupon.id]}
+                      onChange={(val) => {
+                        setStatusMap(prev => ({ ...prev, [coupon.id]: val })); // update locally
+
+                        // update in DB via Redux
+                        dispatch(updateCouponRequest({
+                          id: coupon.id,
+                          data: { ...coupon, status: val ? "active" : "inactive" }
+                        }));
+                      }}
+                    />
+
+
+                  </div>
+                </div>
+              ))}
+
 
               {totalPages > 1 && (
                 <div className="flex justify-between items-center mt-4">

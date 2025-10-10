@@ -10,6 +10,10 @@ const apiroute = {
   editTestimonial: (id) => `${apiurl}/testimonials/${id}`,
 
   couponAdd: `${apiurl}/coupons/add`,
+  couponFetch: `${apiurl}/coupons`,
+
+  // package
+  packageAdd: `${apiurl}/packageAdd`,
 
 }
 

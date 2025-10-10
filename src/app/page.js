@@ -27,22 +27,22 @@ export default function LoginForm() {
     dispatch(loginRequest({ mobile, password }));
   };
 
-  
-useEffect(() => {
-  const savedToken = Cookies.get("token");
-  if (savedToken && !token) {
-  
-    dispatch({ type: "login/loginSuccess", payload: savedToken });
-  } 
-}, [dispatch, token]);
 
-useEffect(() => {
-  if (token) {
-    Cookies.set("token", token, { expires: 1 / 24, path: "/" });
-    router.push("/Admindash");
-  } 
-}, [token, router])
-      console.log("errrrrrrrrrrrrrrrrrr", error);
+  useEffect(() => {
+    const savedToken = Cookies.get("token");
+    if (savedToken && !token) {
+
+      dispatch({ type: "login/loginSuccess", payload: savedToken });
+    }
+  }, [dispatch, token]);
+
+  useEffect(() => {
+    if (token) {
+      Cookies.set("token", token, { expires: 1 / 24, path: "/" });
+      router.push("/Admindash");
+    }
+  }, [token, router])
+  console.log("Redux login state:", { token, error, loading });
 
 
   return (
@@ -122,11 +122,11 @@ useEffect(() => {
           </button>
         </form>
 
-        {error && (          
-          <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>             
-        )} 
+        {error && (
+          <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>
+        )}
       </div>
-      
+
     </div>
   );
 }

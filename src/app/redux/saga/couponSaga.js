@@ -22,13 +22,14 @@ import { apiroute } from "../config";
 const apidata = (payload) => {
   return axios.post(apiroute.couponAdd, payload)
 }
+const apidataFetch = () => {
+  return axios.get(apiroute.couponFetch)
+}
 
 // Create
 function* createCouponSaga(action) {
-  console.log("Payload received:", action.payload);
   try {
-    console.log("payload", action.payload.formData);
-    const response = yield call(apidata, action.payload.formData);
+    const response = yield call(apidata, action.payload);
     yield put(createCouponSuccess(response.data.coupon));
   } catch (error) {
     console.error("Create coupon error:", error);
@@ -40,7 +41,7 @@ function* createCouponSaga(action) {
 // Fetch all
 function* fetchCouponsSaga() {
   try {
-    const response = yield call(axios.get, `${BASE_URL}/coupons`);
+    const response = yield call(apidataFetch);
     yield put(fetchCouponsSuccess(response.data.coupons));
   } catch (error) {
     yield put(fetchCouponsFailure(error.message));
