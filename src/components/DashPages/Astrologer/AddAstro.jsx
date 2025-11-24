@@ -6,6 +6,7 @@ import CustomInput from "@/components/Custom/CustomInput";
 import CSC from "@/components/Custom/CSC";
 import CustomButton from "@/components/Custom/CustomButtom";
 import AstroProCharge from "../../Data/AstroProCharge";
+import MultiSelect from "@/components/Custom/MultiSelect";
 
 export default function AddAstro() {
 
@@ -27,36 +28,49 @@ export default function AddAstro() {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("Form Submitted:", formData);
-        // yaha API call karega (axios/fetch)
     };
+
 
     const selectFields = [
         {
-            label: "Specialisation / Expertise",
+            label: "Skills & Expertise",
             name: "expertise",
             placeholder: "Select Expertise",
-            options: ["English", "Hindi", "Tarot", "Numerology"],
+            options: ["Palmistry", "Face Reading", "Tarot", "Numerology"],
+            multiple: true,
         },
         {
             label: "Language Known",
             name: "language",
             placeholder: "Select Language",
-            options: ["English", "Hindi", "Spanish", "French"],
+            options: ["English", "Hindi", "Punjabi", "Malayalam", "Telugu", "Tamil", "Kannada"],
+            multiple: true,
         },
         {
             label: "Problems Handled",
             name: "problems",
             placeholder: "Select Problems",
-            options: ["Love", "Career", "Health", "Finance"],
+            options: ["Love", "Career", "Health", "Finance", "Pregnancy", "Job", "Education", "Marriage"],
+            multiple: true,
         },
-        {
-            label: "Astrologer Status",
-            name: "status",
-            placeholder: "Select Status",
-            options: ["Available", "Busy", "Offline"],
-        },
-
+    
     ];
+
+
+    const [formDat, setFormDat] = useState({
+        expertise: [],
+        language: [],
+        problems: [],
+    });
+
+    const updateField = (name, value) => {
+        setFormDat((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+
 
     return (
         <div className="min-h-screen ">
@@ -247,29 +261,25 @@ export default function AddAstro() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-3">
+
+                        <div className="flex flex-col gap-4">
+
                             {selectFields.map((field, idx) => (
-                                <div key={idx}>
-                                    <label className="block text-sm font-medium mb-1 text-gray-600">
-                                        {field.label}
-                                    </label>
-                                    <select
-                                        name={field.name}
-                                        className="w-full border rounded-full border-gray-400 p-2 "
-                                    >
-                                        <option value="" hidden className="text-gray-200">
-                                            {field.placeholder}
-                                        </option>
-                                        {field.options.map((opt, i) => (
-                                            <option key={i} value={opt}>
-                                                {opt}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <MultiSelect
+                                    key={idx}
+                                    label={field.label}
+                                    options={field.options}
+                                    placeholder={field.placeholder}
+                                    selected={formDat[field.name]}
+                                    setSelected={(value) => updateField(field.name, value)}
+                                    multiple={field.multiple}
+                                />
                             ))}
+
                         </div>
-                        
+
+
+
                         <div className="flex w-full ">
                             <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-400  bg-white w-full">
                                 <h2 className="font-semibold text-sm text-center ">Astrologer Charges</h2>

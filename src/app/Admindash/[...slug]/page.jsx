@@ -16,6 +16,7 @@ import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
 import AstroProfile from "@/components/DashPages/Astrologer/AstroProfile";
 import TestimonialList from "../../../components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
 import EditTestimonial from "../editTestimonial/[id]/page";
+import AstroList from "@/components/DashPages/Astrologer/astroList";
 
 export default function AdminPanel() {
   const params = useParams();
@@ -47,7 +48,7 @@ export default function AdminPanel() {
     addastro: <AddAstro />,
     astroprofile: <AstroProfile />,
     addtesti: <AddTestimonial />,
-    // astrolist: <AstroList/>,
+    astrolist: <AstroList/>,
     edittestimonial: <EditTestimonial />,
 
   };
