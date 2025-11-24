@@ -15,10 +15,7 @@ const variantClasses = {
 export default function CustomButton({ type = "button", onClick, className = "", children, variant, ...props }) {
   const [isMounted, setIsMounted] = useState(false);
 
-  const loginpopup = () => {
-    toast.error("Your Are Offline Please Connect to Login");
-  };
-
+ 
   return isMounted ? (
     <button
       type={type}

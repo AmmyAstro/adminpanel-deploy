@@ -5,15 +5,16 @@ import bannerReducer from "./slices/bannerSlice";
 import addGiftReducer from "./slices/addGiftSlice";
 import testimonialReducer from "./slices/testimonialSlice";
 import couponReducer from "./slices/couponSlice";
-
-
-
+import GetListSlice from "./slices/astrologer/GetListSlice";
+import ActiveAccountSlice from "./slices/astrologer/ActiveAccountSlice";
 const rootReducer = combineReducers({
   login: loginReducer,
   banner: bannerReducer,
   addGift: addGiftReducer,
   testimonial: testimonialReducer, 
   coupon: couponReducer,
+  astrologerlist:GetListSlice,
+  astrologeractive:ActiveAccountSlice
 });
 
 export default rootReducer;
