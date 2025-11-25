@@ -7,6 +7,7 @@ import testimonialSaga from "./saga/testimonialSaga";
 import couponSaga from "./saga/couponSaga";
 import getAstroSaga from "./saga/astrologer/getAstroSaga";
 import astroActiveAstro from "./saga/astrologer/astroActiveAstro.js";
+import AstrologerDetailSaga from "./saga/astrologer/AstrologerDetailSaga.js";
 
 
 
@@ -20,7 +21,8 @@ export default function* rootSaga() {
     testimonialSaga(),
     couponSaga(),
     getAstroSaga(),
-    astroActiveAstro()
+    astroActiveAstro(),
+    AstrologerDetailSaga()
   ]);
 
 }

@@ -14,6 +14,10 @@ import { TbPasswordFingerprint } from "react-icons/tb";
 import toast from "react-hot-toast";
 import { getAccountList,resetCode } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
 import AlertLoading from "@/app/common/AlertLoading";
+import { ImProfile } from "react-icons/im";
+import { useRouter } from "next/navigation";
+
+
 
 
 
@@ -26,6 +30,7 @@ export default function AstroList() {
 
 
     const dispatch = useDispatch();
+    const router= useRouter();
    const { loading, astrolist } = useSelector((state) => state.astrologerlist);
             const { accountloading, activeaccount,statusCode } = useSelector((state) => state.astrologeractive);
     const astrologerlist = useMemo(() => {
@@ -54,6 +59,10 @@ export default function AstroList() {
 
 
 
+
+   const astrologerProfile = (id) => {
+  router.push(`astrolist/astroprofile/${id}`);
+}
 
 
       const generateAccount= () =>{
@@ -213,7 +222,9 @@ export default function AstroList() {
                                 onClick={()=>HandlerPassword(row?.id,row?.full_name,row?.mobile2)}><TbPasswordFingerprint />
                             </CustomButton>
                             <CustomButton variant={"yellow"} className="px-2 py-2 text-white rounded-lg font-semibold"><FaEdit /></CustomButton>
-                            {/* <CustomButton variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><MdDeleteForever /></CustomButton> */}
+
+                            <CustomButton onClick={()=>astrologerProfile(row?.id)}
+                            variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><ImProfile /></CustomButton>
                         </div></li>
                 </ul>
             ))}

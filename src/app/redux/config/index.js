@@ -30,6 +30,7 @@ const apiroute = {
 
   ASTROLOGER_LIST: `${API_BASE_URL}astrologer/list`,
     ASTROLOGER_ACCOUNT_ACTIVE: `${API_BASE_URL}astrologer/accountactive`,
+    ASTROLOGER_PROFILE:`${API_BASE_URL}astro/profile`,
 
 }
 

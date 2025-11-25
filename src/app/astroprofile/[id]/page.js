@@ -1,15 +1,59 @@
+import Skenton from "@/app/common/Skenton";
+import { formatDate } from "@/app/helper/helper";
+import { mainurl } from "@/app/redux/config";
+import { RequestAstrologerDetail } from "@/app/redux/slices/astrologer/AstrologerDetail";
 import CustomButton from "@/components/Custom/CustomButtom";
-import CustomToggle from "@/components/Custom/CustomToggle";
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { FaStar } from "react-icons/fa6";
-import AstroProfiledata from "@/components/Data/AstroProifledata";
 import CustomInput from "@/components/Custom/CustomInput";
+import CustomToggle from "@/components/Custom/CustomToggle";
+import AstroProfiledata from "@/components/Data/AstroProifledata";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { FaStar } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
+import { useSelector,useDispatch } from "react-redux";
+
+
+
+
+
+
+
+
 
 export default function AstroProfile() {
-    const [activeTab, setActiveTab] = useState("call");
-    const [openPopup, setOpenPopUp] = useState(false)
+ const [activeTab, setActiveTab] = useState("call");
+ const [openPopup, setOpenPopUp] = useState(false)
+ const dispatch= useDispatch();
+ const params  = useParams();
+ const astro_id=params?.slug[3];
+
+
+   const {astrologerloading,astrologerdata} = useSelector((state)=>state.astrologerdetail);
+    useEffect(()=>{
+    dispatch(RequestAstrologerDetail({astro_id}))
+    },[dispatch,astro_id])
+
+
+
+
+
+
+    const astrologerprofile= useMemo(()=>{
+       return astrologerdata?.profile;
+       },[astrologerdata])
+
+
+
+       const astro_stats = useMemo(()=>{
+         return astrologerdata?.stats;
+         },[astrologerdata])
+
+
+     
+
+
+
     const openWallet = openPopup => {
         setOpenPopUp(true);
     }
@@ -18,6 +62,11 @@ export default function AstroProfile() {
         chat: false,
         promo: false,
     });
+
+    if (astrologerloading) {
+  return <Skenton />;
+}
+
 
     const docs = [
         { id: 1, name: "Pancard", status: "Uploded" },
@@ -34,32 +83,44 @@ export default function AstroProfile() {
         { id: 2, name: "Chat", rate: "4.50", num: "156" },
         { id: 3, name: "Video", rate: "3.10", num: "200" },
     ];
+
+ 
     const stats = [
         {
             id: 1,
             img: "/admin-img/earnings.png",
-            amount: "65,000",
-            label: "Total Revenue",
+            amount: astro_stats?.balance_amount || 0,
+            label: "Availble Balence",
             prefix: "₹ ",
         },
         {
             id: 2,
             img: "/admin-img/investment.png",
-            amount: "5,000",
-            label: "Total Earnings",
+            amount: astro_stats?.total_calls || 0,
+            label: "Total Call",
             prefix: "₹ ",
         },
         {
             id: 3,
             img: "/admin-img/reward.png",
-            amount: "165",
-            label: "Reviews",
+            amount: astro_stats?.total_chats || 0,
+            label: "Total Chat",
             prefix: "",
         },
     ];
 
+
+
+
+
+    
+
+
+
     return (
         <div className="min-h-screen ">
+
+            
             <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-purple-900">
                     Astrologer Profile
@@ -114,7 +175,7 @@ export default function AstroProfile() {
 
                     <div className="flex justify-between items-center bg-purple-200 p-2 rounded-full shadow px-4">
                         <h5 className="text-sm font-bold">Astrologers Details</h5>
-                        <CustomButton variant={"black"} className="text-sm px-3 py-1 text-black" onClick={() => xy()}>Edit</CustomButton>
+                        <CustomButton variant={"black"} className="text-sm px-3 py-1 text-black" >Edit</CustomButton>
                     </div>
 
 
@@ -122,8 +183,8 @@ export default function AstroProfile() {
 
                         <div className="flex items-center gap-4">
                             <div className="">
-                                <Image
-                                    src="/admin-img/user2.png"
+                             
+                               <Image src={mainurl + 'ds-img/' + astrologerprofile?.profile_image}
                                     alt="Avatar"
                                     width={60}
                                     height={60}
@@ -132,9 +193,9 @@ export default function AstroProfile() {
                             </div>
 
                             <div className="flex flex-col ml-5 gap-1">
-                                <span className="font-bold text-gray-800">Test</span>
+                                <span className="font-bold text-gray-800">{astrologerprofile?.full_name || ""}</span>
                                 <small className="font-semibold text-gray-600">
-                                    Astrologer ID : 20627
+                                    Astrologer ID :000-{ astrologerprofile?.id}
                                 </small>
                             </div>
                         </div>
@@ -142,20 +203,21 @@ export default function AstroProfile() {
                         <div className="flex flex-col gap-2  py-3">
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Name :</div>
-                                <div className="text-sm">Tester 1</div>
+                                <div className="text-sm">{astrologerprofile?.full_name || ""}</div>
                             </div>
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Email:</div>
-                                <div className="text-sm">jain@dhwaniastro.com</div>
+                                <div className="text-sm">{astrologerprofile?.full_name}@gmail.com</div>
                             </div>  <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Mobile:</div>
-                                <div className="text-sm">9319490825</div>
+                                <div className="text-sm">{astrologerprofile?.mobile2}</div>
                             </div>  <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Address:</div>
-                                <div className="text-sm">Lodhi Road, Lodhi Road</div>
+                                <div className="text-sm">{astrologerprofile?.address || ""},
+                                    {astrologerprofile?.city || ""},{astrologerprofile?.state || ""}</div>
                             </div>  <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm  ">Joined From:</div>
-                                <div className="text-sm">30 Apr,2024 01:02 pm</div>
+                                <div className="text-sm">{formatDate(astrologerprofile?.created_at)}</div>
                             </div>
                         </div>
                         <hr className="text-gray-300" />
@@ -180,7 +242,7 @@ export default function AstroProfile() {
                                 </label>
                                 <div className="flex items-center gap-5">
                                     <label className="text-sm font-semibold text-gray-700">
-                                        ₹ 30
+                                        ₹ {astrologerprofile?.disc_call_charge}
                                     </label>
                                     <CustomToggle
                                         id="chat"
@@ -196,7 +258,7 @@ export default function AstroProfile() {
                                 </label>
                                 <div className="flex items-center gap-5">
                                     <label className="text-sm font-semibold text-gray-700">
-                                        ₹ 20
+                                        ₹ {astrologerprofile?.disc_chat_charge} 
                                     </label>
                                     <CustomToggle
                                         id="chat"
@@ -212,7 +274,7 @@ export default function AstroProfile() {
                                 </label>
                                 <div className="flex items-center gap-5">
                                     <label className="text-sm font-semibold text-gray-700">
-                                        ₹ 50
+                                        ₹  {astrologerprofile?.astro_video_charges} 
                                     </label>
                                     <CustomToggle
                                         id="chat"
@@ -238,7 +300,7 @@ export default function AstroProfile() {
                                         >
                                             Edit
                                         </CustomButton>
-                                        <span className="text-red-400 text-xs">0/10</span>
+                                        <span className="text-red-400 text-xs">{astro_stats?.promotional || 0}/10</span>
 
                                     </div>
                                     <button
@@ -291,28 +353,9 @@ export default function AstroProfile() {
                             </div>
                         </div>
 
-                        <hr className="text-gray-300" />
+                      
 
-                        <div className="flex flex-col gap-2 py-3">
-                            <h6 className="text-sm font-semibold">Astrologer Charges :</h6>
-                            <div className="space-y-3">
-                                {charge.map((charge) => (
-                                    <div
-                                        key={charge.id}
-                                        className="flex px-4 items-center gap-5 justify-between p-2 border border-gray-50  rounded-full shadow hover:bg-gray-50 transition"
-                                    >
-                                        <div className="flex w-full items-center justify-between">
-                                            <h6 className="font-medium text-sm">{charge.name} :</h6>
-                                            <span
-                                                className={`text-sm`}>
-                                                Rs. {charge.price}
-                                            </span>
-                                        </div>
-
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                     
 
                         <hr className="text-gray-300" />
 

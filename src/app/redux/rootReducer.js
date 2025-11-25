@@ -7,6 +7,8 @@ import testimonialReducer from "./slices/testimonialSlice";
 import couponReducer from "./slices/couponSlice";
 import GetListSlice from "./slices/astrologer/GetListSlice";
 import ActiveAccountSlice from "./slices/astrologer/ActiveAccountSlice";
+import AstrologerDetail from "./slices/astrologer/AstrologerDetail";
+
 const rootReducer = combineReducers({
   login: loginReducer,
   banner: bannerReducer,
@@ -14,7 +16,8 @@ const rootReducer = combineReducers({
   testimonial: testimonialReducer, 
   coupon: couponReducer,
   astrologerlist:GetListSlice,
-  astrologeractive:ActiveAccountSlice
+  astrologeractive:ActiveAccountSlice,
+  astrologerdetail:AstrologerDetail,
 });
 
 export default rootReducer;
