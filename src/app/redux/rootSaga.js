@@ -5,10 +5,25 @@ import bannerSaga from "./saga/bannerSaga";
 import addGiftSaga from "./saga/addGiftSaga";
 import testimonialSaga from "./saga/testimonialSaga";
 import couponSaga from "./saga/couponSaga";
-import packageSaga from "./saga/packageSaga";
+import getAstroSaga from "./saga/astrologer/getAstroSaga";
+import astroActiveAstro from "./saga/astrologer/astroActiveAstro.js";
+import AstrologerDetailSaga from "./saga/astrologer/AstrologerDetailSaga.js";
+import chatHistorySaga from "./saga/chathistory/chatHistorySaga.js";
+
+
 
 
 export default function* rootSaga() {
-  yield all([loginSaga(),bannerSaga(), addGiftSaga(),testimonialSaga(),couponSaga(),packageSaga()]);
+  yield all([
+    loginSaga(),
+    bannerSaga(), 
+    addGiftSaga(),
+    testimonialSaga(),
+    couponSaga(),
+    getAstroSaga(),
+    astroActiveAstro(),
+    AstrologerDetailSaga(),
+    chatHistorySaga(),
+  ]);
 
 }

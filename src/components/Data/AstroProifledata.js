@@ -1,18 +1,23 @@
+import CallComp from "../Custom/CallComp";
+import ChatCom from "../Custom/ChatCom";
+
+
  const AstroProfiledata = [
   {
     id: "call",
     label: "Call History",
     fields: [
-      { label: "Call/Chat Charges", prefix: "Rs.", name: "callCharges", max: 500 },
-      { label: "Call/Chat Commission", prefix: "%.", name: "callCommission", max: 50 },
+      // eslint-disable-next-line react/jsx-key
+      <CallComp />
+     
     ],
   },
   {
     id: "video",
     label: "Chat History",
     fields: [
-      { label: "Video Call Charges", prefix: "Rs.", name: "astro_video_charges", max: 500 },
-      { label: "Video Call Commission", prefix: "%.", name: "video_commission", max: 50 },
+     // eslint-disable-next-line react/jsx-key
+     <ChatCom />
     ],
   },
   {

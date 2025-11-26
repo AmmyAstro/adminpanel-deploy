@@ -18,9 +18,10 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+        <title>Admin-Panel | Online Jyotish Consultation by Dhwani Astro</title>
+        {/* <link rel="icon" href="/favicon.png" /> */}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* Redux Provider now works because this is a client component */}
-        <Provider store={store}>
+       <Provider store={store}>
           {children}
         </Provider>
       </body>

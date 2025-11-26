@@ -13,10 +13,10 @@ import PrivilegeMain from "@/components/DashPages/PrivilegeManager/PrivilegeMain
 import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
 import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
-import AstroProfile from "@/components/DashPages/Astrologer/AstroProfile";
 import TestimonialList from "../../../components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
 import EditTestimonial from "../editTestimonial/[id]/page";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
+import AstroProfile from "@/app/astroprofile/[id]/page";
 
 export default function AdminPanel() {
   const params = useParams();
@@ -46,19 +46,24 @@ export default function AdminPanel() {
     banner: <BannerManager />,
     staffmain: <Staffmain />,
     addastro: <AddAstro />,
-    astroprofile: <AstroProfile />,
     addtesti: <AddTestimonial />,
-    astrolist: <AstroList/>,
+    astrolist: <AstroList />,
     edittestimonial: <EditTestimonial />,
 
   };
+
+  const thirdLevel = {
+    astroprofile: <AstroProfile />,
+
+  }
 
   let Componentrender = null;
 
   if (path.length === 1) {
 
     Componentrender = admindash[path[0]];
-  } else if (path.length === 2) {
+  }
+  else if (path.length === 2) {
 
     if (path[0] === "managecms") {
       Componentrender = secondLevel[path[1]];
@@ -74,12 +79,33 @@ export default function AdminPanel() {
     }
   }
 
+else if (path.length === 3) {
+  if (
+    path[0] === "astromain" &&
+    path[1] === "astrolist" &&
+    thirdLevel[path[2]]
+  ) {
+    Componentrender = thirdLevel[path[2]];
+  }
+}
+else if (path.length === 4) {
+  if (
+    path[0] === "astromain" &&
+    path[1] === "astrolist" &&
+    path[2] === "astroprofile"
+  ) {
+    Componentrender = <AstroProfile id={path[3]} />;
+  }
+}
+
+
+
   return (
     <>
       {Componentrender ? (
         Componentrender
       ) : (
-        <div className="text-center  text-red-600 font-semibold py-10">
+        <div className="text-center  text-purple-600 font-semibold py-10">
           Page not found: <code>{path.join(" / ")}</code>
         </div>
       )}
