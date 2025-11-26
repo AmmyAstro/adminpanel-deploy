@@ -17,17 +17,17 @@ const mainurl="https://newsite-cvo9.onrender.com/";
 
 
 const apiroute = {
-    banneradd: `${apiurl}/banneradd`,
-    addGift: `${apiurl}/addGift`,
-    AdminLogin: `${apiurl}/login`,
-    addTestimonial: `${apiurl}/testimonials/`,
+  banneradd: `${apiurl}/banneradd`,
+  addGift: `${apiurl}/addGift`,
+  AdminLogin: `${apiurl}/login`,
+  addTestimonial: `${apiurl}/testimonials/`,
   editTestimonial: (id) => `${apiurl}/testimonials/${id}`,
 
   couponAdd: `${apiurl}/coupons/add`,
   couponFetch: `${apiurl}/coupons`,
 
   // package
-  packageAdd: `${apiurl}/packageAdd`,
+  packageAdd: `${PAYMENT_MICRO}add/package`,
 
   ASTROLOGER_LIST: `${API_BASE_URL}astrologer/list`,
     ASTROLOGER_ACCOUNT_ACTIVE: `${API_BASE_URL}astrologer/accountactive`,
@@ -35,7 +35,6 @@ const apiroute = {
       CHAT_HISTORY:`${CHAT_MICRO}astrologer/chat_history`,
 
 }
-
 
 const AuthHeader= ()=>{
   const token =cookieHelper.get("token");
