@@ -1,14 +1,14 @@
 import { takeLatest, all, put, call } from "redux-saga/effects";
 import axios from "axios";
 import { apiroute, AuthHeader } from "../config";
-import { packageAddSuccessfully, packageaddfail, sendpackageRequest } from "../slices/packageSlice";
+import { packageAddSuccessfully, packageaddfail, sendpackageRequest,
+    sendRequestPackage, 
+    getSuccessPackage} from "../slices/packageSlice";
+    
 
 
 const apidata = (payload) => {
-
-
     const token = AuthHeader();
-
     const headers = {
     Authorization: `Bearer ${token}`,
   };
@@ -19,6 +19,27 @@ const apidata = (payload) => {
     return axios.post(apiroute.packageAdd, payload, { headers })
 }
 
+
+const package_Data = ()=>{
+return axios.get(apiroute.FETCH_PACKAGE);
+
+}
+
+
+
+function* getPackage(){
+    try {
+      const response=  yield call(package_Data);
+
+
+      console.log("xxxxxxxxxxxxxxxxxxxxx",response?.data);
+     
+   yield put(getSuccessPackage());
+    } catch (error) {
+        console.log(error?.message);
+        
+    }
+}
 // create package
 function* packageAddSaga(action) {
     try {
@@ -32,7 +53,6 @@ function* packageAddSaga(action) {
     }
 }
 export default function* packageSaga() {
-    yield all([
-        takeLatest(sendpackageRequest.type, packageAddSaga),
-    ]);
+    yield takeLatest(sendpackageRequest.type, packageAddSaga);
+    yield takeLatest(sendRequestPackage.type,getPackage);
 }

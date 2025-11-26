@@ -1,14 +1,16 @@
 "use client";
 
-import { sendpackageRequest,resetPackageCode } from "@/app/redux/slices/packageSlice";
+import { sendpackageRequest,resetPackageCode, sendRequestPackage, } from "@/app/redux/slices/packageSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { MdDelete, MdCancel } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
+
+
 
 
 function useDebounce(value, delay = 500) {
@@ -22,23 +24,43 @@ function useDebounce(value, delay = 500) {
 
   return debounced;
 }
+
+
+
 export default function PacakageMain() {
     const [open, setOpen] = useState(false);
-
-    const {adcode,loading,currentPackage} = useSelector((state)=>state.package || {});
-
  const dispatch = useDispatch();
+    const {adcode,loading,currentPackage,response} = useSelector((state)=>state.package || {});
+
+
+
+
+
+useEffect(()=>{
+    dispatch(sendRequestPackage());
+},[dispatch])
+
 
     useEffect(()=>{
+
+        console.log("SDasda",response);
         if(adcode === 200){
             toast.success("Package Added Successfully!");
             dispatch(resetPackageCode());
         }
 
-    },[adcode,dispatch]);
+    },[adcode,dispatch,response]);
 
 
 
+    // const packagedata= useMemo(()=>{
+    //     return packages;
+
+    // },[packages])
+
+
+
+ 
    
     const [tempform, setTempForm] = useState({
         package_name: "",
@@ -162,13 +184,13 @@ export default function PacakageMain() {
                                         value={tempform.tax_apply}
                                         onChange={handleChange}
                                         className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm">
-                                        <option hidden>Select Tax</option>
-                                        <option>18.00% | GST</option>
-                                        <option>1.00% | GST</option>
-                                        <option>3.00% | GST</option>
-                                        <option>5.00% | GST</option>
-                                        <option>12.00% | GST</option>
-                                        <option>28.00% | GST</option>
+                                        <option hidden>Select Tax Gst</option>
+                                        <option>18</option>
+                                        <option>1</option>
+                                        <option>3</option>
+                                        <option>5</option>
+                                        <option>12</option>
+                                        <option>28</option>
                                     </select>
                                 </div>
                             </div>

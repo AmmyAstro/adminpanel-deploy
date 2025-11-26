@@ -5,7 +5,9 @@ const initialState = {
     currentPackage: null,
     loading: false,
     error: null,
-    adcode: null
+    adcode: null,
+    response:null
+
 };
 const packageSlice = createSlice({
     name: "package",
@@ -16,7 +18,7 @@ const packageSlice = createSlice({
         },
         packageAddSuccessfully: (state, action) => {
             state.loading = false;
-            state.packages = action.payload;
+    
             state.adcode = 200;
         },
         packageaddfail: (state, action) => {
@@ -26,9 +28,16 @@ const packageSlice = createSlice({
         resetPackageCode:(state,action) =>{
             state.adcode=null
 
-        }
+        },
+        sendRequestPackage:(state)=>{
+               state.loading = true;
+        },
+   getSuccessPackage: (state) => {
+    state.loading = false;
+    state.response = 200;
+}
     }
 });
 
-export const { packageAddSuccessfully, packageaddfail, sendpackageRequest,resetPackageCode } = packageSlice.actions;
+export const { packageAddSuccessfully, packageaddfail, sendpackageRequest,resetPackageCode,sendRequestPackage,getSuccessPackage } = packageSlice.actions;
 export default packageSlice.reducer;
