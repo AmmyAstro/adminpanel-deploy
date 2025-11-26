@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { loginRequest } from "./redux/slices/loginSlice";
 import Image from "next/image";
-import Cookies from "js-cookie";
+import cookieHelper from "./helper/cookieHelper";
+
 
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
@@ -38,7 +39,7 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (token) {
-      Cookies.set("token", token, { expires: 1 / 24, path: "/" });
+      cookieHelper.set("token",token);
       router.push("/Admindash");
     }
   }, [token, router])

@@ -58,9 +58,9 @@ export default function AstroProfile() {
         setOpenPopUp(true);
     }
     const [availability, setAvailability] = useState({
-        call: false,
-        chat: false,
-        promo: false,
+        call: astrologerprofile?.is_call_online,
+        chat: astrologerprofile?.is_chat_online,
+       
     });
 
     if (astrologerloading) {
@@ -73,11 +73,7 @@ export default function AstroProfile() {
         { id: 2, name: "Aadhar", status: "Uploded" },
         { id: 3, name: "Passbook / Cheque", status: "Upload" },
     ];
-    const charge = [
-        { id: 1, name: "Call", price: "20" },
-        { id: 2, name: "Chat", price: "30" },
-        { id: 3, name: "Video", price: "50" },
-    ];
+
     const review = [
         { id: 1, name: "Call", rate: "4.21", num: "106" },
         { id: 2, name: "Chat", rate: "4.50", num: "156" },
@@ -268,21 +264,7 @@ export default function AstroProfile() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Video
-                                </label>
-                                <div className="flex items-center gap-5">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        ₹  {astrologerprofile?.astro_video_charges} 
-                                    </label>
-                                    <CustomToggle
-                                        id="chat"
-                                        checked={availability.video}
-                                        onChange={(val) => setAvailability({ ...availability, chat: val })}
-                                    />
-                                </div>
-                            </div>
+                          
 
 
                             <div className="grid grid-cols-2 items-center gap-3">
@@ -440,7 +422,7 @@ export default function AstroProfile() {
                             </div>
 
 
-                            <div className="p-4 shadow rounded-lg bg-purple-100">
+                            <div className="p-1 shadow rounded-lg ">
                                 {AstroProfiledata.map(
                                     (tab) =>
                                         activeTab === tab.id && (
@@ -448,18 +430,8 @@ export default function AstroProfile() {
                                                 <tbody className="space-y-2">
                                                     {tab.fields.map((field, idx) => (
                                                         <tr key={idx} className="mb-2">
-                                                            <td className="py-2 pr-4">{field.label} :</td>
-                                                            <td>
-                                                                {field.prefix}
-                                                                <input
-                                                                    type="text"
-                                                                    name={field.name}
-                                                                    defaultValue="0"
-                                                                    maxLength="3"
-                                                                    max={field.max}
-                                                                    className="border rounded-md px-2 py-1 w-20 ml-1 text-center"
-                                                                />
-                                                            </td>
+                                                            <td className="py-2 pr-4">{field}</td>
+                                                       
                                                         </tr>
                                                     ))}
                                                 </tbody>

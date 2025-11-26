@@ -1,3 +1,4 @@
+import cookieHelper from "@/app/helper/cookieHelper";
 
 const apiurl = "http://localhost:5000/api";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5002/api/";
@@ -31,7 +32,19 @@ const apiroute = {
   ASTROLOGER_LIST: `${API_BASE_URL}astrologer/list`,
     ASTROLOGER_ACCOUNT_ACTIVE: `${API_BASE_URL}astrologer/accountactive`,
     ASTROLOGER_PROFILE:`${API_BASE_URL}astro/profile`,
+      CHAT_HISTORY:`${CHAT_MICRO}astrologer/chat_history`,
 
 }
 
-export { apiroute,mainurl }
+
+const AuthHeader= ()=>{
+  const token =cookieHelper.get("token");
+
+  return token;
+}
+
+
+
+
+
+export { apiroute,mainurl,AuthHeader }

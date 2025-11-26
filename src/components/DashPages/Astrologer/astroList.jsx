@@ -12,7 +12,7 @@ import { MdDeleteForever } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { TbPasswordFingerprint } from "react-icons/tb";
 import toast from "react-hot-toast";
-import { getAccountList,resetCode } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
+import { getAccountList, resetCode } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
 import AlertLoading from "@/app/common/AlertLoading";
 import { ImProfile } from "react-icons/im";
 import { useRouter } from "next/navigation";
@@ -30,9 +30,9 @@ export default function AstroList() {
 
 
     const dispatch = useDispatch();
-    const router= useRouter();
-   const { loading, astrolist } = useSelector((state) => state.astrologerlist);
-            const { accountloading, activeaccount,statusCode } = useSelector((state) => state.astrologeractive);
+    const router = useRouter();
+    const { loading, astrolist } = useSelector((state) => state.astrologerlist);
+    const { accountloading, activeaccount, statusCode } = useSelector((state) => state.astrologeractive);
     const astrologerlist = useMemo(() => {
         return astrolist?.sortedAstrologers;
     }, [astrolist])
@@ -44,64 +44,65 @@ export default function AstroList() {
 
 
     const [showUpdatePopup, setShowUpdatePopup] = useState(false);
-    const [astrodetail,setAstroDetail]= useState("");
+    const [astrodetail, setAstroDetail] = useState("");
     const [password, setPassword] = useState("");
 
-    const HandlerPassword = (astro_id,name,phone) => {
-      setShowUpdatePopup(true);
-      setAstroDetail({
-        astroId:astro_id,
-        profilename:name,
-        phonenumber:phone
-      })}
+    const HandlerPassword = (astro_id, name, phone) => {
+        setShowUpdatePopup(true);
+        setAstroDetail({
+            astroId: astro_id,
+            profilename: name,
+            phonenumber: phone
+        })
+    }
 
 
 
 
 
 
-   const astrologerProfile = (id) => {
-  router.push(`astrolist/astroprofile/${id}`);
-}
+    const astrologerProfile = (id) => {
+        router.push(`astrolist/astroprofile/${id}`);
+    }
 
 
-      const generateAccount= () =>{
-       try {
-         
-         if(password === ""){
-           toast.error("Please Enter New Password!");
-         }else{
-    let payload= {
-            newPassword:password,
-            phone:astrodetail?.phonenumber
-         }
+    const generateAccount = () => {
+        try {
+
+            if (password === "") {
+                toast.error("Please Enter New Password!");
+            } else {
+                let payload = {
+                    newPassword: password,
+                    phone: astrodetail?.phonenumber
+                }
 
 
-    
-          dispatch(getAccountList(payload))
+
+                dispatch(getAccountList(payload))
 
 
+
+            }
+
+
+        } catch (error) {
 
         }
-
-        
-       } catch (error) {
-        
-       }
-      }
+    }
 
 
 
 
 
-      useEffect(()=>{
-        if(statusCode === 200){
+    useEffect(() => {
+        if (statusCode === 200) {
             dispatch(resetCode());
-        toast.success("Congragucation Astrologer Account Active!");
+            toast.success("Congragucation Astrologer Account Active!");
 
-   setShowUpdatePopup(false)
+            setShowUpdatePopup(false)
         }
-      },[statusCode])
+    }, [statusCode])
 
     return (
         <div className="min-h-screen ">
@@ -120,11 +121,11 @@ export default function AstroList() {
                 <li>S.No</li>
                 <li>Name</li>
                 <li>Mobile</li>
-             
+
                 <li>Secret Login</li>
                 <li>Activity</li>
                 <li>Status</li>
-                   <li>Last Login</li>
+                <li>Last Login</li>
 
                 <li>Action</li>
             </ul>
@@ -146,7 +147,7 @@ export default function AstroList() {
                         </div>
                     </div></li>
                     <li className="line-clamp-2  text-ellipsis ">{row?.mobile2}</li>
-                   
+
                     <li>
                         <CustomButton variant={"black"} className="px-2 py-2 text-white rounded-lg font-semibold">
                             <FaUserSecret />
@@ -178,40 +179,40 @@ export default function AstroList() {
                     </li>
                     <li>
                         {
-                            row?.availability === 1 && 
-                              <CustomToggle
-                        checked
-                            id="chat"
-                        // onChange={(val)}
-                        />
+                            row?.availability === 1 &&
+                            <CustomToggle
+                                checked
+                                id="chat"
+                            // onChange={(val)}
+                            />
                         }
-                         {
-                            row?.availability === 0 && 
-                              <CustomToggle
-                    
-                            id="chat"
-                        // onChange={(val)}
-                        />
+                        {
+                            row?.availability === 0 &&
+                            <CustomToggle
+
+                                id="chat"
+                            // onChange={(val)}
+                            />
                         }
 
-                         {
-                            row?.availability === 2 && 
-                              <CustomToggle
-                    
-                            id="chat"
-                        // onChange={(val)}
-                        />
-                        }
-                      
-                        
-                        </li>
+                        {
+                            row?.availability === 2 &&
+                            <CustomToggle
 
-                        
+                                id="chat"
+                            // onChange={(val)}
+                            />
+                        }
+
+
+                    </li>
+
+
                     <li>
                         <div className="flex items-center justify-center gap-3 text-xs">
 
-                         23/11/25 10:20 am
-                         
+                            23/11/25 10:20 am
+
                         </div></li>
 
 
@@ -219,17 +220,17 @@ export default function AstroList() {
                         <div className="flex items-center justify-center gap-3 text-xs">
 
                             <CustomButton variant={"red"} className="px-2 py-2 text-white rounded-lg font-semibold"
-                                onClick={()=>HandlerPassword(row?.id,row?.full_name,row?.mobile2)}><TbPasswordFingerprint />
+                                onClick={() => HandlerPassword(row?.id, row?.full_name, row?.mobile2)}><TbPasswordFingerprint />
                             </CustomButton>
                             <CustomButton variant={"yellow"} className="px-2 py-2 text-white rounded-lg font-semibold"><FaEdit /></CustomButton>
 
-                            <CustomButton onClick={()=>astrologerProfile(row?.id)}
-                            variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><ImProfile /></CustomButton>
+                            <CustomButton onClick={() => astrologerProfile(row?.id)}
+                                variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><ImProfile /></CustomButton>
                         </div></li>
                 </ul>
             ))}
 
- {showUpdatePopup && (
+            {showUpdatePopup && (
                 <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
                     <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
                         <button onClick={() => setShowUpdatePopup(false)} className="absolute top-2  right-2 text-red-500 text-xl">
@@ -238,22 +239,22 @@ export default function AstroList() {
                         <h1 className="text-xl font-bold">Active New Account</h1>
 
 
-                             <div className="flex flex-col mt-4">
+                        <div className="flex flex-col mt-4">
                             <label> Astrologer  : {astrodetail?.profilename || ""}</label>
-                            
-                           
+
+
                         </div>
-                       
-                          <div className="flex flex-col mt-4">
+
+                        <div className="flex flex-col mt-4">
                             <label>Enter Phone Number</label>
-                            
+
                             <div className="flex items-center space-x-2">
                                 <input
-                                disabled
+                                    disabled
                                     type="number"
                                     className="border p-2 rounded w-full"
                                     onChange={(e) => setPassword(e.target.value)}
-                                 value={astrodetail?.phonenumber}
+                                    value={astrodetail?.phonenumber}
                                 />
 
                             </div>
@@ -262,7 +263,7 @@ export default function AstroList() {
 
                         <div className="flex flex-col mt-4">
                             <label>Enter New Password</label>
-                            
+
                             <div className="flex items-center space-x-2">
                                 <input
                                     type="password"
@@ -281,7 +282,7 @@ export default function AstroList() {
 
 
                                 <CustomButton variant={"red"} onClick={generateAccount}
-                                className="px-2 py-2 text-white rounded-lg font-semibold"
+                                    className="px-2 py-2 text-white rounded-lg font-semibold"
 
 
                                 >Active Account</CustomButton>
@@ -293,8 +294,8 @@ export default function AstroList() {
                     </div>
                 </div>
             )}
-<AlertLoading show={accountloading} title="Please Wait..." />
-           
+            <AlertLoading show={accountloading} title="Please Wait..." />
+
         </div>
     );
 }
