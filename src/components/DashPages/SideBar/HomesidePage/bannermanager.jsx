@@ -1,53 +1,64 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Image from "next/image";
-import { TbEdit } from "react-icons/tb";
-import { MdDelete, MdCancel } from "react-icons/md";
+import { MdCancel } from "react-icons/md";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import { sendbannerRequest } from "@/app/redux/slices/bannerSlice";
+import toast from "react-hot-toast";
 
+// Debounce helper
+function useDebounce(value, delay = 500) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebounced(value), delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debounced;
+}
 
 export default function BannerManager() {
   const dispatch = useDispatch();
   const { response, loading } = useSelector((state) => state.banner);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
+
+  const [tempData, setTempData] = useState({
     heading: "",
     subheading: "",
     slug: "",
-    sortorder: 0,
+    sortorder: "",
     bannerlink: "",
-    // image: null,
     language: "en",
-    imageUrl: "hello"
+    imageUrl: "hello",
   });
 
-
+  const formData = useDebounce(tempData, 600);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-    setFormData((prev) => ({
+
+    setTempData((prev) => ({
       ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }));
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "sortorder" ? Number(value) : value, 
+      [name]:
+        type === "file"
+          ? files[0]
+          : name === "sortorder"
+          ? Number(value)
+          : value,
     }));
   };
 
   const handleSubmit = () => {
+    console.log("SUBMITTING FORM", formData);
     dispatch(sendbannerRequest({ formData }));
-    console.log("asaS", formData);
-
+    setIsOpen(false);
+    toast.success("Banner added successfully!");
   };
-
-
-
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
@@ -55,7 +66,9 @@ export default function BannerManager() {
         <div className="fixed z-50 inset-0 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
             <div className="flex justify-between items-center border-b pb-2 mb-4">
-              <h6 className="text-lg font-semibold">Add Banner Image</h6>
+              <h6 className="text-lg text-center font-semibold">
+                Enter Banner Details :
+              </h6>
               <CustomButton onClick={() => setIsOpen(false)}>
                 <MdCancel className="text-2xl text-gray-600 hover:text-red-500" />
               </CustomButton>
@@ -67,7 +80,7 @@ export default function BannerManager() {
                   label="Language"
                   id="language"
                   name="language"
-                  value={formData.language}
+                  value={tempData.language}
                   onChange={handleChange}
                   required
                   options={[
@@ -81,7 +94,7 @@ export default function BannerManager() {
                   type="text"
                   id="heading"
                   name="heading"
-                  value={formData.heading}
+                  value={tempData.heading}
                   onChange={handleChange}
                   required
                   placeholder="Enter main banner heading"
@@ -92,7 +105,7 @@ export default function BannerManager() {
                   type="text"
                   id="subheading"
                   name="subheading"
-                  value={formData.subheading}
+                  value={tempData.subheading}
                   onChange={handleChange}
                   required
                   placeholder="Enter banner sub heading"
@@ -103,7 +116,7 @@ export default function BannerManager() {
                   type="text"
                   id="bannerlink"
                   name="bannerlink"
-                  value={formData.bannerlink}
+                  value={tempData.bannerlink}
                   onChange={handleChange}
                   required
                   placeholder="Enter banner link"
@@ -114,7 +127,7 @@ export default function BannerManager() {
                   type="number"
                   id="sortorder"
                   name="sortorder"
-                  value={formData.sortorder}
+                  value={tempData.sortorder}
                   onChange={handleChange}
                   required
                   placeholder="Enter sort order"
@@ -125,32 +138,17 @@ export default function BannerManager() {
                   type="text"
                   id="slug"
                   name="slug"
-                  value={formData.slug}
+                  value={tempData.slug}
                   onChange={handleChange}
                   required
                   placeholder="Enter slug"
                 />
-
-                {/* <div>
-                  <CustomInput
-                    label="Image"
-                    type="file"
-                    id="image"
-                    name="image"
-                    onChange={handleChange}
-                    required
-                  />
-                  <small className="text-xs text-red-500">
-                    *NOTE: Maximum upload limit 1MB
-                  </small>
-                </div> */}
               </div>
 
               <div className="flex justify-center">
                 <CustomButton
                   variant="green"
                   onClick={handleSubmit}
-
                   className="w-fit px-10 rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
                 >
                   Submit
@@ -172,7 +170,8 @@ export default function BannerManager() {
         </CustomButton>
       </div>
 
-      <div className="p-4 flex flex-col gap-3">
+
+        <div className="p-4 flex flex-col gap-3">
         <div className="grid grid-cols-6 place-items-center font-semibold border-b py-5 bg-[#7a5ba3] rounded-lg text-white px-4">
           <div>S.no</div>
           <div>Banner Name</div>
@@ -181,52 +180,6 @@ export default function BannerManager() {
           <div>Status</div>
           <div>Actions</div>
         </div>
-
-        {/* {banners?.map((banner, i) => (
-          <div
-            key={banner.id}
-            className="grid grid-cols-6 items-center place-items-center border-b border-purple-300 py-4 px-5 text-sm bg-[#9f83c430] rounded-lg"
-          >
-            <div>{i + 1}</div>
-            <div>{banner.heading}</div>
-            <div>{banner.language}</div>
-
-            <div>
-              <Image
-                src={banner.image}
-                alt={banner.heading}
-                width={200}
-                height={80}
-                className="rounded-lg"
-              />
-            </div>
-
-            <div>
-              <input
-                type="checkbox"
-                checked={banner.status}
-                onChange={() =>
-                  dispatch(
-                    updateBannerRequest({ ...banner, status: !banner.status })
-                  )
-                }
-                className="w-4 h-4 accent-blue-600"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <button className="p-2 bg-gray-200 rounded-md hover:bg-gray-300">
-                <TbEdit className="text-blue-800" />
-              </button>
-              <button
-                onClick={() => dispatch(deleteBannerRequest(banner.id))}
-                className="p-2 bg-red-400 text-white rounded-md hover:bg-red-500"
-              >
-                <MdDelete />
-              </button>
-            </div>
-          </div>
-        ))} */}
       </div>
     </div>
   );

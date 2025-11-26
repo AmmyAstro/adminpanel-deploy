@@ -1,19 +1,46 @@
 "use client";
 
-import { sendpackageRequest } from "@/app/redux/slices/packageSlice";
+import { sendpackageRequest,resetPackageCode } from "@/app/redux/slices/packageSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MdDelete, MdCancel } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
+
+function useDebounce(value, delay = 500) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebounced(value), delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debounced;
+}
 export default function PacakageMain() {
     const [open, setOpen] = useState(false);
-    const dispatch = useDispatch();
-    const [form, setForm] = useState({
+
+    const {adcode,loading,currentPackage} = useSelector((state)=>state.package || {});
+
+ const dispatch = useDispatch();
+
+    useEffect(()=>{
+        if(adcode === 200){
+            toast.success("Package Added Successfully!");
+            dispatch(resetPackageCode());
+        }
+
+    },[adcode,dispatch]);
+
+
+
+   
+    const [tempform, setTempForm] = useState({
         package_name: "",
         package_amount: "",
         talk_time_value: "",
@@ -23,22 +50,28 @@ export default function PacakageMain() {
         coupon_percentage: "",
 
     });
+    const formData = useDebounce(tempform, 600);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
+        setTempForm({ ...tempform, [name]: value });
     };
 
-    const packageSubmit = (e) => {
-        e.preventDefault();
+    const packageSubmit = () => {
+    
+    console.log("kjfhkwjegfjkewgkewj", formData);
 
         const payload = {
-            ...form,
-            package_amount: parseFloat(form.package_amount || 0),
-            talk_time_value: parseFloat(form.talk_time_value || 0),
-            coupon_count: parseInt(form.coupon_count || 0),
-            coupon_percentage: parseInt(form.coupon_percentage || 0),
-
+            ...formData,
+            package_amount: parseFloat(tempform.package_amount || 0),
+            talk_time_value: parseFloat(tempform.talk_time_value || 0),
+            coupon_count: parseInt(tempform.coupon_count || 0),
+            coupon_percentage: parseInt(tempform.coupon_percentage || 0),
         };
+
+
+
+      
 
         // if (editCoupon) {
         //     dispatch(updateCouponRequest({ id: editCoupon.id, data: payload }));
@@ -46,11 +79,14 @@ export default function PacakageMain() {
         // }
         //  else {
         dispatch(sendpackageRequest(payload));
-        toast.success("Package created successfully!");
+        setOpen(false);
+       
         // }
 
         // handleCloseModal();
     };
+
+    
 
     return (
         <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
@@ -83,7 +119,7 @@ export default function PacakageMain() {
                                         type="text"
                                         name="package_name"
                                         required
-                                        value={form.package_name}
+                                        value={tempform.package_name}
                                         onChange={handleChange}
                                         placeholder="Package Name" className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                                     />
@@ -96,7 +132,7 @@ export default function PacakageMain() {
                                         type="number"
                                         name="package_amount"
                                         required
-                                        value={form.package_amount}
+                                        value={tempform.package_amount}
                                         onChange={handleChange}
                                         placeholder="Package Amount" className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                                     />
@@ -112,7 +148,7 @@ export default function PacakageMain() {
                                         type="number"
                                         name="talk_time_value"
                                         required
-                                        value={form.talk_time_value}
+                                        value={tempform.talk_time_value}
                                         onChange={handleChange}
                                         placeholder="Talk Time Value" className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                                     />
@@ -123,7 +159,7 @@ export default function PacakageMain() {
                                     <select
                                         name="tax_apply"
                                         required
-                                        value={form.tax_apply}
+                                        value={tempform.tax_apply}
                                         onChange={handleChange}
                                         className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm">
                                         <option hidden>Select Tax</option>
@@ -145,7 +181,7 @@ export default function PacakageMain() {
                                         type="text"
                                         name="coupon_code"
                                         required
-                                        value={form.coupon_code}
+                                        value={tempform.coupon_code}
                                         onChange={handleChange}
                                         placeholder="Coupon Code" className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                                     />
@@ -158,7 +194,7 @@ export default function PacakageMain() {
                                         type="number"
                                         name="coupon_count"
                                         required
-                                        value={form.coupon_count}
+                                        value={tempform.coupon_count}
                                         onChange={handleChange}
                                         placeholder="Coupon Count" className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                                     />
@@ -173,7 +209,7 @@ export default function PacakageMain() {
                                         type="number"
                                         name="coupon_percentage"
                                         required
-                                        value={form.coupon_percentage}
+                                        value={tempform.coupon_percentage}
                                         onChange={handleChange}
                                         placeholder="Coupon Percentage" className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                                     />

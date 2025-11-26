@@ -13,7 +13,7 @@ export default function CustomInput({ label, type, error, ...props }) {
       <input
         type={type}
         {...props}
-        className={`w-full text-gray-800 text-sm sm:text-sm   border border-gray-300 placeholder:text-gray-300 bg-white rounded-full focus:outline-none focus:ring-0 ${error ? 'border-red-500' : ''}' : ''
+        className={`w-full text-gray-800 text-sm sm:text-sm px-2 py-1.5 border border-gray-300 placeholder:text-gray-300 bg-white rounded-full focus:outline-none focus:ring-0 ${error ? 'border-red-500' : ''}' : ''
           } ${props.className || ''}`}
       />
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
