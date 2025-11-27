@@ -1,6 +1,6 @@
 "use client";
 
-import { sendRequestPackage } from "@/app/redux/slices/pack/getPackSlice";
+import { sendRequestPackage, sendRequestUpdatePackageStatus } from "@/app/redux/slices/pack/getPackSlice";
 import { sendpackageRequest, resetPackageCode } from "@/app/redux/slices/packageSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
@@ -65,7 +65,7 @@ export default function PacakageMain() {
 
 
 
-    console.log("ASas", response);
+    console.log("ASasxxxxxxxxxxx", response);
 
 
 
@@ -119,6 +119,7 @@ export default function PacakageMain() {
 
  const handleToggle = (id,value) =>{
     console.log("aSXSAD", id , value)
+    dispatch(sendRequestUpdatePackageStatus({id:id,status:value}))
 
  }
 

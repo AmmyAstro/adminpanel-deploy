@@ -24,6 +24,13 @@ const getPackSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
+        sendRequestUpdatePackageStatus: (state) => {
+            state.loading = true;
+        },
+        updatePackStatus: (state, action) => {
+            state.response = action.payload;
+            state.loading = false;
+        }
         
     }
 });
@@ -31,7 +38,8 @@ const getPackSlice = createSlice({
 export const {
     sendRequestPackage,
     sendRequestPackageSuccess,
-    sendRequestPackageFail
+    sendRequestPackageFail,
+    updatePackStatus,sendRequestUpdatePackageStatus
 } = getPackSlice.actions;
 
 export default getPackSlice.reducer;
