@@ -9,6 +9,8 @@ import getAstroSaga from "./saga/astrologer/getAstroSaga";
 import astroActiveAstro from "./saga/astrologer/astroActiveAstro.js";
 import AstrologerDetailSaga from "./saga/astrologer/AstrologerDetailSaga.js";
 import chatHistorySaga from "./saga/chathistory/chatHistorySaga.js";
+import packageSaga from "./saga/packageSaga";
+
 
 
 
@@ -24,6 +26,7 @@ export default function* rootSaga() {
     astroActiveAstro(),
     AstrologerDetailSaga(),
     chatHistorySaga(),
+    packageSaga(),
   ]);
 
 }
