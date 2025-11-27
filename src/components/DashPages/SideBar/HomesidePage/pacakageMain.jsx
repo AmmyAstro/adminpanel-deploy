@@ -1,16 +1,20 @@
 "use client";
 
-import { sendRequestPackage } from "@/app/redux/slices/pack/getPackSlice";
+import AlertLoading from "@/app/common/AlertLoading";
+import { sendRequestPackage, sendUpdateStatus,resetUpdatestatus } from "@/app/redux/slices/pack/getPackSlice";
 import { sendpackageRequest, resetPackageCode } from "@/app/redux/slices/packageSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { MdDelete, MdCancel } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
+
+
 
 
 
@@ -35,8 +39,8 @@ export default function PacakageMain() {
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
     const { adcode, loading, currentPackage } = useSelector((state) => state.package || {});
-    const { response, loading: packloading } = useSelector((state) => state.getpackage);
-
+    const { response, loading: packloading,statusCode } = useSelector((state) => state.getpackage);
+     const [choose,setChoose] = useState("");
 
 
 
@@ -63,9 +67,14 @@ export default function PacakageMain() {
     }, [response])
 
 
+  useEffect(() => {
+    if (statusCode === 200) {
+        toast.success("Package Status Update!");
+        dispatch(resetUpdatestatus());
 
-
-    console.log("ASas", response);
+        window.location.reload();
+    }
+}, [statusCode, dispatch]);
 
 
 
@@ -118,7 +127,16 @@ export default function PacakageMain() {
     };
 
  const handleToggle = (id,value) =>{
-    console.log("aSXSAD", id , value)
+
+
+    dispatch(sendUpdateStatus({
+        id,
+        status:value
+    }))
+
+    setChoose(1);
+
+
 
  }
 
@@ -261,6 +279,10 @@ export default function PacakageMain() {
 
                 )}
 
+
+
+                <AlertLoading show={packloading} title="Please Wait..."/>
+
                 <div className="mt-10">
 
                     <div className="overflow-x-auto rounded-xl shadow">
@@ -295,10 +317,15 @@ export default function PacakageMain() {
 
 
                                     <div className="flex items-center gap-2 text-center items-center justify-center" >
+
+
                                         <CustomToggle
-                                            checked={pkg.coupon_status === 1}
-                                            onChange={(val) => handleToggle(pkg.id, val)}
+                                            checked={pkg?.status === 1  }
+                                            onChange={(val) => handleToggle(pkg?.id, val)}
                                         />
+
+
+                                     
 
                                     </div>
 
@@ -306,12 +333,12 @@ export default function PacakageMain() {
                                         <button className="p-2 bg-gray-200 rounded-md hover:bg-gray-300">
                                             <TbEdit className="text-blue-800" />
                                         </button>
-                                        <button
+                                        {/* <button
                                             onClick={() => handleDelete(pkg.id)}
                                             className="p-2 bg-red-400 text-white rounded-md hover:bg-red-500"
                                         >
                                             <MdDelete />
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </div>
                             ))}

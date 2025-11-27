@@ -1,8 +1,20 @@
 import CallComp from "../Custom/CallComp";
 import ChatCom from "../Custom/ChatCom";
+import GiftComp from "../Custom/GiftComp";
+import WalletCom from "../Custom/WalletCom";
 
 
  const AstroProfiledata = [
+   {
+    id: "Wallet",
+    label: "Wallet History",
+      fields: [
+      // eslint-disable-next-line react/jsx-key
+      <WalletCom />
+     
+    ],
+   
+  },
   {
     id: "call",
     label: "Call History",
@@ -20,7 +32,16 @@ import ChatCom from "../Custom/ChatCom";
      <ChatCom />
     ],
   },
+
   {
+    id: "gift",
+    label: "Gift History",
+    fields: [
+      // eslint-disable-next-line react/jsx-key
+      <GiftComp />
+    ],
+  },
+    {
     id: "offer",
     label: "Order History",
     fields: [
@@ -29,19 +50,6 @@ import ChatCom from "../Custom/ChatCom";
       { label: "Offer Chat Charges", prefix: "Rs.", name: "disc_chat_charge", max: 50 },
     ],
   },
-  {
-    id: "gift",
-    label: "Live History",
-    fields: [
-      { label: "Gift Commission", prefix: "%.", name: "gift_commission", max: 50 },
-    ],
-  },
-  {
-    id: "shop",
-    label: "DhwaniShop",
-    fields: [
-      { label: "Gift Commission", prefix: "%.", name: "gift_commission", max: 50 },
-    ],
-  },
+ 
 ];
 export default AstroProfiledata;

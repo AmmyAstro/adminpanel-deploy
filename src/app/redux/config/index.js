@@ -26,14 +26,18 @@ const apiroute = {
   couponAdd: `${apiurl}/coupons/add`,
   couponFetch: `${apiurl}/coupons`,
 
-  // package
-  packageAdd: `${PAYMENT_MICRO}add/package`,
-
-  ASTROLOGER_LIST: `${API_BASE_URL}astrologer/list`,
+    // package
+    packageAdd: `${PAYMENT_MICRO}add/package`,
+    ASTROLOGER_LIST: `${API_BASE_URL}astrologer/list`,
     ASTROLOGER_ACCOUNT_ACTIVE: `${API_BASE_URL}astrologer/accountactive`,
     ASTROLOGER_PROFILE:`${API_BASE_URL}astro/profile`,
-      CHAT_HISTORY:`${CHAT_MICRO}astrologer/chat_history`,
-      FETCH_PACKAGE:`${PAYMENT_MICRO}recharge/pack`,
+    CHAT_HISTORY:`${CHAT_MICRO}astrologer/chat_history`,
+    FETCH_PACKAGE:`${PAYMENT_MICRO}adminpanelpackage`,
+    PACKAGE_STATUS:`${PAYMENT_MICRO}update/package`,
+    CALL_HISTORY:`${CHAT_MICRO}call/history`,
+
+     GET_HISTORY :`${API_AUTH_URL}astro_gift`,
+     WALLET_HISTORY:`${CHAT_MICRO}wallet_history`,
 
 }
 
