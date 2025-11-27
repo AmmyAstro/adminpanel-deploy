@@ -33,6 +33,7 @@ const apiroute = {
     ASTROLOGER_ACCOUNT_ACTIVE: `${API_BASE_URL}astrologer/accountactive`,
     ASTROLOGER_PROFILE:`${API_BASE_URL}astro/profile`,
       CHAT_HISTORY:`${CHAT_MICRO}astrologer/chat_history`,
+      FETCH_PACKAGE:`${PAYMENT_MICRO}recharge/pack`,
 
 }
 

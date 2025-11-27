@@ -9,6 +9,7 @@ import GetListSlice from "./slices/astrologer/GetListSlice";
 import ActiveAccountSlice from "./slices/astrologer/ActiveAccountSlice";
 import AstrologerDetail from "./slices/astrologer/AstrologerDetail";
 import chatHistorySlice from "./slices/chathistory/chatHistorySlice";
+import getPackSlice from "./slices/pack/getPackSlice.js"
 
 const rootReducer = combineReducers({
   login: loginReducer,
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
   astrologerlist:GetListSlice,
   astrologeractive:ActiveAccountSlice,
   astrologerdetail:AstrologerDetail,
-  chathistory:chatHistorySlice
+  chathistory:chatHistorySlice,
+  getpackage:getPackSlice
 });
 
 export default rootReducer;

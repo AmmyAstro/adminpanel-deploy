@@ -1,45 +1,76 @@
 "use client";
 
-import { sendpackageRequest,resetPackageCode } from "@/app/redux/slices/packageSlice";
+import { sendRequestPackage } from "@/app/redux/slices/pack/getPackSlice";
+import { sendpackageRequest, resetPackageCode } from "@/app/redux/slices/packageSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
+import CustomToggle from "@/components/Custom/CustomToggle";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { MdDelete, MdCancel } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
 
 
+
+
+
+
 function useDebounce(value, delay = 500) {
-  const [debounced, setDebounced] = useState(value);
+    const [debounced, setDebounced] = useState(value);
 
-  useEffect(() => {
-    const handler = setTimeout(() => setDebounced(value), delay);
+    useEffect(() => {
+        const handler = setTimeout(() => setDebounced(value), delay);
 
-    return () => clearTimeout(handler);
-  }, [value, delay]);
+        return () => clearTimeout(handler);
+    }, [value, delay]);
 
-  return debounced;
+    return debounced;
 }
+
+
+
 export default function PacakageMain() {
     const [open, setOpen] = useState(false);
+    const dispatch = useDispatch();
+    const { adcode, loading, currentPackage } = useSelector((state) => state.package || {});
+    const { response, loading: packloading } = useSelector((state) => state.getpackage);
 
-    const {adcode,loading,currentPackage} = useSelector((state)=>state.package || {});
 
- const dispatch = useDispatch();
 
-    useEffect(()=>{
-        if(adcode === 200){
+
+    useEffect(() => {
+        dispatch(sendRequestPackage());
+    }, [dispatch])
+
+
+    useEffect(() => {
+
+
+        if (adcode === 200) {
             toast.success("Package Added Successfully!");
             dispatch(resetPackageCode());
         }
 
-    },[adcode,dispatch]);
+    }, [adcode, dispatch]);
 
 
 
-   
+    const packagedata = useMemo(() => {
+        return response;
+
+    }, [response])
+
+
+
+
+    console.log("ASas", response);
+
+
+
+
+
     const [tempform, setTempForm] = useState({
         package_name: "",
         package_amount: "",
@@ -58,8 +89,8 @@ export default function PacakageMain() {
     };
 
     const packageSubmit = () => {
-    
-    console.log("kjfhkwjegfjkewgkewj", formData);
+
+
 
         const payload = {
             ...formData,
@@ -71,7 +102,7 @@ export default function PacakageMain() {
 
 
 
-      
+
 
         // if (editCoupon) {
         //     dispatch(updateCouponRequest({ id: editCoupon.id, data: payload }));
@@ -80,13 +111,16 @@ export default function PacakageMain() {
         //  else {
         dispatch(sendpackageRequest(payload));
         setOpen(false);
-       
+
         // }
 
         // handleCloseModal();
     };
 
-    
+ const handleToggle = (id,value) =>{
+    console.log("aSXSAD", id , value)
+
+ }
 
     return (
         <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
@@ -104,7 +138,7 @@ export default function PacakageMain() {
                     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                         <div className="bg-white rounded-2xl flex flex-col gap-3 shadow-lg w-full max-w-lg p-6 relative">
                             <div className="flex items-center justify-between  font-semibold border-b py-3 bg-[#7a5ba3] rounded-full text-white px-4">
-                                <h6 className="text-lg font-semibold">Add New Package</h6>
+
                                 <button onClick={() => setOpen(false)}>
                                     <MdCancel className="text-2xl text-gray-100 hover:text-red-500" />
                                 </button>
@@ -162,13 +196,13 @@ export default function PacakageMain() {
                                         value={tempform.tax_apply}
                                         onChange={handleChange}
                                         className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm">
-                                        <option hidden>Select Tax</option>
-                                        <option>18.00% | GST</option>
-                                        <option>1.00% | GST</option>
-                                        <option>3.00% | GST</option>
-                                        <option>5.00% | GST</option>
-                                        <option>12.00% | GST</option>
-                                        <option>28.00% | GST</option>
+                                        <option hidden>Select Tax Gst</option>
+                                        <option>18</option>
+                                        <option>1</option>
+                                        <option>3</option>
+                                        <option>5</option>
+                                        <option>12</option>
+                                        <option>28</option>
                                     </select>
                                 </div>
                             </div>
@@ -228,46 +262,47 @@ export default function PacakageMain() {
                 )}
 
                 <div className="mt-10">
-                    <h3 className="text-lg font-semibold mb-4">Wallets Package List</h3>
+
                     <div className="overflow-x-auto rounded-xl shadow">
                         <div className="w-full rounded-xl  overflow-hidden">
                             {/* Header row */}
-                            <div className="grid grid-cols-6 gap-2 font-semibold text-sm rounded-2xl border-b bg-purple-300 p-2 text-gray-600">
-                                <div>S.No</div>
-                                <div>Package Name</div>
-                                <div>Package Amount</div>
-                                <div>Talktime Value</div>
-                                <div>Status</div>
-                                <div>Action</div>
+                            <div className="grid grid-cols-8 gap-2 font-semibold text-sm rounded-2xl border-b bg-purple-300 p-2 text-gray-600">
+                                <div className="text-center">S.No</div>
+                                <div className="text-center">Package Name</div>
+                                <div className="text-center">Package Amount</div>
+                                <div className="text-center">Coupon Count</div>
+                                <div className="text-center">Coupon Code</div>
+                                <div className="text-center">Coupon Per.</div>
+                                <div className="text-center">Status</div>
+                                <div className="text-center">Action</div>
                             </div>
 
                             {/* Dynamic rows */}
-                            {/* {packages.map((pkg, index) => (
+                            {packagedata?.map((pkg, index) => (
                                 <div
                                     key={pkg.id}
-                                    className="grid grid-cols-6 items-center text-sm text-gray-700 border-b hover:bg-gray-50 p-3"
+                                    className="grid grid-cols-8 bg-white items-center text-sm text-gray-700 border-b hover:bg-gray-50 p-3"
                                 >
-                                    <div>{index + 1}</div>
-                                    <div>{pkg.name}</div>
-                                    <div>₹{pkg.amount}</div>
-                                    <div>{pkg.talktime}</div>
+                                    <div className="text-center">{index + 1}</div>
+                                    <div className="text-center">{pkg?.package_name}</div>
+                                    <div className="text-center">₹{pkg?.package_amount}</div>
 
-                                    <div className="flex items-center gap-2">
+                                    <div className="text-center">{pkg?.coupon_count || "N/A"}</div>
+
+
+                                    <div className="text-center">{pkg?.coupon_code || "N/A"}</div>
+                                    <div className="text-center">{pkg?.coupon_percentage || "N/A"}</div>
+
+
+                                    <div className="flex items-center gap-2 text-center items-center justify-center" >
                                         <CustomToggle
-                                            checked={pkg.status === "active"}
+                                            checked={pkg.coupon_status === 1}
                                             onChange={(val) => handleToggle(pkg.id, val)}
                                         />
-                                        <span
-                                            className={`text-xs font-medium px-2 py-1 rounded-full ${pkg.status === "active"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
-                                                }`}
-                                        >
-                                            {pkg.status === "active" ? "Active" : "Inactive"}
-                                        </span>
+
                                     </div>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 text-center justify-center">
                                         <button className="p-2 bg-gray-200 rounded-md hover:bg-gray-300">
                                             <TbEdit className="text-blue-800" />
                                         </button>
@@ -279,7 +314,7 @@ export default function PacakageMain() {
                                         </button>
                                     </div>
                                 </div>
-                            ))} */}
+                            ))}
                         </div>
                     </div>
                 </div>
