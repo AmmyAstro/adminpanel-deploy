@@ -27,8 +27,6 @@ const dummyData = [
 
 export default function CustomerList() {
     const [search, setSearch] = useState({ id: "", name: "", phone: "" });
-    const [selected, setSelected] = useState([]);
-    const [selectAll, setSelectAll] = useState(false);
 
     const filteredData = dummyData.filter(
         (item) =>
@@ -37,22 +35,8 @@ export default function CustomerList() {
             item.phone.toLowerCase().includes(search.phone.toLowerCase())
     );
 
-    const handleSelect = (id) => {
-        if (selected.includes(id)) {
-            setSelected(selected.filter((s) => s !== id));
-        } else {
-            setSelected([...selected, id]);
-        }
-    };
 
-    const handleSelectAll = () => {
-        if (selectAll) {
-            setSelected([]);
-        } else {
-            setSelected(filteredData.map((item) => item.id));
-        }
-        setSelectAll(!selectAll);
-    };
+
 
     return (
         <div className="min-h-screen ">
@@ -111,7 +95,7 @@ export default function CustomerList() {
                                     <tr
                                         key={item.id}
                                         className="border-b border-gray-300 text-[13px] bg-[#7d738929] hover:bg-gray-50 transition"
-                                    >
+                                     >
                                         <td className="p-3 flex items-end gap-2">
 
                                             <span> {item.id}</span>
