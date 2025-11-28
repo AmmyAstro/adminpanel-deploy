@@ -1,13 +1,18 @@
 import { call, put, takeLatest } from "redux-saga/effects";
-import { sendRequestPackage, sendRequestPackageSuccess, sendRequestPackageFail, 
-  updatePackStatus, sendRequestUpdatePackageStatus } from "../../slices/pack/getPackSlice";
+import { sendRequestPackage,sendRequestPackageSuccess,sendRequestPackageFail,
+sendUpdateStatus,UpdateStatusResponse,resetUpdatestatus } from "../../slices/pack/getPackSlice";
 import axios from "axios";
 import { apiroute, AuthHeader } from "../../config";
 
 
 
+
 const fetchPackageApi = () => {
-  return axios.get(apiroute.FETCH_PACKAGE);
+     const token = AuthHeader();
+    const headers = {
+        Authorization: `Bearer ${token}`
+    };
+    return axios.get(apiroute.FETCH_PACKAGE,{headers});
 };
 const fetchPackStatusApi = (payload) => {
   const token = AuthHeader();
@@ -18,6 +23,31 @@ const fetchPackStatusApi = (payload) => {
   return axios.post(apiroute.PACK_STATUS_UPDATE, payload, { headers })
 }
 
+
+
+const updateStatus= (payload) =>{
+    const token = AuthHeader();
+    const headers = {
+        Authorization: `Bearer ${token}`
+    };
+
+    return axios.post(apiroute.PACKAGE_STATUS,payload,{headers});
+}
+
+
+
+function* handlerStatusUpdate(action){
+    try {
+        
+        const response= yield call(updateStatus,action.payload);
+        yield put(UpdateStatusResponse(response))
+        
+
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+}
 
 function* handleSendRequestPackage() {
   try {
@@ -41,5 +71,5 @@ function* updatePackStatusSaga(action) {
 
 export default function* getPackSaga() {
   yield takeLatest(sendRequestPackage.type, handleSendRequestPackage);
-  yield takeLatest(sendRequestUpdatePackageStatus.type, updatePackStatusSaga);
+  yield takeLatest(sendUpdateStatus.type,handlerStatusUpdate);
 }

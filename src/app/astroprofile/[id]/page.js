@@ -2,6 +2,7 @@ import Skenton from "@/app/common/Skenton";
 import { formatDate } from "@/app/helper/helper";
 import { mainurl } from "@/app/redux/config";
 import { RequestAstrologerDetail } from "@/app/redux/slices/astrologer/AstrologerDetail";
+
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
@@ -11,7 +12,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { FaStar } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 
 
@@ -22,35 +23,47 @@ import { useSelector,useDispatch } from "react-redux";
 
 
 export default function AstroProfile() {
- const [activeTab, setActiveTab] = useState("call");
- const [openPopup, setOpenPopUp] = useState(false)
- const dispatch= useDispatch();
- const params  = useParams();
- const astro_id=params?.slug[3];
+    const [activeTab, setActiveTab] = useState("call");
+    const [openPopup, setOpenPopUp] = useState(false)
+    const dispatch = useDispatch();
+    const params = useParams();
+    const astro_id = params?.slug[3];
 
 
-   const {astrologerloading,astrologerdata} = useSelector((state)=>state.astrologerdetail);
-    useEffect(()=>{
-    dispatch(RequestAstrologerDetail({astro_id}))
-    },[dispatch,astro_id])
+    const { astrologerloading, astrologerdata } = useSelector((state) => state.astrologerdetail);
 
 
 
 
 
 
-    const astrologerprofile= useMemo(()=>{
-       return astrologerdata?.profile;
-       },[astrologerdata])
+    useEffect(() => {
+        dispatch(RequestAstrologerDetail({ astro_id }))
+
+    }, [dispatch, astro_id])
 
 
 
-       const astro_stats = useMemo(()=>{
-         return astrologerdata?.stats;
-         },[astrologerdata])
 
 
-     
+
+    const astrologerprofile = useMemo(() => {
+        return astrologerdata?.profile;
+    }, [astrologerdata])
+
+
+
+    const astro_stats = useMemo(() => {
+        return astrologerdata?.stats;
+    }, [astrologerdata])
+
+
+
+
+
+
+
+
 
 
 
@@ -60,12 +73,12 @@ export default function AstroProfile() {
     const [availability, setAvailability] = useState({
         call: astrologerprofile?.is_call_online,
         chat: astrologerprofile?.is_chat_online,
-       
+
     });
 
     if (astrologerloading) {
-  return <Skenton />;
-}
+        return <Skenton />;
+    }
 
 
     const docs = [
@@ -80,7 +93,7 @@ export default function AstroProfile() {
         { id: 3, name: "Video", rate: "3.10", num: "200" },
     ];
 
- 
+
     const stats = [
         {
             id: 1,
@@ -109,14 +122,14 @@ export default function AstroProfile() {
 
 
 
-    
+
 
 
 
     return (
         <div className="min-h-screen ">
 
-            
+
             <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-purple-900">
                     Astrologer Profile
@@ -179,8 +192,8 @@ export default function AstroProfile() {
 
                         <div className="flex items-center gap-4">
                             <div className="">
-                             
-                               <Image src={mainurl + 'ds-img/' + astrologerprofile?.profile_image}
+
+                                <Image src={mainurl + 'ds-img/' + astrologerprofile?.profile_image}
                                     alt="Avatar"
                                     width={60}
                                     height={60}
@@ -191,7 +204,7 @@ export default function AstroProfile() {
                             <div className="flex flex-col ml-5 gap-1">
                                 <span className="font-bold text-gray-800">{astrologerprofile?.full_name || ""}</span>
                                 <small className="font-semibold text-gray-600">
-                                    Astrologer ID :000-{ astrologerprofile?.id}
+                                    Astrologer ID :000-{astrologerprofile?.id}
                                 </small>
                             </div>
                         </div>
@@ -220,17 +233,17 @@ export default function AstroProfile() {
 
                         <div className="flex flex-col gap-2 py-3">
                             <div className="flex items-center justify-between">
-                                <h6 className="text-sm font-semibold">Online Availability:</h6>     
+                                <h6 className="text-sm font-semibold">Online Availability:</h6>
                                 <div className="flex items-center gap-3">
-                                <CustomButton
-                                    variant={"black"}
-                                    onClick={() => alert("Edit clicked")}
-                                    className="px-2 py-[2px] text-[10px] transition"
-                                >
-                                    Edit
-                                </CustomButton>
+                                    <CustomButton
+                                        variant={"black"}
+                                        onClick={() => alert("Edit clicked")}
+                                        className="px-2 py-[2px] text-[10px] transition"
+                                    >
+                                        Edit
+                                    </CustomButton>
 
-                            </div></div>
+                                </div></div>
 
                             <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-gray-700">
@@ -254,7 +267,7 @@ export default function AstroProfile() {
                                 </label>
                                 <div className="flex items-center gap-5">
                                     <label className="text-sm font-semibold text-gray-700">
-                                        ₹ {astrologerprofile?.disc_chat_charge} 
+                                        ₹ {astrologerprofile?.disc_chat_charge}
                                     </label>
                                     <CustomToggle
                                         id="chat"
@@ -264,7 +277,7 @@ export default function AstroProfile() {
                                 </div>
                             </div>
 
-                          
+
 
 
                             <div className="grid grid-cols-2 items-center gap-3">
@@ -335,9 +348,9 @@ export default function AstroProfile() {
                             </div>
                         </div>
 
-                      
 
-                     
+
+
 
                         <hr className="text-gray-300" />
 
@@ -431,7 +444,7 @@ export default function AstroProfile() {
                                                     {tab.fields.map((field, idx) => (
                                                         <tr key={idx} className="mb-2">
                                                             <td className="py-2 pr-4">{field}</td>
-                                                       
+
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -454,7 +467,7 @@ export default function AstroProfile() {
                                     <span className="text-xs font-semibold">LA</span>
                                     <CustomToggle
                                         id="call"
-                                        checked={availability.call}
+
                                         onChange={(val) => setAvailability({ ...availability, call: val })}
                                     />
                                 </div>
@@ -462,7 +475,7 @@ export default function AstroProfile() {
                                     <span className="text-xs font-semibold">LA</span>
                                     <CustomToggle
                                         id="call"
-                                        checked={availability.call}
+
                                         onChange={(val) => setAvailability({ ...availability, call: val })}
                                     />
                                 </div>
@@ -470,7 +483,7 @@ export default function AstroProfile() {
                                     <span className="text-xs font-semibold">LA</span>
                                     <CustomToggle
                                         id="call"
-                                        checked={availability.call}
+
                                         onChange={(val) => setAvailability({ ...availability, call: val })}
                                     />
                                 </div>
@@ -478,7 +491,7 @@ export default function AstroProfile() {
                                     <span className="text-xs font-semibold">LA</span>
                                     <CustomToggle
                                         id="call"
-                                        checked={availability.call}
+
                                         onChange={(val) => setAvailability({ ...availability, call: val })}
                                     />
                                 </div>
@@ -486,7 +499,7 @@ export default function AstroProfile() {
                                     <span className="text-xs font-semibold">LA</span>
                                     <CustomToggle
                                         id="call"
-                                        checked={availability.call}
+
                                         onChange={(val) => setAvailability({ ...availability, call: val })}
                                     />
                                 </div>
@@ -495,7 +508,7 @@ export default function AstroProfile() {
                                     <span className="text-xs font-semibold">LA</span>
                                     <CustomToggle
                                         id="call"
-                                        checked={availability.call}
+
                                         onChange={(val) => setAvailability({ ...availability, call: val })}
                                     />
                                 </div>

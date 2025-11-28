@@ -1,98 +1,166 @@
-import React, { useEffect } from "react"
-import CustomButton from "./CustomButtom"
-import { useSelector,useDispatch } from "react-redux"
-import { fetchMessages } from "@/app/redux/slices/chathistory/chatHistorySlice";
+import React, { useEffect, useMemo } from "react"
+
+import { useSelector, useDispatch } from "react-redux"
+
+import { formatDate } from "@/app/helper/helper";
+import CustomToggle from "./CustomToggle";
+import AlertLoading from "@/app/common/AlertLoading";
+import { fetchcallHistory } from "@/app/redux/slices/callhistory/getCallHistory";
+
+
+function ChatCom() {
+
+
+    const { calldata, loading: callloading, currentPage, totalPages } = useSelector((state) => state.callhistory);
+
+
+    const dispatch = useDispatch();
 
 
 
-function CallComp() {
+    const call_data = useMemo(() => calldata, [calldata]);
+    useEffect(() => {
+        dispatch(fetchcallHistory({ astrologer_id: 1, limit: 12, page: currentPage }))
+
+    }, [dispatch, currentPage]);
 
 
-    const dispatch= useDispatch();
 
-    useEffect(()=>{
- 
-     dispatch(fetchMessages({
-        astrologer_id:1,
-        limit:12,
-        page:1
-     }))
-    },[dispatch])
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            dispatch(
+                fetchcallHistory({
+                    astrologer_id: 1,
+                    limit: 12,
+                    page: newPage,
+                })
+            );
+        }
+    };
+
 
 
 
 
     return (
         <div>
+
             <ul className="grid w-full grid-cols-8 place-self-center items-center justify-center place-center self-center font-bold bg-purple-200 rounded-md p-2 text-sm text-purple-900">
-                <li>S.No</li>
-                <li>Name</li>
-                <li>Mobile</li>
-
-                <li>Secret Login</li>
-                <li>Activity</li>
-                <li>Status</li>
-                <li>Last Login</li>
-
-                <li>Action</li>
+                <li className="text-center">S.No</li>
+                <li className="text-center">Chat Id</li>
+                <li className="text-center">User</li>
+                <li className="text-center">Duration</li>
+                <li className="text-center">Astro Price</li>
+                <li className="text-center">Type</li>
+                <li className="text-center">Date</li>
+                <li className="text-center">Action</li>
             </ul>
 
-            <ul
-                // key={row.id}
-                className="grid grid-cols-8 border-b border-gray-200 text-sm text-gray-700 p-2 hover:bg-gray-50">
-                <li>hgtght</li>
+            <AlertLoading show={callloading} title="Please Wait.." />
+            {call_data?.map((item, index) => (
+                <ul
+                    key={index}
+                    className="grid grid-cols-8 border-b border-gray-200 text-xs text-gray-700 p-2 hover:bg-gray-50"
+                >
+                    <li className="text-center">{(currentPage - 1) * 12 + (index + 1)}</li>
 
-                <li>     <div className="flex items-center gap-2">
+                    <li className="text-center">
+                        <div className="flex items-center gap-2">
+                            <div className="flex flex-col gap-1">
+                                <span className="">{item?.request_session_id}</span>
 
-                    <div className="flex flex-col gap-1">
-                        <span className="text-sm">akash</span>
+                                {item?.request_status === 4 && (
+                                    <span className="text-red-600 font-medium">(Reject)</span>
+                                )}
+                                {item?.request_status === 5 && (
+                                    <span className="text-green-600 font-medium">(Complete)</span>
+                                )}
+                                {item?.request_status === 2 && (
+                                    <span className="text-green-600 font-medium">(Processing)</span>
+                                )}
+                            </div>
+                        </div>
+                    </li>
 
-                    </div>
-                </div></li>
-                <li className="line-clamp-2  text-ellipsis ">akash</li>
+                    <li className="text-center">{item?.user_name}</li>
 
-                <li>
-                    <CustomButton variant={"black"} className="px-2 py-2 text-white rounded-lg font-semibold">
-                        akash
-                    </CustomButton>
-                </li>
+                    <li className="text-center">{item?.duration}</li>
 
+                    <li className="text-center">
 
-                <li>
-                    <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1">
 
-                        akash
+                            {
+                                item?.is_promotional === 0 &&
+                                "₹ 0.00"
 
-
-
-                    </div>
-                </li>
-                <li>
-                    akash
-
-
-                </li>
-
-
-                <li>
-                    <div className="flex items-center justify-center gap-3 text-xs">
-
-                        23/11/25 10:20 am
-
-                    </div></li>
+                            }
 
 
-                <li>
-                    <div className="flex items-center justify-center gap-3 text-xs">
+                            {item?.is_promotional === 1 && "₹ 5.00"}
 
-                        akash
-                    </div>
-                </li>
-            </ul>
+                            {item?.is_promotional === 2 && (
+                                <span>₹{item?.astro_charge}.00</span>
+                            )}
+                        </div>
+
+
+
+                        <span className="text-red-600 font-medium">({item?.astro_deduction})</span>
+
+
+
+                    </li>
+
+                    <li className="text-center flex flex-col gap-1">
+                        {item?.is_promotional === 0 && (
+                            <span className="text-yellow-600 font-medium">Free</span>
+                        )}
+                        {item?.is_promotional === 1 && (
+                            <span className="text-red-600 font-medium">Offer</span>
+                        )}
+                        {item?.is_promotional === 2 && (
+                            <span className="text-green-600 font-medium">Paid</span>
+                        )}
+
+                        <span className="text-red-600 font-medium">({item?.request_type})</span>
+                    </li>
+
+                    <li className="text-center">{formatDate(item?.created_at)}</li>
+
+                    <li className="text-center">
+                        <div className="flex items-center justify-center">
+                            <CustomToggle id="chat" checked={true} />
+                        </div>
+                    </li>
+                </ul>
+            ))}
+
+
+            <div className="flex justify-center items-center gap-3 mt-4">
+                <button
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="px-3 py-1 bg-purple-300 rounded disabled:bg-gray-300"
+                >
+                    Prev
+                </button>
+
+                <span className="font-semibold">
+                    Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="px-3 py-1 bg-purple-300 rounded disabled:bg-gray-300"
+                >
+                    Next
+                </button>
+            </div>
         </div>
-    )
+    );
 }
 
-
-
-export default React.memo(CallComp)
+export default React.memo(ChatCom);

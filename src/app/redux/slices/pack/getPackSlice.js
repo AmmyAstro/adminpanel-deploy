@@ -8,7 +8,8 @@ const getPackSlice = createSlice({
         loading: false,
 
         response: null,
-        error: null
+        error: null,
+        statusCode:null,
     },
 
     reducers: {
@@ -24,14 +25,18 @@ const getPackSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        sendRequestUpdatePackageStatus: (state) => {
+       sendUpdateStatus:(state)=>{
             state.loading = true;
-        },
-        updatePackStatus: (state, action) => {
-            state.response = action.payload;
-            state.loading = false;
-        }
-        
+     },
+     UpdateStatusResponse:(state,action) =>{
+        state.loading= false;
+        state.statusCode= 200;
+
+     },
+     resetUpdatestatus:(state,action)=>{
+        state.statusCode= null;
+     }
+
     }
 });
 
@@ -39,7 +44,9 @@ export const {
     sendRequestPackage,
     sendRequestPackageSuccess,
     sendRequestPackageFail,
-    updatePackStatus,sendRequestUpdatePackageStatus
+    sendUpdateStatus,
+    UpdateStatusResponse,
+    resetUpdatestatus
 } = getPackSlice.actions;
 
 export default getPackSlice.reducer;

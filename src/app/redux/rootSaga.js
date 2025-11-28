@@ -11,7 +11,9 @@ import AstrologerDetailSaga from "./saga/astrologer/AstrologerDetailSaga.js";
 import chatHistorySaga from "./saga/chathistory/chatHistorySaga.js";
 import packageSaga from "./saga/packageSaga";
 import getPackSaga from "./saga/pack/getPackSaga.js"
-
+import callHistorySaga from "./saga/callhistory/callHistorySaga.js"
+import giftSaga from "./saga/gift/giftSaga.js";
+import WalletSaga from "./saga/wallet/WalletSaga.js";
 
 
 
@@ -28,7 +30,10 @@ export default function* rootSaga() {
     AstrologerDetailSaga(),
     chatHistorySaga(),
     packageSaga(),
-    getPackSaga()
+    getPackSaga(),
+    callHistorySaga(),
+    giftSaga(),
+    WalletSaga()
   ]);
 
 }
