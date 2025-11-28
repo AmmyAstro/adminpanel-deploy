@@ -8,10 +8,10 @@ const GetListSlice = createSlice({
     initialState,
     reducers: {
         getRequestList: (state) => {
-            state.loading = false
+            state.loading = true;
         },
         getAstrologerList: (state, action) => {
-            state.loading = true;
+            state.loading = false;
             state.astrolist = action.payload;
 
 

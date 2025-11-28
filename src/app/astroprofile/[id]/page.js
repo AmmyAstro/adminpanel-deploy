@@ -135,7 +135,7 @@ export default function AstroProfile() {
                     Astrologer Profile
                 </h2>
                 <CustomButton variant={"gray"} className="px-3 py-1" onClick={openWallet}>Manage Wallet</CustomButton>
-                
+
             </div>
             {openPopup && (
                 <div className="fixed inset-0 bg-[#00000062] bg-opacity-50 flex items-center justify-center z-50">
@@ -143,7 +143,7 @@ export default function AstroProfile() {
 
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-bold mb-4 text-purple-700">Manage Wallet</h3>
-                            
+
                             <button
                                 onClick={() => setOpenPopUp(false)}
                                 className=" text-lg justify-start self-start text-gray-500 hover:text-gray-700 ">
@@ -219,14 +219,14 @@ export default function AstroProfile() {
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Email:</div>
                                 <div className="text-sm">{astrologerprofile?.full_name}@gmail.com</div>
-                            </div>  
+                            </div>
 
-                                <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Ranking:</div>
                                 <div className="text-sm">{astrologerprofile?.astro_tag || "N/A"}</div>
-                            </div>  
-                            
-                            
+                            </div>
+
+
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Mobile:</div>
                                 <div className="text-sm">{astrologerprofile?.mobile2}</div>

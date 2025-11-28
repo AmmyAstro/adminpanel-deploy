@@ -28,7 +28,7 @@ const apiroute = {
 
     // package
     packageAdd: `${PAYMENT_MICRO}add/package`,
-    ASTROLOGER_LIST: `${API_BASE_URL}astrologer/list`,
+    ASTROLOGER_LIST: `${API_BASE_URL}astrologerlist`,
     ASTROLOGER_ACCOUNT_ACTIVE: `${API_BASE_URL}astrologer/accountactive`,
     ASTROLOGER_PROFILE:`${API_BASE_URL}astro/profile`,
     CHAT_HISTORY:`${CHAT_MICRO}astrologer/chat_history`,

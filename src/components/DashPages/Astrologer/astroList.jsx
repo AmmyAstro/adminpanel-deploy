@@ -21,14 +21,6 @@ import { MdFilterVintage } from "react-icons/md";
 
 
 
-
-
-
-
-
-
-
-
 export default function AstroList() {
 
 
@@ -40,8 +32,7 @@ export default function AstroList() {
         return astrolist?.sortedAstrologers;
     }, [astrolist])
     useEffect(() => {
-
-        dispatch(getRequestList());
+    dispatch(getRequestList());
 
     }, [dispatch])
 
@@ -170,24 +161,25 @@ export default function AstroList() {
                     <CustomInput className="px-3 py-1" placeholder="search here..." />
                 </div>
             </div>
-            <ul className="grid w-full grid-cols-8 place-self-center items-center justify-center place-center self-center font-bold bg-purple-200 rounded-md p-2 text-sm text-purple-900">
+            <ul className="grid w-full grid-cols-7 place-self-center items-center justify-center place-center self-center font-bold bg-purple-200 rounded-md p-2 text-sm text-purple-900">
                 <li>S.No</li>
                 <li>Name</li>
                 <li>Mobile</li>
 
-                <li>Secret Login</li>
+            
                 <li>Activity</li>
-                <li>Status</li>
-                <li>Last Login</li>
+                    <li className="text-center">Secret Login</li>
+                {/* <li>Status</li> */}
+                <li>Tag</li>
                     
 
-                <li>Action</li>
+                <li className="text-center">Action</li>
             </ul>
 
             {astrologerlist?.map((row, index) => (
                 <ul
                     key={row.id}
-                    className="grid grid-cols-8 border-b border-gray-200 text-sm text-gray-700 p-2 hover:bg-gray-50">
+                    className="grid grid-cols-7 border-b border-gray-200 text-sm text-gray-700 p-2 hover:bg-gray-50">
                     <li>{index + 1}</li>
 
                     <li>     <div className="flex items-center gap-2">
@@ -202,11 +194,6 @@ export default function AstroList() {
                     </div></li>
                     <li className="line-clamp-2  text-ellipsis ">{row?.mobile2}</li>
 
-                    <li>
-                        <CustomButton variant={"black"} className="px-2 py-2 text-white rounded-lg font-semibold">
-                            <FaUserSecret />
-                        </CustomButton>
-                    </li>
 
 
                     <li>
@@ -231,7 +218,7 @@ export default function AstroList() {
 
                         </div>
                     </li>
-                    <li>
+                    {/* <li>
                         {
                             row?.availability === 1 &&
                             <CustomToggle
@@ -259,13 +246,19 @@ export default function AstroList() {
                         }
 
 
+                    </li> */}
+
+                    <li className=" justify-center text-center">
+                        <CustomButton variant={"black"} className="px-2 py-2 text-white rounded-lg font-semibold">
+                            <FaUserSecret />
+                        </CustomButton>
                     </li>
 
-
                     <li>
-                        <div className="flex items-center justify-center gap-3 text-xs">
+                        <div className="flex  gap-3 text-xs">
 
-                            23/11/25 10:20 am
+                              <CustomButton  onClick={() => HandlerTag(row?.id, row?.full_name)}
+                                variant={"green"} className="px-2 py-2 rounded-lg font-semibold"><MdFilterVintage  /></CustomButton>
 
                         </div></li>
 
@@ -284,11 +277,12 @@ export default function AstroList() {
                                 variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><ImProfile /></CustomButton>
 
 
-                           <CustomButton  onClick={() => HandlerTag(row?.id, row?.full_name)}
-                                variant={"green"} className="px-2 py-2 rounded-lg font-semibold"><MdFilterVintage  /></CustomButton>
+                       
                         </div></li>
                 </ul>
             ))}
+
+            <AlertLoading show={loading} title="Fetch Record..."/>
 
             {showUpdatePopup && (
                 <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">

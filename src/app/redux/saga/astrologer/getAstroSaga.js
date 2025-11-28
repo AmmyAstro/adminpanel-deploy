@@ -1,9 +1,14 @@
 import {call,put,takeLatest} from "redux-saga/effects";
-import { apiroute } from "../../config";
+import { apiroute, AuthHeader } from "../../config";
 import axios from "axios";
 import { getRequestList,getAstrologerList,failastroList } from "../../slices/astrologer/GetListSlice";
+
 const astrolist = () =>{
-return axios.get(apiroute.ASTROLOGER_LIST);
+     const token = AuthHeader();
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+return axios.get(apiroute.ASTROLOGER_LIST,{headers});
 }
 
 
