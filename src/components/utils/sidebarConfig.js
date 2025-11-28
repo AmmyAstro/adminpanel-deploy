@@ -49,7 +49,7 @@ const sidebarConfig = {
     ],
     astrologerSide: [
         { name: "Astrologer List", href: "/Admindash/astromain/astrolist", img: <PiListBulletsBold /> },
-   
+
         { name: "Add Astrologer", href: "/Admindash/astromain/addastro", img: <MdOutlineContactPage /> },
         { name: "Astrologer Revenue", href: "#", img: <MdOutlineContactPage /> },
         { name: "Astrologer Reviews", href: "#", img: <MdOutlineContactPage /> },
@@ -58,6 +58,10 @@ const sidebarConfig = {
         { name: "Call Logs", href: "#", img: <MdOutlineContactPage /> },
         { name: "Chat Logs", href: "#", img: <MdOutlineContactPage /> },
     ],
+    customerSide: [
+        { name: "Customer List", href: "/Admindash/customer", img: <MdOutlineContactPage /> },
+
+    ]
 };
 
 export default sidebarConfig;

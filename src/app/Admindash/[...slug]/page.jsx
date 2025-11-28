@@ -17,6 +17,7 @@ import TestimonialList from "../../../components/DashPages/SideBar/HomesidePage/
 import EditTestimonial from "../editTestimonial/[id]/page";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
 import AstroProfile from "@/app/astroprofile/[id]/page";
+import CustomerList from "@/components/DashPages/Customer/customerList";
 
 export default function AdminPanel() {
   const params = useParams();
@@ -38,7 +39,7 @@ export default function AdminPanel() {
     astromain: <AstrologerMain />,
     testimonialmain: <TestimonialList />,
     edittestimonial: <EditTestimonial />,
-
+    customer: <CustomerList />,
   };
 
 
@@ -79,24 +80,24 @@ export default function AdminPanel() {
     }
   }
 
-else if (path.length === 3) {
-  if (
-    path[0] === "astromain" &&
-    path[1] === "astrolist" &&
-    thirdLevel[path[2]]
-  ) {
-    Componentrender = thirdLevel[path[2]];
+  else if (path.length === 3) {
+    if (
+      path[0] === "astromain" &&
+      path[1] === "astrolist" &&
+      thirdLevel[path[2]]
+    ) {
+      Componentrender = thirdLevel[path[2]];
+    }
   }
-}
-else if (path.length === 4) {
-  if (
-    path[0] === "astromain" &&
-    path[1] === "astrolist" &&
-    path[2] === "astroprofile"
-  ) {
-    Componentrender = <AstroProfile id={path[3]} />;
+  else if (path.length === 4) {
+    if (
+      path[0] === "astromain" &&
+      path[1] === "astrolist" &&
+      path[2] === "astroprofile"
+    ) {
+      Componentrender = <AstroProfile id={path[3]} />;
+    }
   }
-}
 
 
 

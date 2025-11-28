@@ -7,14 +7,14 @@ import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { FaEdit, FaUserSecret } from "react-icons/fa";
+import { FaEdit, FaUserCircle, FaUserSecret } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { TbPasswordFingerprint } from "react-icons/tb";
 import toast from "react-hot-toast";
 import { getAccountList, resetCode } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
 import AlertLoading from "@/app/common/AlertLoading";
-import { ImProfile } from "react-icons/im";
+
 import { useRouter } from "next/navigation";
 
 
@@ -218,14 +218,15 @@ export default function AstroList() {
 
                     <li>
                         <div className="flex items-center justify-center gap-3 text-xs">
+                            <CustomButton onClick={() => astrologerProfile(row?.id)}
+                                className="p-2 bg-blue-400 text-white rounded-full hover:bg-blue-500 hover:scale-102">    <FaUserCircle /></CustomButton>
+                            <CustomButton variant={"yellow"} className="p-2 bg-red-400 text-white rounded-full hover:bg-red-500 hover:scale-102"><FaEdit /></CustomButton>
 
-                            <CustomButton variant={"red"} className="px-2 py-2 text-white rounded-lg font-semibold"
+                            <CustomButton variant={"red"} className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 hover:scale-102"
                                 onClick={() => HandlerPassword(row?.id, row?.full_name, row?.mobile2)}><TbPasswordFingerprint />
                             </CustomButton>
-                            <CustomButton variant={"yellow"} className="px-2 py-2 text-white rounded-lg font-semibold"><FaEdit /></CustomButton>
 
-                            <CustomButton onClick={() => astrologerProfile(row?.id)}
-                                variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><ImProfile /></CustomButton>
+
                         </div></li>
                 </ul>
             ))}
