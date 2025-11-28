@@ -12,10 +12,13 @@ import { MdDeleteForever } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { TbPasswordFingerprint } from "react-icons/tb";
 import toast from "react-hot-toast";
-import { getAccountList, resetCode } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
+import { getAccountList, resetCode, sendTagRequest } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
 import AlertLoading from "@/app/common/AlertLoading";
 import { ImProfile } from "react-icons/im";
 import { useRouter } from "next/navigation";
+import { MdFilterVintage } from "react-icons/md";
+
+
 
 
 
@@ -32,7 +35,7 @@ export default function AstroList() {
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading, astrolist } = useSelector((state) => state.astrologerlist);
-    const { accountloading, activeaccount, statusCode } = useSelector((state) => state.astrologeractive);
+    const { accountloading, activeaccount, statusCode,tagCode } = useSelector((state) => state.astrologeractive);
     const astrologerlist = useMemo(() => {
         return astrolist?.sortedAstrologers;
     }, [astrolist])
@@ -46,6 +49,10 @@ export default function AstroList() {
     const [showUpdatePopup, setShowUpdatePopup] = useState(false);
     const [astrodetail, setAstroDetail] = useState("");
     const [password, setPassword] = useState("");
+      const [ranking, setRanking] = useState("Rising Star");
+       const [showranking, setShowRanking] = useState("");
+
+        const [showtag, setShowTag] = useState(false);
 
     const HandlerPassword = (astro_id, name, phone) => {
         setShowUpdatePopup(true);
@@ -53,6 +60,16 @@ export default function AstroList() {
             astroId: astro_id,
             profilename: name,
             phonenumber: phone
+        })
+    }
+
+
+       const HandlerTag = (astro_id, name) => {
+        setShowTag(true);
+        setAstroDetail({
+            astroId: astro_id,
+            profilename: name,
+           
         })
     }
 
@@ -92,6 +109,31 @@ export default function AstroList() {
     }
 
 
+   const updateTag = () => {
+        try {
+
+            if (ranking === "") {
+                toast.error("Please Select Ranking!");
+            } else {
+                let payload = {
+                    astro_id:astrodetail?.astroId,
+                    tag:ranking
+                   
+                }
+
+  dispatch(sendTagRequest(payload))
+
+
+
+            }
+
+
+        } catch (error) {
+
+        }
+    }
+
+
 
 
 
@@ -103,6 +145,17 @@ export default function AstroList() {
             setShowUpdatePopup(false)
         }
     }, [statusCode])
+    
+    useEffect(() => {
+        if (tagCode === 201) {
+
+
+          
+            dispatch(resetCode());
+            toast.success("Astrologer Tag Update Successfully!");
+            setShowTag(false)
+        }
+    }, [tagCode])
 
     return (
         <div className="min-h-screen ">
@@ -126,6 +179,7 @@ export default function AstroList() {
                 <li>Activity</li>
                 <li>Status</li>
                 <li>Last Login</li>
+                    
 
                 <li>Action</li>
             </ul>
@@ -215,6 +269,8 @@ export default function AstroList() {
 
                         </div></li>
 
+                       
+
 
                     <li>
                         <div className="flex items-center justify-center gap-3 text-xs">
@@ -226,6 +282,10 @@ export default function AstroList() {
 
                             <CustomButton onClick={() => astrologerProfile(row?.id)}
                                 variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><ImProfile /></CustomButton>
+
+
+                           <CustomButton  onClick={() => HandlerTag(row?.id, row?.full_name)}
+                                variant={"green"} className="px-2 py-2 rounded-lg font-semibold"><MdFilterVintage  /></CustomButton>
                         </div></li>
                 </ul>
             ))}
@@ -294,6 +354,65 @@ export default function AstroList() {
                     </div>
                 </div>
             )}
+
+
+
+
+            {showtag&& (
+                <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
+                    <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
+                        <button onClick={() => setShowTag(false)} className="absolute top-2  right-2 text-red-500 text-xl">
+                            ✖
+                        </button>
+                        <h1 className="text-xl font-bold"></h1>
+
+
+                        <div className="flex flex-col mt-4">
+                            <label> Astrologer  : {astrodetail?.profilename || ""}</label>
+
+
+                        </div>
+
+                       
+
+
+                        <div className="flex flex-col mt-4">
+                            <label>Select Tag</label>
+
+                            <div className="flex items-center space-x-2 w-full">
+                               <select className="form-control w-full py-1 rounded-lg border 
+                               border-gray-300 outline-none focus:ring-none"
+                                 onChange={(e) => setRanking(e.target.value)}>
+                                <option>Rising Star</option>
+                                <option>Celebrity</option>
+                                 <option>Top Ranking</option>
+                                <option>Top Choice</option>
+
+                               </select>
+
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col mt-4">
+
+                            <div className="flex items-center space-x-2">
+
+
+
+                                <CustomButton variant={"red"} onClick={updateTag}
+                                    className="px-2 py-2 text-white rounded-lg font-semibold"
+
+
+                                >Update Tag</CustomButton>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            )}
+
             <AlertLoading show={accountloading} title="Please Wait..." />
 
         </div>
