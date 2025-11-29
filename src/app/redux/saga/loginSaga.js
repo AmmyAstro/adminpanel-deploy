@@ -7,17 +7,25 @@ import Cookies from "js-cookie";
 import { loginRequest, loginSuccess, loginFailure } from "../slices/loginSlice";
 import { apiroute } from "../config";
 
+
+
+const loginapi = (payload) =>{
+  return  axios.post(apiroute.AdminLogin,payload)
+
+}
+
 function* loginUser(action) {
 
-  console.log("XAAx",action.payload);
   try {
-    const response = yield call(axios.post,apiroute.AdminLogin, action.payload);  
+    const response = yield call(loginapi,action.payload);  
 
     const data = response.data;
+
+    console.log("ASaS",data);
   
 yield put(loginSuccess({
-        user: data.user,
-        token: data.accessToken,
+        user: data.staffid,
+        token: data?.token,
       })
     );
 

@@ -6,26 +6,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginRequest } from "./redux/slices/loginSlice";
 import Image from "next/image";
 import cookieHelper from "./helper/cookieHelper";
+import toast from "react-hot-toast";
+import AlertLoading from "./common/AlertLoading";
+
 
 
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [username,setUserName]= useState("")
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
   const { loading, token, error } = useSelector((state) => state.login || {});
 
-  const handleMobileChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setMobile(value);
-  };
 
-  const handleSubmit = (e) => {
-    // alert("Login button clicked");
-    e.preventDefault();
-    dispatch(loginRequest({ mobile, password }));
+
+  const handleSubmit = () => {
+    if(!username){
+      toast.error("Please Enter UserName");
+    }else if(!password){
+            toast.error("Please Enter Password");
+    }else{
+      dispatch(loginRequest({ username, password }));
+    }
+  
+  
+    
   };
 
 
@@ -38,12 +46,13 @@ export default function LoginForm() {
   // }, [dispatch, token]);
 
   useEffect(() => {
+    console.log("AzASz",token);
     if (token) {
       cookieHelper.set("token",token);
       router.push("/Admindash");
     }
   }, [token, router])
-  console.log("Redux login state:", { token, error, loading });
+  
 
 
   return (
@@ -61,8 +70,8 @@ export default function LoginForm() {
           Enter your credentials to continue
         </p>
 
-        <form
-          onSubmit={handleSubmit}
+        <div
+         
           className="space-y-4 flex flex-col items-center justify-center"
         >
           <div className="w-full">
@@ -70,18 +79,18 @@ export default function LoginForm() {
               htmlFor="mobile"
               className="block text-sm font-medium text-gray-700"
             >
-              Phone Number
+             UserName
             </label>
             <input
               type="text"
-              id="mobile"
-              name="mobile"
-              value={mobile}
-              onChange={handleMobileChange}
-              maxLength={10}
-              inputMode="numeric"
+          
+          
+              value={username}
+              onChange={(e)=>setUserName(e.target.value)}
+           
+              inputMode="String"
               required
-              placeholder="Enter phone number"
+              placeholder="Enter UserName"
               className="mt-1 w-full rounded-full border border-gray-200  px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
@@ -115,17 +124,18 @@ export default function LoginForm() {
           </div>
 
           <button
-            type="submit"
+            onClick={handleSubmit}
             disabled={loading}
             className="w-fit place-self-center px-10 self-center justify-self-center rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
-        </form>
+        </div>
 
         {error && (
           <p className="err-blink text-center text-red-600 text-sm mt-2">{error}</p>
         )}
+        <AlertLoading show={loading} title="Please Wait.." />
       </div>
 
     </div>
