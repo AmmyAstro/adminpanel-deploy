@@ -1,7 +1,9 @@
 import {call,put,takeLatest} from "redux-saga/effects";
 import { apiroute, AuthHeader } from "../../config";
 import axios from "axios";
-import { getAccountList,AccountSetSuccess,FailAccountSetSuccess,sendTagRequest,updateTagSuccessfully } from "../../slices/astrologer/ActiveAccountSlice";
+import { getAccountList,AccountSetSuccess,FailAccountSetSuccess,
+    sendTagRequest,updateTagSuccessfully,
+    sendManagePriceRequest,managePriceSuccessfully } from "../../slices/astrologer/ActiveAccountSlice";
 
 const astroaccount = (payload) =>{
 
@@ -19,6 +21,43 @@ const updatetag = (payload) =>{
 
   return axios.post(apiroute.ASTROLOGER_TAG,payload,{headers})
 }
+
+const manageprice= (payload) =>{
+
+    console.log("Aas",payload);
+        const token = AuthHeader();
+         const headers = {
+              Authorization: `Bearer ${token}`,
+               };
+
+  return axios.post(apiroute.ASTROLOGER_MANAGEPRICE,payload,{headers})
+    
+}
+
+
+
+function* AstrologerManagePrice(action){
+    try {
+
+        console.log("ASAsaS",action.payload);
+        // const {price,status,astro_id,remarks}= action
+        const response = yield call(manageprice,action.payload);
+
+        console.log("res",response);
+        if(response?.status===201){
+        yield put(managePriceSuccessfully(response?.data))
+
+        }else{
+            console.log("errror");
+        }
+        
+    } catch (error) {
+        console.log("eroror",error?.message);
+        
+    }
+}
+
+
 
 
 
@@ -44,6 +83,9 @@ function* AstrologerTagUpdate(action){
 }
 
 
+
+
+
 function* ActiveAstrologer(action){
 try {
 const response= yield call (astroaccount,action.payload);
@@ -58,4 +100,5 @@ yield put(AccountSetSuccess(response?.data))
 export default function* getAstroSaga(){
  yield takeLatest(getAccountList.type,ActiveAstrologer);
  yield takeLatest (sendTagRequest.type,AstrologerTagUpdate);
+ yield takeLatest(sendManagePriceRequest.type,AstrologerManagePrice);
 }

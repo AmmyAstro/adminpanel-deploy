@@ -3,15 +3,16 @@ import Cookies from 'js-cookie';
 
 const cookieHelper = {
 
-  set: (key, value, expiresHours = 1) => {
-    const safeValue = typeof value === 'object' ? JSON.stringify(value) : value;
-    Cookies.set(key, safeValue, {
-      expires: expiresHours / 24, 
-      path: '/',
-      secure: true,
-      sameSite: 'Strict',
-    });
-  },
+set: (key, value, expiresHours = 24) => {
+  const safeValue = typeof value === 'object' ? JSON.stringify(value) : value;
+
+  Cookies.set(key, safeValue, {
+    expires: expiresHours / 24,
+    path: '/',
+    secure: true,
+    sameSite: 'Strict',
+  });
+},
 
 
   get: (key) => {

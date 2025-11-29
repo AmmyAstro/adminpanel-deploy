@@ -1,6 +1,8 @@
+import AlertLoading from "@/app/common/AlertLoading";
 import Skenton from "@/app/common/Skenton";
 import { formatDate } from "@/app/helper/helper";
 import { mainurl } from "@/app/redux/config";
+import { resetCode, sendManagePriceRequest } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
 import { RequestAstrologerDetail } from "@/app/redux/slices/astrologer/AstrologerDetail";
 
 import CustomButton from "@/components/Custom/CustomButtom";
@@ -10,16 +12,10 @@ import AstroProfiledata from "@/components/Data/AstroProifledata";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState, useEffect, useMemo, Suspense } from "react";
+import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-
-
-
-
-
-
-
 
 
 export default function AstroProfile() {
@@ -30,7 +26,14 @@ export default function AstroProfile() {
     const astro_id = params?.slug[3];
 
 
+
+    const [price, setPrice] = useState("");
+    const [remarks, setRemarks] = useState("");
+
     const { astrologerloading, astrologerdata } = useSelector((state) => state.astrologerdetail);
+      const { accountloading,priceCode,updateprice } = useSelector((state) => state.astrologeractive);
+
+      console.log("asdasd",updateprice);
 
 
 
@@ -45,6 +48,14 @@ export default function AstroProfile() {
 
 
 
+    useEffect(() => {
+        if (priceCode === 202) {
+            dispatch(resetCode());
+            toast.success("Astrologer Price Update Successfully!");
+
+           setOpenPopUp(false);
+        }
+    }, [priceCode,dispatch])
 
 
     const astrologerprofile = useMemo(() => {
@@ -56,15 +67,6 @@ export default function AstroProfile() {
     const astro_stats = useMemo(() => {
         return astrologerdata?.stats;
     }, [astrologerdata])
-
-
-
-
-
-
-
-
-
 
 
     const openWallet = openPopup => {
@@ -98,7 +100,7 @@ export default function AstroProfile() {
         {
             id: 1,
             img: "/admin-img/earnings.png",
-            amount: astro_stats?.balance_amount || 0,
+            amount: Math.ceil(Number(astrologerprofile?.balance_amount)) || 0,
             label: "Availble Balence",
             prefix: "₹ ",
         },
@@ -119,7 +121,28 @@ export default function AstroProfile() {
     ];
 
 
+    const Manageprice = (type) => {
+        try {
+            if (!price) {
+                toast.error("Please Enter Price");
+            } else if (!remarks) {
+                toast.error("Please Enter Remarks");
+            } else {
+  dispatch(sendManagePriceRequest({
+                    price:price,
+                    remarks:remarks,
+                    astro_id:astro_id,
+                    status:type
+                 }))
+                 }
+          
+            } catch (error) {
+                
 
+                console.log("ASASA",error?.message);
+                   }
+                  
+    }
 
 
 
@@ -137,6 +160,7 @@ export default function AstroProfile() {
                 <CustomButton variant={"gray"} className="px-3 py-1" onClick={openWallet}>Manage Wallet</CustomButton>
 
             </div>
+            <AlertLoading show={accountloading} title="Please Wait..." />
             {openPopup && (
                 <div className="fixed inset-0 bg-[#00000062] bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-lg">
@@ -155,23 +179,28 @@ export default function AstroProfile() {
                                 type="text"
                                 placeholder="Enter Amount"
                                 className="  px-3 py-2 text-sm "
+                                onChange={(e) => setPrice(e.target.value)}
                             />
-                            <CustomInput
-                                type="text"
-                                placeholder="Transaction ID / Notes"
-                                className=" px-3 py-2 text-sm "
-                            />
+
+
+                            <textarea
+
+                                className="px-3"
+                                onChange={(e) => setRemarks(e.target.value)}
+                                placeholder="Remarks">
+
+                            </textarea>
                         </div>
 
                         <div className="flex justify-center gap-3">
                             <CustomButton variant={"green"}
                                 className="  text-white   py-2 px-5 text-sm font-semibold"
-                                onClick={() => alert("Add Money clicked")}>
+                                onClick={() => Manageprice("add")}>
                                 Add Gems
                             </CustomButton>
                             <CustomButton variant={"red"}
                                 className="  text-whitepx-4 py-2 px-5 text-sm font-semibold"
-                                onClick={() => alert("Withdraw clicked")}>
+                                onClick={() => Manageprice("deduct")}>
                                 Deduct Gems
                             </CustomButton>
                         </div>

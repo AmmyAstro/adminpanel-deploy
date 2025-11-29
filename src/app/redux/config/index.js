@@ -39,6 +39,7 @@ const apiroute = {
      GET_HISTORY :`${API_AUTH_URL}astro_gift`,
      WALLET_HISTORY:`${CHAT_MICRO}wallet_history`,
      ASTROLOGER_TAG:`${API_BASE_URL}tag/update`,
+     ASTROLOGER_MANAGEPRICE:`${CHAT_MICRO}manage/Price`
 
 }
 

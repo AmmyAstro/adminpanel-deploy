@@ -4,6 +4,8 @@ const initialState = {
     activeaccount: [],
     statusCode:null,
     tagCode:null,
+    priceCode:null,
+    updateprice:[]
 
 }
 const ActiveAccountSlice = createSlice({
@@ -28,16 +30,26 @@ const ActiveAccountSlice = createSlice({
            resetCode:(state)=>{
              state.statusCode=null;
                state.tagCode=null;
+               state.priceCode=null;
            },
 
            sendTagRequest: (state) =>{
          state.accountloading = true
-
-
-           },
+              },
            updateTagSuccessfully:(state,action)=>{
                state.accountloading = false;
                state.tagCode=201;
+           },
+         sendManagePriceRequest:(state)=>{
+         state.accountloading = true
+           },
+             managePriceSuccessfully:(state,action)=>{
+                 state.accountloading = false;
+                state.priceCode=202;
+                state.updateprice=action.payload;
+
+
+
            }
 
 
@@ -48,6 +60,8 @@ const ActiveAccountSlice = createSlice({
 
 export const { getAccountList, AccountSetSuccess, 
     FailAccountSetSuccess,resetCode,
-    sendTagRequest,updateTagSuccessfully } = ActiveAccountSlice.actions;
+    sendTagRequest,updateTagSuccessfully,
+    sendManagePriceRequest,
+    managePriceSuccessfully } = ActiveAccountSlice.actions;
 
 export default ActiveAccountSlice.reducer;

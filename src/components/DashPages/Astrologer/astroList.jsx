@@ -35,7 +35,7 @@ export default function AstroList() {
     dispatch(getRequestList());
 
     }, [dispatch])
-
+   
 
     const [showUpdatePopup, setShowUpdatePopup] = useState(false);
     const [astrodetail, setAstroDetail] = useState("");
@@ -54,6 +54,17 @@ export default function AstroList() {
         })
     }
 
+
+     useEffect(() => {
+        if (tagCode === 201) {
+
+
+          
+            dispatch(resetCode());
+            toast.success("Astrologer Tag Update Successfully!");
+            setShowTag(false)
+        }
+    }, [tagCode])
 
        const HandlerTag = (astro_id, name) => {
         setShowTag(true);
@@ -137,16 +148,7 @@ export default function AstroList() {
         }
     }, [statusCode])
     
-    useEffect(() => {
-        if (tagCode === 201) {
 
-
-          
-            dispatch(resetCode());
-            toast.success("Astrologer Tag Update Successfully!");
-            setShowTag(false)
-        }
-    }, [tagCode])
 
     return (
         <div className="min-h-screen ">
