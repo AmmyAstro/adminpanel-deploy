@@ -1,3 +1,6 @@
+
+'use client'
+
 import React, { useEffect, useMemo } from "react"
 import CustomButton from "./CustomButtom"
 import { useSelector, useDispatch } from "react-redux"

@@ -1,3 +1,5 @@
+'use client'
+
 import AlertLoading from "@/app/common/AlertLoading";
 import Skenton from "@/app/common/Skenton";
 import { formatDate } from "@/app/helper/helper";
