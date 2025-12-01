@@ -37,16 +37,9 @@ export default function LoginForm() {
   };
 
 
-  // useEffect(() => {
-  //   const savedToken = Cookies.get("token");
-  //   if (savedToken && !token) {
-
-  //     dispatch({ type: "login/loginSuccess", payload: savedToken });
-  //   }
-  // }, [dispatch, token]);
 
   useEffect(() => {
-    console.log("AzASz",token);
+
     if (token) {
       cookieHelper.set("token",token);
       router.push("/Admindash");

@@ -10,6 +10,8 @@ import { logout } from "../../app/redux/slices/loginSlice";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import CustomButton from "../Custom/CustomButtom";
+import cookieHelper from "@/app/helper/cookieHelper";
+
 
 export default function Header() {
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
@@ -22,15 +24,12 @@ export default function Header() {
 
   const handleLogout = () => {
 
-    Cookies.remove("accessToken");
-
-
-    localStorage.removeItem("accessToken");
+  cookieHelper.remove();
 
     dispatch(logout());
 
 
-    router.push("/login");
+    router.push("/");
   };
 
 
