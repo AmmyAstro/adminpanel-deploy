@@ -1,3 +1,5 @@
+'use client'
+
 import Skenton from "@/app/common/Skenton";
 import { formatDate } from "@/app/helper/helper";
 import { mainurl } from "@/app/redux/config";
