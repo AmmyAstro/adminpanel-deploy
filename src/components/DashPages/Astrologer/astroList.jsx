@@ -25,28 +25,28 @@ import { CgProfile } from "react-icons/cg";
 export default function AstroList() {
     const [search, setSearch] = useState({ id: "", full_name: "", mobile2: "" });
 
- 
+
 
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading, astrolist } = useSelector((state) => state.astrologerlist);
-    const { accountloading, activeaccount, statusCode,tagCode } = useSelector((state) => state.astrologeractive);
+    const { accountloading, activeaccount, statusCode, tagCode } = useSelector((state) => state.astrologeractive);
     const astrologerlist = useMemo(() => {
         return astrolist?.sortedAstrologers;
     }, [astrolist])
     useEffect(() => {
-    dispatch(getRequestList());
+        dispatch(getRequestList());
 
     }, [dispatch])
-   
+
 
     const [showUpdatePopup, setShowUpdatePopup] = useState(false);
     const [astrodetail, setAstroDetail] = useState("");
     const [password, setPassword] = useState("");
-      const [ranking, setRanking] = useState("Rising Star");
-       const [showranking, setShowRanking] = useState("");
+    const [ranking, setRanking] = useState("Rising Star");
+    const [showranking, setShowRanking] = useState("");
 
-        const [showtag, setShowTag] = useState(false);
+    const [showtag, setShowTag] = useState(false);
 
     const HandlerPassword = (astro_id, name, phone) => {
         setShowUpdatePopup(true);
@@ -58,23 +58,23 @@ export default function AstroList() {
     }
 
 
-     useEffect(() => {
+    useEffect(() => {
         if (tagCode === 201) {
 
 
-          
+
             dispatch(resetCode());
             toast.success("Astrologer Tag Update Successfully!");
             setShowTag(false)
         }
     }, [tagCode])
 
-       const HandlerTag = (astro_id, name) => {
+    const HandlerTag = (astro_id, name) => {
         setShowTag(true);
         setAstroDetail({
             astroId: astro_id,
             profilename: name,
-           
+
         })
     }
 
@@ -110,19 +110,19 @@ export default function AstroList() {
     }
 
 
-   const updateTag = () => {
+    const updateTag = () => {
         try {
 
             if (ranking === "") {
                 toast.error("Please Select Ranking!");
             } else {
                 let payload = {
-                    astro_id:astrodetail?.astroId,
-                    tag:ranking
-                   
+                    astro_id: astrodetail?.astroId,
+                    tag: ranking
+
                 }
 
-  dispatch(sendTagRequest(payload))
+                dispatch(sendTagRequest(payload))
 
 
 
@@ -146,7 +146,7 @@ export default function AstroList() {
             setShowUpdatePopup(false)
         }
     }, [statusCode])
-    
+
 
 
     return (
@@ -167,12 +167,12 @@ export default function AstroList() {
                 <li>Name</li>
                 <li>Mobile</li>
 
-            
+
                 <li>Activity</li>
-                    <li className="text-center">Secret Login</li>
+                <li className="text-center">Secret Login</li>
                 {/* <li>Status</li> */}
                 <li>Tag</li>
-                    
+
 
                 <li className="text-center">Action</li>
             </ul>
@@ -183,21 +183,21 @@ export default function AstroList() {
                     className="grid grid-cols-8 border-b border-gray-200 text-sm text-gray-700 p-2 hover:bg-gray-50">
                     <li>{index + 1}</li>
 
-                        <li>     <div className="flex items-center gap-2">
-                            <Image src={mainurl + 'ds-img/' + row.profile_image}
-                                alt="altro image"
-                                width={60} height={60}
-                                className="rounded-full w-12 h-12" />
-                            <div className="flex flex-col gap-1">
-                                <span className="text-sm">{row?.full_name}</span>
-                                <small>ID: <i>{row?.id}</i></small>
-                            </div>
-                        </div></li>
-                        <li className="line-clamp-2  text-ellipsis ">{row?.mobile2}</li>
+                    <li>     <div className="flex items-center gap-2">
+                        <Image src={mainurl + 'ds-img/' + row.profile_image}
+                            alt="altro image"
+                            width={60} height={60}
+                            className="rounded-full w-12 h-12" />
+                        <div className="flex flex-col gap-1">
+                            <span className="text-sm">{row?.full_name}</span>
+                            <small>ID: <i>{row?.id}</i></small>
+                        </div>
+                    </div></li>
+                    <li className="line-clamp-2  text-ellipsis ">{row?.mobile2}</li>
 
 
 
-                        {/* <li>
+                    {/* <li>
                             <div className="flex flex-col gap-1">
 
                                 {
@@ -219,38 +219,38 @@ export default function AstroList() {
 
                             </div>
                         </li> */}
-                        <li>
-                            {
-                                row?.availability === 1 &&
-                                <CustomToggle
-                                    checked
-                                    id="chat"
-                                // onChange={(val)}
-                                />
-                            }
-                            {
-                                row?.availability === 0 &&
-                                <CustomToggle
+                    <li>
+                        {
+                            row?.availability === 1 &&
+                            <CustomToggle
+                                checked
+                                id="chat"
+                            // onChange={(val)}
+                            />
+                        }
+                        {
+                            row?.availability === 0 &&
+                            <CustomToggle
 
-                                    id="chat"
-                                // onChange={(val)}
-                                />
-                            }
+                                id="chat"
+                            // onChange={(val)}
+                            />
+                        }
 
-                            {
-                                row?.availability === 2 &&
-                                <CustomToggle
+                        {
+                            row?.availability === 2 &&
+                            <CustomToggle
 
-                                    id="chat"
-                                // onChange={(val)}
-                                />
-                            }
+                                id="chat"
+                            // onChange={(val)}
+                            />
+                        }
 
 
 
-                        
+
                     </li>
-                 
+
 
                     <li className=" justify-center text-center">
                         <CustomButton variant={"black"} className="px-2 py-2 text-white rounded-lg font-semibold">
@@ -261,12 +261,12 @@ export default function AstroList() {
                     <li>
                         <div className="flex  gap-3 text-xs">
 
-                              <CustomButton  onClick={() => HandlerTag(row?.id, row?.full_name)}
-                                variant={"green"} className="px-2 py-2 rounded-lg font-semibold"><MdFilterVintage  /></CustomButton>
+                            <CustomButton onClick={() => HandlerTag(row?.id, row?.full_name)}
+                                variant={"green"} className="px-2 py-2 rounded-lg font-semibold"><MdFilterVintage /></CustomButton>
 
                         </div></li>
 
-                       
+
 
 
                     <li>
@@ -281,12 +281,12 @@ export default function AstroList() {
                                 variant={"red"} className="px-2 py-2 rounded-lg font-semibold"><CgProfile /></CustomButton>
 
 
-                       
+
                         </div></li>
                 </ul>
             ))}
 
-            <AlertLoading show={loading} title="Fetch Record..."/>
+            <AlertLoading show={loading} title="Fetch Record..." />
 
             {showUpdatePopup && (
                 <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
@@ -356,7 +356,7 @@ export default function AstroList() {
 
 
 
-            {showtag&& (
+            {showtag && (
                 <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
                     <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
                         <button onClick={() => setShowTag(false)} className="absolute top-2  right-2 text-red-500 text-xl">
@@ -371,22 +371,22 @@ export default function AstroList() {
 
                         </div>
 
-                       
+
 
 
                         <div className="flex flex-col mt-4">
                             <label>Select Tag</label>
 
                             <div className="flex items-center space-x-2 w-full">
-                               <select className="form-control w-full py-1 rounded-lg border 
+                                <select className="form-control w-full py-1 rounded-lg border 
                                border-gray-300 outline-none focus:ring-none"
-                                 onChange={(e) => setRanking(e.target.value)}>
-                                <option>Rising Star</option>
-                                <option>Celebrity</option>
-                                 <option>Top Ranking</option>
-                                <option>Top Choice</option>
+                                    onChange={(e) => setRanking(e.target.value)}>
+                                    <option>Rising Star</option>
+                                    <option>Celebrity</option>
+                                    <option>Top Ranking</option>
+                                    <option>Top Choice</option>
 
-                               </select>
+                                </select>
 
                             </div>
                         </div>

@@ -26,7 +26,7 @@ const cards = [
   {
     title: "Customers",
     img: "/admin-img/gif/1.gif",
-    link: "/Admindash/customer",
+    link: "/Admindash/custommain",
     bg: "bg-[#a682a7ce]",
   },
   {

@@ -4,67 +4,51 @@ import CustomInput from "@/components/Custom/CustomInput";
 import { useEffect, useMemo, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { FaEdit, FaUserCircle } from "react-icons/fa";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { sendRequestCustomer } from "@/app/redux/slices/customer/getCustomer";
 import AlertLoading from "@/app/common/AlertLoading";
 import CustomToggle from "@/components/Custom/CustomToggle";
+import { useRouter } from "next/navigation";
 
-
-const dummyData = [
-    {
-        id: "1",
-        name: "Atul Digital ",
-        gender: "Male",
-
-        address: "TA-107 Newyork",
-        phone: "+123 9988568",
-        email: "kazifahim93@gmail.com",
-    },
-    {
-        id: "2",
-        name: "Ruchika Customer",
-        gender: "Female",
-
-        address: "59 Australia, Sydney",
-        phone: "+123 9988568",
-        email: "kazifahim93@gmail.com",
-    },
-];
 
 export default function CustomerList() {
+    const router = useRouter();
+
     const [search, setSearch] = useState({ id: "", name: "", phone: "" });
 
 
-    const {loading,customerlist}= useSelector((state)=>state.getcustomer);
+    const { loading, customerlist } = useSelector((state) => state.getcustomer);
 
 
-    console.log("sss",customerlist);
+    console.log("sss", customerlist);
 
 
 
 
 
-    const list= useMemo(()=>{
+    const list = useMemo(() => {
         return customerlist;
 
-    },[customerlist])
+    }, [customerlist])
 
 
 
-    const dispatch= useDispatch();
+    const dispatch = useDispatch();
 
+    const customerProfile = (id) => {
+        router.push(`customerlist/customerprofile/${id}`);
+    }
 
+    useEffect(() => {
+        dispatch(sendRequestCustomer());
+    }, [dispatch])
 
-useEffect(()=>{
-dispatch(sendRequestCustomer());
-},[dispatch])
-
-    const filteredData = dummyData.filter(
-        (item) =>
-            item.id.toLowerCase().includes(search.id.toLowerCase()) &&
-            item.name.toLowerCase().includes(search.name.toLowerCase()) &&
-            item.phone.toLowerCase().includes(search.phone.toLowerCase())
-    );
+    // const filteredData = dummyData.filter(
+    //     (item) =>
+    //         item.id.toLowerCase().includes(search.id.toLowerCase()) &&
+    //         item.name.toLowerCase().includes(search.name.toLowerCase()) &&
+    //         item.phone.toLowerCase().includes(search.phone.toLowerCase())
+    // );
 
 
 
@@ -98,74 +82,74 @@ dispatch(sendRequestCustomer());
                         onChange={(e) => setSearch({ ...search, phone: e.target.value })}
                         className="px-3 py-2  "
                     />
-                    
+
                 </div>
-<AlertLoading show={loading} title="Please Wait...." />
+                <AlertLoading show={loading} title="Please Wait...." />
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                         <thead className="font-bold border-b py-5 bg-purple-200 p-2 text-sm text-purple-900 rounded-lg px-4">
                             <tr>
                                 <th className="p-3 text-left">S.no</th>
                                 <th className="p-3 text-left">Name</th>
-                    
 
-         
+
+
                                 <th className="p-3 text-left">Phone</th>
                                 <th className="p-3 text-left">Balance</th>
-                                     <th className="p-3 text-left">Status</th>
+                                <th className="p-3 text-left">Status</th>
                                 <th className="p-3 text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {list.length > 0 ? (
-                                list?.map((item,index) => (
+                                list?.map((item, index) => (
                                     <tr
                                         key={item.id}
                                         className="border-b border-gray-300 text-[13px] bg-[#7d738929] hover:bg-gray-50 transition"
-                                     >
+                                    >
                                         <td className="p-3 flex items-end gap-2">
 
-                                            <span> {index+1}</span>
+                                            <span> {index + 1}</span>
                                         </td>
                                         <td className="p-3">{item?.name}</td>
-                                      
+
 
                                         <td className="p-3">{item?.phonenumber}</td>
-                                        
+
                                         <td className="p-3">₹{item?.balance_amount}</td>
-                                   
-                                          <td className="p-3">   {
-                                                                          item?.status === 1 &&
-                                                                          <CustomToggle
-                                                                              checked
-                                                                              id="chat"
-                                                                          // onChange={(val)}
-                                                                          />
-                                                                      }
-                                                                      {
-                                                                          item?.availability === 0 &&
-                                                                          <CustomToggle
-                                          
-                                                                              id="chat"
-                                                                          // onChange={(val)}
-                                                                          />
-                                                                      }
-                                          
-                                                                    
-                                          </td>
+
+                                        <td className="p-3">   {
+                                            item?.status === 1 &&
+                                            <CustomToggle
+                                                checked
+                                                id="chat"
+                                            // onChange={(val)}
+                                            />
+                                        }
+                                            {
+                                                item?.availability === 0 &&
+                                                <CustomToggle
+
+                                                    id="chat"
+                                                // onChange={(val)}
+                                                />
+                                            }
+
+
+                                        </td>
                                         <td className="p-3 flex gap-2">
-                                             <CustomButton 
+                                            <CustomButton onClick={() => customerProfile(item?.id)}
                                                 className="p-2 bg-blue-400 text-white rounded-full hover:bg-blue-500 hover:scale-102">
                                                 <FaUserCircle />
                                             </CustomButton>
                                             <CustomButton variant={"yellow"} className="p-2 bg-gray-300 text-white rounded-full hover:bg-gray-400 hover:scale-102">
-                                   <FaEdit />
+                                                <FaEdit />
                                             </CustomButton>
-                                            <CustomButton 
+                                            <CustomButton
                                                 className="p-2 bg-red-400 text-white rounded-full hover:bg-red-500 hover:scale-102">
                                                 <MdDelete />
                                             </CustomButton>
-                                                   
+
                                         </td>
                                     </tr>
                                 ))

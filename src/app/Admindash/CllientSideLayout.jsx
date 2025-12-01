@@ -20,7 +20,7 @@ export default function ClientSideLayout({ children }) {
     { match: "/Admindash/privilegemain", type: "previlegeSide" },
     { match: "/Admindash/astromain", type: "astrologerSide" },
     { match: "/Admindash/editTestimonial", type: "testimonialSide" },
-    { match: "/Admindash/customer", type: "customerSide" },
+    { match: "/Admindash/custommain", type: "customerSide" },
   ];
 
   const activeSidebar = sidebarConfig.find(item =>

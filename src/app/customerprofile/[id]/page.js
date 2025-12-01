@@ -1,3 +1,4 @@
+"use client";
 import Skenton from "@/app/common/Skenton";
 import { formatDate } from "@/app/helper/helper";
 import { mainurl } from "@/app/redux/config";
@@ -15,7 +16,7 @@ import { MdCancel } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 
 
-export default function AstroProfile() {
+export default function CustomerProfile() {
     const [activeTab, setActiveTab] = useState("call");
     const [openPopup, setOpenPopUp] = useState(false)
     const dispatch = useDispatch();
@@ -40,15 +41,15 @@ export default function AstroProfile() {
 
 
 
-    const astrologerprofile = useMemo(() => {
-        return astrologerdata?.profile;
-    }, [astrologerdata])
+    const customerProfile = useMemo(() => {
+        return customerdata?.profile;
+    }, [customerdata])
 
 
 
-    const astro_stats = useMemo(() => {
-        return astrologerdata?.stats;
-    }, [astrologerdata])
+    const customer_stats = useMemo(() => {
+        return customerdata?.stats;
+    }, [customerdata])
 
 
 
@@ -64,8 +65,8 @@ export default function AstroProfile() {
         setOpenPopUp(true);
     }
     const [availability, setAvailability] = useState({
-        call: astrologerprofile?.is_call_online,
-        chat: astrologerprofile?.is_chat_online,
+        call: customerProfile?.is_call_online,
+        chat: customerProfile?.is_chat_online,
 
     });
 
@@ -91,21 +92,21 @@ export default function AstroProfile() {
         {
             id: 1,
             img: "/admin-img/earnings.png",
-            amount: astro_stats?.balance_amount || 0,
+            amount: customer_stats?.balance_amount || 0,
             label: "Availble Balence",
             prefix: "₹ ",
         },
         {
             id: 2,
             img: "/admin-img/investment.png",
-            amount: astro_stats?.total_calls || 0,
+            amount: customer_stats?.total_calls || 0,
             label: "Total Call",
             prefix: "₹ ",
         },
         {
             id: 3,
             img: "/admin-img/reward.png",
-            amount: astro_stats?.total_chats || 0,
+            amount: customer_stats?.total_chats || 0,
             label: "Total Chat",
             prefix: "",
         },
@@ -186,7 +187,7 @@ export default function AstroProfile() {
                         <div className="flex items-center gap-4">
                             <div className="">
 
-                                <Image src={mainurl + 'ds-img/' + astrologerprofile?.profile_image}
+                                <Image src={mainurl + 'ds-img/' + customerProfile?.profile_image}
                                     alt="Avatar"
                                     width={60}
                                     height={60}
@@ -195,9 +196,9 @@ export default function AstroProfile() {
                             </div>
 
                             <div className="flex flex-col ml-5 gap-1">
-                                <span className="font-bold text-gray-800">{astrologerprofile?.full_name || ""}</span>
+                                <span className="font-bold text-gray-800">{customerProfile?.full_name || ""}</span>
                                 <small className="font-semibold text-gray-600">
-                                    Astrologer ID :000-{astrologerprofile?.id}
+                                    Customer ID :000-{customerProfile?.id}
                                 </small>
                             </div>
                         </div>
@@ -205,21 +206,21 @@ export default function AstroProfile() {
                         <div className="flex flex-col gap-2  py-3">
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Name :</div>
-                                <div className="text-sm">{astrologerprofile?.full_name || ""}</div>
+                                <div className="text-sm">{customerProfile?.full_name || ""}</div>
                             </div>
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Email:</div>
-                                <div className="text-sm">{astrologerprofile?.full_name}@gmail.com</div>
+                                <div className="text-sm">{customerProfile?.full_name}@gmail.com</div>
                             </div>  <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Mobile:</div>
-                                <div className="text-sm">{astrologerprofile?.mobile2}</div>
+                                <div className="text-sm">{customerProfile?.mobile2}</div>
                             </div>  <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Address:</div>
-                                <div className="text-sm">{astrologerprofile?.address || ""},
-                                    {astrologerprofile?.city || ""},{astrologerprofile?.state || ""}</div>
+                                <div className="text-sm">{customerProfile?.address || ""},
+                                    {customerProfile?.city || ""},{customerProfile?.state || ""}</div>
                             </div>  <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm  ">Joined From:</div>
-                                <div className="text-sm">{formatDate(astrologerprofile?.created_at)}</div>
+                                <div className="text-sm">{formatDate(customerProfile?.created_at)}</div>
                             </div>
                         </div>
                         <hr className="text-gray-300" />
@@ -244,7 +245,7 @@ export default function AstroProfile() {
                                 </label>
                                 <div className="flex items-center gap-5">
                                     <label className="text-sm font-semibold text-gray-700">
-                                        ₹ {astrologerprofile?.disc_call_charge}
+                                        ₹ {customerProfile?.disc_call_charge}
                                     </label>
                                     <CustomToggle
                                         id="chat"
@@ -260,7 +261,7 @@ export default function AstroProfile() {
                                 </label>
                                 <div className="flex items-center gap-5">
                                     <label className="text-sm font-semibold text-gray-700">
-                                        ₹ {astrologerprofile?.disc_chat_charge}
+                                        ₹ {customerProfile?.disc_chat_charge}
                                     </label>
                                     <CustomToggle
                                         id="chat"

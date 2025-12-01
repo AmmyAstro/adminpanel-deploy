@@ -18,6 +18,9 @@ import EditTestimonial from "../editTestimonial/[id]/page";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
 import AstroProfile from "@/app/astroprofile/[id]/page";
 import CustomerList from "@/components/DashPages/Customer/customerList";
+import CuustomerProfile from "@/app/customerprofile/[id]/page";
+import CustomerMain from "@/components/DashPages/Customer/CustomerMain";
+
 
 export default function AdminPanel() {
   const params = useParams();
@@ -39,7 +42,7 @@ export default function AdminPanel() {
     astromain: <AstrologerMain />,
     testimonialmain: <TestimonialList />,
     edittestimonial: <EditTestimonial />,
-    customer: <CustomerList />,
+    custommain: <CustomerMain />
   };
 
 
@@ -50,11 +53,13 @@ export default function AdminPanel() {
     addtesti: <AddTestimonial />,
     astrolist: <AstroList />,
     edittestimonial: <EditTestimonial />,
+    customerlist: <CustomerList />,
 
   };
 
   const thirdLevel = {
     astroprofile: <AstroProfile />,
+    customerprofile: <CuustomerProfile />
 
   }
 
@@ -75,6 +80,9 @@ export default function AdminPanel() {
     if (path[0] === "astromain") {
       Componentrender = secondLevel[path[1]];
     }
+      if (path[0] === "custommain") {
+      Componentrender = secondLevel[path[1]];
+    }
     if (path[0] === "testimonialmain") {
       Componentrender = secondLevel[path[1]];
     }
@@ -88,7 +96,17 @@ export default function AdminPanel() {
     ) {
       Componentrender = thirdLevel[path[2]];
     }
+
+    else if (
+      path[0] === "custommain" &&
+      path[1] === "customerlist" &&
+      thirdLevel[path[2]]
+    ) {
+      Componentrender = thirdLevel[path[2]];
+    }
   }
+
+
   else if (path.length === 4) {
     if (
       path[0] === "astromain" &&
@@ -96,6 +114,14 @@ export default function AdminPanel() {
       path[2] === "astroprofile"
     ) {
       Componentrender = <AstroProfile id={path[3]} />;
+    }
+
+    if (
+      path[0] === "custommain" &&
+      path[1] === "customerlist" &&
+      path[2] === "customerprofile"
+    ) {
+      Componentrender = <CuustomerProfile id={path[3]} />;
     }
   }
 

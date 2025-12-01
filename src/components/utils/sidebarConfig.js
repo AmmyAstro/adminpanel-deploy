@@ -59,8 +59,10 @@ const sidebarConfig = {
         { name: "Chat Logs", href: "#", img: <MdOutlineContactPage /> },
     ],
     customerSide: [
-        { name: "Customer List", href: "/Admindash/customer", img: <MdOutlineContactPage /> },
-
+        { name: "Customer List", href: "/Admindash/custommain/customerlist", img: <MdOutlineContactPage /> },
+        { name: "Customer Wallet", href: "/Admindash/customer", img: <MdOutlineContactPage /> },
+        { name: "Customer Account", href: "/Admindash/customer", img: <MdOutlineContactPage /> },
+        { name: "Customer Revenue", href: "/Admindash/customer", img: <MdOutlineContactPage /> },
     ]
 };
 
