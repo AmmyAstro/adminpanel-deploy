@@ -10,7 +10,7 @@ import AlertLoading from "@/app/common/AlertLoading";
 import { fetchcallHistory } from "@/app/redux/slices/callhistory/getCallHistory";
 
 
-function ChatCom() {
+function CallCom({astro_id}) {
 
 
     const { calldata, loading: callloading, currentPage, totalPages } = useSelector((state) => state.callhistory);
@@ -22,9 +22,10 @@ function ChatCom() {
 
     const call_data = useMemo(() => calldata, [calldata]);
     useEffect(() => {
-        dispatch(fetchcallHistory({ astrologer_id: 1, limit: 12, page: currentPage }))
+        dispatch(fetchcallHistory({ astrologer_id: astro_id, limit: 12, page: currentPage }))
 
-    }, [dispatch, currentPage]);
+    }, [dispatch, currentPage,astro_id]);
+
 
 
 
@@ -33,7 +34,7 @@ function ChatCom() {
         if (newPage >= 1 && newPage <= totalPages) {
             dispatch(
                 fetchcallHistory({
-                    astrologer_id: 1,
+                    astrologer_id: astro_id,
                     limit: 12,
                     page: newPage,
                 })
@@ -165,4 +166,4 @@ function ChatCom() {
     );
 }
 
-export default React.memo(ChatCom);
+export default React.memo(CallCom);

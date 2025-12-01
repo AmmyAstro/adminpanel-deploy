@@ -33,6 +33,7 @@ const apiroute = {
      ASTROLOGER_TAG:`${API_BASE_URL}tag/update`,
      ASTROLOGER_MANAGEPRICE:`${CHAT_MICRO}manage/Price`,
      CUSTOMER_LIST:`${API_AUTH_URL}customer/list`,
+     ASTROLOGER_REVIEW:`${API_AUTH_URL}astrologer_review`,
 
 }
 

@@ -60,7 +60,8 @@ const ActiveAccountSlice = createSlice({
 
 export const { getAccountList, AccountSetSuccess, 
     FailAccountSetSuccess,resetCode,
-    sendTagRequest,updateTagSuccessfully,
+    sendTagRequest,
+    updateTagSuccessfully,
     sendManagePriceRequest,
     managePriceSuccessfully } = ActiveAccountSlice.actions;
 

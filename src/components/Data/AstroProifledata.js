@@ -1,6 +1,7 @@
 import CallComp from "../Custom/CallComp";
 import ChatCom from "../Custom/ChatCom";
 import GiftComp from "../Custom/GiftComp";
+import Reviewcom from "../Custom/Reviewcom";
 import WalletCom from "../Custom/WalletCom";
 
 
@@ -8,47 +9,29 @@ import WalletCom from "../Custom/WalletCom";
    {
     id: "Wallet",
     label: "Wallet History",
-      fields: [
-      // eslint-disable-next-line react/jsx-key
-      <WalletCom />
-     
-    ],
+      fields:[WalletCom],
    
   },
   {
     id: "call",
     label: "Call History",
-    fields: [
-      // eslint-disable-next-line react/jsx-key
-      <CallComp />
-     
-    ],
+    fields: [CallComp],
   },
   {
     id: "video",
     label: "Chat History",
-    fields: [
-     // eslint-disable-next-line react/jsx-key
-     <ChatCom />
-    ],
+    fields: [ChatCom ],
   },
 
   {
     id: "gift",
     label: "Gift History",
-    fields: [
-      // eslint-disable-next-line react/jsx-key
-      <GiftComp />
-    ],
+    fields: [GiftComp],
   },
     {
-    id: "offer",
-    label: "Order History",
-    fields: [
-      { label: "Offer Call Charges", prefix: "Rs.", name: "offercallcharges", max: 500 },
-      { label: "Offer Video Commission", prefix: "%.", name: "offervideocharges", max: 50 },
-      { label: "Offer Chat Charges", prefix: "Rs.", name: "disc_chat_charge", max: 50 },
-    ],
+    id: "review",
+    label: "Review History",
+    fields:[Reviewcom],
   },
  
 ];

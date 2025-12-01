@@ -40,7 +40,7 @@ function* AstrologerManagePrice(action){
     try {
 
         console.log("ASAsaS",action.payload);
-        // const {price,status,astro_id,remarks}= action
+   
         const response = yield call(manageprice,action.payload);
 
         console.log("res",response);

@@ -10,7 +10,9 @@ import CustomToggle from "./CustomToggle";
 import AlertLoading from "@/app/common/AlertLoading";
 
 
-function ChatCom() {
+function ChatCom({astro_id}) {
+
+
 
     const { messages, loading, error, currentPage, totalPages } = useSelector(
         (state) => state.chathistory
@@ -22,12 +24,12 @@ function ChatCom() {
     useEffect(() => {
         dispatch(
             fetchMessages({
-                astrologer_id: 1,
+                astrologer_id: astro_id,
                 limit: 12,
                 page: currentPage,
             })
         );
-    }, [dispatch, currentPage]);
+    }, [dispatch, currentPage,astro_id]);
 
     const chatdata = useMemo(() => messages, [messages]);
 
@@ -36,7 +38,7 @@ function ChatCom() {
         if (newPage >= 1 && newPage <= totalPages) {
             dispatch(
                 fetchMessages({
-                    astrologer_id: 1,
+                    astrologer_id: astro_id,
                     limit: 12,
                     page: newPage,
                 })

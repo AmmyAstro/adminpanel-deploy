@@ -13,7 +13,7 @@ import CustomToggle from "@/components/Custom/CustomToggle";
 import AstroProfiledata from "@/components/Data/AstroProifledata";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
@@ -27,6 +27,8 @@ export default function AstroProfile() {
     const params = useParams();
     const astro_id = params?.slug[3];
 
+    const [priceupdate,setPriceUpdate]= useState(0);
+
 
 
     const [price, setPrice] = useState("");
@@ -35,10 +37,17 @@ export default function AstroProfile() {
     const { astrologerloading, astrologerdata } = useSelector((state) => state.astrologerdetail);
       const { accountloading,priceCode,updateprice } = useSelector((state) => state.astrologeractive);
 
-      console.log("asdasd",updateprice);
+  
 
 
 
+
+      const update_price= useMemo(()=>{
+         return parseInt(updateprice?.balance || 0);
+      },[updateprice])
+
+
+      
 
 
 
@@ -98,12 +107,24 @@ export default function AstroProfile() {
     ];
 
 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
     const stats = [
         {
             id: 1,
             img: "/admin-img/earnings.png",
-            amount: Math.ceil(Number(astrologerprofile?.balance_amount)) || 0,
-            label: "Availble Balence",
+            amount: Math.ceil(Number(astrologerprofile?.balance_amount + update_price )) || 0,
+            label: "Availble Balance",
             prefix: "₹ ",
         },
         {
@@ -141,7 +162,6 @@ export default function AstroProfile() {
             } catch (error) {
                 
 
-                console.log("ASASA",error?.message);
                    }
                   
     }
@@ -460,10 +480,11 @@ export default function AstroProfile() {
                                 </div>
                             </div>
                             <div className="flex gap-3 justify-start">
-                                {AstroProfiledata.map((tab) => (
+                                {AstroProfiledata?.map((tab) => (
                                     <button
                                         type="button"
                                         key={tab.id}
+                                        data-astro-id={astro_id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`px-4 py-1 text-sm font-medium rounded-full transition ${activeTab === tab.id
                                             ? "bg-purple-400 text-white"
@@ -482,11 +503,8 @@ export default function AstroProfile() {
                                         activeTab === tab.id && (
                                             <table key={tab.id} className="w-full text-sm">
                                                 <tbody className="space-y-2">
-                                                    {tab.fields.map((field, idx) => (
-                                                        <tr key={idx} className="mb-2">
-                                                            <td className="py-2 pr-4">{field}</td>
-
-                                                        </tr>
+                                                    {tab.fields.map((Comp, idx) => (
+                                                      <Comp key={idx} astro_id={astro_id} />
                                                     ))}
                                                 </tbody>
                                             </table>
