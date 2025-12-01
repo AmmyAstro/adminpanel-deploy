@@ -7,14 +7,14 @@ import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { FaEdit, FaUserSecret } from "react-icons/fa";
+import { FaEdit, FaUserCircle, FaUserSecret } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { TbPasswordFingerprint } from "react-icons/tb";
 import toast from "react-hot-toast";
 import { getAccountList, resetCode, sendTagRequest } from "@/app/redux/slices/astrologer/ActiveAccountSlice";
 import AlertLoading from "@/app/common/AlertLoading";
-import { ImProfile } from "react-icons/im";
+
 import { useRouter } from "next/navigation";
 import { MdFilterVintage } from "react-icons/md";
 
@@ -22,28 +22,30 @@ import { MdFilterVintage } from "react-icons/md";
 
 
 export default function AstroList() {
+    const [search, setSearch] = useState({ id: "", full_name: "", mobile2: "" });
+
 
 
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading, astrolist } = useSelector((state) => state.astrologerlist);
-    const { accountloading, activeaccount, statusCode,tagCode } = useSelector((state) => state.astrologeractive);
+    const { accountloading, activeaccount, statusCode, tagCode } = useSelector((state) => state.astrologeractive);
     const astrologerlist = useMemo(() => {
         return astrolist?.sortedAstrologers;
     }, [astrolist])
     useEffect(() => {
-    dispatch(getRequestList());
+        dispatch(getRequestList());
 
     }, [dispatch])
-   
+
 
     const [showUpdatePopup, setShowUpdatePopup] = useState(false);
     const [astrodetail, setAstroDetail] = useState("");
     const [password, setPassword] = useState("");
-      const [ranking, setRanking] = useState("Rising Star");
-       const [showranking, setShowRanking] = useState("");
+    const [ranking, setRanking] = useState("Rising Star");
+    const [showranking, setShowRanking] = useState("");
 
-        const [showtag, setShowTag] = useState(false);
+    const [showtag, setShowTag] = useState(false);
 
     const HandlerPassword = (astro_id, name, phone) => {
         setShowUpdatePopup(true);
@@ -55,23 +57,23 @@ export default function AstroList() {
     }
 
 
-     useEffect(() => {
+    useEffect(() => {
         if (tagCode === 201) {
 
 
-          
+
             dispatch(resetCode());
             toast.success("Astrologer Tag Update Successfully!");
             setShowTag(false)
         }
     }, [tagCode])
 
-       const HandlerTag = (astro_id, name) => {
+    const HandlerTag = (astro_id, name) => {
         setShowTag(true);
         setAstroDetail({
             astroId: astro_id,
             profilename: name,
-           
+
         })
     }
 
@@ -96,11 +98,7 @@ export default function AstroList() {
                     phone: astrodetail?.phonenumber
                 }
 
-
-
                 dispatch(getAccountList(payload))
-
-
 
             }
 
@@ -111,19 +109,19 @@ export default function AstroList() {
     }
 
 
-   const updateTag = () => {
+    const updateTag = () => {
         try {
 
             if (ranking === "") {
                 toast.error("Please Select Ranking!");
             } else {
                 let payload = {
-                    astro_id:astrodetail?.astroId,
-                    tag:ranking
-                   
+                    astro_id: astrodetail?.astroId,
+                    tag: ranking
+
                 }
 
-  dispatch(sendTagRequest(payload))
+                dispatch(sendTagRequest(payload))
 
 
 
@@ -139,6 +137,11 @@ export default function AstroList() {
 
 
 
+    const filteredData = astrologerlist.filter((row) =>
+        row.id?.toString().toLowerCase().includes(search.id.toLowerCase()) &&
+        row.full_name?.toLowerCase().includes(search.full_name.toLowerCase()) &&
+        row.mobile2?.toString().toLowerCase().includes(search.mobile2.toLowerCase())
+    );
     useEffect(() => {
         if (statusCode === 200) {
             dispatch(resetCode());
@@ -147,7 +150,7 @@ export default function AstroList() {
             setShowUpdatePopup(false)
         }
     }, [statusCode])
-    
+
 
 
     return (
@@ -178,77 +181,80 @@ export default function AstroList() {
                 <li className="text-center">Action</li>
             </ul>
 
-            {astrologerlist?.map((row, index) => (
+            {filteredData?.map((row, index) => (
                 <ul
                     key={row.id}
                     className="grid grid-cols-7 border-b border-gray-200 text-sm text-gray-700 p-2 hover:bg-gray-50">
                     <li>{index + 1}</li>
 
-                    <li>     <div className="flex items-center gap-2">
-                        <Image src={mainurl + 'ds-img/' + row.profile_image}
-                            alt="altro image"
-                            width={60} height={60}
-                            className="rounded-full w-12 h-12" />
-                        <div className="flex flex-col gap-1">
-                            <span className="text-sm">{row?.full_name}</span>
-                            <small>ID: <i>00#-{row?.id}</i></small>
-                        </div>
-                    </div></li>
-                    <li className="line-clamp-2  text-ellipsis ">{row?.mobile2}</li>
+                        <li>     <div className="flex items-center gap-2">
+                            <Image src={mainurl + 'ds-img/' + row.profile_image}
+                                alt="altro image"
+                                width={60} height={60}
+                                className="rounded-full w-12 h-12" />
+                            <div className="flex flex-col gap-1">
+                                <span className="text-sm">{row?.full_name}</span>
+                                <small>ID: <i>{row?.id}</i></small>
+                            </div>
+                        </div></li>
+                        <li className="line-clamp-2  text-ellipsis ">{row?.mobile2}</li>
 
 
 
-                    <li>
-                        <div className="flex flex-col gap-1">
+                        <li>
+                            <div className="flex flex-col gap-1">
 
+                                {
+                                    row?.availability === 1 &&
+                                    <span className="px-2 py-1 text-xs bg-green-400 w-fit text-white rounded-full">Online</span>
+                                }
+
+                                {
+                                    row?.availability === 0 &&
+                                    <span className="px-2 py-1 text-xs bg-red-400 w-fit text-white rounded-full">Offline</span>
+                                }
+
+                                {
+                                    row?.availability === 2 &&
+                                    <span className="px-2 py-1 text-xs bg-yellow-400 w-fit text-white rounded-full">Busy</span>
+                                }
+
+
+
+                            </div>
+                        </li>
+                        <li>
                             {
                                 row?.availability === 1 &&
-                                <span className="px-2 py-1 text-xs bg-green-400 w-fit text-white rounded-full">Online</span>
+                                <CustomToggle
+                                    checked
+                                    id="chat"
+                                // onChange={(val)}
+                                />
                             }
-
                             {
                                 row?.availability === 0 &&
-                                <span className="px-2 py-1 text-xs bg-red-400 w-fit text-white rounded-full">Offline</span>
+                                <CustomToggle
+
+                                    id="chat"
+                                // onChange={(val)}
+                                />
                             }
 
                             {
                                 row?.availability === 2 &&
-                                <span className="px-2 py-1 text-xs bg-yellow-400 w-fit text-white rounded-full">Busy</span>
+                                <CustomToggle
+
+                                    id="chat"
+                                // onChange={(val)}
+                                />
                             }
 
+</li>
 
-
-                        </div>
-                    </li>
-                    {/* <li>
-                        {
-                            row?.availability === 1 &&
-                            <CustomToggle
-                                checked
-                                id="chat"
-                            // onChange={(val)}
-                            />
-                        }
-                        {
-                            row?.availability === 0 &&
-                            <CustomToggle
-
-                                id="chat"
-                            // onChange={(val)}
-                            />
-                        }
-
-                        {
-                            row?.availability === 2 &&
-                            <CustomToggle
-
-                                id="chat"
-                            // onChange={(val)}
-                            />
-                        }
-
-
-                    </li> */}
+                      
+                  
+                  
 
                     <li className=" justify-center text-center">
                         <CustomButton variant={"black"} className="px-2 py-2 text-white rounded-lg font-semibold">
@@ -281,136 +287,141 @@ export default function AstroList() {
 
                        
                         </div></li>
-                </ul>
-            ))}
+                </ul >
+            ))
+}
 
-            <AlertLoading show={loading} title="Fetch Record..."/>
+<AlertLoading show={loading} title="Fetch Record..." />
 
-            {showUpdatePopup && (
-                <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
-                    <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
-                        <button onClick={() => setShowUpdatePopup(false)} className="absolute top-2  right-2 text-red-500 text-xl">
-                            ✖
-                        </button>
-                        <h1 className="text-xl font-bold">Active New Account</h1>
-
-
-                        <div className="flex flex-col mt-4">
-                            <label> Astrologer  : {astrodetail?.profilename || ""}</label>
+{
+    showUpdatePopup && (
+        <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
+            <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
+                <button onClick={() => setShowUpdatePopup(false)} className="absolute top-2  right-2 text-red-500 text-xl">
+                    ✖
+                </button>
+                <h1 className="text-xl font-bold">Active New Account</h1>
 
 
-                        </div>
-
-                        <div className="flex flex-col mt-4">
-                            <label>Enter Phone Number</label>
-
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    disabled
-                                    type="number"
-                                    className="border p-2 rounded w-full"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    value={astrodetail?.phonenumber}
-                                />
-
-                            </div>
-                        </div>
+                <div className="flex flex-col mt-4">
+                    <label> Astrologer  : {astrodetail?.profilename || ""}</label>
 
 
-                        <div className="flex flex-col mt-4">
-                            <label>Enter New Password</label>
+                </div>
 
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="password"
-                                    className="border p-2 rounded w-full"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    value={password}
-                                />
+                <div className="flex flex-col mt-4">
+                    <label>Enter Phone Number</label>
 
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col mt-4">
-
-                            <div className="flex items-center space-x-2">
-
-
-
-                                <CustomButton variant={"red"} onClick={generateAccount}
-                                    className="px-2 py-2 text-white rounded-lg font-semibold"
-
-
-                                >Active Account</CustomButton>
-
-                            </div>
-                        </div>
-
+                    <div className="flex items-center space-x-2">
+                        <input
+                            disabled
+                            type="number"
+                            className="border p-2 rounded w-full"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={astrodetail?.phonenumber}
+                        />
 
                     </div>
                 </div>
-            )}
 
 
+                <div className="flex flex-col mt-4">
+                    <label>Enter New Password</label>
 
-
-            {showtag&& (
-                <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
-                    <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
-                        <button onClick={() => setShowTag(false)} className="absolute top-2  right-2 text-red-500 text-xl">
-                            ✖
-                        </button>
-                        <h1 className="text-xl font-bold"></h1>
-
-
-                        <div className="flex flex-col mt-4">
-                            <label> Astrologer  : {astrodetail?.profilename || ""}</label>
-
-
-                        </div>
-
-                       
-
-
-                        <div className="flex flex-col mt-4">
-                            <label>Select Tag</label>
-
-                            <div className="flex items-center space-x-2 w-full">
-                               <select className="form-control w-full py-1 rounded-lg border 
-                               border-gray-300 outline-none focus:ring-none"
-                                 onChange={(e) => setRanking(e.target.value)}>
-                                <option>Rising Star</option>
-                                <option>Celebrity</option>
-                                 <option>Top Ranking</option>
-                                <option>Top Choice</option>
-
-                               </select>
-
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col mt-4">
-
-                            <div className="flex items-center space-x-2">
-
-
-
-                                <CustomButton variant={"red"} onClick={updateTag}
-                                    className="px-2 py-2 text-white rounded-lg font-semibold"
-
-
-                                >Update Tag</CustomButton>
-
-                            </div>
-                        </div>
-
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="password"
+                            className="border p-2 rounded w-full"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                        />
 
                     </div>
                 </div>
-            )}
 
-            <AlertLoading show={accountloading} title="Please Wait..." />
+                <div className="flex flex-col mt-4">
 
+                    <div className="flex items-center space-x-2">
+
+
+
+                        <CustomButton variant={"red"} onClick={generateAccount}
+                            className="px-2 py-2 text-white rounded-lg font-semibold"
+
+
+                        >Active Account</CustomButton>
+
+                    </div>
+                </div>
+
+
+            </div>
         </div>
+    )
+}
+
+
+
+
+{
+    showtag && (
+        <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
+            <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
+                <button onClick={() => setShowTag(false)} className="absolute top-2  right-2 text-red-500 text-xl">
+                    ✖
+                </button>
+                <h1 className="text-xl font-bold"></h1>
+
+
+                <div className="flex flex-col mt-4">
+                    <label> Astrologer  : {astrodetail?.profilename || ""}</label>
+
+
+                </div>
+
+
+
+
+                <div className="flex flex-col mt-4">
+                    <label>Select Tag</label>
+
+                    <div className="flex items-center space-x-2 w-full">
+                        <select className="form-control w-full py-1 rounded-lg border 
+                               border-gray-300 outline-none focus:ring-none"
+                            onChange={(e) => setRanking(e.target.value)}>
+                            <option>Rising Star</option>
+                            <option>Celebrity</option>
+                            <option>Top Ranking</option>
+                            <option>Top Choice</option>
+
+                        </select>
+
+                    </div>
+                </div>
+
+                <div className="flex flex-col mt-4">
+
+                    <div className="flex items-center space-x-2">
+
+
+
+                        <CustomButton variant={"red"} onClick={updateTag}
+                            className="px-2 py-2 text-white rounded-lg font-semibold"
+
+
+                        >Update Tag</CustomButton>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    )
+}
+
+<AlertLoading show={accountloading} title="Please Wait..." />
+
+        </div >
     );
 }

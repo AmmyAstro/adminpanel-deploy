@@ -14,6 +14,14 @@ const fetchPackageApi = () => {
     };
     return axios.get(apiroute.FETCH_PACKAGE,{headers});
 };
+const fetchPackStatusApi = (payload) => {
+  const token = AuthHeader();
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+  console.log("Headers for Pack Status Update:", headers);
+  return axios.post(apiroute.PACK_STATUS_UPDATE, payload, { headers })
+}
 
 
 
@@ -44,9 +52,20 @@ function* handlerStatusUpdate(action){
 function* handleSendRequestPackage() {
   try {
     const data = yield call(fetchPackageApi);
-    yield put(sendRequestPackageSuccess(data?.data));  
+    yield put(sendRequestPackageSuccess(data?.data));
   } catch (err) {
     yield put(sendRequestPackageFail(err.message));
+  }
+}
+
+function* updatePackStatusSaga(action) {
+  try {
+    console.log("Update Pack Status Payload:", action.payload);
+    const data = yield call(fetchPackStatusApi, action.payload);
+    console.log("Update Pack Status Response:", data);
+    yield put(updatePackStatus(data?.data));
+  } catch (err) {
+    console.error("Update Pack Status Error:", err.message);
   }
 }
 

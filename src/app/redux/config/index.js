@@ -6,15 +6,7 @@ const API_AUTH_URL = process.env.NEXT_PUBLIC_API_AUTH_URL || "http://localhost:5
 const PAYMENT_MICRO = process.env.NEXT_PUBLIC_PAYMENT_MICRO || "http://localhost:5005/api/";
 const CHAT_MICRO = process.env.NEXT_PUBLIC_CHAT_MICRO || "http://localhost:8001/api/";
 
-
-
-
-const mainurl="https://newsite-cvo9.onrender.com/";
-
-
-
-
-
+const mainurl = "https://newsite-cvo9.onrender.com/";
 
 const apiroute = {
   banneradd: `${apiurl}/banneradd`,
@@ -43,14 +35,10 @@ const apiroute = {
 
 }
 
-const AuthHeader= ()=>{
-  const token =cookieHelper.get("token");
+const AuthHeader = () => {
+  const token = cookieHelper.get("token");
 
   return token;
 }
 
-
-
-
-
-export { apiroute,mainurl,AuthHeader }
+export { apiroute, mainurl, AuthHeader }
