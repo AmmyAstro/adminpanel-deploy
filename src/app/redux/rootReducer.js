@@ -14,6 +14,7 @@ import getCallHistory from "./slices/callhistory/getCallHistory.js"
 import giftSlice from "./slices/gift/giftSlice.js";
 import WalletSlice from "./slices/wallet/WalletSlice.js";
 import getCustomer from "./slices/customer/getCustomer.js";
+import getReview from "./slices/astrologer/getReview.js";
 
 const rootReducer = combineReducers({
   login: loginReducer,
@@ -29,7 +30,8 @@ const rootReducer = combineReducers({
   callhistory:getCallHistory,
   gift:giftSlice,
   astrologerWallet:WalletSlice,
-  getcustomer:getCustomer
+  getcustomer:getCustomer,
+  reviewhistory:getReview
 });
 
 export default rootReducer;

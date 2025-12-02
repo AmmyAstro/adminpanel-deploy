@@ -15,6 +15,7 @@ import callHistorySaga from "./saga/callhistory/callHistorySaga.js"
 import giftSaga from "./saga/gift/giftSaga.js";
 import WalletSaga from "./saga/wallet/WalletSaga.js";
 import getCustomerSaga from "./saga/customer/getCustomerSaga.js";
+import getReviewSaga from "./saga/astrologer/getReviewSaga.js";
 
 
 
@@ -35,7 +36,8 @@ export default function* rootSaga() {
     callHistorySaga(),
     giftSaga(),
     WalletSaga(),
-    getCustomerSaga()
+    getCustomerSaga(),
+    getReviewSaga()
   ]);
 
 }

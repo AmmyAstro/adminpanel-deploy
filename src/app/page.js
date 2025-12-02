@@ -14,7 +14,7 @@ import AlertLoading from "./common/AlertLoading";
 export default function LoginForm() {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
-  const [username,setUserName]= useState("")
+  const [username, setUserName] = useState("")
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -24,16 +24,16 @@ export default function LoginForm() {
 
 
   const handleSubmit = () => {
-    if(!username){
+    if (!username) {
       toast.error("Please Enter UserName");
-    }else if(!password){
-            toast.error("Please Enter Password");
-    }else{
+    } else if (!password) {
+      toast.error("Please Enter Password");
+    } else {
       dispatch(loginRequest({ username, password }));
     }
-  
-  
-    
+
+
+
   };
 
 
@@ -41,11 +41,11 @@ export default function LoginForm() {
   useEffect(() => {
 
     if (token) {
-      cookieHelper.set("token",token);
+      cookieHelper.set("token", token);
       router.push("/Admindash");
     }
   }, [token, router])
-  
+
 
 
   return (
@@ -64,7 +64,7 @@ export default function LoginForm() {
         </p>
 
         <div
-         
+
           className="space-y-4 flex flex-col items-center justify-center"
         >
           <div className="w-full">
@@ -72,15 +72,15 @@ export default function LoginForm() {
               htmlFor="mobile"
               className="block text-sm font-medium text-gray-700"
             >
-             UserName
+              UserName
             </label>
             <input
               type="text"
-          
-          
+
+
               value={username}
-              onChange={(e)=>setUserName(e.target.value)}
-           
+              onChange={(e) => setUserName(e.target.value)}
+
               inputMode="String"
               required
               placeholder="Enter UserName"

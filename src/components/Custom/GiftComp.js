@@ -12,7 +12,7 @@ import { fetchGiftsRequest } from "@/app/redux/slices/gift/giftSlice";
 
 
 
-function GiftComp() {
+function GiftComp({astro_id}) {
 
     const { loading, gifts } = useSelector((state) => state.gift);
 
@@ -30,8 +30,8 @@ function GiftComp() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(fetchGiftsRequest({ astro_id: 1 }))
-    }, [dispatch])
+        dispatch(fetchGiftsRequest({ astro_id: astro_id }))
+    }, [dispatch,astro_id])
     return (
         <div>
 

@@ -6,16 +6,17 @@ import React, { useEffect, useMemo } from "react"
 import { useSelector, useDispatch } from "react-redux"
 
 import { formatDate } from "@/app/helper/helper";
-import CustomToggle from "./CustomToggle";
+
 import AlertLoading from "@/app/common/AlertLoading";
-import { fetchcallHistory } from "@/app/redux/slices/callhistory/getCallHistory";
-import { fetchWalletRequest } from "@/app/redux/slices/wallet/WalletSlice";
+import { fetchReview } from "@/app/redux/slices/astrologer/getReview";
 
 
-function WalletCom({ astro_id }) {
 
 
-    const { transactions, loading: callloading, currentPage, totalPages, balance } = useSelector((state) => state.astrologerWallet);
+function Reviewcom({astro_id}) {
+
+
+    const { review, loading, currentPage, totalPages } = useSelector((state) => state.reviewhistory);
 
 
 
@@ -24,15 +25,17 @@ function WalletCom({ astro_id }) {
 
 
 
-    const wallet_data = useMemo(() => transactions, [transactions]);
+    const review_data = useMemo(() => review, [review]);
+
+
 
 
 
 
     useEffect(() => {
-        dispatch(fetchWalletRequest({ astrologer_id: astro_id, limit: 12, page: currentPage }))
+        dispatch(fetchReview({ astro_id, limit: 12, page: currentPage }))
 
-    }, [dispatch, currentPage, astro_id]);
+    }, [dispatch, currentPage,astro_id]);
 
 
 
@@ -40,8 +43,8 @@ function WalletCom({ astro_id }) {
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             dispatch(
-                fetchWalletRequest({
-                    astrologer_id: 1,
+                fetchReview({
+                    astro_id,
                     limit: 12,
                     page: newPage,
                 })
@@ -59,58 +62,55 @@ function WalletCom({ astro_id }) {
             <ul className="grid w-full grid-cols-8 place-self-center items-center justify-center place-center self-center font-bold bg-purple-200 rounded-md p-2 text-sm text-purple-900">
                 <li className="text-center"> S No</li>
                 <li className="text-center"> Order ID</li>
-                <li className="text-center">Category</li>
-                <li className="text-center">Amount</li>
-                <li className="text-center">Duration</li>
                 <li className="text-center">Type</li>
+                <li className="text-center">Review</li>
+                <li className="text-center">Reply</li>
+                  <li className="text-center">Star</li>
+                <li className="text-center">UserName</li>
+              
                 <li className="text-center">Date</li>
 
-                <li className="text-center">Remark</li>
+               
 
                 {/* <li className="text-center">Action</li> */}
             </ul>
 
-            <AlertLoading show={callloading} title="Please Wait.." />
-            {wallet_data?.map((tx, index) => (
+            <AlertLoading show={loading} title="Please Wait.." />
+            {review_data?.map((tx, index) => (
                 <ul
                     key={index}
                     className="grid grid-cols-8 border-b border-gray-200 text-xs text-gray-700 p-2 hover:bg-gray-50"
                 >
                     <li className="text-center">{index + 1}</li>
-                    <li className="text-center">{tx?.transaction_id}</li>
+                    <li className="text-center text-green-600 font-medium">{tx?.review_id}</li>
 
                     <li className="text-center"> {tx?.type}</li>
-                    <li className="text-center">
-                        <div className="flex items-center gap-2">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-center">  ₹{" "}
-                                    {Number(tx?.amount).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    })}
+            
 
+                    <li> {tx?.comment || "N/A"}</li>
 
+                    <li> {tx?.reply_to || "N/A"}</li>
+                    
+              <li className="text-center"> {tx?.star || "N/A"}</li>
 
-                                </span>
-
-
-                            </div>
-                        </div>
-                    </li>
-
-                    <li> {tx?.chat_time || "N/A"}</li>
 
                     <li className="text-center">
                         <div className="flex items-center gap-2">
                             <div className="flex flex-col gap-1">
+<span>
+    {tx?.user_name}
+</span>
 
+<span className="text-red-600 font-medium">
+ ( Id:{tx?.id})
+</span>
 
-                                {tx.transaction_type === "credit" && (
+                                {/* {tx.transaction_type === "credit" && (
                                     <span className="text-green-600 font-medium">(credit)</span>
                                 )}
                                 {tx.transaction_type === "debit" && (
                                     <span className="text-red-600 font-medium">(debit)</span>
-                                )}
+                                )} */}
 
                             </div>
                         </div>
@@ -120,20 +120,7 @@ function WalletCom({ astro_id }) {
 
 
 
-                    <li className="text-center">
-
-                        <div className="flex flex-col gap-1">
-
-                            {tx.remarks || tx.refund_reason || tx?.transaction_by}
-                        </div>
-
-
-
-
-
-
-
-                    </li>
+                  
 
 
 
@@ -169,4 +156,4 @@ function WalletCom({ astro_id }) {
     );
 }
 
-export default React.memo(WalletCom);
+export default React.memo(Reviewcom);
