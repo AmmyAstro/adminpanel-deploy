@@ -263,10 +263,7 @@ export default function AstroProfile() {
                         </div>
 
                         <div className="flex flex-col gap-2  py-3">
-                            <div className="flex justify-between items-center">
-                                <div className="font-semibold text-sm">Name :</div>
-                                <div className="text-sm">{astrologerprofile?.full_name || ""}</div>
-                            </div>
+                        
                             <div className="flex justify-between items-center">
                                 <div className="font-semibold text-sm">Email:</div>
                                 <div className="text-sm">{astrologerprofile?.full_name}@gmail.com</div>
