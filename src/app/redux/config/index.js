@@ -15,7 +15,7 @@ const apiroute = {
   addTestimonial: `${apiurl}/testimonials/`,
   editTestimonial: (id) => `${apiurl}/testimonials/${id}`,
 
-  couponAdd: `${apiurl}/coupons/add`,
+  couponAdd: `${PAYMENT_MICRO}coupon/create`,
   couponFetch: `${apiurl}/coupons`,
 
     // package
