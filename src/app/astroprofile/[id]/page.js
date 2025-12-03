@@ -27,7 +27,7 @@ export default function AstroProfile() {
     const params = useParams();
     const astro_id = params?.slug[3];
 
-    const [priceupdate,setPriceUpdate]= useState(0);
+
 
 
 
@@ -35,19 +35,19 @@ export default function AstroProfile() {
     const [remarks, setRemarks] = useState("");
 
     const { astrologerloading, astrologerdata } = useSelector((state) => state.astrologerdetail);
-      const { accountloading,priceCode,updateprice } = useSelector((state) => state.astrologeractive);
-
-  
+    const { accountloading, priceCode, updateprice } = useSelector((state) => state.astrologeractive);
 
 
 
 
-      const update_price= useMemo(()=>{
-         return parseInt(updateprice?.balance || 0);
-      },[updateprice])
 
 
-      
+    const update_price = useMemo(() => {
+        return parseInt(updateprice?.balance || 0);
+    }, [updateprice])
+
+
+
 
 
 
@@ -64,9 +64,9 @@ export default function AstroProfile() {
             dispatch(resetCode());
             toast.success("Astrologer Price Update Successfully!");
 
-           setOpenPopUp(false);
+            setOpenPopUp(false);
         }
-    }, [priceCode,dispatch])
+    }, [priceCode, dispatch])
 
 
     const astrologerprofile = useMemo(() => {
@@ -111,19 +111,19 @@ export default function AstroProfile() {
 
 
 
- 
 
 
 
 
- 
+
+
 
 
     const stats = [
         {
             id: 1,
             img: "/admin-img/earnings.png",
-            amount: Math.ceil(Number(astrologerprofile?.balance_amount + update_price )) || 0,
+            amount: Math.ceil(Number(astrologerprofile?.balance_amount + update_price)) || 0,
             label: "Availble Balance",
             prefix: "₹ ",
         },
@@ -151,19 +151,19 @@ export default function AstroProfile() {
             } else if (!remarks) {
                 toast.error("Please Enter Remarks");
             } else {
-  dispatch(sendManagePriceRequest({
-                    price:price,
-                    remarks:remarks,
-                    astro_id:astro_id,
-                    status:type
-                 }))
-                 }
-          
-            } catch (error) {
-                
+                dispatch(sendManagePriceRequest({
+                    price: price,
+                    remarks: remarks,
+                    astro_id: astro_id,
+                    status: type
+                }))
+            }
 
-                   }
-                  
+        } catch (error) {
+
+
+        }
+
     }
 
 
@@ -504,7 +504,7 @@ export default function AstroProfile() {
                                             <table key={tab.id} className="w-full text-sm">
                                                 <tbody className="space-y-2">
                                                     {tab.fields.map((Comp, idx) => (
-                                                      <Comp key={idx} astro_id={astro_id} />
+                                                        <Comp key={idx} astro_id={astro_id} />
                                                     ))}
                                                 </tbody>
                                             </table>
