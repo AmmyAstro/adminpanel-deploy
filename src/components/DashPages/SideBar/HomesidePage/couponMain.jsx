@@ -26,12 +26,12 @@ export default function CouponMain() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useDispatch();
-  const { coupons,addCode,loading } = useSelector((state) => state.coupon);
+  const { coupons, addCode, loading } = useSelector((state) => state.coupon);
 
 
 
   // Memoized filtered coupons
-  
+
 
   // Memoized pagination
 
@@ -55,16 +55,16 @@ export default function CouponMain() {
   };
 
 
-  useEffect(()=>{
-    if(addCode === 200){
+  useEffect(() => {
+    if (addCode === 200) {
       toast.success("New Coupon Add Successfully");
       dispatch(resetCode());
-        handleCloseModal();
+      handleCloseModal();
     }
 
-  },[addCode])
+  }, [addCode])
 
- 
+
   const [coupon, setCoupon] = useState({
     code: "",
     description: "",
@@ -74,7 +74,7 @@ export default function CouponMain() {
     max_discount: 0,
     redeem_limit: 0,
     validity: 0,
-    visibility:true,
+    visibility: true,
     status: true,
     start_date: "2025-12-03",
     end_date: "",
@@ -86,8 +86,8 @@ export default function CouponMain() {
 
 
 
-   const handleChange = (key, value) => {
-   
+  const handleChange = (key, value) => {
+
     setCoupon((prev) => ({
       ...prev,
       [key]: value,
@@ -99,21 +99,21 @@ export default function CouponMain() {
 
 
   const handleSubmit = () => {
-  
+
 
     const payload = {
 
-      code:coupon.code,
-      description:coupon.description,
-      applicable:coupon.applicable,
-      type:coupon.type,
-      status:coupon.status,
-      visibility:coupon.visibility,
-      coupon_mode:coupon.coupon_mode,
-       percentage: parseFloat(coupon.percentage || 0),
+      code: coupon.code,
+      description: coupon.description,
+      applicable: coupon.applicable,
+      type: coupon.type,
+      status: coupon.status,
+      visibility: coupon.visibility,
+      coupon_mode: coupon.coupon_mode,
+      percentage: parseFloat(coupon.percentage || 0),
       max_discount: parseFloat(coupon.max_discount || 0),
       redeem_limit: parseInt(coupon.redeem_limit || 0),
-   
+
       start_date: coupon.start_date || null,
       end_date: coupon.end_date || null,
     };
@@ -123,10 +123,10 @@ export default function CouponMain() {
       toast.success("Coupon updated successfully!");
     } else {
       dispatch(createCouponRequest(payload));
-     
+
     }
 
-  
+
   };
 
   const handleDelete = (id) => {
@@ -141,18 +141,12 @@ export default function CouponMain() {
   const handleCloseModal = () => {
     setCoupOpen(false);
     setEditCoupon(null);
-  
+
   };
 
   const handleReset = () => {
-    
+
   };
-
-
-
-
-
-
 
 
   return (
@@ -174,15 +168,15 @@ export default function CouponMain() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                
-             <div>
+
+                <div>
                   <label className="block text-sm font-medium">Applicable On</label>
                   <select
                     name="apply_on"
                     required
                     value={coupon.coupon_mode}
                     onChange={(e) => handleChange("coupon_mode", e.target.value)}
-                   
+
                     className="mt-1 block w-full rounded-full border border-gray-300 p-2 text-sm"
                   >
                     <option value="1">Manual</option>
@@ -191,8 +185,8 @@ export default function CouponMain() {
                 </div>
 
 
-                
-           
+
+
 
                 <div>
                   <label className="block text-sm font-medium">Coupon Code</label>
@@ -201,7 +195,7 @@ export default function CouponMain() {
                     name="coupon_code"
                     required
                     value={coupon.code}
-                   onChange={(e) => handleChange("code", e.target.value)}
+                    onChange={(e) => handleChange("code", e.target.value)}
                     placeholder="Coupon Code"
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500"
                   />
@@ -213,7 +207,7 @@ export default function CouponMain() {
                     name="coupon_desc"
                     required
                     value={coupon.description}
-                  onChange={(e) => handleChange("description",e.target.value)}
+                    onChange={(e) => handleChange("description", e.target.value)}
                     placeholder="Coupon Description"
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500"
                   />
@@ -228,7 +222,7 @@ export default function CouponMain() {
                     required
                     value={coupon.applicable}
                     onChange={(e) => handleChange("applicable", e.target.value)}
-                   
+
                     className="mt-1 block w-full rounded-full border border-gray-300 p-2 text-sm"
                   >
                     <option value="recharge">Recharge</option>
@@ -240,8 +234,8 @@ export default function CouponMain() {
                   <select
                     name="coupon_type"
                     required
-              
-                       value={coupon.type}
+
+                    value={coupon.type}
                     onChange={(e) => handleChange("type", e.target.value)}
                     className="mt-1 block w-full rounded-full border border-gray-300 p-2 text-sm"
                   >
@@ -258,7 +252,7 @@ export default function CouponMain() {
                     type="number"
                     name="percentage"
                     required
-                   value={coupon.percentage}
+                    value={coupon.percentage}
                     onChange={(e) => handleChange("percentage", e.target.value)}
                     placeholder="Cashback / Flat Discount (%)"
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm no-spinner"
@@ -270,9 +264,9 @@ export default function CouponMain() {
                   <CustomInput
                     type="number"
                     name="max_discount"
-                   
 
-                     value={coupon.max_discount}
+
+                    value={coupon.max_discount}
                     onChange={(e) => handleChange("max_discount", e.target.value)}
                     placeholder="Max Discount (Upto Rs)"
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm no-spinner"
@@ -286,14 +280,14 @@ export default function CouponMain() {
                   <CustomInput
                     type="number"
                     name="redeem_limit"
-               
-                     value={coupon.redeem_limit}
+
+                    value={coupon.redeem_limit}
                     onChange={(e) => handleChange("redeem_limit", e.target.value)}
                     placeholder="Redeem Limit Per User"
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                   />
                 </div>
-               
+
 
 
 
@@ -302,9 +296,9 @@ export default function CouponMain() {
                   <label className="block text-sm font-medium"> Start Date</label>
                   <CustomInput
                     type="date"
-                     value={coupon.start_date}
+                    value={coupon.start_date}
                     onChange={(e) => handleChange("start_date", e.target.value)}
-                  
+
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                   />
                 </div>
@@ -313,7 +307,7 @@ export default function CouponMain() {
                   <CustomInput
                     type="date"
                     name="coupon_end_date"
-                value={coupon.end_date}
+                    value={coupon.end_date}
                     onChange={(e) => handleChange("end_date", e.target.value)}
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                   />
@@ -326,7 +320,7 @@ export default function CouponMain() {
                   <label className="block text-sm font-medium">Visibility</label>
                   <select
                     name="visibility"
-                   value={coupon.visibility}
+                    value={coupon.visibility}
                     onChange={(e) => handleChange("visibility", e.target.value)}
                     className="mt-1 block w-full rounded-full border border-gray-300 p-2 text-sm"
                   >
@@ -339,8 +333,8 @@ export default function CouponMain() {
 
               {/* Buttons */}
               <div className="flex gap-6 items-center justify-center mt-6">
-                <CustomButton variant={"green"}  onClick={handleSubmit}
-                type="submit" className="px-3 py-1">
+                <CustomButton variant={"green"} onClick={handleSubmit}
+                  type="submit" className="px-3 py-1">
                   Submit
                 </CustomButton>
                 <CustomButton variant={"gray"} onClick={handleReset} className="px-3 py-1">
