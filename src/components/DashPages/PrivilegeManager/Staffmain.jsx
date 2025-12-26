@@ -1,9 +1,12 @@
 "use client";
+
+import { useState } from "react";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
-import { useState } from "react";
 
 export default function Staffmain() {
+  const [activeTab, setActiveTab] = useState("role");
+
   const [roles, setRoles] = useState([
     "Analyst",
     "Developer",
@@ -12,193 +15,388 @@ export default function Staffmain() {
     "Writer",
     "Creator",
   ]);
+
   const [selectedRole, setSelectedRole] = useState("");
   const [newRole, setNewRole] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState("");
 
-  const [privileges, setPrivileges] = useState({
-    create: false,
-    edit: false,
-    delete: false,
-    siteInfo: false,
-    memberInfo: false,
+  const [permissions, setPermissions] = useState({
+    astrologer: {
+      ViewProfile: false,
+      EditProfile: false,
+      ManageAvailability: false,
+    },
+    chat: {
+      ViewChat: false,
+      ReplyChat: false,
+      DeleteChat: false,
+    },
   });
 
-  const [selectAll, setSelectAll] = useState(false);
-
-  const handleCheckAll = () => {
-    const newValue = !selectAll;
-    setSelectAll(newValue);
-    setPrivileges({
-      create: newValue,
-      edit: newValue,
-      delete: newValue,
-      siteInfo: newValue,
-      memberInfo: newValue,
-    });
-  };
-
-  const handlePrivilegeChange = (key) => {
-    setPrivileges({ ...privileges, [key]: !privileges[key] });
+  const togglePermission = (section, key) => {
+    setPermissions((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [key]: !prev[section][key],
+      },
+    }));
   };
 
   const handleAddRole = (e) => {
     e.preventDefault();
-    if (newRole.trim() !== "") {
-      setRoles([...roles, newRole]);
-      setNewRole("");
-      setShowForm(false);
+    if (!newRole.trim()) return;
+
+    setRoles([...roles, newRole]);
+    setNewRole("");
+    setShowForm(false);
+  };
+  const confirmDeleteRole = () => {
+    if (!roleToDelete) return;
+
+    setRoles((prev) => prev.filter((role) => role !== roleToDelete));
+
+    if (selectedRole === roleToDelete) {
+      setSelectedRole("");
     }
+
+    setRoleToDelete("");
+    setShowDeleteModal(false);
+  };
+  const [profileRole, setProfileRole] = useState("");
+  const [profilePermissions, setProfilePermissions] = useState({
+    astrologer: {
+      viewProfile: false,
+      editProfile: false,
+    },
+    chat: {
+      viewChat: false,
+      replyChat: false,
+    },
+  });
+
+  const toggleProfilePermission = (section, key) => {
+    setProfilePermissions((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [key]: !prev[section][key],
+      },
+    }));
   };
 
   return (
-    <div className=" mx-auto my-6 bg-white shadow-lg rounded-xl p-6">
-      <h3 className="text-2xl font-bold mb-6">Roles Privilege Manager</h3>
+    <div className="mx-auto my-6 bg-white shadow-lg rounded-xl p-6">
+      <h3 className="text-2xl font-bold mb-6">Staff Management Console</h3>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <img src="/admin-img/12.png" alt="user" className="w-8 h-8" />
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-yellow-300"
-          >
-            <option disabled value="">
-              Enter Role
-            </option>
-            {roles.map((role, idx) => (
-              <option key={idx} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="flex border-b pb-5 gap-15 w-full items-center justify-center mb-6">
+        <button
+          onClick={() => setActiveTab("role")}
+          className={`px-8 rounded-xl cursor-pointer py-2 font-semibold transition ${activeTab === "role" ? "bg-purple-400  text-white" : "text-gray-400"
+            }`}
+        >
+          Role Manager
+        </button>
 
-        <div className="flex items-center gap-3">
-          <CustomButton variant={"green"}
-            onClick={() => setShowForm(true)}
-            className="px-3 py-1 transition">
-            Create New Role
-          </CustomButton>
-          <CustomButton variant={"yellow"} className=" px-3 py-1 transition text-white">
-            Update Privilege
-          </CustomButton>
-        </div>
+        <button
+          onClick={() => setActiveTab("profile")}
+          className={`px-8 py-2 rounded-xl cursor-pointer font-semibold transition ${activeTab === "profile"
+            ? "bg-purple-400  text-white"
+            : "text-gray-400"
+            }`}
+        >
+          Profile Manager
+        </button>
       </div>
 
-      {showForm && (
-        <div className="bg-gray-100 border border-gray-200 p-6 rounded-lg mb-6">
-          <h2 className="text-base w-40 font-semibold mb-4 text-center bg-purple-900 text-white py-2 rounded-full">
-            Add New Role
-          </h2>
-          <form onSubmit={handleAddRole} className="flex flex-col gap-4 w-50">
-            <CustomInput
-              type="text"
-              value={newRole}
-              onChange={(e) => setNewRole(e.target.value)}
-              placeholder="Enter role..."
-              className="px-3 py-2"
-              required
-            />
-            <div className="flex gap-3 justify-center">
-              <CustomButton
-                type="submit"
-                className="px-4 py-2 "
-              >
+      <div className="shadow p-5 rounded-2xl">
+        {activeTab === "role" && (
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-xl font-bold mb-2">Select Role</h4>
+
+              <div className="border border-gray-200 shadow-xl rounded-xl p-6">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  {roles.map((role) => {
+                    const isActive = selectedRole === role;
+
+                    return (
+                      <button
+                        key={role}
+                        onClick={() => setSelectedRole(role)}
+                        className={`px-8 py-3 cursor-pointer bg-purple-100 rounded-lg text-lg font-medium transition
+                         ${isActive ? "bg-purple-500 text-white" : "bg-purple-100 text-purple-700 hover:bg-purple-200"} `} >
+                        {role}
+                      </button>
+                    );
+                  })}
+
+                  {!showForm && (
+                    <button
+                      onClick={() => setShowForm(true)}
+                      className="px-4 py-2 cursor-pointer rounded-full text-sm font-medium border border-dashed text-green-500 hover:bg-green-50" >
+                      + Add New Role
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="px-4 py-2 cursor-pointer rounded-full text-sm font-medium border-dashed border text-red-600 hover:bg-red-50" >
+                    - Delete Role
+                  </button>
+                </div>
+
+                {/* Add Role Form */}
+                {showForm && (
+                  <form onSubmit={handleAddRole} className="flex gap-3">
+                    <CustomInput
+                      value={newRole}
+                      onChange={(e) => setNewRole(e.target.value)}
+                      placeholder="Enter new role"
+                    />
+                    <CustomButton type="submit">Add</CustomButton>
+
+                    <CustomButton
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false);
+                        setNewRole("");
+                      }}
+                      variant="secondary"
+                    >
+                      Cancel
+                    </CustomButton>
+                  </form>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-xl font-bold mb-2">
+                Role Permission Manager
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Astrologer Permissions */}
+                <div className="border border-gray-300 shadow-xl rounded-2xl p-4">
+                  <h5 className="font-semibold mb-4">Astrologer Permissions</h5>
+
+                  <div className="flex flex-wrap gap-3">
+                    {Object.keys(permissions.astrologer).map((key) => {
+                      const isActive = permissions.astrologer[key];
+
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => togglePermission("astrologer", key)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition cursor-pointer
+                            ${isActive ? "bg-black text-white" : "bg-gray-100 text-gray-600"} `} >
+                          {key.replace(/([A-Z])/g, " $1")}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Chat Permissions */}
+                <div className="border border-gray-300 shadow-xl rounded-2xl p-4">
+                  <h5 className="font-semibold mb-4">Chat Permissions</h5>
+
+                  <div className="flex flex-wrap gap-3">
+                    {Object.keys(permissions.chat).map((key) => {
+                      const isActive = permissions.chat[key];
+
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => togglePermission("chat", key)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition cursor-pointer
+                            ${isActive
+                              ? "bg-black text-white"
+                              : "bg-gray-100 text-gray-600"
+                            } `}
+                        >
+                          {key.replace(/([A-Z])/g, " $1")}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-4 justify-center">
+              <CustomButton variant="green" className="px-4 py-1">
                 Save
               </CustomButton>
-              <CustomButton         
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="px-4 py-2 "
-              >
-                Close
-              </CustomButton>
+
+              <CustomButton variant="gray"  className="px-4 py-1 ">
+                Cancel
+              </CustomButton> 
             </div>
-          </form>
-        </div>
-      )}
 
-      <div className="flex items-center gap-3 mb-4">
-        <input
-          type="checkbox"
-          checked={selectAll}
-          onChange={handleCheckAll}
-          className="w-4 h-4"
-        />
-        <h3 className="text-lg font-medium">Check All</h3>
-      </div>
-      <hr className="mb-6" />
 
-      <div className="space-y-6">
-        <div>
-          <h6 className="font-semibold mb-2">Website Setup</h6>
-
-          <div className="flex gap-6 mb-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={privileges.create}
-                onChange={() => handlePrivilegeChange("create")}
-              />
-              <span>Create</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={privileges.edit}
-                onChange={() => handlePrivilegeChange("edit")}
-              />
-              <span>Edit</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={privileges.delete}
-                onChange={() => handlePrivilegeChange("delete")}
-              />
-              <span>Delete</span>
-            </label>
           </div>
+        )}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg w-full max-w-md p-6 shadow-xl">
+              <h4 className="text-lg font-bold mb-4">Delete Role</h4>
 
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2 font-semibold">
-              <input
-                type="checkbox"
-                checked={
-                  privileges.siteInfo && privileges.memberInfo ? true : false
-                }
-                onChange={() => {
-                  const newVal = !(
-                    privileges.siteInfo && privileges.memberInfo
-                  );
-                  setPrivileges({
-                    ...privileges,
-                    siteInfo: newVal,
-                    memberInfo: newVal,
+              <p className="text-sm text-gray-600 mb-4">
+                Select a role to permanently delete.
+              </p>
+
+              <select
+                className="w-full border rounded-md p-2 mb-6"
+                value={roleToDelete}
+                onChange={(e) => setRoleToDelete(e.target.value)}
+              >
+                <option value="">-- Select Role --</option>
+                {roles.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setRoleToDelete("");
+                  }}
+                  className="px-4 py-2 rounded-md border text-gray-600"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={confirmDeleteRole}
+                  disabled={!roleToDelete}
+                  className="px-4 py-2 rounded-md bg-red-600 text-white disabled:opacity-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+
+
+        {/* -------------------------profile tab--------------- */}
+
+        {activeTab === "profile" && (
+          <div className="space-y-8">
+            <h4 className="text-xl font-bold">Create Staff Profile</h4>
+
+            {/* Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CustomInput placeholder="Full Name" />
+              <CustomInput placeholder="Email Address" />
+              <CustomInput placeholder="Mobile Number" />
+              <CustomInput placeholder="Password" type="password" />
+              <div>
+                <h5 className="font-semibold mb-3">Assign Role</h5>
+
+                <div className="border border-gray-200 rounded-xl shadow-xl p-6 flex flex-wrap gap-3">
+                  {roles.map((role) => {
+                    const isActive = profileRole === role;
+
+                    return (
+                      <button
+                        key={role}
+                        onClick={() => setProfileRole(role)}
+                        className={`px-4 cursor-pointer py-2 rounded-md text-sm font-medium transition
+                          ${isActive ? "bg-black text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"} `} >
+                        {role}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <h5 className="font-semibold mb-4">Assign Permissions</h5>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 border border-gray-200 p-6 rounded-xl shadow-xl gap-6">
+                  <div className="border border-gray-100 rounded-xl shadow p-3">
+                    <h6 className="font-semibold mb-3">
+                      Astrologer Permissions
+                    </h6>
+
+                    <div className="flex flex-wrap gap-3">
+                      {Object.keys(profilePermissions.astrologer).map((key) => {
+                        const active = profilePermissions.astrologer[key];
+
+                        return (
+                          <button
+                            key={key}
+                            onClick={() =>
+                              toggleProfilePermission("astrologer", key)
+                            }
+                            className={`px-4 py-2 cursor-pointer rounded-full text-sm font-medium transition
+                                ${active ? "bg-black text-white" : "bg-gray-100 text-gray-600"} `} >
+                            {key.replace(/([A-Z])/g, " $1")}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="border border-gray-100 rounded-xl shadow p-3">
+                    <h6 className="font-semibold mb-3">Chat Permissions</h6>
+
+                    <div className="flex flex-wrap gap-3">
+                      {Object.keys(profilePermissions.chat).map((key) => {
+                        const active = profilePermissions.chat[key];
+
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => toggleProfilePermission("chat", key)}
+                            className={`px-4 cursor-pointer py-2 rounded-full text-sm font-medium transition
+                                 ${active ? "bg-black text-white" : "bg-gray-100 text-gray-600"} `} >
+                            {key.replace(/([A-Z])/g, " $1")}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center">
+              <CustomButton variant="green" className="px-4 py-1">
+                Create Profile
+              </CustomButton>
+
+              <CustomButton
+                variant="gray"
+                className="px-4 py-1"
+                onClick={() => {
+                  setProfileRole("");
+                  setProfilePermissions({
+                    astrologer: {
+                      viewProfile: false,
+                      editProfile: false,
+                    },
+                    chat: {
+                      viewChat: false,
+                      replyChat: false,
+                    },
                   });
                 }}
-              />
-              Select All
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={privileges.siteInfo}
-                onChange={() => handlePrivilegeChange("siteInfo")}
-              />
-              Site Info
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={privileges.memberInfo}
-                onChange={() => handlePrivilegeChange("memberInfo")}
-              />
-              Member Info
-            </label>
+              >
+                Cancel
+              </CustomButton>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

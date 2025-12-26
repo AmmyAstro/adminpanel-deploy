@@ -16,8 +16,6 @@ import {
 import toast from "react-hot-toast";
 import AlertLoading from "@/app/common/AlertLoading";
 
-
-
 export default function CouponMain() {
   const [isCoupOpen, setCoupOpen] = useState(false);
 
@@ -28,15 +26,9 @@ export default function CouponMain() {
   const dispatch = useDispatch();
   const { coupons, addCode, loading } = useSelector((state) => state.coupon);
 
-
-
   // Memoized filtered coupons
 
-
   // Memoized pagination
-
-
-
 
   useEffect(() => {
     dispatch(fetchCouponsRequest());
@@ -45,7 +37,6 @@ export default function CouponMain() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
-
 
 
   const formatDate = (dateString) => {
@@ -83,9 +74,6 @@ export default function CouponMain() {
     coupon_mode: 1,
   });
 
-
-
-
   const handleChange = (key, value) => {
 
     setCoupon((prev) => ({
@@ -94,12 +82,7 @@ export default function CouponMain() {
     }));
   };
 
-
-
-
-
   const handleSubmit = () => {
-
 
     const payload = {
 
@@ -123,10 +106,7 @@ export default function CouponMain() {
       toast.success("Coupon updated successfully!");
     } else {
       dispatch(createCouponRequest(payload));
-
     }
-
-
   };
 
   const handleDelete = (id) => {
@@ -135,8 +115,6 @@ export default function CouponMain() {
       toast.success("Coupon deleted successfully!");
     }
   };
-
-
 
   const handleCloseModal = () => {
     setCoupOpen(false);
@@ -163,8 +141,6 @@ export default function CouponMain() {
               </button>
             </div>
 
-
-
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
@@ -183,9 +159,6 @@ export default function CouponMain() {
                     <option value="2">AutoMatic</option>
                   </select>
                 </div>
-
-
-
 
 
                 <div>
@@ -212,8 +185,6 @@ export default function CouponMain() {
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-
-
 
                 <div>
                   <label className="block text-sm font-medium">Applicable On</label>
@@ -245,7 +216,6 @@ export default function CouponMain() {
                 </div>
 
 
-
                 <div>
                   <label className="block text-sm font-medium">Cashback / Flat Discount (%)</label>
                   <CustomInput
@@ -273,8 +243,6 @@ export default function CouponMain() {
                   />
                 </div>
 
-
-
                 <div>
                   <label className="block text-sm font-medium">Redeem Limit Per User</label>
                   <CustomInput
@@ -287,10 +255,6 @@ export default function CouponMain() {
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                   />
                 </div>
-
-
-
-
 
                 <div>
                   <label className="block text-sm font-medium"> Start Date</label>
@@ -312,9 +276,6 @@ export default function CouponMain() {
                     className="mt-1 block w-full border border-gray-300 p-2 text-sm"
                   />
                 </div>
-
-
-
 
                 <div>
                   <label className="block text-sm font-medium">Visibility</label>
@@ -366,6 +327,7 @@ export default function CouponMain() {
           />
         </div>
 
+
         {/* <div className="couplist text-gray-600">
           {filteredCoupons.length > 0 ? (
             <>
@@ -384,8 +346,7 @@ export default function CouponMain() {
               {paginatedCoupons.map((coupon, index) => (
                 <div
                   key={coupon.id}
-                  className="grid grid-cols-8 gap-2 border-b p-2 text-sm items-center hover:bg-gray-50 text-gray-600"
-                >
+                  className="grid grid-cols-8 gap-2 border-b p-2 text-sm items-center hover:bg-gray-50 text-gray-600">
                   <div className="col-span-1 text-center">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </div>
@@ -401,13 +362,12 @@ export default function CouponMain() {
                   <div className="col-span-1">
                     {coupon.coupon_end_date
                       ? new Date(coupon.coupon_end_date).toLocaleDateString("en-IN")
-                      : "-"}
+                      : "-"} 
                   </div>
                   <div className="col-span-1 flex gap-4 text-center items-center justify-center">
                     <button
                       className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 cursor-pointer"
-                      onClick={() => handleEdit(coupon)}
-                    >
+                      onClick={() => handleEdit(coupon)}>
                       <FiEdit size={18} />
                     </button>
                     <CustomToggle
@@ -423,11 +383,10 @@ export default function CouponMain() {
                       }}
                     />
 
-
                   </div>
                 </div>
               ))}
-
+ 
 
               {totalPages > 1 && (
                 <div className="flex justify-between items-center mt-4">
@@ -435,8 +394,7 @@ export default function CouponMain() {
                     variant="gray"
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className="px-4 py-2"
-                  >
+                    className="px-4 py-2">
                     Previous
                   </CustomButton>
                   <span className="text-sm text-gray-600">
@@ -456,7 +414,10 @@ export default function CouponMain() {
           ) : (
             <p>{searchTerm ? "No matching coupons found." : "No coupons available."}</p>
           )}
-        </div> */}
+        </div> 
+        */}
+
+
       </div>
       <AlertLoading show={loading} title="Please Wait...." />
     </div>
