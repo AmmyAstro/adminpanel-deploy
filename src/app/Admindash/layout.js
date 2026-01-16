@@ -10,13 +10,12 @@ import { Toaster } from "react-hot-toast";
 export default function AdminLayout({ children }) {
   const [mounted, setMounted] = useState(false);
 
-  // Prevent hydration mismatch by waiting for client mount
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   if (!mounted) {
-    // Optionally return a loader/skeleton here
     return null;
   }
 

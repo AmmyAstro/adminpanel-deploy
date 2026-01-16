@@ -1,79 +1,36 @@
 "use client";
-import { useState } from "react";
+
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addAstrologerSchema } from "../../../app/schema/addAstrologer.schema";
 import Image from "next/image";
+
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
-import CSC from "@/components/Custom/CSC";
 import CustomButton from "@/components/Custom/CustomButtom";
-import AstroProCharge from "../../Data/AstroProCharge";
-import MultiSelect from "@/components/Custom/MultiSelect";
 
 export default function AddAstro() {
-
-    const [activeTab, setActiveTab] = useState("call");
-
-    const [formData, setFormData] = useState({
-        astroname: "",
-        email: "",
-        phone: "",
-        role: "",
-        experience: "",
+    const {
+        register,
+        handleSubmit,
+        control,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(addAstrologerSchema),
+        defaultValues: {
+            gender: "ml",
+        },
     });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+    const onSubmit = (data) => {
+        console.log("FORM DATA 👉", data);
+        alert("Submit working — check console");
+        reset();
     };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form Submitted:", formData);
-    };
-
-
-    const selectFields = [
-        {
-            label: "Skills & Expertise",
-            name: "expertise",
-            placeholder: "Select Expertise",
-            options: ["Palmistry", "Face Reading", "Tarot", "Numerology"],
-            multiple: true,
-        },
-        {
-            label: "Language Known",
-            name: "language",
-            placeholder: "Select Language",
-            options: ["English", "Hindi", "Punjabi", "Malayalam", "Telugu", "Tamil", "Kannada"],
-            multiple: true,
-        },
-        {
-            label: "Problems Handled",
-            name: "problems",
-            placeholder: "Select Problems",
-            options: ["Love", "Career", "Health", "Finance", "Pregnancy", "Job", "Education", "Marriage"],
-            multiple: true,
-        },
-    
-    ];
-
-
-    const [formDat, setFormDat] = useState({
-        expertise: [],
-        language: [],
-        problems: [],
-    });
-
-    const updateField = (name, value) => {
-        setFormDat((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-
 
     return (
-        <div className="min-h-screen ">
+        <div className="min-h-screen">
             <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-purple-900">
                     Add New Astrologer
@@ -88,432 +45,244 @@ export default function AddAstro() {
             </div>
 
             <form
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit(onSubmit)}
                 className="bg-white shadow-lg rounded-2xl p-5 space-y-6">
                 <h2 className=" mb-2 text-base font-semibold text-purple-500">
                     Basic Astrologer Details :
                 </h2>
+
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Astrologer Full Name
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                            <CustomInput
-                                type="text"
-                                name="astroname"
-                                value={formData.astroname}
-                                onChange={handleChange}
-                                placeholder="Enter full name"
-                                className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
                             />
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                {...register("astroname")}
+                                placeholder="Enter full name"
+                            />
+
+
                         </div>
+                        {errors.astroname && (
+                            <p className="text-red-500 text-xs">
+                                {errors.astroname.message}
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Display Name
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                            <CustomInput
-                                type="text"
-                                name="displayName"
-                                value={formData.displayName}
-                                onChange={handleChange}
-                                placeholder="Enter Display name"
-                                className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
                             />
+
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                {...register("displayName")}
+                                placeholder="Enter display name"
+                            />
+
                         </div>
+                        {errors.displayName && (
+                            <p className="text-red-500 text-xs">
+                                {errors.displayName.message}
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Display Name (Hindi)
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                            <CustomInput
-                                type="text"
-                                name="ahname"
-                                value={formData.ahname}
-                                onChange={handleChange}
-                                placeholder="Enter Display name in hindi"
-                                className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
                             />
-                        </div>
-                    </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                {...register("hindiName")}
+                                placeholder="Enter name in hindi"
+                            />
+
+                        </div>
+                        {errors.hindiName && (
+                            <p className="text-red-500 text-xs">
+                                {errors.hindiName.message}
+                            </p>
+                        )}
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Phone Number
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                            <CustomInput
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
+                            />
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                type="number"
                                 placeholder="Enter phone number"
-                                className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                                {...register("phoneNumber", { valueAsNumber: true })}
                             />
                         </div>
+                        {errors.phoneNumber && (
+                            <p className="text-red-500 text-xs">{errors.phoneNumber.message}</p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Email Address
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                            <CustomInput
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Enter email"
-                                className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
                             />
+
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                {...register("email")}
+                                placeholder="Enter email"
+                            />
+
                         </div>
+                        {errors.email && (
+                            <p className="text-red-500 text-xs">
+                                {errors.email.message}
+                            </p>
+                        )}
                     </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-500    mb-1">
                             Years of Experience
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
+                            />
                             <CustomInput
-                                type="number"
-                                name="experience"
-                                value={formData.experience}
-                                onChange={handleChange}
-                                placeholder="e.g. 5"
                                 className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                                type="number" placeholder="Enter experience in years"
+                                {...register("experience", { valueAsNumber: true })}
+                            />
+                        </div>
+                        {errors.address && (
+                            <p className="text-red-500 text-xs">{errors.address.message}</p>
+                        )}
+                    </div>
+
+
+                    <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-500 mb-1">
+                            Address
+                        </label>
+                        <div className="flex items-center gap-2 border border-gray-400 rounded-2xl px-2 p-1">
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side rounded-full"
+                            />
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                {...register("address")}
+                                placeholder="Enter address"
+                            />
+                            {errors.address && (
+                                <p className="text-red-500 text-xs">
+                                    {errors.address.message}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <Controller
+                        name="gender"
+                        control={control}
+                        render={({ field }) => (
+                            <CustomDropdown
+                                {...field}
+                                label="Gender"
+                                options={[
+                                    { value: "ml", label: "Male" },
+                                    { value: "fe", label: "Female" },
+                                ]}
+                            />
+                        )}
+                    />
+                    {errors.gender && (
+                        <p className="text-red-500 text-xs">{errors.gender.message}</p>
+                    )}
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-500    mb-1">
+                            Pincode
+                        </label>
+                        <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
+                            />
+                            <CustomInput
+                                className="w-full outline-none border-0 border-none bg-transparent"
+                                type="number" placeholder="Enter pincode"
+                                {...register("pincode", { valueAsNumber: true })}
                             />
                         </div>
                     </div>
-                    <CSC className="col-span-full" />
+
                     <div>
                         <label className="block text-sm font-medium text-gray-500    mb-1">
                             Password
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                            <CustomInput
-                                type="number"
-                                name="experience"
-                                value={formData.experience}
-                                onChange={handleChange}
-                                placeholder="Passsword"
-                                className="w-full outline-none border-0 border-none bg-transparent"
-                                required
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
                             />
+                            <CustomInput type="password" className="w-full outline-none border-0 border-none bg-transparent" {...register("password")} />
+                            {errors.password && (
+                                <p className="text-red-500 text-xs">{errors.password.message}</p>
+                            )}
                         </div>
                     </div>
-                </div>
-
-
-                <div className="bg-white shadow-lg rounded-2xl p-5 space-y-6">
-                    <h2 className=" mb-2 text-base font-semibold text-purple-500">
-                        About Astrologer :
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                About Me (in English)
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-2xl px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side rounded-full" />
-                                <textarea
-                                    name="aboutMe"
-                                    value={formData.aboutMe}
-                                    onChange={handleChange}
-                                    placeholder="Enter about me in english"
-                                    className="w-full outline-none border-0  px-2 py-1 bg-transparent placeholder:text-sm placeholder:text-gray-200"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                About Me (in Hindi)
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-2xl px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <textarea
-                                    name="aboutMeHindi"
-                                    value={formData.aboutMeHindi}
-                                    onChange={handleChange}
-                                    placeholder="Enter about me in hindi"
-                                    className="w-full outline-none border-0  bg-transparent placeholder:text-sm placeholder:text-gray-200"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <div className="flex flex-col gap-4">
-
-                            {selectFields.map((field, idx) => (
-                                <MultiSelect
-                                    key={idx}
-                                    label={field.label}
-                                    options={field.options}
-                                    placeholder={field.placeholder}
-                                    selected={formDat[field.name]}
-                                    setSelected={(value) => updateField(field.name, value)}
-                                    multiple={field.multiple}
-                                />
-                            ))}
-
-                        </div>
-
-
-
-                        <div className="flex w-full ">
-                            <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-400  bg-white w-full">
-                                <h2 className="font-semibold text-sm text-center ">Astrologer Charges</h2>
-                                <div className="flex gap-3 justify-center">
-                                    {AstroProCharge.map((tab) => (
-                                        <button
-                                            type="button"
-                                            key={tab.id}
-                                            onClick={() => setActiveTab(tab.id)}
-                                            className={`px-4 py-1 text-sm font-medium rounded-full transition ${activeTab === tab.id
-                                                ? "bg-purple-400 text-white"
-                                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                                }`}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    ))}
-                                </div>
-
-
-                                <div className="p-4 shadow rounded-lg bg-purple-100">
-                                    {AstroProCharge.map(
-                                        (tab) =>
-                                            activeTab === tab.id && (
-                                                <table key={tab.id} className="w-full text-sm">
-                                                    <tbody className="space-y-2">
-                                                        {tab.fields.map((field, idx) => (
-                                                            <tr key={idx} className="mb-2">
-                                                                <td className="py-2 pr-4">{field.label} :</td>
-                                                                <td>
-                                                                    {field.prefix}
-                                                                    <input
-                                                                        type="text"
-                                                                        name={field.name}
-                                                                        defaultValue="0"
-                                                                        maxLength="3"
-                                                                        max={field.max}
-                                                                        className="border rounded-md px-2 py-1 w-20 ml-1 text-center"
-                                                                    />
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            )
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
 
 
                 </div>
 
-                <div className="bg-white shadow-lg rounded-2xl p-5 space-y-6">
-                    <h2 className=" mb-2 text-base font-semibold text-purple-500">
-                        Astrologer Bank Details :
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                Account Holder Name
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <CustomInput
-                                    type="text"
-                                    name="astroname"
-                                    value={formData.astroname}
-                                    onChange={handleChange}
-                                    placeholder="Enter full name"
-                                    className="w-full outline-none border-0 border-none bg-transparent"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                Account No :
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <CustomInput
-                                    type="text"
-                                    name="displayName"
-                                    value={formData.displayName}
-                                    onChange={handleChange}
-                                    placeholder="Enter Display name"
-                                    className="w-full outline-none border-0 border-none bg-transparent"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                Bank Name
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <CustomInput
-                                    type="text"
-                                    name="ahname"
-                                    value={formData.ahname}
-                                    onChange={handleChange}
-                                    placeholder="Enter Display name in hindi"
-                                    className="w-full outline-none border-0 border-none bg-transparent"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                IFSC Code
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <CustomInput
-                                    type="text"
-                                    name="ahname"
-                                    value={formData.ahname}
-                                    onChange={handleChange}
-                                    placeholder="Enter Display name in hindi"
-                                    className="w-full outline-none border-0 border-none bg-transparent"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                PAN Card Number
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <CustomInput
-                                    type="text"
-                                    name="ahname"
-                                    value={formData.ahname}
-                                    onChange={handleChange}
-                                    placeholder="Enter Display name in hindi"
-                                    className="w-full outline-none border-0 border-none bg-transparent"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">
-                                Branch Name
-                            </label>
-                            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                                <img src="/admin-img/userte.png" alt="user" className="input-img-side" />
-                                <CustomInput
-                                    type="text"
-                                    name="ahname"
-                                    value={formData.ahname}
-                                    onChange={handleChange}
-                                    placeholder="Enter Display name in hindi"
-                                    className="w-full outline-none border-0 border-none bg-transparent"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="w-full col-span-3 p-4 bg-white rounded-xl shadow-sm border border-gray-50">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Images <sup className="text-red-500">*</sup>
-                                </label>
-
-                                <div className="mt-3 flex gap-6">
-
-                                    <div className="flex-shrink-0 bg-[#2f1254] rounded-2xl items-center justify-center flex p-1 ">
-                                        <img
-                                            src="/admin-img/userte.png"
-                                            alt="Preview"
-                                            className=" object-contain rounded-md  input-img-side"
-                                        />
-                                    </div>
 
 
-                                    <div className="flex flex-wrap gap-4 items-center justify-center">
-                                        {[
-                                            { label: "Profile Image", name: "profile" },
-                                            { label: "Aadhar Image", name: "aadhar" },
-                                            { label: "PanCard Image", name: "pan" },
-                                            { label: "Passbook Image", name: "passbook" },
-                                        ].map((item, idx) => (
-                                            <div key={idx} className="flex items-center gap-3">
-                                                <label className="w-[10rem] text-sm font-medium text-gray-600">
-                                                    {item.label} <b>:</b>
-                                                </label>
-                                                <input
-                                                    required
-                                                    type="file"
-                                                    name={item.name}
-                                                    accept=".pdf, .docx, .xlsx, .jpg, .jpeg, .png"
-                                                    className="block w-full text-sm text-gray-600 file:mr-4 file:py-1 file:px-3 
-                                                                        file:rounded-full file:border-0 
-                                                                        file:text-sm file:font-medium 
-                                                                        file:bg-purple-50 file:text-purple-700 
-                                                                        hover:file:bg-purple-100"
-                                                />
-                                            </div>
-                                        ))}
 
 
-                                    </div>
-                                </div>
-                            </div>
-                            <span className="text-xs text-red-400 mt-2">
-                                ***Note: Maximum upload limit <b>1 MB</b>.
-                            </span>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="flex place-content-center gap-4 pt-4">
-                    <CustomButton variant={"green"}
-                        type="submit"
-                        className="px-5 py-2 transition">
+
+
+
+
+
+                <div className="flex gap-4 items-center justify-center">
+                    <CustomButton type="submit" variant="green" className="px-4 py-1">
                         Save Astrologer
                     </CustomButton>
-                    <CustomButton variant={"gray"}
-                        type="reset"
-                        onClick={() =>
-                            setFormData({
-                                name: "",
-                                email: "",
-                                phone: "",
-                                role: "",
-                                experience: "",
-                            })
-                        }
-                        className=" px-6 py-2  transition" >
+
+                    <CustomButton type="button" variant="gray" className="px-4 py-1" onClick={() => reset()}>
                         Reset
                     </CustomButton>
                 </div>

@@ -9,7 +9,7 @@ const sidebarConfig = {
     //     { name: "Dashboard", href: "/admindash/home", img: <PiListBulletsBold /> },
     //   ],
     giftSide: [
-        { name: "Gift List", href: "#", img: <PiListBulletsBold /> },
+        { name: "Gift List", href: "#", img: <PiListBulletsBold  /> },
         { name: "Add Gift", href: "#", img: <MdOutlineContactPage /> },
     ],
     cmsSide: [
@@ -23,7 +23,7 @@ const sidebarConfig = {
         { name: "Razor Settings", href: "#", img: <MdOutlineContactPage /> },
 
     ],
-    testimonialSide: [
+    testimonialSide: [  
         // { name: "Testimonial List", href: "/Admindash", img: <PiListBulletsBold /> },
         { name: "Video Testimonial", href: "#", img: <MdOutlineContactPage /> },
         { name: "Add Testimonial", href: "/Admindash/testimonialmain/addtesti", img: <MdOutlineContactPage /> },

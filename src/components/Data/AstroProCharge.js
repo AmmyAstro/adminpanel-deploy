@@ -1,4 +1,4 @@
- const AstroProCharge = [
+const AstroProCharge = [
   {
     id: "call",
     label: "Call/Chat",
@@ -11,8 +11,10 @@
     id: "video",
     label: "Video Call",
     fields: [
-      { label: "Video Call Charges", prefix: "Rs.", name: "astro_video_charges", max: 500 },
-      { label: "Video Call Commission", prefix: "%.", name: "video_commission", max: 50 },
+      { label: "Live Streaming", prefix: "Rs.", name: "astro_video_charges", max: 500 },
+      { label: "Live Call", prefix: "%.", name: "video_commission", max: 50 },
+      { label: "Video Call", prefix: "%.", name: "video_commission", max: 50 },
+
     ],
   },
   {

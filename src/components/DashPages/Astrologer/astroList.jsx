@@ -258,13 +258,13 @@ export default function AstroList() {
                         </CustomButton>
                     </li>
 
-                    <li>
+                    {/* <li>
                         <div className="flex  gap-3 text-xs">
 
                             <CustomButton onClick={() => HandlerTag(row?.id, row?.full_name)}
                                 variant={"green"} className="px-2 py-2 rounded-lg font-semibold"><MdFilterVintage /></CustomButton>
 
-                        </div></li>
+                        </div></li> */}
 
 
 
@@ -356,7 +356,7 @@ export default function AstroList() {
 
 
 
-            {showtag && (
+            {/* {showtag && (
                 <div className="fixed inset-0 flex justify-center items-center bg-[#0000009a]">
                     <div className="bg-white p-6 rounded-lg shadow-lg relative w-[400px]">
                         <button onClick={() => setShowTag(false)} className="absolute top-2  right-2 text-red-500 text-xl">
@@ -409,7 +409,7 @@ export default function AstroList() {
 
                     </div>
                 </div>
-            )}
+            )} */}
 
             <AlertLoading show={accountloading} title="Please Wait..." />
 
