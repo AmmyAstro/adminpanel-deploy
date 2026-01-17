@@ -12,6 +12,53 @@
     }
 }
 
+/* editor custom css  */
+.prose h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.prose h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.prose h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.prose h5 {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.prose h6 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+.ProseMirror h1 { font-size: 32px; }
+.ProseMirror h2 { font-size: 28px; }
+.ProseMirror h3 { font-size: 24px; }
+.ProseMirror h4 { font-size: 20px; }
+.ProseMirror h5 { font-size: 18px; }
+.ProseMirror h6 { font-size: 16px; }
+
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #a1a1aa;
+  float: left;
+  height: 0;
+  font-size: 14px;
+  pointer-events: none;
+}
+
 
 
 /* ---- login error blink ------- */

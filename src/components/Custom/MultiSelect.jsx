@@ -6,7 +6,7 @@ export default function MultiSelect({
   selected = [],
   setSelected,
   placeholder,
-  multiple
+  multiple,
 }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -35,18 +35,18 @@ export default function MultiSelect({
       }
     } else {
       setSelected(option);
-      setOpen(false); 
+      setOpen(false);
     }
   };
 
   return (
-    <div className="mb-4" ref={dropdownRef}>
+    <div className="mb-4 relative" ref={dropdownRef}>
       <label className="block text-sm font-medium mb-1 text-gray-600">
         {label}
       </label>
 
       <div
-        className="w-full border rounded-full border-gray-400 p-2 flex flex-wrap gap-2 cursor-pointer bg-white"
+        className="w-full  border rounded-full border-gray-400 p-2 flex flex-wrap gap-2 cursor-pointer bg-white"
         onClick={() => setOpen(!open)}
       >
         {selected.length === 0 && (
@@ -74,7 +74,7 @@ export default function MultiSelect({
       </div>
 
       {open && (
-        <div className="mt-2 border border-gray-200 rounded-xl p-2 bg-white shadow-lg">
+        <div className="mt-2 border absolute z-99 w-80 border-gray-200 rounded-xl p-2 bg-white shadow-lg">
           {options.map((opt, idx) => (
             <div
               key={idx}

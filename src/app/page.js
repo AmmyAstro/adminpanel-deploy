@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { loginRequest } from "./redux/slices/loginSlice";
@@ -21,6 +21,8 @@ export default function LoginForm() {
 
   const { loading, token, error } = useSelector((state) => state.login || {});
 
+  const loginRef = useRef(null);
+
 
 
   const handleSubmit = () => {
@@ -31,8 +33,6 @@ export default function LoginForm() {
     } else {
       dispatch(loginRequest({ username, password }));
     }
-
-
 
   };
 
@@ -45,6 +45,12 @@ export default function LoginForm() {
       router.push("/Admindash");
     }
   }, [token, router])
+
+   const handleEnter = (e) => {
+    if (e.key === "Enter" && loginRef.current) {
+      loginRef.current.click();
+    }
+  };
 
 
 
@@ -101,6 +107,7 @@ export default function LoginForm() {
                 id="password"
                 name="password"
                 value={password}
+                onKeyDown={handleEnter}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter password"
@@ -116,7 +123,7 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <button
+          <button ref={loginRef}
             onClick={handleSubmit}
             disabled={loading}
             className="w-fit place-self-center px-10 self-center justify-self-center rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
