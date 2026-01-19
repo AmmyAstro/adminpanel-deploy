@@ -1,5 +1,5 @@
-"use client";
 
+"use client";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addAstrologerSchema } from "../../../app/schema/addAstrologer.schema";
@@ -11,18 +11,13 @@ import CustomButton from "@/components/Custom/CustomButtom";
 import TapEditor from "@/components/Custom/TapEditor";
 import MultiSelect from "@/components/Custom/MultiSelect";
 import AstroProCharge from "@/components/Data/AstroProCharge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import CSC from "@/components/Custom/CSC";
 export default function AddAstro() {
 
-
     const [activeTab, setActiveTab] = useState("call");
-    const {
-        register,
-        handleSubmit,
-        control,
-        reset,
-        formState: { errors },
-    } = useForm({
+
+    const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
         resolver: zodResolver(addAstrologerSchema),
         defaultValues: {
             gender: "ml",
@@ -31,35 +26,42 @@ export default function AddAstro() {
             expertise: [],
             languages: [],
             problems: [],
-        },
-        charges: {
-            callCharges: 0,
-            callCommission: 0,
-            astro_video_charges: 0,
-            video_commission: 0,
-            offercallcharges: 0,
-            offervideocharges: 0,
-            disc_chat_charge: 0,
-            gift_commission: 0,
-        },
-        bankDetails: {
-            accountHolderName: "",
-            accountNumber: "",
-            bankName: "",
-            ifscCode: "",
-            panCardNumber: "",
-            branchName: "",
-            documents: {
-                profile: null,
-                aadhar: null,
-                pan: null,
-                passbook: null,
-            }
+            aboutEnglish: "",
+            aboutHindi: "",
+
+            charges: {
+                callCharges: "",
+                callCommission: "",
+                videocall_charges: "",
+                videocall_commission: "",
+                audiocall_charges: "",
+                audiocall_commission: "",
+                offercallcharges: "",
+                offervideocharges: "",
+                disc_chat_charge: "",
+                gift_commission: "",
+            },
+
+            bankDetails: {
+                accountHolderName: "",
+                accountNumber: "",
+                bankName: "",
+                ifscCode: "",
+                panCardNumber: "",
+                branchName: "",
+                documents: {
+                    profile: null,
+                    aadhar: null,
+                    pan: null,
+                    passbook: null,
+                },
+            },
         },
     });
 
 
-    // fields for skills expertise 
+
+
     const selectFields = [
         {
             label: "Skills & Expertise",
@@ -71,7 +73,7 @@ export default function AddAstro() {
             label: "Language Known",
             name: "languages",
             placeholder: "Select Language",
-            options: ["English", "Hindi", "Punjabi", "Malayalam"],
+            options: ["English", "Hindi", "Punjabi", "Malayalam, "],
         },
         {
             label: "Problems Handled",
@@ -82,6 +84,11 @@ export default function AddAstro() {
     ];
 
 
+    useEffect(() => {
+        if (Object.keys(errors).length > 0) {
+            console.log("❌ FORM ERRORS:", errors);
+        }
+    }, [errors]);
 
 
     const onSubmit = (data) => {
@@ -308,6 +315,9 @@ export default function AddAstro() {
                                 {...register("pincode", { valueAsNumber: true })}
                             />
                         </div>
+                        {errors.pincode && (
+                            <p className="text-red-500 text-xs">{errors.pincode.message}</p>
+                        )}
                     </div>
 
                     <div>
@@ -321,11 +331,13 @@ export default function AddAstro() {
                                 className="input-img-side"
                             />
                             <CustomInput type="password" className="w-full outline-none border-0 border-none bg-transparent" {...register("password")} />
-                            {errors.password && (
-                                <p className="text-red-500 text-xs">{errors.password.message}</p>
-                            )}
+
                         </div>
+                        {errors.password && (
+                            <p className="text-red-500 text-xs">{errors.password.message}</p>
+                        )}
                     </div>
+                    {/* <CSC/> */}
 
 
                 </div>
@@ -342,16 +354,23 @@ export default function AddAstro() {
                             About Me (in English)
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-2xl px-2 p-1">
+                            <Controller
+                                name="aboutEnglish"
+                                control={control}
+                                render={({ field }) => (
+                                    <TapEditor
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        placeholder="About astrologer (English)"
+                                    />
+                                )}
+                            />
 
-                            {/* <textarea
-                                name="aboutMe"
-
-                                placeholder="Enter about me in english"
-                                className="w-full outline-none border-0  px-2 py-1 bg-transparent placeholder:text-sm placeholder:text-gray-200"
-                                required
-                            /> */}
-                            <TapEditor />
                         </div>
+                        {errors.aboutEnglish && (
+                            <p className="text-red-500 text-xs">{errors.aboutEnglish.message}</p>
+                        )}
+
                     </div>
 
                     <div>
@@ -360,8 +379,23 @@ export default function AddAstro() {
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-2xl px-2 p-1">
 
-                            <TapEditor />
+                            <Controller
+                                name="aboutHindi"
+                                control={control}
+                                render={({ field }) => (
+                                    <TapEditor
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        placeholder="About astrologer (Hindi)"
+                                    />
+                                )}
+                            />
+
+
                         </div>
+                        {errors.aboutHindi && (
+                            <p className="text-red-500 text-xs">{errors.aboutHindi.message}</p>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-2">
@@ -382,6 +416,9 @@ export default function AddAstro() {
                                 )}
                             />
                         ))}
+                        {errors.label && (
+                            <p className="text-red-500 text-xs">{errors.label.message}</p>
+                        )}
                     </div>
 
 
@@ -392,7 +429,7 @@ export default function AddAstro() {
                                 Astrologer Charges
                             </h2>
 
-                            {/* Tabs */}
+
                             <div className="flex gap-3 justify-center">
                                 {AstroProCharge.map((tab) => (
                                     <button
@@ -409,7 +446,7 @@ export default function AddAstro() {
                                 ))}
                             </div>
 
-                            {/* Active Tab Content */}
+
                             <div className="p-4 shadow rounded-lg bg-purple-100">
                                 {AstroProCharge.map(
                                     (tab) =>
@@ -446,6 +483,7 @@ export default function AddAstro() {
                             </div>
                         </div>
                     </div>
+
                     {errors?.charges?.callCharges && (
                         <p className="text-red-500 text-xs">
                             {errors.charges.callCharges.message}
@@ -516,7 +554,7 @@ export default function AddAstro() {
                                     className="input-img-side"
                                 />
                                 <CustomInput
-                                    className="w-full outline-none bg-transparent"
+                                    className="w-full outline-none border-0 border-none bg-transparent"
                                     type="text"
                                     placeholder="Enter account holder name"
                                     {...register("bankDetails.accountHolderName")}
@@ -540,7 +578,7 @@ export default function AddAstro() {
                                     className="input-img-side"
                                 />
                                 <CustomInput
-                                    className="w-full outline-none bg-transparent"
+                                    className="w-full outline-none border-0 border-none bg-transparent"
                                     type="text"
                                     placeholder="Enter account number"
                                     {...register("bankDetails.accountNumber")}
@@ -644,42 +682,70 @@ export default function AddAstro() {
                             )}
                         </div>
 
-                        <div className="w-full col-span-3 p-4 bg-white rounded-xl shadow-sm border border-gray-50">
-                            {[
-                                { label: "Profile Image", name: "profile" },
-                                { label: "Aadhar Image", name: "aadhar" },
-                                { label: "PanCard Image", name: "pan" },
-                                { label: "Passbook Image", name: "passbook" },
-                            ].map((item, idx) => (
-                                <div key={idx} className="flex items-center gap-3">
-                                    <label className="w-[10rem] text-sm font-medium text-gray-600">
-                                        {item.label} :
-                                    </label>
+                        <div className="mt-3 flex gap-6 col-span-3">
+                            <div className="flex-shrink-0 bg-[#2f1254] rounded-2xl items-center justify-start flex p-1 ">
+                                <img
+                                    src="/admin-img/userte.png"
+                                    alt="Preview"
+                                    className=" object-contain rounded-md  input-img-side"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <div className="flex flex-wrap gap-4 items-center justify-start">
+                                    {[
+                                        { label: "Profile Image", name: "profile" },
+                                        { label: "Aadhar Image", name: "aadhar" },
+                                        { label: "PanCard Image", name: "pan" },
+                                        { label: "Passbook Image", name: "passbook" },
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                            <label className="w-[10rem] text-sm font-medium text-gray-600">
+                                                {item.label} :
+                                            </label>
 
-                                    <Controller
-                                        name={`bankDetails.documents.${item.name}`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <input
-                                                type="file"
-                                                accept=".jpg,.jpeg,.png,.pdf"
-                                                className="block w-full text-sm text-gray-600"
-                                                onChange={(e) => field.onChange(e.target.files?.[0])}
+                                            <Controller
+                                                name={`bankDetails.documents.${item.name}`}
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <input
+                                                        type="file"
+                                                        accept=".jpg,.jpeg,.png,.pdf"
+                                                        className="block w-full text-sm text-gray-600 file:mr-4 file:py-1 file:px-3 
+                                                                        file:rounded-full file:border-0 
+                                                                        file:text-sm file:font-medium 
+                                                                        file:bg-purple-50 file:text-purple-700 
+                                                                        hover:file:bg-purple-100"
+                                                        onChange={(e) => field.onChange(e.target.files?.[0])}
+                                                    />
+                                                )}
                                             />
-                                        )}
-                                    />
+                                        </div>
+                                    ))}
+                                    {/* {errors?.bankDetails?.documents?.profile && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.bankDetails.documents.profile.message}
+                                        </p>
+                                    )}
+                                    {errors?.bankDetails?.documents?.aadhar && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.bankDetails.documents.aadhar.message}
+                                        </p>
+                                    )}
+                                    {errors?.bankDetails?.documents?.pan && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.bankDetails.documents.pan.message}
+                                        </p>
+                                    )}
+                                    {errors?.bankDetails?.documents?.passbook && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.bankDetails.documents.passbook.message}
+                                        </p>
+                                    )} */}
                                 </div>
-                            ))}
-                            {errors?.bankDetails?.documents?.profile && (
-                                <p className="text-xs text-red-500">
-                                    {errors.bankDetails.documents.profile.message}
-                                </p>
-                            )}
-
-
-                            <span className="text-xs text-red-400 mt-2">
-                                ***Note: Maximum upload limit <b>1 MB</b>.
-                            </span>
+                                <span className="text-xs text-red-400 mt-2">
+                                    ***Note: Maximum upload limit <b>1 MB</b>.
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

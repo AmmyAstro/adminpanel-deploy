@@ -3,16 +3,22 @@ const chargeField = z
   .number()
   .min(0, "Must be ≥ 0");
 
-  const fileSchema = z
+const fileSchema = z
   .instanceof(File)
   .refine((file) => file.size <= 1024 * 1024, "Max file size is 1MB");
+
 
 export const addAstrologerSchema = z.object({
   astroname: z.string().min(2, "Name is required"),
   displayName: z.string().min(2, "Display name required"),
   hindiName: z.string().min(2, "Hindi name required"),
 
-  phoneNumber: z.number(),
+  phoneNumber: z
+    .number({ invalid_type_error: "Phone number is required" })
+    .refine((v) => !isNaN(v), "Invalid phone number"),
+
+  pincode: z
+    .number({ invalid_type_error: "Pincode is required" }),
   email: z.string().email("Invalid email"),
 
   experience: z.number().min(0),
@@ -30,8 +36,11 @@ export const addAstrologerSchema = z.object({
     callCharges: chargeField.max(500),
     callCommission: chargeField.max(50),
 
-    astro_video_charges: chargeField.max(500),
-    video_commission: chargeField.max(50),
+    videocall_charges: chargeField.max(500),
+    videocall_commission: chargeField.max(50),
+
+    audiocall_charges: chargeField.max(500),
+    audiocall_commission: chargeField.max(50),
 
     offercallcharges: chargeField.max(500),
     offervideocharges: chargeField.max(50),
@@ -41,9 +50,13 @@ export const addAstrologerSchema = z.object({
   }),
 
   address: z.string().min(10, "Address must be at least 10 characters"),
-  pincode: z.number(),
+
 
   password: z.string().min(6, "Password must be at least 6 characters"),
+
+  aboutEnglish: z.string().min(20, "About is required"),
+  aboutHindi: z.string().min(20, "Hindi about is required"),
+
 
   bankDetails: z.object({
     accountHolderName: z

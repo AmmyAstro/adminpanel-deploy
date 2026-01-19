@@ -8,15 +8,17 @@ const AstroProCharge = [
     ],
   },
   {
-    id: "video",
-    label: "Video Call",
+    id: "live",
+    label: "Live Call",
     fields: [
-      { label: "Live Streaming", prefix: "Rs.", name: "charges.astro_video_charges", max: 500 },
-      { label: "Video Commission", prefix: "%", name: "charges.video_commission", max: 50 },
+      { label: "Video Call", prefix: "Rs.", name: "charges.videocall_charges", max: 500 },
+      { label: "Audio Call", prefix: "Rs.", name: "charges.audiocall_charges", max: 50 },
+      { label: "Audio Call Commission", prefix: "Rs.", name: "charges.audiocall_commission", max: 50 },
+      { label: "Video Call Commission", prefix: "Rs.", name: "charges.videocall_commission", max: 50 },
     ],
   },
   {
-    id: "offer",
+    id: "offers",
     label: "Offer Price",
     fields: [
       { label: "Offer Call Charges", prefix: "Rs.", name: "charges.offercallcharges", max: 500 },
@@ -24,13 +26,13 @@ const AstroProCharge = [
       { label: "Offer Chat Charges", prefix: "Rs.", name: "charges.disc_chat_charge", max: 50 },
     ],
   },
-  {
-    id: "gift",
-    label: "Gift",
-    fields: [
-      { label: "Gift Commission", prefix: "%", name: "charges.gift_commission", max: 50 },
-    ],
-  },
+  // {
+  //   id: "gift",
+  //   label: "Gift",
+  //   fields: [
+  //     { label: "Gift Commission", prefix: "%", name: "charges.gift_commission", max: 50 },
+  //   ],
+  // },
 ];
 
 

@@ -3,8 +3,13 @@ import { useEditor, EditorContent, useEditorState } from "@tiptap/react";
 // import { FloatingMenu, BubbleMenu } from '@tiptap/react/menus'
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { useEffect } from "react";
 
-export default function TapEditor() {
+export default function TapEditor({
+    value = "",
+    onChange,
+    placeholder = "Write something...",
+}) {
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -14,18 +19,24 @@ export default function TapEditor() {
         ],
         editorProps: {
             attributes: {
-               class: "focus:outline-none w-full min-h-[100px] text-sm"
+                class: "focus:outline-none w-full min-h-[100px] text-sm"
 
             },
         },
-        content:"",
-        // onUpdate : ({ editor }) => {      
-        //     onChange?.(editor.getHTML());   
-            
-        // },
-                immediatelyRender: false,
+        content: value,
+        immediatelyRender: false,
+        onUpdate: ({ editor }) => {
+            const html = editor.getHTML();
+            onChange?.(html);
+        },
     });
 
+
+    useEffect(() => {
+        if (editor && value !== editor.getHTML()) {
+            editor.commands.setContent(value || "");
+        }
+    }, [value, editor]);
     return (
         <div className="flex flex-col gap-1 w-full">
             {editor && <Toolbar editor={editor} />}
@@ -47,7 +58,7 @@ const Toolbar = ({ editor }) => {
                 isStrike: ctx.editor.isActive("strike") ?? false,
                 isUnderline: ctx.editor.isActive("underline") ?? false,
                 isParagraph: ctx.editor.isActive('paragraph') ?? false,
-                isHeading1: ctx.editor.isActive('heading', { level: 1 }) ?? false,
+                // isHeading1: ctx.editor.isActive('heading', { level: 1 }) ?? false,
                 isHeading2: ctx.editor.isActive('heading', { level: 2 }) ?? false,
                 isHeading3: ctx.editor.isActive('heading', { level: 3 }) ?? false,
                 isHeading4: ctx.editor.isActive('heading', { level: 4 }) ?? false,
