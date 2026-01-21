@@ -11,7 +11,7 @@ import AstrologerDetail from "./slices/astrologer/AstrologerDetail";
 import chatHistorySlice from "./slices/chathistory/chatHistorySlice";
 import getPackSlice from "./slices/pack/getPackSlice.js"
 import getCallHistory from "./slices/callhistory/getCallHistory.js"
-import giftSlice from "./slices/gift/giftSlice.js";
+
 import WalletSlice from "./slices/wallet/WalletSlice.js";
 import getCustomer from "./slices/customer/getCustomer.js";
 import getReview from "./slices/astrologer/getReview.js";
@@ -19,7 +19,12 @@ import getReview from "./slices/astrologer/getReview.js";
 const rootReducer = combineReducers({
   login: loginReducer,
   banner: bannerReducer,
+
+  // gift 
+  giftList: addGiftReducer,
   addGift: addGiftReducer,
+
+  
   testimonial: testimonialReducer, 
   coupon: couponReducer,
   astrologerlist:GetListSlice,
@@ -28,7 +33,7 @@ const rootReducer = combineReducers({
   chathistory:chatHistorySlice,
   getpackage:getPackSlice,
   callhistory:getCallHistory,
-  gift:giftSlice,
+  // gift:giftSlice,
   astrologerWallet:WalletSlice,
   getcustomer:getCustomer,
   reviewhistory:getReview

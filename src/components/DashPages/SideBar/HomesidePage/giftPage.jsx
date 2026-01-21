@@ -1,32 +1,40 @@
 "use client";
-import { useDispatch } from "react-redux";
-import { addGiftRequest } from "@/app/redux/slices/addGiftSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addGiftRequest,
+  fetchGiftRequest,
+} from "@/app/redux/slices/addGiftSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 
 export default function Giftpage() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const [showForm, setShowForm] = useState(false);
-  const [gifts, setGifts] = useState([]);
+  // const [gifts, setGifts] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    amount: 0,
+    amount: "",
     status: "",
     // image: null,
   });
 
+  const { gifts = [], loading, error } = useSelector((state) => state.addGift);
+
+  useEffect(() => {
+    dispatch(fetchGiftRequest());
+  }, [dispatch]);
+  console.log(
+    "Redux state:",
+    useSelector((state) => state),
+  );
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // if (name === "image") {
-    //   setFormData({ ...formData, image: files[0] });
-    // } else {
-    //   setFormData({ ...formData, [name]: value });
-    // }
-        setFormData((prev) => ({
+
+    setFormData((prev) => ({
       ...prev,
       [name]: name === "amount" ? Number(value) : value,
     }));
@@ -34,14 +42,21 @@ export default function Giftpage() {
 
   const handleSubmit = (e) => {
     dispatch(addGiftRequest({ formData }));
-       console.log("asaS", formData);
+    setFormData({
+      title: "",
+      amount: "",
+      status: "",
+    });
+
+    // console.log("giftttttttttttttttttttttt", formData);
   };
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div className="flex justify-between items-center mb-6">
         <h3 className="heading-banner">Gifts</h3>
-        <CustomButton variant={"green"}
+        <CustomButton
+          variant={"green"}
           onClick={() => setShowForm(true)}
           className="px-4 py-2 text-white  "
         >
@@ -68,7 +83,7 @@ export default function Giftpage() {
             <div className="flex flex-col">
               <CustomInput
                 label="Amount"
-                  type="number"
+                type="number"
                 name="amount"
                 value={formData.amount}
                 onChange={handleInputChange}
@@ -79,7 +94,6 @@ export default function Giftpage() {
             </div>
 
             <div className="flex flex-col">
-
               <CustomDropdown
                 label="Status"
                 id="status"
@@ -88,8 +102,8 @@ export default function Giftpage() {
                 onChange={handleInputChange}
                 required
                 options={[
-                  { value: "ac", label: "Active" },
-                  { value: "in", label: "Inactive" },
+                  { value: "active", label: "Active" },
+                  { value: "inactive", label: "Inactive" },
                 ]}
               />
             </div>
@@ -109,18 +123,21 @@ export default function Giftpage() {
             </div> */}
           </div>
 
-
           <div className="flex gap-4">
-            <CustomButton variant={"green"}
-              type="submit" 
+            <CustomButton
+              variant={"green"}
+              type="submit"
               onClick={handleSubmit}
-              className="px-4 py-2  hover:bg-green-700" >
+              className="px-4 py-2  hover:bg-green-700"
+            >
               Submit
             </CustomButton>
-            <CustomButton variant={"gray"}
+            <CustomButton
+              variant={"gray"}
               type="button"
               // onClick={handleSubmit}
-              className="px-4 py-2  hover:bg-gray-500" >
+              className="px-4 py-2  hover:bg-gray-500"
+            >
               Cancel
             </CustomButton>
           </div>
@@ -129,32 +146,17 @@ export default function Giftpage() {
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h5 className="text-lg font-semibold mb-4">Gift List</h5>
-        {gifts.length === 0 ? (
-          <p className="text-gray-500">No gifts added yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {gifts.map((gift, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between border-b pb-2"
-              >
-                <div>
-                  <h6 className="font-medium">{gift.title}</h6>
-                  <p className="text-sm text-gray-600">
-                    Amount: {gift.amount} | Status: {gift.status}
-                  </p>
-                </div>
-                {gift.image && (
-                  <img
-                    src={URL.createObjectURL(gift.image)}
-                    alt="Gift"
-                    className="w-12 h-12 rounded-md object-cover"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+
+        {Array.isArray(gifts) && gifts.length === 0 && <p>No gifts found</p>}
+
+        {Array.isArray(gifts) &&
+          gifts.map((gift) => (
+            <div key={gift.id}>
+              <h4>{gift.title}</h4>
+              <p>Amount: ₹{gift.amount}</p>
+              <p>Status: {gift.status ? "Active" : "Inactive"}</p>
+            </div>
+          ))}
       </div>
     </div>
   );

@@ -26,9 +26,7 @@ export default function CouponMain() {
   const dispatch = useDispatch();
   const { coupons, addCode, loading } = useSelector((state) => state.coupon);
 
-  // Memoized filtered coupons
 
-  // Memoized pagination
 
   useEffect(() => {
     dispatch(fetchCouponsRequest());

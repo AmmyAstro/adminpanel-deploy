@@ -24,9 +24,16 @@ export const addAstrologerSchema = z.object({
   experience: z.number().min(0),
 
   gender: z.enum(["ml", "fe"]),
+  tzone: z.enum(["In", "Us"]),
   tags: z.enum(["new", "rs", "cl", "tp", "tc"]),
 
   vtags: z.enum(["verify", "noverify"]),
+
+  countryStateCity: z.object({
+    country: z.string().min(1, "Country is required"),
+    state: z.string().min(1, "State is required"),
+    city: z.string().min(1, "City is required"),
+  }),
 
   expertise: z.array(z.string()).min(1, "Select at least one expertise"),
   languages: z.array(z.string()).min(1, "Select at least one language"),
@@ -46,7 +53,7 @@ export const addAstrologerSchema = z.object({
     offervideocharges: chargeField.max(50),
     disc_chat_charge: chargeField.max(50),
 
-    gift_commission: chargeField.max(50),
+    // gift_commission: chargeField.max(50),
   }),
 
   address: z.string().min(10, "Address must be at least 10 characters"),
@@ -87,3 +94,8 @@ export const addAstrologerSchema = z.object({
     }),
   }),
 });
+
+
+
+
+

@@ -10,7 +10,13 @@ const mainurl = "https://newsite-cvo9.onrender.com/";
 
 const apiroute = {
   banneradd: `${apiurl}/banneradd`,
+
+  // Gifts 
+  giftList: `${apiurl}/giftList`,
   addGift: `${apiurl}/addGift`,
+
+
+
   AdminLogin: `${API_AUTH_URL}staff/login`,
   addTestimonial: `${apiurl}/testimonials/`,
   editTestimonial: (id) => `${apiurl}/testimonials/${id}`,

@@ -1,18 +1,17 @@
 import { call, put, takeLatest, all } from "redux-saga/effects";
 import axios from "axios";
 import { apiroute } from "../config";
-import { addGiftFail, addGiftRequest, addGiftSuccess } from "../slices/addGiftSlice";
+import { addGiftFail, addGiftRequest, addGiftSuccess, fetchGiftFail, fetchGiftRequest, fetchGiftSuccess } from "../slices/addGiftSlice";
 
 const apidata = (payload) => {
-    console.log("payload h ye", payload);
-
     return axios.post(apiroute.addGift, payload)
-
+}
+const giftListFetch = () => {
+    return axios.get(apiroute.giftList)
 }
 
 function* createAddGiftSaga(action) {
     try {
-        console.log("payload data here", action.payload.formData);
         const response = yield call(apidata, action.payload.formData);
         console.log("response h ye ", response)
         yield put(addGiftSuccess(response?.data));
@@ -21,8 +20,19 @@ function* createAddGiftSaga(action) {
 
         yield put(addGiftFail(error?.message));
     }
-}
+};
+
+function* fetchGiftListSaga() {
+    try {
+        const response = yield call(giftListFetch);
+        yield put(fetchGiftSuccess(response?.data));
+    } catch (error) {
+        yield put(fetchGiftFail(error?.message));
+    }
+};
+
 
 export default function* addGiftSaga() {
-    yield takeLatest(addGiftRequest.type, createAddGiftSaga)
+    yield takeLatest(addGiftRequest.type, createAddGiftSaga);
+    yield takeLatest(fetchGiftRequest.type, fetchGiftListSaga);
 }

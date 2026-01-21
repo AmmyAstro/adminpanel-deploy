@@ -21,6 +21,7 @@ export default function AddAstro() {
         resolver: zodResolver(addAstrologerSchema),
         defaultValues: {
             gender: "ml",
+            tzone: "In",
             tags: "new",
             vtags: "noverify",
             expertise: [],
@@ -28,6 +29,13 @@ export default function AddAstro() {
             problems: [],
             aboutEnglish: "",
             aboutHindi: "",
+
+
+            countryStateCity: {
+                country: "",
+                state: "",
+                city: "",
+            },
 
             charges: {
                 callCharges: "",
@@ -39,7 +47,7 @@ export default function AddAstro() {
                 offercallcharges: "",
                 offervideocharges: "",
                 disc_chat_charge: "",
-                gift_commission: "",
+                // gift_commission: "",
             },
 
             bankDetails: {
@@ -147,6 +155,7 @@ export default function AddAstro() {
                             </p>
                         )}
                     </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Display Name
@@ -170,6 +179,7 @@ export default function AddAstro() {
                             </p>
                         )}
                     </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             Display Name (Hindi)
@@ -337,7 +347,35 @@ export default function AddAstro() {
                             <p className="text-red-500 text-xs">{errors.password.message}</p>
                         )}
                     </div>
-                    {/* <CSC/> */}
+
+                    <Controller
+                        name="tzone"
+                        control={control}
+                        render={({ field }) => (
+                            <CustomDropdown
+                                {...field}
+                                label="TimeZone"
+                                options={[
+                                    { value: "In", label: "India (UTC+5:30)" },
+                                    { value: "Us", label: "US (UTC-5:00)" },
+                                ]}
+                            />
+                        )}
+                    />
+
+                    <Controller className="col-span-3"
+                        name="countryStateCity"
+                        control={control}
+                        render={({ field }) => (
+                            <CSC value={field.value} onChange={field.onChange}  />
+                        )}
+                    />
+
+                    {errors.countryStateCity && (
+                        <p className="text-red-500 text-sm">
+                            Please select Country, State and City
+                        </p>
+                    )}
 
 
                 </div>
