@@ -2,11 +2,14 @@
 import { call, put, takeLatest, all } from "redux-saga/effects";
 import axios from "axios";
 import { apiroute } from "../config";
-import { bannerAddSuccessfully, banneraddfail, sendbannerRequest } from "../slices/bannerSlice";
+import { bannerAddSuccessfully, banneraddfail, addbannerRequest, fetchBannerFail, fetchBannerRequest , fetchBannerSuccess } from "../slices/bannerSlice";
 
 const apidata = (payload) => {
-    return axios.post(apiroute.banneradd, payload)
-} 
+    return axios.post(apiroute.bannerAdd, payload)
+}
+const bannerListFetch = () => {
+    return axios.get(apiroute.bannerList)
+}
 
 function* createBannerSaga(action) {
     try {
@@ -19,8 +22,18 @@ function* createBannerSaga(action) {
     }
 }
 
+function* fetchBannerListSaga() {
+    try {
+        const response = yield call(bannerListFetch);
+        yield put(fetchBannerSuccess(response?.data));
+    } catch (error) {
+        yield put(fetchBannerFail(error?.message));
+    }
+}
+
 export default function* bannerSaga() {
-    yield takeLatest(sendbannerRequest.type, createBannerSaga)
+    yield takeLatest(addbannerRequest.type, createBannerSaga),
+        yield takeLatest(fetchBannerRequest.type, fetchBannerListSaga);
 }
 
 

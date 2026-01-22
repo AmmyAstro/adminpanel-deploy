@@ -1,15 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  loading: false,
-  response: [],
+  addBanner: {
+    loading: false,
+    success: false,
+    error: null,
+  },
+  listBanner: {
+    loading: false,
+    data: [],
+    error: null,
+  },
 };
 
 const bannerSlice = createSlice({
   name: "banner",
   initialState,
   reducers: {
-    sendbannerRequest: (state, action) => {
+    // Add Banner 
+    addbannerRequest: (state, action) => {
       state.loading = true;
     },
     bannerAddSuccessfully: (state, action) => {
@@ -20,10 +29,22 @@ const bannerSlice = createSlice({
       state.loading = false;
       state.response = action.payload;
     },
+
+    // Fetch banner list
+    fetchBannerRequest: (state) => {
+      state.listBanner.loading = true;
+    },
+    fetchBannerSuccess: (state, action) => {
+      state.listBanner.loading = false;
+      state.listBanner.data = action.payload.bannerList;
+    },
+    fetchBannerFail: (state, action) => {
+      state.listBanner.loading = false;
+      state.listBanner.error = action.payload;
+    },
   },
 });
 
-export const { sendbannerRequest, bannerAddSuccessfully, banneraddfail } =
-  bannerSlice.actions;
+export const { addbannerRequest, bannerAddSuccessfully, banneraddfail, fetchBannerRequest, fetchBannerSuccess, fetchBannerFail } = bannerSlice.actions;
 
 export default bannerSlice.reducer;

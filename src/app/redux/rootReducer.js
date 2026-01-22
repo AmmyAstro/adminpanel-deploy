@@ -21,8 +21,8 @@ const rootReducer = combineReducers({
   banner: bannerReducer,
 
   // gift 
-  giftList: addGiftReducer,
-  addGift: addGiftReducer,
+  
+  gift: addGiftReducer,
 
   
   testimonial: testimonialReducer, 

@@ -9,7 +9,7 @@ export default function ManageCMS() {
         {/* Stats Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="flex flex-col items-center bg-white shadow-md rounded-xl p-6">
-            <img src="/img/12.png" alt="Users" className="w-20 h-20 object-contain mb-4" />
+            {/* <img src="/img/12.png" alt="Users" className="w-20 h-20 object-contain mb-4" /> */}
             <div className="text-center">
               <h3 className="text-lg font-semibold">Users</h3>
               <span className="text-xl font-bold text-purple-600">180000</span>

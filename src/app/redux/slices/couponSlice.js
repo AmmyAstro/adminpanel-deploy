@@ -1,11 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  coupons: [],
-  currentCoupon: null,
-  loading: false,
-  error: null,
-  addCode:null,
+  add: {
+    loading: false,
+    success: false,
+    error: null,
+  },
+  list: {
+    loading: false,
+    data: [],
+    error: null,
+  },
 };
 
 const couponSlice = createSlice({
@@ -20,12 +25,12 @@ const couponSlice = createSlice({
     fetchCouponsSuccess: (state, action) => {
       state.loading = false;
       state.coupons = action.payload;
-    
+
     },
     fetchCouponsFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
-     
+
     },
 
     // Get by ID
@@ -49,8 +54,8 @@ const couponSlice = createSlice({
     },
     createCouponSuccess: (state, action) => {
       state.loading = false;
-      state.coupons.push(action.payload);
-         state.addCode=200;
+      // state.coupons.push(action.payload);
+      state.addCode = 200;
     },
     createCouponFailure: (state, action) => {
       state.loading = false;
@@ -85,8 +90,8 @@ const couponSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    resetCode:(state,action)=>{
-      state.resetCode=null;
+    resetCode: (state, action) => {
+      state.resetCode = null;
     }
   },
 });

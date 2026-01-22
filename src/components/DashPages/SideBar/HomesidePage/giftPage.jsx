@@ -13,7 +13,7 @@ export default function Giftpage() {
   const dispatch = useDispatch();
 
   const [showForm, setShowForm] = useState(false);
-  // const [gifts, setGifts] = useState([]);
+
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -21,15 +21,19 @@ export default function Giftpage() {
     // image: null,
   });
 
-  const { gifts = [], loading, error } = useSelector((state) => state.addGift);
+
+  useEffect(() => { dispatch(fetchGiftRequest()); }, [dispatch]);
+  const reduxState = useSelector(state => state.gift.list.data);
 
   useEffect(() => {
-    dispatch(fetchGiftRequest());
-  }, [dispatch]);
-  console.log(
-    "Redux state:",
-    useSelector((state) => state),
-  );
+    console.log("Redux state changed:", reduxState);
+  }, [reduxState]);
+
+
+  const gifts = useSelector(state => state.gift.list.data);
+  const loading = useSelector(state => state.gift.list.loading);
+  const error = useSelector(state => state.gift.list.error);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,8 +51,9 @@ export default function Giftpage() {
       amount: "",
       status: "",
     });
+    setShowForm(false);
+    toast.success("Banner added successfully!");
 
-    // console.log("giftttttttttttttttttttttt", formData);
   };
 
   return (
@@ -147,17 +152,39 @@ export default function Giftpage() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h5 className="text-lg font-semibold mb-4">Gift List</h5>
 
-        {Array.isArray(gifts) && gifts.length === 0 && <p>No gifts found</p>}
+        {loading && <p>Loading...</p>}
 
-        {Array.isArray(gifts) &&
-          gifts.map((gift) => (
-            <div key={gift.id}>
-              <h4>{gift.title}</h4>
-              <p>Amount: ₹{gift.amount}</p>
-              <p>Status: {gift.status ? "Active" : "Inactive"}</p>
-            </div>
-          ))}
+        {!loading && Array.isArray(gifts) && gifts.length === 0 && (
+          <p className="text-gray-500">No gifts found</p>
+        )}
+
+        <div className="grid grid-cols-4">
+          {Array.isArray(gifts) &&
+            gifts.map((gift) => (
+              <div
+                key={gift.id}
+                className=" last:border-b-0 pb-3 mb-3"
+              >
+                <h4 className="font-medium">{gift.title}</h4>
+                <p>Amount: ₹{gift.amount}</p>
+                <p>
+                  Status:{" "}
+                  <span
+                    className={
+                      gift.status === "active"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {gift.status === "active" ? "Active" : "Inactive"}
+                  </span>
+                </p>
+              </div>
+            ))}
+        </div>
       </div>
+
+
     </div>
   );
 }

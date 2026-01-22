@@ -59,18 +59,15 @@ export default function CouponMain() {
     description: "",
     applicable: "recharge",
     type: "cashback",
+    status: "active",
+    visibility: "visible",
     percentage: 0,
     max_discount: 0,
     redeem_limit: 0,
-    validity: 0,
-    visibility: true,
-    status: true,
-    start_date: "2025-12-03",
+    start_date: "",
     end_date: "",
-    package_id: 1,
-    applicable_countries: "",
-    coupon_mode: 1,
   });
+
 
   const handleChange = (key, value) => {
 
@@ -79,40 +76,33 @@ export default function CouponMain() {
       [key]: value,
     }));
   };
-
   const handleSubmit = () => {
+    dispatch(createCouponRequest({
+      coupon_cod: coupon.code,
+      coupon_desc: coupon.description,
+      apply_on: coupon.applicable,
+      coupon_type: coupon.type,
 
-    const payload = {
+      flat_discount: Number(coupon.percentage) || null,
+      max_discount: Number(coupon.max_discount) || null,
+      redeem_limit: Number(coupon.redeem_limit) || null,
 
-      code: coupon.code,
-      description: coupon.description,
-      applicable: coupon.applicable,
-      type: coupon.type,
-      status: coupon.status,
-      visibility: coupon.visibility,
-      coupon_mode: coupon.coupon_mode,
-      percentage: parseFloat(coupon.percentage || 0),
-      max_discount: parseFloat(coupon.max_discount || 0),
-      redeem_limit: parseInt(coupon.redeem_limit || 0),
+      coupon_start_date: coupon.start_date || null,
+      coupon_end_date: coupon.end_date || null,
 
-      start_date: coupon.start_date || null,
-      end_date: coupon.end_date || null,
-    };
+      status: coupon.status,           // "active"
+      visibility: coupon.visibility,   // "visible"
+    }));
 
-    if (editCoupon) {
-      dispatch(updateCouponRequest({ id: editCoupon.id, data: payload }));
-      toast.success("Coupon updated successfully!");
-    } else {
-      dispatch(createCouponRequest(payload));
-    }
+    setCoupOpen(false);
   };
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure to delete this coupon?")) {
-      dispatch(deleteCouponRequest(id));
-      toast.success("Coupon deleted successfully!");
-    }
-  };
+  // const handleDelete = (id) => {
+  //   if (confirm("Are you sure to delete this coupon?")) {
+  //     dispatch(deleteCouponRequest(id));
+  //     toast.success("Coupon deleted successfully!");
+  //   }
+  // };
 
   const handleCloseModal = () => {
     setCoupOpen(false);
@@ -120,9 +110,9 @@ export default function CouponMain() {
 
   };
 
-  const handleReset = () => {
+  // const handleReset = () => {
 
-  };
+  // };
 
 
   return (
@@ -296,9 +286,9 @@ export default function CouponMain() {
                   type="submit" className="px-3 py-1">
                   Submit
                 </CustomButton>
-                <CustomButton variant={"gray"} onClick={handleReset} className="px-3 py-1">
+                {/* <CustomButton variant={"gray"} onClick={handleReset} className="px-3 py-1">
                   Reset
-                </CustomButton>
+                </CustomButton> */}
               </div>
             </div>
           </div>

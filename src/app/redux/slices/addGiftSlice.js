@@ -1,46 +1,58 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    loading : false,
-    response : [],
+    add: {
+        loading: false,
+        success: false,
+        error: null,
+    },
+    list: {
+        loading: false,
+        data: [],
+        error: null,
+    },
 };
 
-const addGiftSlice = createSlice({
-    name:"addGift",
+const giftSlice = createSlice({
+    name: "gift",
     initialState,
-     gifts: [],   
     reducers: {
-
-        // creating or adding new gift
-
-        addGiftRequest: (state, action) => {
-            state.loading = true;
+        // ADD GIFT
+        addGiftRequest: (state) => {
+            state.add.loading = true;
+            state.add.error = null;
         },
-        addGiftSuccess: (state, action) => {
-            state.loading = false;
-            state.response = action.payload;
+        addGiftSuccess: (state) => {
+            state.add.loading = false;
+            state.add.success = true;
         },
         addGiftFail: (state, action) => {
-            state.loading = false;
-            state.response = action.payload;
+            state.add.loading = false;
+            state.add.error = action.payload;
         },
 
-        // fetching or getting all gift list 
-        fetchGiftRequest: (state, action) => {
-            state.loading = true;
+        // FETCH GIFTS
+        fetchGiftRequest: (state) => {
+            state.list.loading = true;
         },
         fetchGiftSuccess: (state, action) => {
-            state.loading = false;
-            state.response = action.payload;
+            state.list.loading = false;
+            state.list.data = action.payload.giftList; 
         },
         fetchGiftFail: (state, action) => {
-            state.loading = false;
-            state.response = action.payload;
+            state.list.loading = false;
+            state.list.error = action.payload;
         },
-        
-    }
+    },
 });
 
-export const {addGiftRequest, addGiftSuccess, addGiftFail, fetchGiftRequest, fetchGiftSuccess, fetchGiftFail} = addGiftSlice.actions;
+export const {
+    addGiftRequest,
+    addGiftSuccess,
+    addGiftFail,
+    fetchGiftRequest,
+    fetchGiftSuccess,
+    fetchGiftFail,
+} = giftSlice.actions;
 
-export default addGiftSlice.reducer;
+export default giftSlice.reducer;

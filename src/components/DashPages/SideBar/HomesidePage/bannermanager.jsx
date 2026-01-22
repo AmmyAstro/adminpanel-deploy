@@ -5,7 +5,7 @@ import { MdCancel } from "react-icons/md";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
-import { sendbannerRequest } from "@/app/redux/slices/bannerSlice";
+import { addbannerRequest, fetchBannerRequest } from "@/app/redux/slices/bannerSlice";
 import toast from "react-hot-toast";
 
 // Debounce helper
@@ -23,7 +23,7 @@ function useDebounce(value, delay = 500) {
 
 export default function BannerManager() {
   const dispatch = useDispatch();
-  const { response, loading } = useSelector((state) => state.banner);
+ 
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -48,14 +48,23 @@ export default function BannerManager() {
         type === "file"
           ? files[0]
           : name === "sortorder"
-          ? Number(value)
-          : value,
+            ? Number(value)
+            : value,
     }));
   };
 
+  useEffect(() => { dispatch(fetchBannerRequest()); }, [dispatch]);
+  const reduxState = useSelector(state => state.banner.listBanner.data);
+
+  useEffect(() => {
+    console.log("Redux state changed:", reduxState);
+  }, [reduxState]);
+  const bannerList = useSelector(state => state.banner.listBanner.data);
+  const loading = useSelector(state => state.banner.listBanner.loading);
+
   const handleSubmit = () => {
-    console.log("SUBMITTING FORM", formData);
-    dispatch(sendbannerRequest({ formData }));
+    console.log("banner inputssss", formData);
+    dispatch(addbannerRequest({ formData }));
     setIsOpen(false);
     toast.success("Banner added successfully!");
   };
@@ -149,8 +158,7 @@ export default function BannerManager() {
                 <CustomButton
                   variant="green"
                   onClick={handleSubmit}
-                  className="w-fit px-10 rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50"
-                >
+                  className="w-fit px-10 rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50">
                   Submit
                 </CustomButton>
               </div>
@@ -171,7 +179,8 @@ export default function BannerManager() {
       </div>
 
 
-        <div className="p-4 flex flex-col gap-3">
+      <div className="p-4 flex flex-col gap-3">
+     
         <div className="grid grid-cols-6 place-items-center font-semibold border-b py-5 bg-[#7a5ba3] rounded-lg text-white px-4">
           <div>S.no</div>
           <div>Banner Name</div>
@@ -180,6 +189,43 @@ export default function BannerManager() {
           <div>Status</div>
           <div>Actions</div>
         </div>
+           {loading && <p>Loading...</p>}
+
+        {!loading && Array.isArray(bannerList) && bannerList.length === 0 && (
+          <p className="text-gray-500">No banners found</p>
+        )}
+        {Array.isArray(bannerList) &&
+          bannerList.map((banner, index) => (
+            <div key={index} className="grid grid-cols-6 place-items-center border-b py-5 px-4">
+              <div>{index + 1}</div>
+              <div>{banner.heading}</div>
+              {/* <div>{banner.subheading}</div> */}
+
+              <div>{banner.language}</div>
+              <div>{banner.imageUrl}</div>
+              <div>{banner.status}</div> 
+              {/* <div>{banner.link}</div> */}
+
+              {/* <div>{banner.slug}</div> */}
+
+              <div className="flex gap-2">
+                <CustomButton
+                  variant="green"
+                  onClick={() => handleEdit(banner)}
+                  className="px-3 py-1"
+                >
+                  Edit
+                </CustomButton>
+                <CustomButton
+                  variant="red"
+                  onClick={() => handleDelete(banner.id)}
+                  className="px-3 py-1"
+                >
+                  Delete
+                </CustomButton>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );

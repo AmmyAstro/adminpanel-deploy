@@ -22,15 +22,17 @@ import { apiroute, AuthHeader } from "../config";
 
 const apidata = (payload) => {
 
-  const token = AuthHeader();
-  const headers = {
-    Authorization: `Bearer ${token}`
-  };
-  return axios.post(apiroute.couponAdd, payload, { headers })
+  // const token = AuthHeader();
+  // const headers = {
+  //   Authorization: `Bearer ${token}`
+  // };
+  return axios.post(apiroute.couponAdd, payload)
 }
 const apidataFetch = () => {
   return axios.get(apiroute.couponFetch)
 }
+
+
 
 // Create
 function* createCouponSaga(action) {
