@@ -78,7 +78,7 @@ export default function CouponMain() {
   };
   const handleSubmit = () => {
     dispatch(createCouponRequest({
-      coupon_cod: coupon.code,
+      couponCode: coupon.code,
       coupon_desc: coupon.description,
       apply_on: coupon.applicable,
       coupon_type: coupon.type,
@@ -90,8 +90,8 @@ export default function CouponMain() {
       coupon_start_date: coupon.start_date || null,
       coupon_end_date: coupon.end_date || null,
 
-      status: coupon.status,           // "active"
-      visibility: coupon.visibility,   // "visible"
+      status: coupon.status,        
+      visibility: coupon.visibility,  
     }));
 
     setCoupOpen(false);

@@ -20,7 +20,7 @@ const apiroute = {
 
   // Coupon 
   couponAdd: `${apiurl}/couponAdd`,
-  couponFetch: `${apiurl}/coupons`,
+  // couponFetch: `${apiurl}/coupons`,
 
   AdminLogin: `${API_AUTH_URL}staff/login`,
   addTestimonial: `${apiurl}/testimonials/`,
