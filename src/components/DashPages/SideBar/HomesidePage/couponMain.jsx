@@ -1,5 +1,6 @@
 "use client";
-
+import { MdDelete } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MdCancel } from "react-icons/md";
@@ -9,12 +10,12 @@ import {
   createCouponRequest,
   fetchCouponsRequest,
   deleteCouponRequest,
-  updateCouponRequest,
-  resetCode
+  // resetCode
 } from "@/app/redux/slices/couponSlice";
 
 import toast from "react-hot-toast";
 import AlertLoading from "@/app/common/AlertLoading";
+import CustomToggle from "@/components/Custom/CustomToggle";
 
 export default function CouponMain() {
   const [isCoupOpen, setCoupOpen] = useState(false);
@@ -24,13 +25,10 @@ export default function CouponMain() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useDispatch();
-  const { coupons, addCode, loading } = useSelector((state) => state.coupon);
 
 
 
-  useEffect(() => {
-    dispatch(fetchCouponsRequest());
-  }, [dispatch]);
+
 
   useEffect(() => {
     setCurrentPage(1);
@@ -44,14 +42,14 @@ export default function CouponMain() {
   };
 
 
-  useEffect(() => {
-    if (addCode === 200) {
-      toast.success("New Coupon Add Successfully");
-      dispatch(resetCode());
-      handleCloseModal();
-    }
+  // useEffect(() => {
+  //   if (addCode === 200) {
+  //     toast.success("New Coupon Add Successfully");
+  //     // dispatch(resetCode());
+  //     handleCloseModal();
+  //   }
 
-  }, [addCode])
+  // }, [addCode])
 
 
   const [coupon, setCoupon] = useState({
@@ -67,6 +65,7 @@ export default function CouponMain() {
     start_date: "",
     end_date: "",
   });
+
 
 
   const handleChange = (key, value) => {
@@ -90,19 +89,34 @@ export default function CouponMain() {
       coupon_start_date: coupon.start_date || null,
       coupon_end_date: coupon.end_date || null,
 
-      status: coupon.status,        
-      visibility: coupon.visibility,  
+      status: coupon.status,
+      visibility: coupon.visibility,
     }));
 
     setCoupOpen(false);
   };
 
-  // const handleDelete = (id) => {
-  //   if (confirm("Are you sure to delete this coupon?")) {
-  //     dispatch(deleteCouponRequest(id));
-  //     toast.success("Coupon deleted successfully!");
-  //   }
-  // };
+
+  useEffect(() => { dispatch(fetchCouponsRequest()); }, [dispatch]);
+  const reduxState = useSelector(state => state.coupon.list.data);
+
+  useEffect(() => {
+    console.log("Coupon Redux state changed:", reduxState);
+  }, [reduxState]);
+
+  const coupons = useSelector(state => state.coupon.list.data);
+
+  const handleDelete = (id) => {
+    if (!id) {
+      console.error("Invalid coupon id");
+      return;
+    }
+
+    if (confirm("Are you sure to delete this coupon?")) {
+      dispatch(deleteCouponRequest(id));
+    }
+  };
+
 
   const handleCloseModal = () => {
     setCoupOpen(false);
@@ -273,8 +287,8 @@ export default function CouponMain() {
                     onChange={(e) => handleChange("visibility", e.target.value)}
                     className="mt-1 block w-full rounded-full border border-gray-300 p-2 text-sm"
                   >
-                    <option value="1" >Visible</option>
-                    <option value="2">Not Visible</option>
+                    <option value="visible" >Visible</option>
+                    <option value="not_visible">Not Visible</option>
                   </select>
                 </div>
 
@@ -316,98 +330,109 @@ export default function CouponMain() {
         </div>
 
 
-        {/* <div className="couplist text-gray-600">
-          {filteredCoupons.length > 0 ? (
-            <>
-              <div className="grid grid-cols-8 gap-2 font-semibold text-sm rounded-2xl border-b bg-purple-300 p-2 text-gray-600">
-                <div className="col-span-1 text-center">Sr No</div>
-                <div className="col-span-1 text-center">Code</div>
-                <div className="col-span-1 text-center">Description</div>
-                <div className="col-span-1 text-center">Type</div>
-                <div className="col-span-1 text-center">Discount</div>
-                <div className="col-span-1 text-center">Start Date</div>
-                <div className="col-span-1 text-center">End Date</div>
-                <div className="col-span-1 text-center">Actions</div>
-              </div>
+        <div className="couplist text-gray-600">
 
-             
-              {paginatedCoupons.map((coupon, index) => (
-                <div
-                  key={coupon.id}
-                  className="grid grid-cols-8 gap-2 border-b p-2 text-sm items-center hover:bg-gray-50 text-gray-600">
-                  <div className="col-span-1 text-center">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </div>
-                  <div className="col-span-1 text-center">{coupon.coupon_code}</div>
-                  <div className="col-span-1 text-center">{coupon.coupon_desc}</div>
-                  <div className="col-span-1 text-center">{coupon.coupon_type}</div>
-                  <div className="col-span-1 text-center">{coupon.flat_discount}</div>
-                  <div className="col-span-1 text-center">
-                    {coupon.coupon_start_date
-                      ? new Date(coupon.coupon_start_date).toLocaleDateString("en-IN")
-                      : "-"}
-                  </div>
-                  <div className="col-span-1">
-                    {coupon.coupon_end_date
-                      ? new Date(coupon.coupon_end_date).toLocaleDateString("en-IN")
-                      : "-"} 
-                  </div>
-                  <div className="col-span-1 flex gap-4 text-center items-center justify-center">
-                    <button
-                      className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 cursor-pointer"
-                      onClick={() => handleEdit(coupon)}>
-                      <FiEdit size={18} />
-                    </button>
-                    <CustomToggle
-                      checked={statusMap[coupon.id]}
-                      onChange={(val) => {
-                        setStatusMap(prev => ({ ...prev, [coupon.id]: val })); // update locally
+          <div className="grid grid-cols-8 gap-2 font-semibold text-sm rounded-2xl border-b bg-purple-300 p-2 text-gray-600">
+            <div className="col-span-1 text-center">Sr No</div>
+            <div className="col-span-1 text-center">Code</div>
+            <div className="col-span-1 text-center">Description</div>
+            <div className="col-span-1 text-center">Type</div>
+            <div className="col-span-1 text-center">Discount</div>
+            <div className="col-span-1 text-center">Start Date</div>
+            <div className="col-span-1 text-center">End Date</div>
+            <div className="col-span-1 text-center">Actions</div>
+          </div>
 
-                        // update in DB via Redux
-                        dispatch(updateCouponRequest({
-                          id: coupon.id,
-                          data: { ...coupon, status: val ? "active" : "inactive" }
-                        }));
-                      }}
-                    />
 
-                  </div>
+          {Array.isArray(coupons) &&
+            coupons.map((coupon, index) => (
+              <div
+                key={coupon.id}
+                className="grid grid-cols-8 gap-2 border-b p-2 text-sm items-center hover:bg-gray-50 text-gray-600">
+                <div className="col-span-1 text-center">
+                  {
+                    /* {(currentPage - 1) * itemsPerPage + */
+                    index + 1}
                 </div>
-              ))}
- 
+                <div className="col-span-1 text-center">{coupon.couponCode}</div>
+                <div className="col-span-1 text-center">{coupon.coupon_desc}</div>
+                <div className="col-span-1 text-center">{coupon.coupon_type}</div>
+                <div className="col-span-1 text-center">{coupon.flat_discount}</div>
+                <div className="col-span-1 text-center">
+                  {coupon.coupon_start_date
+                    ? new Date(coupon.coupon_start_date).toLocaleDateString("en-IN")
+                    : "-"}
+                </div>
+                <div className="col-span-1">
+                  {coupon.coupon_end_date
+                    ? new Date(coupon.coupon_end_date).toLocaleDateString("en-IN")
+                    : "-"}
+                </div>
+                <div className="col-span-1 flex gap-4 text-center items-center justify-center">
+                  <button
+                    className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                    onClick={() => handleEdit(coupon)}>
+                    {/* <FiEdit size={18} /> */}
+                    <FaEdit />
+                  </button>
 
-              {totalPages > 1 && (
-                <div className="flex justify-between items-center mt-4">
-                  <CustomButton
-                    variant="gray"
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2">
-                    Previous
-                  </CustomButton>
-                  <span className="text-sm text-gray-600">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <CustomButton
-                    variant="gray"
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2"
+                  <button
+                    className="px-2 py-1 bg-red-400 text-white rounded hover:bg-red-500 cursor-pointer"
+                    onClick={() => handleDelete(coupon.id)}
                   >
-                    Next
-                  </CustomButton>
+                    <MdDelete />
+                  </button>
+
+                  {/* <CustomToggle
+                    checked={statusMap[coupon.id]}
+                    onChange={(val) => {
+                      setStatusMap(prev => ({ ...prev, [coupon.id]: val })); 
+
+                      // update in DB via Redux
+                      dispatch(updateCouponRequest({
+                        id: coupon.id,
+                        data: { ...coupon, status: val ? "active" : "inactive" }
+                      }));
+                    }}
+                  /> */}
+
                 </div>
-              )}
-            </>
-          ) : (
-            <p>{searchTerm ? "No matching coupons found." : "No coupons available."}</p>
-          )}
-        </div> 
-        */}
+              </div>
+            ))}
+
+
+          {/* {totalPages > 1 && (
+            <div className="flex justify-between items-center mt-4">
+              <CustomButton
+                variant="gray"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="px-4 py-2">
+                Previous
+              </CustomButton>
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <CustomButton
+                variant="gray"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2"
+              >
+                Next
+              </CustomButton>
+            </div>
+          )} */}
+
+          {/* ) : (
+          <p>{searchTerm ? "No matching coupons found." : "No coupons available."}</p>
+          )} */}
+        </div>
+
 
 
       </div>
-      <AlertLoading show={loading} title="Please Wait...." />
-    </div>
+      {/* <AlertLoading show={loading} title="Please Wait...." /> */}
+    </div >
   );
 }

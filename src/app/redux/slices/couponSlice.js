@@ -17,65 +17,68 @@ const couponSlice = createSlice({
   name: "coupon",
   initialState,
   reducers: {
-    // Fetch all
-    fetchCouponsRequest: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchCouponsSuccess: (state, action) => {
-      state.loading = false;
-      state.coupons = action.payload;
 
-    },
-    fetchCouponsFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-
-    },
-
-    // Get by ID
-    fetchCouponByIdRequest: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchCouponByIdSuccess: (state, action) => {
-      state.loading = false;
-      state.currentCoupon = action.payload;
-    },
-    fetchCouponByIdFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
 
     // Create
     createCouponRequest: (state) => {
-      state.loading = true;
-      state.error = null;
+      state.add.loading = true;
+      state.add.error = null;
     },
     createCouponSuccess: (state, action) => {
-      state.loading = false;
+      state.add.loading = false;
       // state.coupons.push(action.payload);
-      state.addCode = 200;
+      state.add.addCode = 200;
     },
     createCouponFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
+      state.add.loading = false;
+      state.add.error = action.payload;
     },
 
-    // Update
-    updateCouponRequest: (state) => {
-      state.loading = true;
-      state.error = null;
+
+    // Fetch all
+    fetchCouponsRequest: (state) => {
+      state.list.loading = true;
+      state.list.error = null;
     },
-    updateCouponSuccess: (state, action) => {
-      state.loading = false;
-      const index = state.coupons.findIndex(c => c.id === action.payload.id);
-      if (index !== -1) state.coupons[index] = action.payload;
+    fetchCouponsSuccess: (state, action) => {
+      state.list.loading = false;
+      state.list.data = action.payload.couponList;
+
     },
-    updateCouponFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
+    fetchCouponsFailure: (state, action) => {
+      state.list.loading = false;
+      state.list.error = action.payload;
+
     },
+
+    // // Get by ID
+    // fetchCouponByIdRequest: (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // },
+    // fetchCouponByIdSuccess: (state, action) => {
+    //   state.loading = false;
+    //   state.currentCoupon = action.payload;
+    // },
+    // fetchCouponByIdFailure: (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // },
+
+    // // Update
+    // updateCouponRequest: (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // },
+    // updateCouponSuccess: (state, action) => {
+    //   state.loading = false;
+    //   const index = state.coupons.findIndex(c => c.id === action.payload.id);
+    //   if (index !== -1) state.coupons[index] = action.payload;
+    // },
+    // updateCouponFailure: (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // },
 
     // Delete
     deleteCouponRequest: (state) => {
@@ -90,9 +93,9 @@ const couponSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    resetCode: (state, action) => {
-      state.resetCode = null;
-    }
+    // resetCode: (state, action) => {
+    //   state.resetCode = null;
+    // }
   },
 });
 
@@ -100,15 +103,15 @@ export const {
   fetchCouponsRequest,
   fetchCouponsSuccess,
   fetchCouponsFailure,
-  fetchCouponByIdRequest,
-  fetchCouponByIdSuccess,
-  fetchCouponByIdFailure,
+  // fetchCouponByIdRequest,
+  // fetchCouponByIdSuccess,
+  // fetchCouponByIdFailure,
   createCouponRequest,
   createCouponSuccess,
   createCouponFailure,
-  updateCouponRequest,
-  updateCouponSuccess,
-  updateCouponFailure,
+  // updateCouponRequest,
+  // updateCouponSuccess,
+  // updateCouponFailure,
   deleteCouponRequest,
   deleteCouponSuccess,
   deleteCouponFailure,

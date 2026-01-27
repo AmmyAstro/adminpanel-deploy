@@ -20,11 +20,12 @@ const apiroute = {
 
   // Coupon 
   couponAdd: `${apiurl}/couponAdd`,
-  // couponFetch: `${apiurl}/coupons`,
+  couponFetch: `${apiurl}/couponFetch`,
+  couponDelete: (id) => `${apiurl}/coupon/${id}`,
 
   AdminLogin: `${API_AUTH_URL}staff/login`,
   addTestimonial: `${apiurl}/testimonials/`,
-  editTestimonial: (id) => `${apiurl}/testimonials/${id}`,
+  // editTestimonial: (id) => `${apiurl}/testimonials/${id}`,
 
 
 

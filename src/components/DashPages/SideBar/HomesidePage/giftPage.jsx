@@ -8,6 +8,7 @@ import CustomButton from "@/components/Custom/CustomButtom";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Giftpage() {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ export default function Giftpage() {
       status: "",
     });
     setShowForm(false);
-    toast.success("Banner added successfully!");
+    toast.success("Gift added successfully!");
 
   };
 

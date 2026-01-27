@@ -5,15 +5,15 @@ import {
   fetchCouponsRequest,
   fetchCouponsSuccess,
   fetchCouponsFailure,
-  fetchCouponByIdRequest,
-  fetchCouponByIdSuccess,
-  fetchCouponByIdFailure,
+  // fetchCouponByIdRequest,
+  // fetchCouponByIdSuccess,
+  // fetchCouponByIdFailure,
   createCouponRequest,
   createCouponSuccess,
   createCouponFailure,
-  updateCouponRequest,
-  updateCouponSuccess,
-  updateCouponFailure,
+  // updateCouponRequest,
+  // updateCouponSuccess,
+  // updateCouponFailure,
   deleteCouponRequest,
   deleteCouponSuccess,
   deleteCouponFailure,
@@ -28,8 +28,12 @@ const apidata = (payload) => {
   // };
   return axios.post(apiroute.couponAdd, payload)
 }
-const apidataFetch = () => {
+const couponListFetch = () => {
   return axios.get(apiroute.couponFetch)
+}
+
+const couponDeleteApi = (id) => {
+  return axios.delete(apiroute.couponDelete(id))
 }
 
 
@@ -50,51 +54,54 @@ function* createCouponSaga(action) {
 // Fetch all
 function* fetchCouponsSaga() {
   try {
-    const response = yield call(apidataFetch);
-    yield put(fetchCouponsSuccess(response.data.coupons));
+    const response = yield call(couponListFetch);
+    yield put(fetchCouponsSuccess(response?.data));
   } catch (error) {
-    yield put(fetchCouponsFailure(error.message));
+    yield put(fetchCouponsFailure(error?.message));
   }
 }
 
 // Fetch by ID
-function* fetchCouponByIdSaga(action) {
-  try {
-    const response = yield call(axios.get, `${BASE_URL}/coupons/${action.payload}`);
-    yield put(fetchCouponByIdSuccess(response.data.coupon));
-  } catch (error) {
-    yield put(fetchCouponByIdFailure(error.message));
-  }
-}
+// function* fetchCouponByIdSaga(action) {
+//   try {
+//     const response = yield call(axios.get, `${BASE_URL}/coupons/${action.payload}`);
+//     yield put(fetchCouponByIdSuccess(response.data.coupon));
+//   } catch (error) {
+//     yield put(fetchCouponByIdFailure(error.message));
+//   }
+// }
 
 
 
 // Update
-function* updateCouponSaga(action) {
-  try {
-    const { id, data } = action.payload;
-    const response = yield call(axios.put, `${BASE_URL}/coupons/${id}`, data);
-    yield put(updateCouponSuccess(response.data.coupon));
-  } catch (error) {
-    yield put(updateCouponFailure(error.message));
-  }
-}
+// function* updateCouponSaga(action) {
+//   try {
+//     const { id, data } = action.payload;
+//     const response = yield call(axios.put, `${BASE_URL}/coupons/${id}`, data);
+//     yield put(updateCouponSuccess(response.data.coupon));
+//   } catch (error) {
+//     yield put(updateCouponFailure(error.message));
+//   }
+// }
 
 // Delete
 function* deleteCouponSaga(action) {
+  console.log("delete payload:", action.payload);
+
   try {
     const id = action.payload;
-    yield call(axios.delete, `${BASE_URL}/coupons/${id}`);
+    yield call(couponDeleteApi, id);
     yield put(deleteCouponSuccess(id));
   } catch (error) {
-    yield put(deleteCouponFailure(error.message));
+    yield put(deleteCouponFailure(error?.message));
   }
 }
 
+
 export default function* couponSaga() {
   yield takeLatest(fetchCouponsRequest.type, fetchCouponsSaga);
-  yield takeLatest(fetchCouponByIdRequest.type, fetchCouponByIdSaga);
+  // yield takeLatest(fetchCouponByIdRequest.type, fetchCouponByIdSaga);
   yield takeLatest(createCouponRequest.type, createCouponSaga);
-  yield takeLatest(updateCouponRequest.type, updateCouponSaga);
+  // yield takeLatest(updateCouponRequest.type, updateCouponSaga);
   yield takeLatest(deleteCouponRequest.type, deleteCouponSaga);
 }
