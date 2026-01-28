@@ -2,6 +2,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
   addGiftRequest,
+  deleteGiftRequest,
   fetchGiftRequest,
 } from "@/app/redux/slices/addGiftSlice";
 import CustomButton from "@/components/Custom/CustomButtom";
@@ -9,6 +10,8 @@ import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 export default function Giftpage() {
   const dispatch = useDispatch();
@@ -55,6 +58,18 @@ export default function Giftpage() {
     setShowForm(false);
     toast.success("Gift added successfully!");
 
+  };
+
+   const handleDelete = (id) => {
+    if (!id) {
+      console.error("Invalid coupon id");
+      return;
+    }
+
+    if (confirm("Are you sure to delete this gift?")) {
+      dispatch(deleteGiftRequest(id));
+    }
+    toast.success(" Gift Deleted Successfully");
   };
 
   return (
@@ -159,14 +174,14 @@ export default function Giftpage() {
           <p className="text-gray-500">No gifts found</p>
         )}
 
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-4 gap-5">
           {Array.isArray(gifts) &&
             gifts.map((gift) => (
               <div
                 key={gift.id}
-                className=" last:border-b-0 pb-3 mb-3"
+                className=" last:border-b-0 bg-purple-50 uppe rounded-xl p-3 gap-2 flex flex-col items-center justify-center "
               >
-                <h4 className="font-medium">{gift.title}</h4>
+                <h4 className="tracking-wide uppercase font-semibold">{gift.title}</h4>
                 <p>Amount: ₹{gift.amount}</p>
                 <p>
                   Status:{" "}
@@ -180,6 +195,21 @@ export default function Giftpage() {
                     {gift.status === "active" ? "Active" : "Inactive"}
                   </span>
                 </p>
+                <div className=" flex gap-6 text-center items-center justify-between">
+                  <button
+                    className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                    onClick={() => handleEdit(gift)}>
+                  
+                    <FaEdit />
+                  </button>
+
+                  <button
+                    className="px-2 py-1 bg-red-400 text-white rounded hover:bg-red-500 cursor-pointer"
+                    onClick={() => handleDelete(gift.id)}
+                  >
+                    <MdDelete />
+                  </button>
+                </div>
               </div>
             ))}
         </div>

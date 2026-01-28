@@ -42,9 +42,23 @@ const bannerSlice = createSlice({
       state.listBanner.loading = false;
       state.listBanner.error = action.payload;
     },
+
+    // Delete banner 
+    deleteBannerRequest: (state) => {
+      state.listBanner.loading = true;
+    },
+    deleteBannerSuccess: (state, action) => {
+      state.listBanner.loading = false;
+      state.listBanner.data = state.listBanner.data.filter(banner => banner.id !== action.payload.id);
+    },
+    deleteBannerFail: (state, action) => {
+      state.listBanner.loading = false;
+      state.listBanner.error = action.payload;
+    },
   },
 });
 
-export const { addbannerRequest, bannerAddSuccessfully, banneraddfail, fetchBannerRequest, fetchBannerSuccess, fetchBannerFail } = bannerSlice.actions;
+export const { addbannerRequest, bannerAddSuccessfully, banneraddfail, fetchBannerRequest, fetchBannerSuccess, fetchBannerFail, 
+deleteBannerRequest, deleteBannerSuccess, deleteBannerFail } = bannerSlice.actions;
 
 export default bannerSlice.reducer;

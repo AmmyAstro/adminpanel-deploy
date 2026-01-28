@@ -13,10 +13,12 @@ const apiroute = {
   // Banner 
   bannerAdd: `${apiurl}/bannerAdd`,
   bannerList: `${apiurl}/bannerList`,
+  bannerDelete: (id) => `${apiurl}/banner/${id}`,
 
   // Gifts 
   giftList: `${apiurl}/giftList`,
   addGift: `${apiurl}/addGift`,
+  giftDelete: (id) => `${apiurl}/gift/${id}`,
 
   // Coupon 
   couponAdd: `${apiurl}/couponAdd`,

@@ -5,7 +5,7 @@ import { MdCancel } from "react-icons/md";
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
-import { addbannerRequest, fetchBannerRequest } from "@/app/redux/slices/bannerSlice";
+import { addbannerRequest, deleteBannerRequest, fetchBannerRequest } from "@/app/redux/slices/bannerSlice";
 import toast from "react-hot-toast";
 
 // Debounce helper
@@ -68,6 +68,17 @@ export default function BannerManager() {
     setIsOpen(false);
     toast.success("Banner added successfully!");
   };
+     const handleDelete = (id) => {
+      if (!id) {
+        console.error("Invalid coupon id"); 
+        return;
+      }
+  
+      if (confirm("Are you sure to delete this gift?")) {
+        dispatch(deleteBannerRequest(id));
+      }
+      toast.success(" Gift Deleted Successfully");
+    };
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">

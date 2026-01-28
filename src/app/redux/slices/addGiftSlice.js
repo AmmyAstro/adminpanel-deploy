@@ -43,6 +43,19 @@ const giftSlice = createSlice({
             state.list.loading = false;
             state.list.error = action.payload;
         },
+
+        //Delete Gifts
+        deleteGiftRequest: (state) => {
+            state.list.loading = true;
+        },
+        deleteGiftSuccess: (state, action) => {
+            state.list.loading = false;
+            state.list.data = state.list.data.filter(gift => gift.id !== action.payload.id);
+        },
+        deleteGiftFail: (state, action) => {
+            state.list.loading = false;
+            state.list.error = action.payload;
+        },
     },
 });
 
@@ -53,6 +66,9 @@ export const {
     fetchGiftRequest,
     fetchGiftSuccess,
     fetchGiftFail,
+    deleteGiftRequest,
+    deleteGiftSuccess,
+    deleteGiftFail,
 } = giftSlice.actions;
 
 export default giftSlice.reducer;

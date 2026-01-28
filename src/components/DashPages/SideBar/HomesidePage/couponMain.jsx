@@ -94,6 +94,7 @@ export default function CouponMain() {
     }));
 
     setCoupOpen(false);
+    toast.success("New Coupon Add Successfully");
   };
 
 
@@ -115,6 +116,7 @@ export default function CouponMain() {
     if (confirm("Are you sure to delete this coupon?")) {
       dispatch(deleteCouponRequest(id));
     }
+    toast.success(" Coupon Deleted Successfully");
   };
 
 
