@@ -1,18 +1,16 @@
-// middleware.js
 import { NextResponse } from "next/server";
-import Cookies from "js-cookie"; 
 
 export function middleware(req) {
-  const token = req.cookies.get("token"); 
-  const url = req.nextUrl.pathname;
+  const token = req.cookies.get("token")?.value;
 
-  if (!token && url.startsWith("/Admindash")) {
+  console.log("MIDDLEWARE RUNNING");
+  console.log("PATH:", req.nextUrl.pathname);
+  console.log("TOKEN:", token);
+
+  if (!token && req.nextUrl.pathname.startsWith("/Admindash")) {
+    console.log("Redirecting because no token");
     return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ["/Admindash/:path*"],
-};
