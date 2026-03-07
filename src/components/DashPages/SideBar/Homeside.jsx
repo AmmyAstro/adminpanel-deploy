@@ -8,7 +8,7 @@ export default function Homeside() {
 
   const menuItems = [
     { href: "/Admindash/couponmain", title: "Coupons", src: "/admin-img/badge-percent.png" },
-    { href: "/Admindash/pacakagemain", title: "Add Packages", src: "/admin-img/boxo.png" },
+    { href: "/Admindash/packages", title: "Wallet Packages", src: "/admin-img/boxo.png" },
     { href: "/Admindash/giftpage", title: "Add Gifts", src: "/admin-img/gift.png" },
     { href: "/Admindash/managecms", title: "Manage CMS", src: "/admin-img/lead.png" },
     { href: "/Admindash/testimonialmain", title: "Testimonials", src: "/admin-img/testimonials.png" },

@@ -15,7 +15,7 @@ export default function ClientSideLayout({ children }) {
     { match: "/Admindash/giftpage", type: "giftSide" },
     { match: "/Admindash/testimonialmain", type: "testimonialSide" },
     { match: "/Admindash/couponmain", type: "couponSide" },
-    { match: "/Admindash/pacakagemain", type: "packageSide" },
+    { match: "/Admindash/packages", type: "packageSide" },
     { match: "/Admindash/blogmain", type: "blogSide" },
     { match: "/Admindash/privilegemain", type: "previlegeSide" },
     { match: "/Admindash/astromain", type: "astrologerSide" },

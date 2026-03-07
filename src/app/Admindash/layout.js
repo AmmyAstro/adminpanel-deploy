@@ -8,16 +8,7 @@ import ClientSideLayout from "./CllientSideLayout";
 import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({ children }) {
-  const [mounted, setMounted] = useState(false);
 
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>

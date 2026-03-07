@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import cookieHelper from "./helper/cookieHelper";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 
@@ -26,42 +25,53 @@ const LOGIN_ADMIN = gql`
 `;
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
   const router = useRouter();
 
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+
   const [loginAdmin, { loading }] = useMutation(LOGIN_ADMIN, {
-  onCompleted: (data) => {
-    console.log("✅ LOGIN RESPONSE:", data);
-    toast.success("Login successful");
-    router.push("/Admindash");
-  },
-  onError: (error) => {
-    console.error("❌ LOGIN ERROR:", error);
-    toast.error(error.message);
-  },
-});
+onCompleted: (data) => {
 
-const handleSubmit = async () => {
-  console.log("🚀 Submitting login:", { email, password });
+  const { accessToken, refreshToken } = data.loginAdmin;
 
-  if (!email) return toast.error("Email is required");
-  // if (!isValidEmail(email))
-  //   return toast.error("Enter valid email format");
-  if (!password) return toast.error("Password is required");
+  // localStorage
+  localStorage.setItem("adminToken", accessToken);
 
-  try {
-    const response = await loginAdmin({
-      variables: { email, password },
+  // cookie for middleware
+  document.cookie = `token=${accessToken}; path=/`;
+
+  toast.success("Login successful");
+
+  router.replace("/Admindash");
+},
+  });
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
     });
+  };
 
-    console.log("📦 Mutation returned:", response);
-  } catch (err) {
-    console.error("🔥 Mutation catch block:", err);
-  }
-};
+  const handleSubmit = async () => {
+    const { email, password } = form;
+
+    if (!email) return toast.error("Email is required");
+    if (!password) return toast.error("Password is required");
+
+    try {
+      await loginAdmin({
+        variables: { email, password },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0000004b] px-4">
@@ -74,37 +84,32 @@ const handleSubmit = async () => {
           className="mx-auto mb-6"
         />
 
-        <h2 className="text-2xl font-bold text-center mb-2">
-          Admin Sign In
-        </h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Admin Sign In</h2>
 
         <div className="space-y-4">
-
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+            <label className="text-sm font-medium">Email</label>
             <input
+              name="email"
               type="email"
-              placeholder="amrender@dhwaniastro.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-full border px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              placeholder="admin@dhwaniastro.com"
+              value={form.email}
+              onChange={handleChange}
+              className="mt-1 w-full rounded-full border px-3 py-2 focus:ring-2 focus:ring-purple-500 outline-none"
             />
           </div>
 
           {/* Password */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
+            <label className="text-sm font-medium">Password</label>
 
             <input
+              name="password"
               type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-full border px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              value={form.password}
+              onChange={handleChange}
+              className="mt-1 w-full rounded-full border px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 outline-none"
             />
 
             <button

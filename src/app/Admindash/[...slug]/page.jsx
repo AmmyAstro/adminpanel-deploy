@@ -7,7 +7,7 @@ import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannerman
 import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
 import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/Testimonial/addTestimonial";
 import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
-import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
+// import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
 import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
 import PrivilegeMain from "@/components/DashPages/PrivilegeManager/PrivilegeMain";
 import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
@@ -36,7 +36,7 @@ export default function AdminPanel() {
     managecms: <ManageCMS />,
     giftpage: <Giftpage />,
     couponmain: <CouponMain />,
-    pacakagemain: <PacakageMain />,
+    // pacakagemain: <PacakageMain />,
     blogmain: <BlogMain />,
     privilegemain: <PrivilegeMain />,
     astromain: <AstrologerMain />,
