@@ -1,63 +1,120 @@
 "use client";
-import sidebarConfig from "@/components/utils/sidebarConfig";
-import Image from "next/image";
+
+import sidebarConfig, { iconMap } from "@/components/utils/sidebarConfig";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePermissions } from "@/hooks/usePermission";
+import { moduleConfig } from "@/components/utils/moduleConfig";
 
-export default function SideBarMain({ type }) {
-  const menuItems = sidebarConfig[type] || [];
+export default function SideBarMain() {
   const pathname = usePathname();
 
-  return (
-    <aside className="fixed px-3 top-[3.5rem] bottom-[2.5rem] left-0 w-20 md:w-48 bg-[#2c0a4d] flex flex-col py-6 space-y-4">
+  // 🔥 Extract section from URL
+  const path = pathname.split("/");
+
+  const sectionMap = {
+    privilegemain: "privilege",
+    astromain: "astrologer",
+    managecms: "cms",
+    custommain: "customer",
+  };
+
+  const section = sectionMap[path[2]] || null;
+
+  const { permissions, loading } = usePermissions();
+
+  if (loading) return null;
+
+  const allModules = permissions || [];
+
+  // 🔥 Filter using moduleConfig
+const allowedModules = permissions.filter((mod) => {
+  const config = moduleConfig[mod.slug];
+  return config && config.section === section;
+});
+
+  const staticItems = sidebarConfig.static;
+  const sectionItems = sidebarConfig.sections?.[section] || [];
+
+  // ✅ Better active logic
+  const isActive = (href) => pathname.startsWith(href);
+
+  const renderItem = (item) => {
+    const Icon = iconMap[item.icon] || iconMap.default;
+
+    return (
       <Link
-        className={`sidebar-logo flex justify-evenly items-center px-4 py-2 rounded-xl mb-6 transition
-             ${ pathname === "/Admindash"
-            ? "bg-yellow-600 text-black scale-105"
-            : "bg-yellow-500 text-black"
-        }
-        `}
-        href="/Admindash"
+        key={item.href}
+        href={item.href}
+        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200
+        ${
+          isActive(item.href)
+            ? "bg-yellow-500 text-black scale-105"
+            : "hover:bg-[#ffffff14] text-white"
+        }`}
       >
-        <span className="text-base font-semibold">Dashboard</span>
-        <Image
-          src="/admin-img/dash.png"
-          alt="dashboard image"
-          height={20}
-          width={20}
+        <Icon
+          className={`text-lg ${
+            isActive(item.href) ? "text-black" : "text-yellow-400"
+          }`}
         />
+
+        <span
+          className={`hidden md:inline text-[13px] ${
+            isActive(item.href)
+              ? "text-black font-semibold"
+              : "text-white"
+          }`}
+        >
+          {item.name}
+        </span>
       </Link>
+    );
+  };
 
-      {menuItems.map((item, index) => {
-        const isActive = pathname === item.href;
+  // 🔥 Section title mapping
+  const sectionTitleMap = {
+    privilege: "Privilege",
+    astrologer: "Astrologer",
+    cms: "CMS",
+    customer: "Customer",
+  };
 
-        return (
-          <Link
-            key={index}
-            href={item.href}
-            className={`flex items-center md:justify-start justify-center gap-3 px-2 md:px-3 py-2  transition ${
-              isActive
-                ? "bg-yellow-500 rounded-full text-black scale-105"
-                : "hover:bg-[#ffffff14] hover:scale-105 hover:text-white"
-            }`}
-          >
-            <span
-              className={`text-xl ${
-                isActive ? "text-black" : "text-yellow-400"
-              }`}
-            >
-              {item.img}
-            </span>
-            <span
-              className={`hidden md:inline text-[13px] ${
-                isActive ? "text-black font-semibold" : "text-white"
-              }`}
-            >
-              {item.name}
-            </span>
-          </Link>
-        );
-      })}
+  return (
+    <aside className="fixed px-3 top-14 bottom-10 left-0 w-20 md:w-48 bg-[#2c0a4d] flex flex-col py-6 space-y-3 overflow-y-auto">
+
+      {/* STATIC */}
+      {staticItems.map((item) => renderItem(item))}
+
+      {/* SECTION STATIC */}
+      {sectionItems.length > 0 && (
+        <div className="mt-3 space-y-2">
+          {sectionItems.map((item) => renderItem(item))}
+        </div>
+      )}
+
+      {/* 🔥 DYNAMIC MODULES */}
+      {sidebarConfig.dynamic && allowedModules.length > 0 && (
+        <div className="mt-4 space-y-2">
+
+          {/* Section Title */}
+          <p className="text-[10px] text-gray-400 px-3 uppercase tracking-wider">
+            {sectionTitleMap[section] || section}
+          </p>
+
+          {/* Modules */}
+          {allowedModules.map((mod) => {
+            const config = moduleConfig[mod.slug];
+            if (!config) return null;
+
+            return renderItem({
+              name: mod.name,
+              href: `/Admindash/${config.section}main/${config.route}`,
+              icon: config.icon || "default",
+            });
+          })}
+        </div>
+      )}
     </aside>
   );
 }

@@ -1,5 +1,15 @@
 'use client';
-const CustomDropdown = ({ label, value, onChange, name, id, required, className, options = [] }) => {
+
+const CustomDropdown = ({
+  label,
+  value,
+  onChange,
+  name,
+  id,
+  required,
+  className,
+  children
+}) => {
   return (
     <div>
       {label && (
@@ -7,19 +17,16 @@ const CustomDropdown = ({ label, value, onChange, name, id, required, className,
           {label}
         </label>
       )}
+
       <select
         id={id}
         name={name}
         value={value}
         onChange={onChange}
         required={required}
-        className={`w-full border rounded-full border-gray-300 p-2 ${className || ''}`}
+        className={`w-full border rounded-full border-gray-300 p-2 ${className || ""}`}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
+        {children}
       </select>
     </div>
   );

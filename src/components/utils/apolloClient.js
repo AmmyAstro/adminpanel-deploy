@@ -4,21 +4,19 @@ import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4001/graphql",
+  uri: "http://localhost:4001/graphql",credentials: "omit",
 });
 
 const authLink = setContext((_, { headers }) => {
-
-  let token = null;
-
-  if (typeof window !== "undefined") {
-    token = localStorage.getItem("adminToken");
-  }
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("token")
+      : null;
 
   return {
     headers: {
       ...headers,
-      Authorization: token ? `Bearer ${token}` : "",
+      authorization: token ? `Bearer ${token}` : undefined, 
     },
   };
 });
@@ -26,6 +24,14 @@ const authLink = setContext((_, { headers }) => {
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "network-only",
+    },
+    query: {
+      fetchPolicy: "network-only",
+    },
+  },
 });
 
 export default client;

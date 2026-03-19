@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import Razordash from "@/components/DashPages/Razor/Razordash";
 import ManageCMS from "@/components/DashPages/SideBar/HomesidePage/manageCMS";
 import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannermanager";
@@ -9,18 +10,21 @@ import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/Testimon
 import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
 // import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
 import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
+
 import PrivilegeMain from "@/components/DashPages/PrivilegeManager/PrivilegeMain";
 import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
+
 import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
-import TestimonialList from "../../../components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
-import EditTestimonial from "../editTestimonial/[id]/page";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
 import AstroProfile from "@/app/astroprofile/[id]/page";
+
+import TestimonialList from "@/components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
+import EditTestimonial from "../editTestimonial/[id]/page";
+
+import CustomerMain from "@/components/DashPages/Customer/CustomerMain";
 import CustomerList from "@/components/DashPages/Customer/customerList";
 import CuustomerProfile from "@/app/customerprofile/[id]/page";
-import CustomerMain from "@/components/DashPages/Customer/CustomerMain";
-
 
 export default function AdminPanel() {
   const params = useParams();
@@ -30,82 +34,86 @@ export default function AdminPanel() {
     return <div>Invalid URL structure</div>;
   }
 
+  /* ---------------------------
+      LEVEL 1 ROUTES
+  --------------------------- */
 
-  const admindash = {
+  const firstLevel = {
     razordash: <Razordash />,
     managecms: <ManageCMS />,
     giftpage: <Giftpage />,
     couponmain: <CouponMain />,
-    // pacakagemain: <PacakageMain />,
     blogmain: <BlogMain />,
     privilegemain: <PrivilegeMain />,
     astromain: <AstrologerMain />,
     testimonialmain: <TestimonialList />,
-    edittestimonial: <EditTestimonial />,
-    custommain: <CustomerMain />
+    custommain: <CustomerMain />,
   };
 
+  /* ---------------------------
+      LEVEL 2 ROUTES
+  --------------------------- */
 
   const secondLevel = {
-    banner: <BannerManager />,
-    staffmain: <Staffmain />,
-    addastro: <AddAstro />,
-    addtesti: <AddTestimonial />,
-    astrolist: <AstroList />,
-    edittestimonial: <EditTestimonial />,
-    customerlist: <CustomerList />,
+    managecms: {
+      banner: <BannerManager />,
+    },
 
+    privilegemain: {
+      staffmain: <Staffmain />,
+    },
+
+    astromain: {
+      addastro: <AddAstro />,
+      astrolist: <AstroList />,
+    },
+
+    testimonialmain: {
+      addtesti: <AddTestimonial />,
+      edittestimonial: <EditTestimonial />,
+    },
+
+    custommain: {
+      customerlist: <CustomerList />,
+    },
   };
+
+  /* ---------------------------
+      LEVEL 3 ROUTES
+  --------------------------- */
 
   const thirdLevel = {
     astroprofile: <AstroProfile />,
-    customerprofile: <CuustomerProfile />
-
-  }
+    customerprofile: <CuustomerProfile />,
+  };
 
   let Componentrender = null;
 
+  /* ---------- LEVEL 1 ---------- */
+
   if (path.length === 1) {
-
-    Componentrender = admindash[path[0]];
+    Componentrender = firstLevel[path[0]];
   }
+
+  /* ---------- LEVEL 2 ---------- */
+
   else if (path.length === 2) {
-
-    if (path[0] === "managecms") {
-      Componentrender = secondLevel[path[1]];
-    }
-    if (path[0] === "privilegemain") {
-      Componentrender = secondLevel[path[1]];
-    }
-    if (path[0] === "astromain") {
-      Componentrender = secondLevel[path[1]];
-    }
-      if (path[0] === "custommain") {
-      Componentrender = secondLevel[path[1]];
-    }
-    if (path[0] === "testimonialmain") {
-      Componentrender = secondLevel[path[1]];
-    }
+    Componentrender = secondLevel[path[0]]?.[path[1]];
   }
+
+  /* ---------- LEVEL 3 ---------- */
 
   else if (path.length === 3) {
-    if (
-      path[0] === "astromain" &&
-      path[1] === "astrolist" &&
-      thirdLevel[path[2]]
-    ) {
+    if (path[0] === "astromain" && path[1] === "astrolist") {
       Componentrender = thirdLevel[path[2]];
     }
 
-    else if (
-      path[0] === "custommain" &&
-      path[1] === "customerlist" &&
-      thirdLevel[path[2]]
-    ) {
+    if (path[0] === "custommain" && path[1] === "customerlist") {
       Componentrender = thirdLevel[path[2]];
     }
   }
 
+  /* ---------- LEVEL 4 (dynamic id) ---------- */
 
   else if (path.length === 4) {
     if (
@@ -125,14 +133,12 @@ export default function AdminPanel() {
     }
   }
 
-
-
   return (
     <>
       {Componentrender ? (
         Componentrender
       ) : (
-        <div className="text-center  text-purple-600 font-semibold py-10">
+        <div className="text-center text-purple-600 font-semibold py-10">
           Page not found: <code>{path.join(" / ")}</code>
         </div>
       )}

@@ -6,13 +6,14 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
+import client from "@/components/utils/apolloClient";
 
-const LOGIN_ADMIN = gql`
-  mutation LoginAdmin($email: String!, $password: String!) {
-    loginAdmin(email: $email, password: $password) {
+const LOGIN_STAFF = gql`
+  mutation LoginStaff($email: String!, $password: String!) {
+    loginStaff(email: $email, password: $password) {
       accessToken
       refreshToken
-      admin {
+      user {
         id
         name
         email
@@ -24,7 +25,7 @@ const LOGIN_ADMIN = gql`
   }
 `;
 
-export default function AdminLogin() {
+export default function StaffLogin() {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -34,28 +35,28 @@ export default function AdminLogin() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [loginAdmin, { loading }] = useMutation(LOGIN_ADMIN, {
-onCompleted: (data) => {
+  const [loginStaff, { loading }] = useMutation(LOGIN_STAFF, {
+    onCompleted: async (data) => {
+      const { accessToken, user } = data.loginStaff;
 
-  const { accessToken, refreshToken } = data.loginAdmin;
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("user", JSON.stringify(user));
 
-  // localStorage
-  localStorage.setItem("adminToken", accessToken);
+      await client.resetStore();
+      toast.success(`Welcome ${user.name}`);
+      router.push("/Admindash");
+    },
 
-  // cookie for middleware
-  document.cookie = `token=${accessToken}; path=/`;
-
-  toast.success("Login successful");
-
-  router.replace("/Admindash");
-},
+    onError: (err) => {
+      toast.error(err.message || "Login failed");
+    },
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async () => {
@@ -64,13 +65,9 @@ onCompleted: (data) => {
     if (!email) return toast.error("Email is required");
     if (!password) return toast.error("Password is required");
 
-    try {
-      await loginAdmin({
-        variables: { email, password },
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    await loginStaff({
+      variables: { email, password },
+    });
   };
 
   return (
@@ -84,10 +81,9 @@ onCompleted: (data) => {
           className="mx-auto mb-6"
         />
 
-        <h2 className="text-2xl font-bold text-center mb-6">Admin Sign In</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Staff Sign In</h2>
 
         <div className="space-y-4">
-          {/* Email */}
           <div>
             <label className="text-sm font-medium">Email</label>
             <input
@@ -100,7 +96,6 @@ onCompleted: (data) => {
             />
           </div>
 
-          {/* Password */}
           <div className="relative">
             <label className="text-sm font-medium">Password</label>
 

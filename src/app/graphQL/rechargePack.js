@@ -1,0 +1,45 @@
+import { gql } from "@apollo/client";
+
+export const GET_RECHARGE_PACKS = gql`
+  query GetRechargePacks {
+    getRechargePacks {
+      id
+      name
+      description
+      price
+      talktime
+      isActive
+      createdAt
+    }
+  }
+`;
+
+export const CREATE_RECHARGE_PACK = gql`
+  mutation CreateRechargePack($input: RechargePackInput!) {
+    createRechargePack(input: $input) {
+      id
+      name
+      price
+      talktime
+      isActive
+    }
+  }
+`;
+
+export const UPDATE_RECHARGE_PACK = gql`
+  mutation UpdateRechargePack($id: ID!, $input: RechargePackInput!) {
+    updateRechargePack(id: $id, input: $input) {
+      id
+      name
+      price
+      talktime
+      isActive
+    }
+  }
+`;
+
+export const DELETE_RECHARGE_PACK = gql`
+  mutation DeleteRechargePack($id: ID!) {
+    deleteRechargePack(id: $id)
+  }
+`;

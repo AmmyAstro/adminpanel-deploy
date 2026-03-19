@@ -1,4 +1,3 @@
-
 "use client";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,14 +12,40 @@ import MultiSelect from "@/components/Custom/MultiSelect";
 import AstroProCharge from "@/components/Data/AstroProCharge";
 import { useEffect, useState } from "react";
 import CSC from "@/components/Custom/CSC";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
+import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
+
+
+const ADD_ASTROLOGER = gql`
+mutation AddAstrologer($data: AddAstrologerInput!) {
+  addAstrologer(data: $data) {
+    id
+    name
+    email
+    approvalStatus
+  }
+}
+`;
+
 export default function AddAstro() {
 
     const [activeTab, setActiveTab] = useState("call");
 
-    const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
+    const [addAstrologer, { loading, error }] = useMutation(ADD_ASTROLOGER);
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        reset,
+        watch,
+        setValue,
+        formState: { errors }
+    } = useForm({
         resolver: zodResolver(addAstrologerSchema),
         defaultValues: {
-            gender: "ml",
+            gender: "Male",
             tzone: "In",
             tags: "new",
             vtags: "noverify",
@@ -28,8 +53,6 @@ export default function AddAstro() {
             languages: [],
             problems: [],
             aboutEnglish: "",
-            aboutHindi: "",
-
 
             countryStateCity: {
                 country: "",
@@ -38,16 +61,12 @@ export default function AddAstro() {
             },
 
             charges: {
-                callCharges: "",
-                callCommission: "",
+                callChatCharges: "",
+                callChatOfferCharges: "",
+                callChatCommission: "",
                 videocall_charges: "",
-                videocall_commission: "",
                 audiocall_charges: "",
-                audiocall_commission: "",
-                offercallcharges: "",
-                offervideocharges: "",
-                disc_chat_charge: "",
-                // gift_commission: "",
+                audiovideocall_offer_charges: "",
             },
 
             bankDetails: {
@@ -57,16 +76,93 @@ export default function AddAstro() {
                 ifscCode: "",
                 panCardNumber: "",
                 branchName: "",
-                documents: {
-                    profile: null,
-                    aadhar: null,
-                    pan: null,
-                    passbook: null,
-                },
+
+            },
+            documents: {
+                profilePic: null,
+                aadhaar: null,
+                panCard: null,
+                passbook: null,
             },
         },
     });
 
+
+
+    const pincode = watch("pincode");
+
+    useEffect(() => {
+
+        if (!pincode || pincode.toString().length !== 6) return;
+
+        const timer = setTimeout(async () => {
+
+            try {
+
+                const res = await fetch(
+                    `https://api.postalpincode.in/pincode/${pincode}`
+                );
+
+                const data = await res.json();
+
+                if (data[0].Status === "Success") {
+
+                    const location = data[0].PostOffice[0];
+
+                    setValue("countryStateCity.country", "India");
+                    setValue("countryStateCity.state", location.State);
+                    setValue("countryStateCity.city", location.District);
+
+                } else {
+
+                    setValue("countryStateCity.country", "");
+                    setValue("countryStateCity.state", "");
+                    setValue("countryStateCity.city", "");
+
+                }
+
+            } catch (error) {
+                console.log("Pincode fetch error:", error);
+            }
+
+        }, 500);
+
+        return () => clearTimeout(timer);
+
+    }, [pincode, setValue]);
+
+
+
+
+ const onSubmit = async (formData) => {
+  const fd = new FormData();
+
+  fd.append("aadhaar", formData.documents.aadhaar);
+  fd.append("panCard", formData.documents.panCard);
+  fd.append("passbook", formData.documents.passbook);
+  fd.append("profilePic", formData.documents.profilePic);
+
+  const uploadRes = await fetch(
+    "http://localhost:4001/api/upload-documents",
+    {
+      method: "POST",
+      body: fd,
+    }
+  );
+
+  const uploadedFiles = await uploadRes.json();
+
+  const payload = mapAstrologerPayload({
+    ...formData,
+    documents: uploadedFiles,
+  });
+  console.log("xxxxxxxxxxxxxxxxxxxxxxxxxx",payload);
+  
+
+  await addAstrologer({
+    variables: { data: payload },
+  });
+};
 
 
 
@@ -81,7 +177,7 @@ export default function AddAstro() {
             label: "Language Known",
             name: "languages",
             placeholder: "Select Language",
-            options: ["English", "Hindi", "Punjabi", "Malayalam, "],
+            options: ["English", "Hindi", "Punjabi", "Malayalam"],
         },
         {
             label: "Problems Handled",
@@ -99,17 +195,9 @@ export default function AddAstro() {
     }, [errors]);
 
 
-    const onSubmit = (data) => {
-        console.log("FORM DATA 👉", data);
-        alert("Submit working — check console");
-        reset();
-    };
-
-
-
-
     return (
         <div className="min-h-screen">
+
             <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-purple-900">
                     Add New Astrologer
@@ -126,6 +214,7 @@ export default function AddAstro() {
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="bg-white shadow-lg rounded-2xl p-5 space-y-6">
+
                 <h2 className=" mb-2 text-base font-semibold text-purple-500">
                     Basic Astrologer Details :
                 </h2>
@@ -182,50 +271,6 @@ export default function AddAstro() {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                            Display Name (Hindi)
-                        </label>
-                        <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img
-                                src="/admin-img/userte.png"
-                                alt="user"
-                                className="input-img-side"
-                            />
-
-                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
-                                {...register("hindiName")}
-                                placeholder="Enter name in hindi"
-                            />
-
-                        </div>
-                        {errors.hindiName && (
-                            <p className="text-red-500 text-xs">
-                                {errors.hindiName.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">
-                            Phone Number
-                        </label>
-                        <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img
-                                src="/admin-img/userte.png"
-                                alt="user"
-                                className="input-img-side"
-                            />
-                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
-                                type="number"
-                                placeholder="Enter phone number"
-                                {...register("phoneNumber", { valueAsNumber: true })}
-                            />
-                        </div>
-                        {errors.phoneNumber && (
-                            <p className="text-red-500 text-xs">{errors.phoneNumber.message}</p>
-                        )}
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">
                             Email Address
                         </label>
                         <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
@@ -247,6 +292,48 @@ export default function AddAstro() {
                             </p>
                         )}
                     </div>
+
+                    <Controller
+                        name="gender"
+                        control={control}
+                        render={({ field }) => (
+                            <CustomDropdown
+                                {...field}
+                                label="Gender"
+                                options={[
+                                    { value: "MALE", label: "Male" },
+                                    { value: "FEMALE", label: "Female" },
+                                    { value: "OTHER", label: "Other" },
+                                ]}
+                            />
+                        )}
+                    />
+                    {errors.gender && (
+                        <p className="text-red-500 text-xs">{errors.gender.message}</p>
+                    )}
+
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">
+                            Phone Number
+                        </label>
+                        <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
+                            <img
+                                src="/admin-img/userte.png"
+                                alt="user"
+                                className="input-img-side"
+                            />
+                            <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
+                                type="number"
+                                placeholder="Enter phone number"
+                                {...register("phoneNumber", { valueAsNumber: true })}
+                            />
+                        </div>
+                        {errors.phoneNumber && (
+                            <p className="text-red-500 text-xs">{errors.phoneNumber.message}</p>
+                        )}
+                    </div>
+
 
                     <div>
                         <label className="block text-sm font-medium text-gray-500    mb-1">
@@ -291,23 +378,7 @@ export default function AddAstro() {
                         )}
                     </div>
 
-                    <Controller
-                        name="gender"
-                        control={control}
-                        render={({ field }) => (
-                            <CustomDropdown
-                                {...field}
-                                label="Gender"
-                                options={[
-                                    { value: "ml", label: "Male" },
-                                    { value: "fe", label: "Female" },
-                                ]}
-                            />
-                        )}
-                    />
-                    {errors.gender && (
-                        <p className="text-red-500 text-xs">{errors.gender.message}</p>
-                    )}
+
 
                     <div>
                         <label className="block text-sm font-medium text-gray-500    mb-1">
@@ -328,6 +399,47 @@ export default function AddAstro() {
                         {errors.pincode && (
                             <p className="text-red-500 text-xs">{errors.pincode.message}</p>
                         )}
+                    </div>
+
+                    <div className="col-span-3 grid grid-cols-3 gap-4">
+                        <div >
+                            <label className="block text-sm font-medium text-gray-500 mb-1">
+                                Country
+                            </label>
+
+                            <CustomInput
+                                className="w-full outline-none  bg-transparent"
+                                {...register("countryStateCity.country")}
+                                placeholder="Auto fetched country"
+                                readOnly
+                            />
+                        </div>
+
+                        <div >
+                            <label className="block text-sm font-medium text-gray-500 mb-1">
+                                State
+                            </label>
+
+                            <CustomInput
+                                className="w-full outline-none  bg-transparent"
+                                {...register("countryStateCity.state")}
+                                placeholder="Auto fetched state"
+                                readOnly
+                            />
+                        </div>
+
+                        <div >
+                            <label className="block text-sm font-medium text-gray-500 mb-1">
+                                City
+                            </label>
+
+                            <CustomInput
+                                className="w-full outline-none  bg-transparent"
+                                {...register("countryStateCity.city")}
+                                placeholder="Auto fetched city"
+                                readOnly
+                            />
+                        </div>
                     </div>
 
                     <div>
@@ -363,20 +475,6 @@ export default function AddAstro() {
                         )}
                     />
 
-                    <Controller className="col-span-3"
-                        name="countryStateCity"
-                        control={control}
-                        render={({ field }) => (
-                            <CSC value={field.value} onChange={field.onChange}  />
-                        )}
-                    />
-
-                    {errors.countryStateCity && (
-                        <p className="text-red-500 text-sm">
-                            Please select Country, State and City
-                        </p>
-                    )}
-
 
                 </div>
 
@@ -387,7 +485,7 @@ export default function AddAstro() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <div>
+                    <div className="col-span-2">
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                             About Me (in English)
                         </label>
@@ -411,30 +509,7 @@ export default function AddAstro() {
 
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">
-                            About Me (in Hindi)
-                        </label>
-                        <div className="flex items-center gap-2 border border-gray-400 rounded-2xl px-2 p-1">
 
-                            <Controller
-                                name="aboutHindi"
-                                control={control}
-                                render={({ field }) => (
-                                    <TapEditor
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        placeholder="About astrologer (Hindi)"
-                                    />
-                                )}
-                            />
-
-
-                        </div>
-                        {errors.aboutHindi && (
-                            <p className="text-red-500 text-xs">{errors.aboutHindi.message}</p>
-                        )}
-                    </div>
 
                     <div className="flex flex-col gap-2">
                         {selectFields.map((field, idx) => (
@@ -462,7 +537,7 @@ export default function AddAstro() {
 
 
                     <div className="flex w-full">
-                        <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-400 bg-white w-full">
+                        <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-200 bg-white w-full">
                             <h2 className="font-semibold text-sm text-center">
                                 Astrologer Charges
                             </h2>
@@ -538,11 +613,11 @@ export default function AddAstro() {
                                 label="Astrologer Tag"
 
                                 options={[
-                                    { value: "new", label: "New" },
-                                    { value: "rs", label: "Rising Star" },
-                                    { value: "cl", label: "Celebrity" },
-                                    { value: "tp", label: "Top Ranking" },
-                                    { value: "tc", label: "Top Choice" },
+                                    { value: "New", label: "New" },
+                                    { value: "Rising Star", label: "Rising Star" },
+                                    { value: "Celebrity", label: "Celebrity" },
+                                    { value: "Top Ranking", label: "Top Ranking" },
+                                    { value: "Top Choice", label: "Top Choice" },
                                 ]}
                             />
                         )} />
@@ -731,9 +806,9 @@ export default function AddAstro() {
                             <div className="flex flex-col gap-1">
                                 <div className="flex flex-wrap gap-4 items-center justify-start">
                                     {[
-                                        { label: "Profile Image", name: "profile" },
-                                        { label: "Aadhar Image", name: "aadhar" },
-                                        { label: "PanCard Image", name: "pan" },
+                                        { label: "Profile Image", name: "profilePic" },
+                                        { label: "Aadhar Image", name: "aadhaar" },
+                                        { label: "PanCard Image", name: "panCard" },
                                         { label: "Passbook Image", name: "passbook" },
                                     ].map((item, idx) => (
                                         <div key={idx} className="flex items-center gap-3">
@@ -742,7 +817,7 @@ export default function AddAstro() {
                                             </label>
 
                                             <Controller
-                                                name={`bankDetails.documents.${item.name}`}
+                                                name={`documents.${item.name}`}
                                                 control={control}
                                                 render={({ field }) => (
                                                     <input
@@ -789,24 +864,32 @@ export default function AddAstro() {
                 </div>
 
 
-
-
-
-
-
-
-
-
-
                 <div className="flex gap-4 items-center justify-center">
-                    <CustomButton type="submit" variant="green" className="px-4 py-1">
-                        Save Astrologer
+                    <CustomButton
+                        type="submit"
+                        variant="green"
+                        className="px-4 py-1"
+                        disabled={loading}
+                    >
+                        {loading ? "Saving..." : "Save Astrologer"}
                     </CustomButton>
 
-                    <CustomButton type="button" variant="gray" className="px-4 py-1" onClick={() => reset()}>
+                    <CustomButton
+                        type="button"
+                        variant="gray"
+                        className="px-4 py-1"
+                        onClick={() => reset()}
+                    >
                         Reset
                     </CustomButton>
                 </div>
+
+                {error && (
+                    <p className="text-red-500 text-sm text-center">
+                        {error.message}
+                    </p>
+                )}
+
             </form>
         </div>
     );

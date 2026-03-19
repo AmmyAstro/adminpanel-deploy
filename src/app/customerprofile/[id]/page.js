@@ -9,7 +9,7 @@ import CustomButton from "@/components/Custom/CustomButtom";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
-import CustomProfiledata from "@/components/Data/CustomProfileData";
+// import CustomProfiledata from "@/components/Data/CustomProfileData";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState, useEffect, useMemo, Suspense } from "react";
