@@ -1,37 +1,38 @@
 "use client";
 
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+  makeVar,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
+
+export const authTokenVar = makeVar(null);
+
+
 const httpLink = createHttpLink({
-  uri: "http://localhost:4001/graphql",credentials: "omit",
+  uri: "http://localhost:4001/graphql",
+  credentials: "include",
 });
 
+
 const authLink = setContext((_, { headers }) => {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null;
+  const token = authTokenVar();
 
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : undefined, 
+      Authorization: token ? `Bearer ${token}` : undefined,
     },
   };
 });
 
+
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
-  defaultOptions: {
-    watchQuery: {
-      fetchPolicy: "network-only",
-    },
-    query: {
-      fetchPolicy: "network-only",
-    },
-  },
 });
 
 export default client;

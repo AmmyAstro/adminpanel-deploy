@@ -146,8 +146,12 @@ export const UPDATE_ROLE = gql`
 `;
 
 export const DELETE_ROLE = gql`
-  mutation DeleteRole($roleId: String!) {
-    deleteRole(roleId: $roleId)
+  mutation DeleteRole($roleId: ID!) {
+    deleteRole(roleId: $roleId) {
+      success
+      message
+      error
+    }
   }
 `;
 

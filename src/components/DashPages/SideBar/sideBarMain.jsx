@@ -37,7 +37,7 @@ const allowedModules = permissions.filter((mod) => {
   const sectionItems = sidebarConfig.sections?.[section] || [];
 
   // ✅ Better active logic
-  const isActive = (href) => pathname.startsWith(href);
+  const isActive = (href) => pathname.startsWith(href); 
 
   const renderItem = (item) => {
     const Icon = iconMap[item.icon] || iconMap.default;

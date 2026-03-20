@@ -1,18 +1,33 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { useMutation, useQuery } from "@apollo/client/react";
-import { CREATE_MODULE, DELETE_MODULE, GET_MODULES, UPDATE_MODULE } from "@/app/graphQL/privilageOperations";
+
+import {
+  CREATE_MODULE,
+  DELETE_MODULE,
+  GET_MODULES,
+  UPDATE_MODULE,
+} from "@/app/graphQL/privilageOperations";
+
 import DataTable from "@/components/utils/DataTable";
+import { useActionHandler } from "@/hooks/useActionHandler";
+import ConfirmModal from "@/components/Custom/ConformModal";
+import ProtectedActionButton from "@/components/Custom/ActionButton";
 
 export default function ModuleManager() {
+  const {
+    confirmState,
+    setConfirmState,
+    executeAction,
+    handleConfirm,
+  } = useActionHandler();
 
   const { data, loading, error, refetch } = useQuery(GET_MODULES, {
     variables: { page: 1, limit: 10 },
   });
 
-const modules = data?.getModulesPaginated?.data || [];
+  const modules = data?.getModulesPaginated?.data || [];
 
   const [createModule] = useMutation(CREATE_MODULE);
   const [updateModule] = useMutation(UPDATE_MODULE);
@@ -25,10 +40,6 @@ const modules = data?.getModulesPaginated?.data || [];
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
 
-  const [menuOpen, setMenuOpen] = useState(null);
-
-
-
   useEffect(() => {
     if (editingModule) {
       setName(editingModule.name);
@@ -40,8 +51,6 @@ const modules = data?.getModulesPaginated?.data || [];
       setDescription("");
     }
   }, [editingModule]);
-
-
 
   const handleSubmit = async () => {
     try {
@@ -60,55 +69,31 @@ const modules = data?.getModulesPaginated?.data || [];
             name,
             slug,
             description,
-            section : "privilege"
+            section: "privilege",
           },
         });
       }
 
       await refetch();
-
       setOpenModal(false);
       setEditingModule(null);
-
     } catch (err) {
       console.error("Module save error:", err);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteModule({
-        variables: { id },
-      });
-
-      await refetch();
-
-    } catch (err) {
-      console.error("Delete module error:", err);
-    }
-  };
-
   if (loading) return <p className="p-10">Loading modules...</p>;
   if (error) return <p className="p-10 text-red-500">Error loading modules</p>;
+
   const moduleColumns = [
-    {
-      header: "Name",
-      accessor: "name",
-    },
-    {
-      header: "Slug",
-      accessor: "slug",
-    },
-    {
-      header: "Description",
-      accessor: "description",
-    },
+    { header: "Name", accessor: "name" },
+    { header: "Slug", accessor: "slug" },
+    { header: "Description", accessor: "description" },
     {
       header: "Actions",
-      accessor: "actions",
       render: (row) => (
         <div className="flex justify-center gap-3">
-
+          {/* EDIT */}
           <button
             onClick={() => {
               setEditingModule(row);
@@ -119,21 +104,26 @@ const modules = data?.getModulesPaginated?.data || [];
             Edit
           </button>
 
-          <button
-            onClick={() => handleDelete(row.id)}
+        
+          <ProtectedActionButton
+            module="modules"
+            action="delete"
+            executeAction={executeAction}
+            mutationFn={deleteModule}
+            variables={{ id: row.id }}
+            onSuccess={refetch}
             className="px-3 py-1 text-xs bg-red-500 text-white rounded"
           >
             Delete
-          </button>
-
+          </ProtectedActionButton>
         </div>
       ),
     },
   ];
+
   return (
     <div className="p-10">
-
-
+      {/* CREATE */}
       <button
         onClick={() => {
           setEditingModule(null);
@@ -144,26 +134,24 @@ const modules = data?.getModulesPaginated?.data || [];
         Create Module
       </button>
 
+      {/* GLOBAL CONFIRM MODAL */}
+      <ConfirmModal
+        open={!!confirmState}
+        onCancel={() => setConfirmState(null)}
+        onConfirm={handleConfirm}
+      />
 
+      {/* TABLE */}
       <div className="mt-10 overflow-x-auto">
-
         <div className="w-full bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
-
-          <DataTable
-            columns={moduleColumns}
-            data={modules}
-          />
-
+          <DataTable columns={moduleColumns} data={modules} />
         </div>
-
       </div>
 
-
+      {/* MODAL */}
       {openModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-
           <div className="bg-white rounded-xl p-6 w-[400px] space-y-4">
-
             <h2 className="text-xl font-semibold">
               {editingModule ? "Edit Module" : "Create Module"}
             </h2>
@@ -192,7 +180,6 @@ const modules = data?.getModulesPaginated?.data || [];
             />
 
             <div className="flex justify-end gap-3">
-
               <button
                 onClick={() => {
                   setOpenModal(false);
@@ -209,14 +196,10 @@ const modules = data?.getModulesPaginated?.data || [];
               >
                 {editingModule ? "Update" : "Create"}
               </button>
-
             </div>
-
           </div>
-
         </div>
       )}
-
     </div>
   );
 }

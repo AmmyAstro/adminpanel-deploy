@@ -6,7 +6,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import client from "@/components/utils/apolloClient";
+import client, { authTokenVar } from "@/components/utils/apolloClient";
 
 const LOGIN_STAFF = gql`
   mutation LoginStaff($email: String!, $password: String!) {
@@ -39,11 +39,16 @@ export default function StaffLogin() {
     onCompleted: async (data) => {
       const { accessToken, user } = data.loginStaff;
 
+    
+      authTokenVar(accessToken);
+
+    
       localStorage.setItem("token", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
+      toast.success(`Welcome ${user.name}`);
 
       await client.resetStore();
-      toast.success(`Welcome ${user.name}`);
+
       router.push("/Admindash");
     },
 
