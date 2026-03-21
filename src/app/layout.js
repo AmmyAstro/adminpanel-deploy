@@ -5,6 +5,7 @@ import "./globals.css";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import ApolloWrapper from "@/providers/ApolloProvider";
+import { PermissionProvider } from "@/context/PermissionContext";
 
 
 
@@ -26,9 +27,13 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
         <Provider store={store}>
-           <ApolloWrapper>
-            {children}
-            </ApolloWrapper>
+
+          <ApolloWrapper>
+            <PermissionProvider>
+              {children}
+            </PermissionProvider>
+          </ApolloWrapper>
+
         </Provider>
 
       </body>

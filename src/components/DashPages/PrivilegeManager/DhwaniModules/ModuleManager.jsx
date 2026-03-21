@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMutation, useQuery } from "@apollo/client/react";
 
 import {
@@ -12,8 +12,9 @@ import {
 
 import DataTable from "@/components/utils/DataTable";
 import { useActionHandler } from "@/hooks/useActionHandler";
-import ConfirmModal from "@/components/Custom/ConformModal";
+import ConfirmModal from "@/components/Custom/ConfirmModal";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
+import { usePermissions } from "@/context/PermissionContext";
 
 export default function ModuleManager() {
   const {
@@ -27,6 +28,10 @@ export default function ModuleManager() {
     variables: { page: 1, limit: 10 },
   });
 
+  const { can, isSuperAdmin } = usePermissions();
+
+  const canEdit = isSuperAdmin || can("modules", "update");
+  const canCreate = isSuperAdmin || can("modules", "create");
   const modules = data?.getModulesPaginated?.data || [];
 
   const [createModule] = useMutation(CREATE_MODULE);
@@ -54,6 +59,16 @@ export default function ModuleManager() {
 
   const handleSubmit = async () => {
     try {
+      const canSubmit =
+        isSuperAdmin ||
+        (editingModule
+          ? can("modules", "update")
+          : can("modules", "create"));
+
+      if (!canSubmit) {
+        console.log("No permission");
+        return;
+      }
       if (editingModule) {
         await updateModule({
           variables: {
@@ -95,16 +110,21 @@ export default function ModuleManager() {
         <div className="flex justify-center gap-3">
           {/* EDIT */}
           <button
+            disabled={!canEdit}
             onClick={() => {
+              if (!canEdit) return;
               setEditingModule(row);
               setOpenModal(true);
             }}
-            className="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+            className={`px-3 py-1 text-xs rounded ${!canEdit
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+              }`}
           >
             Edit
           </button>
 
-        
+
           <ProtectedActionButton
             module="modules"
             action="delete"
@@ -124,15 +144,17 @@ export default function ModuleManager() {
   return (
     <div className="p-10">
       {/* CREATE */}
-      <button
-        onClick={() => {
+      <ProtectedActionButton
+        module="modules"
+        action="create"
+        executeAction={() => {
           setEditingModule(null);
           setOpenModal(true);
         }}
         className="px-5 py-2 bg-yellow-500 text-black rounded-lg"
       >
         Create Module
-      </button>
+      </ProtectedActionButton>
 
       {/* GLOBAL CONFIRM MODAL */}
       <ConfirmModal

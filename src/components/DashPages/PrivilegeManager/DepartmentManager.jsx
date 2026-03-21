@@ -11,15 +11,14 @@ import {
 } from "@/app/graphQL/privilageOperations";
 
 import DataTable from "@/components/utils/DataTable";
-import { usePermissions } from "@/hooks/usePermission";
+import { usePermissions } from "@/context/PermissionContext";
 
 import { useActionHandler } from "@/hooks/useActionHandler";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
-import ConfirmModal from "@/components/Custom/ConformModal";
-
+import ConfirmModal from "@/components/Custom/ConfirmModal";
 
 export default function DepartmentManager() {
-  const { permissions } = usePermissions();
+  const { can, isSuperAdmin } = usePermissions();
 
   const {
     confirmState,
@@ -44,6 +43,10 @@ export default function DepartmentManager() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
+  // 🔥 Permissions
+  const canCreate = isSuperAdmin || can("departments", "create");
+  const canEdit = isSuperAdmin || can("departments", "update");
+
   const resetForm = () => {
     setName("");
     setDescription("");
@@ -52,6 +55,17 @@ export default function DepartmentManager() {
 
   const handleSubmit = async () => {
     try {
+      const canSubmit =
+        isSuperAdmin ||
+        (editing
+          ? can("departments", "update")
+          : can("departments", "create"));
+
+      if (!canSubmit) {
+        console.log("No permission");
+        return;
+      }
+
       if (editing) {
         await updateDepartment({
           variables: {
@@ -74,8 +88,8 @@ export default function DepartmentManager() {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error loading departments</p>;
+  if (loading) return <p className="p-10">Loading...</p>;
+  if (error) return <p className="p-10 text-red-500">Error loading departments</p>;
 
   const departmentColumns = [
     {
@@ -92,18 +106,24 @@ export default function DepartmentManager() {
         <div className="flex justify-center gap-2">
           {/* EDIT */}
           <button
+            disabled={!canEdit}
             onClick={() => {
+              if (!canEdit) return;
               setEditing(row);
               setName(row.name);
               setDescription(row.description);
               setOpen(true);
             }}
-            className="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+            className={`px-3 py-1 text-xs rounded ${
+              !canEdit
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-500 text-white"
+            }`}
           >
             Edit
           </button>
 
-          {/* 🔥 DELETE (NOW FULLY ABSTRACTED) */}
+          {/* DELETE */}
           <ProtectedActionButton
             module="departments"
             action="delete"
@@ -124,16 +144,22 @@ export default function DepartmentManager() {
     <div className="p-10 space-y-5">
       {/* CREATE */}
       <button
+        disabled={!canCreate}
         onClick={() => {
+          if (!canCreate) return;
           resetForm();
           setOpen(true);
         }}
-        className="bg-yellow-500 px-4 py-2 rounded"
+        className={`px-4 py-2 rounded ${
+          !canCreate
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-yellow-500"
+        }`}
       >
         Create Department
       </button>
 
-      {/* GLOBAL CONFIRM */}
+      {/* CONFIRM MODAL */}
       <ConfirmModal
         open={!!confirmState}
         onCancel={() => setConfirmState(null)}

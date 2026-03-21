@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-
 export const GET_MY_ACCESS = gql`
   query GetMyAccess {
     getMyAccess {
@@ -17,8 +16,8 @@ export const GET_MY_ACCESS = gql`
 ================================ */
 
 export const GET_MODULES = gql`
- query GetModules($page: Int, $limit: Int) {
-  getModulesPaginated(page: $page, limit: $limit) {
+  query GetModules($page: Int, $limit: Int) {
+    getModulesPaginated(page: $page, limit: $limit) {
       data {
         id
         name
@@ -122,18 +121,16 @@ export const CREATE_ROLE = gql`
 
 export const UPDATE_ROLE = gql`
   mutation UpdateRole(
-    $id: ID!
+    $roleId: String!
     $name: String
     $slug: String
     $description: String
-    $isActive: Boolean
   ) {
     updateRole(
-      id: $id
+      roleId: $roleId
       name: $name
       slug: $slug
       description: $description
-      isActive: $isActive
     ) {
       id
       name
@@ -161,6 +158,7 @@ export const GET_PERMISSIONS = gql`
       data {
         id
         name
+        type 
         modules {
           id
           name
@@ -169,6 +167,7 @@ export const GET_PERMISSIONS = gql`
     }
   }
 `;
+
 export const CREATE_PERMISSION = gql`
   mutation ($name: String!, $moduleIds: [ID!]!) {
     createPermission(name: $name, moduleIds: $moduleIds) {

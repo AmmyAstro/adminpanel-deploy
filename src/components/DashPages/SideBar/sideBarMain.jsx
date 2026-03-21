@@ -1,15 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
 import sidebarConfig, { iconMap } from "@/components/utils/sidebarConfig";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { usePermissions } from "@/hooks/usePermission";
+import { usePermissions } from "@/context/PermissionContext";
 import { moduleConfig } from "@/components/utils/moduleConfig";
 
 export default function SideBarMain() {
   const pathname = usePathname();
 
-  // 🔥 Extract section from URL
   const path = pathname.split("/");
 
   const sectionMap = {
@@ -21,23 +21,27 @@ export default function SideBarMain() {
 
   const section = sectionMap[path[2]] || null;
 
-  const { permissions, loading } = usePermissions();
+  const { permissions, loading, can, isSuperAdmin } = usePermissions();
 
   if (loading) return null;
 
-  const allModules = permissions || [];
+  const allowedModules = useMemo(() => {
+    if (!permissions) return [];
 
-  // 🔥 Filter using moduleConfig
-const allowedModules = permissions.filter((mod) => {
-  const config = moduleConfig[mod.slug];
-  return config && config.section === section;
-});
+    return permissions.filter((mod) => {
+      const config = moduleConfig[mod.slug];
+  
+      const hasAccess =
+        isSuperAdmin || can(mod.slug, "read");
+
+      return config && config.section === section && hasAccess;
+    });
+  }, [permissions, section, can, isSuperAdmin]);
 
   const staticItems = sidebarConfig.static;
   const sectionItems = sidebarConfig.sections?.[section] || [];
 
-  // ✅ Better active logic
-  const isActive = (href) => pathname.startsWith(href); 
+  const isActive = (href) => pathname.startsWith(href);
 
   const renderItem = (item) => {
     const Icon = iconMap[item.icon] || iconMap.default;
@@ -47,24 +51,23 @@ const allowedModules = permissions.filter((mod) => {
         key={item.href}
         href={item.href}
         className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200
-        ${
-          isActive(item.href)
+        ${isActive(item.href)
             ? "bg-yellow-500 text-black scale-105"
             : "hover:bg-[#ffffff14] text-white"
-        }`}
+          }`}
       >
         <Icon
-          className={`text-lg ${
-            isActive(item.href) ? "text-black" : "text-yellow-400"
-          }`}
+          className={`text-lg ${isActive(item.href)
+              ? "text-black"
+              : "text-yellow-400"
+            }`}
         />
 
         <span
-          className={`hidden md:inline text-[13px] ${
-            isActive(item.href)
+          className={`hidden md:inline text-[13px] ${isActive(item.href)
               ? "text-black font-semibold"
               : "text-white"
-          }`}
+            }`}
         >
           {item.name}
         </span>
@@ -72,7 +75,6 @@ const allowedModules = permissions.filter((mod) => {
     );
   };
 
-  // 🔥 Section title mapping
   const sectionTitleMap = {
     privilege: "Privilege",
     astrologer: "Astrologer",
@@ -93,16 +95,14 @@ const allowedModules = permissions.filter((mod) => {
         </div>
       )}
 
-      {/* 🔥 DYNAMIC MODULES */}
+      {/* DYNAMIC */}
       {sidebarConfig.dynamic && allowedModules.length > 0 && (
         <div className="mt-4 space-y-2">
 
-          {/* Section Title */}
           <p className="text-[10px] text-gray-400 px-3 uppercase tracking-wider">
             {sectionTitleMap[section] || section}
           </p>
 
-          {/* Modules */}
           {allowedModules.map((mod) => {
             const config = moduleConfig[mod.slug];
             if (!config) return null;
