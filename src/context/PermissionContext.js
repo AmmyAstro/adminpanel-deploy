@@ -21,7 +21,18 @@ export const PermissionProvider = ({ children }) => {
     return data?.getMyAccess || [];
   }, [data]);
 
-  const isSuperAdmin = false; // later backend se
+  const isSuperAdmin = useMemo(() => {
+    if (!permissions.length) return false;
+
+    // if all modules coming → assume superadmin
+    return permissions.every(
+      (mod) =>
+        mod.permissions.includes(`${mod.slug}.create`) &&
+        mod.permissions.includes(`${mod.slug}.read`) &&
+        mod.permissions.includes(`${mod.slug}.update`) &&
+        mod.permissions.includes(`${mod.slug}.delete`)
+    );
+  }, [permissions]);
 
   const can = (module, action) => {
     if (isSuperAdmin) return true;

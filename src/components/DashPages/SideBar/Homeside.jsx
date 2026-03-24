@@ -1,45 +1,54 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
+
+import { useMemo } from "react";
 import Link from "next/link";
+import { useQuery } from "@apollo/client/react";
+import { GET_MODULES } from "@/app/graphQL/privilageOperations";
 
 export default function Homeside() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { data, loading, error } = useQuery(GET_MODULES, {
+    variables: { page: 1, limit: 100 },
+  });
 
-  const menuItems = [
-    { href: "/Admindash/couponmain", title: "Coupons", src: "/admin-img/badge-percent.png" },
-    { href: "/Admindash/packages", title: "Wallet Packages", src: "/admin-img/boxo.png" },
-    { href: "/Admindash/giftpage", title: "Add Gifts", src: "/admin-img/gift.png" },
-    { href: "/Admindash/managecms", title: "Manage CMS", src: "/admin-img/lead.png" },
-    { href: "/Admindash/testimonialmain", title: "Testimonials", src: "/admin-img/testimonials.png" },
-    { href: "/Admindash/blogmain", title: "Blog", src: "/admin-img/blog.png" },
-  ];
+  const modules = data?.getModulesPaginated?.data || [];
+
+  const TARGET_SECTION = "home";
+
+  const sections = useMemo(() => {
+    return modules
+      .filter((m) => m.section?.toLowerCase() === TARGET_SECTION)
+      .map((m) => ({
+        name: m.name,
+        slug: m.slug,
+      }));
+  }, [modules]);
+
+  if (loading) return null;
+  if (error) return <p className="text-red-500">Error</p>;
 
   return (
-    <aside
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-      className={` h-fit place-self-center top-50 bg-[#2c0a4d] text-yellow-400 flex flex-col py-6 rounded-r-xl transition-all duration-300 
-        ${isOpen ? "w-17" : "w-15"} 
-      `}
-    >
-      <div className="sidebar-floating flex flex-col items-center space-y-6">
-        {menuItems.map((item, index) => (
+    <aside className="h-fit bg-[#2c0a4d] text-yellow-400 flex flex-col py-6 rounded-r-xl w-20">
+      <div className="flex flex-col space-y-3">
+        {sections.map((item) => (
           <Link
-            key={index}
-            href={item.href}
-            title={item.title}
-            className="floating-item flex items-center w-full px-4 py-2 space-x-3 rounded-lg  hover:bg-[#ffffff1a] hover:text-white transition"
-          >
-            <Image
-              src={item.src}
-              alt={item.title}
-              width={28}
-              height={28}
-              className="flex-shrink-0"
-            />
+            key={item.slug}
+            href={`/Admindash/${item.slug}`}
+            className="
+              group
+              overflow-hidden
+              bg-yellow-500 text-black
+              rounded-r-xl
+                hover:scale-105 hover:px-4 w-fit
+          
+              transition-all duration-300 ease-in-out
 
-             <span className="floating-tooltip">{item.title}</span>
+              px-3 py-2
+              whitespace-nowrap
+            "
+          >
+            <span className="block text-xs line-clamp-2 ">
+              {item.name}
+            </span>
           </Link>
         ))}
       </div>

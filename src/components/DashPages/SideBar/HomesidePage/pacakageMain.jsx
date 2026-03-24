@@ -9,14 +9,19 @@ import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import AlertLoading from "@/app/common/AlertLoading";
+import ConfirmModal from "@/components/Custom/ConfirmModal";
 
 import {
   GET_RECHARGE_PACKS,
   CREATE_RECHARGE_PACK,
   UPDATE_RECHARGE_PACK,
   DELETE_RECHARGE_PACK,
-} from "../../../../app/graphQL/rechargePack";
+} from "@/app/graphQL/rechargePack";
+
+import { usePermissions } from "@/context/PermissionContext";
+import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { useActionHandler } from "@/hooks/useActionHandler";
 
 export default function PackageMain() {
   const [open, setOpen] = useState(false);
@@ -30,18 +35,65 @@ export default function PackageMain() {
     isActive: true,
   });
 
-  const { data, loading, refetch } = useQuery(GET_RECHARGE_PACKS);
+  // 🔥 Permissions
+  const { can, isSuperAdmin } = usePermissions();
+  const canRead = isSuperAdmin || can("walletpackages", "read");
+  const canCreate = isSuperAdmin || can("walletpackages", "create");
+  const canUpdate = isSuperAdmin || can("walletpackages", "update");
+
+  // 🔥 Action handler (for delete confirm)
+  const {
+    confirmState,
+    setConfirmState,
+    executeAction,
+    handleConfirm,
+  } = useActionHandler();
+
+  // 🔥 Query
+  const { data, loading, refetch } = useQuery(GET_RECHARGE_PACKS, {
+    skip: !canRead,
+  });
 
   const [createPack] = useMutation(CREATE_RECHARGE_PACK);
   const [updatePack] = useMutation(UPDATE_RECHARGE_PACK);
   const [deletePack] = useMutation(DELETE_RECHARGE_PACK);
 
+  const packs = data?.getRechargePacks || [];
+
+  // 🔥 No access
+  if (!canRead) {
+    return <p className="p-10 text-red-500">No Access</p>;
+  }
+
+  // 🔥 Handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setForm({
+      name: "",
+      description: "",
+      price: "",
+      talktime: "",
+      isActive: true,
+    });
+    setEditPack(null);
   };
 
   const handleSubmit = async () => {
+    const canSubmit =
+      isSuperAdmin ||
+      (editPack
+        ? can("walletpackages", "update")
+        : can("walletpackages", "create"));
+
+    if (!canSubmit) {
+      toast.error("No permission");
+      return;
+    }
+
     try {
       const payload = {
         name: form.name,
@@ -58,36 +110,16 @@ export default function PackageMain() {
             input: payload,
           },
         });
-
         toast.success("Package updated");
       } else {
         await createPack({
           variables: { input: payload },
         });
-
         toast.success("Package created");
       }
 
       setOpen(false);
-      setEditPack(null);
-      setForm({
-        name: "",
-        description: "",
-        price: "",
-        talktime: "",
-        isActive: true,
-      });
-
-      refetch();
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deletePack({ variables: { id } });
-      toast.success("Package deleted");
+      resetForm();
       refetch();
     } catch (err) {
       toast.error(err.message);
@@ -95,6 +127,11 @@ export default function PackageMain() {
   };
 
   const handleToggle = async (pkg) => {
+    if (!(isSuperAdmin || can("walletpackages", "update"))) {
+      toast.error("No permission");
+      return;
+    }
+
     try {
       await updatePack({
         variables: {
@@ -115,32 +152,49 @@ export default function PackageMain() {
     }
   };
 
-  const getRechargePacks = data?.getRechargePacks || [];
-
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div className="max-w-5xl mx-auto">
+
+        {/* HEADER */}
         <div className="flex justify-between mb-6">
           <h3 className="text-xl font-semibold">Manage Wallet Packages</h3>
 
-          <CustomButton variant="green" onClick={() => setOpen(true)}>
-            Add Package
+          <CustomButton
+            variant="green"
+            onClick={() => {
+              if (!canCreate) return;
+              resetForm();
+              setOpen(true);
+            }}
+            className={!canCreate ? "opacity-50 cursor-not-allowed" : "px-2 py-1"}
+          >
+            Create Package
           </CustomButton>
         </div>
 
-        {/* Modal */}
+        {/* CONFIRM MODAL */}
+        <ConfirmModal
+          open={!!confirmState}
+          onCancel={() => setConfirmState(null)}
+          onConfirm={handleConfirm}
+        />
 
+        {/* MODAL */}
         {open && (
           <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-            <div className="bg-white rounded-xl p-6 w-[500px]">
-              <div className="flex justify-end">
+            <div className="bg-white rounded-xl p-6 w-[500px] space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-semibold">
+                  {editPack ? "Edit Package" : "Create Package"}
+                </h2>
                 <MdCancel
                   className="text-2xl cursor-pointer"
                   onClick={() => setOpen(false)}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-2 gap-4">
                 <CustomInput
                   name="name"
                   value={form.name}
@@ -172,19 +226,29 @@ export default function PackageMain() {
                 />
               </div>
 
-              <div className="flex justify-center mt-5">
-                <CustomButton variant="green" onClick={handleSubmit}>
-                  Submit
+              <div className="flex items-center gap-3">
+                <span className="text-sm">Active</span>
+                <CustomToggle
+                  checked={form.isActive}
+                  onChange={(val) =>
+                    setForm((prev) => ({ ...prev, isActive: val }))
+                  }
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <CustomButton className="px-2 py-1" variant="green" onClick={handleSubmit}>
+                  {editPack ? "Update" : "Create"}
                 </CustomButton>
               </div>
             </div>
           </div>
         )}
 
+        {/* LOADING */}
         <AlertLoading show={loading} title="Loading..." />
 
-        {/* Table */}
-
+        {/* TABLE */}
         <div className="mt-10">
           <div className="grid grid-cols-7 bg-purple-300 p-2 font-semibold text-center">
             <div>S.No</div>
@@ -196,10 +260,10 @@ export default function PackageMain() {
             <div>Action</div>
           </div>
 
-          {getRechargePacks.map((pkg, index) => (
+          {packs.map((pkg, index) => (
             <div
               key={pkg.id}
-              className="grid grid-cols-7 text-center border-b p-3"
+              className="grid grid-cols-7 text-center border-b p-3 items-center"
             >
               <div>{index + 1}</div>
               <div>{pkg.name}</div>
@@ -213,26 +277,46 @@ export default function PackageMain() {
                 />
               </div>
 
-              <div>{new Date(pkg.createdAt).toLocaleDateString()}</div>
+              <div>
+                {pkg.createdAt
+                  ? new Date(pkg.createdAt).toLocaleDateString()
+                  : "-"}
+              </div>
 
               <div className="flex gap-2 justify-center">
+                {/* EDIT */}
                 <button
+                  disabled={!canUpdate}
                   onClick={() => {
+                    if (!canUpdate) return;
                     setEditPack(pkg);
                     setForm(pkg);
                     setOpen(true);
                   }}
-                  className="p-2 bg-gray-200 rounded"
+                  className={`p-2 rounded ${
+                    !canUpdate
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200"
+                  }`}
                 >
                   <TbEdit />
                 </button>
 
-                <button
-                  onClick={() => handleDelete(pkg.id)}
+                {/* DELETE */}
+                <ProtectedActionButton
+                  module="walletpackages"
+                  action="delete"
+                  executeAction={executeAction}
+                  mutationFn={deletePack}
+                  variables={{ id: pkg.id }}
+                  onSuccess={() => {
+                    toast.success("Deleted");
+                    refetch();
+                  }}
                   className="p-2 bg-red-500 text-white rounded"
                 >
                   <MdDelete />
-                </button>
+                </ProtectedActionButton>
               </div>
             </div>
           ))}

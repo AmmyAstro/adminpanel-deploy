@@ -11,7 +11,6 @@ import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
 // import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
 import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
 
-import PrivilegeMain from "@/components/DashPages/PrivilegeManager/PrivilegeMain";
 import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
 
 import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
@@ -44,7 +43,6 @@ export default function AdminPanel() {
     giftpage: <Giftpage />,
     couponmain: <CouponMain />,
     blogmain: <BlogMain />,
-    privilegemain: <PrivilegeMain />,
     astromain: <AstrologerMain />,
     testimonialmain: <TestimonialList />,
     custommain: <CustomerMain />,
@@ -59,9 +57,7 @@ export default function AdminPanel() {
       banner: <BannerManager />,
     },
 
-    privilegemain: {
-      staffmain: <Staffmain />,
-    },
+
 
     astromain: {
       addastro: <AddAstro />,

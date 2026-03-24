@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_COUPONS = gql`
-  query {
-    coupons {
+  query GetCoupons {
+    getCoupons {
       id
       code
       description

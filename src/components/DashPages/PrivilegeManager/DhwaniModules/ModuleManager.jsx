@@ -30,9 +30,15 @@ export default function ModuleManager() {
 
   const { can, isSuperAdmin } = usePermissions();
 
-  const canEdit = isSuperAdmin || can("modules", "update");
-  const canCreate = isSuperAdmin || can("modules", "create");
   const modules = data?.getModulesPaginated?.data || [];
+
+  // 🔥 Extract sections dynamically
+  const sectionsFromDB = useMemo(() => {
+    const allSections = modules.map((m) => m.section).filter(Boolean);
+    return [...new Set(allSections)];
+  }, [modules]);
+
+  const canEdit = isSuperAdmin || can("modules", "update");
 
   const [createModule] = useMutation(CREATE_MODULE);
   const [updateModule] = useMutation(UPDATE_MODULE);
@@ -45,18 +51,29 @@ export default function ModuleManager() {
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
 
+  const [section, setSection] = useState("");
+  const [customSection, setCustomSection] = useState("");
+  const [useCustomSection, setUseCustomSection] = useState(false);
+
+  // 🔁 Reset / Edit fill
   useEffect(() => {
     if (editingModule) {
       setName(editingModule.name);
       setSlug(editingModule.slug);
       setDescription(editingModule.description || "");
+      setSection(editingModule.section || "");
+      setUseCustomSection(false);
     } else {
       setName("");
       setSlug("");
       setDescription("");
+      setSection("");
+      setCustomSection("");
+      setUseCustomSection(false);
     }
   }, [editingModule]);
 
+  // 🔥 SUBMIT
   const handleSubmit = async () => {
     try {
       const canSubmit =
@@ -65,10 +82,37 @@ export default function ModuleManager() {
           ? can("modules", "update")
           : can("modules", "create"));
 
-      if (!canSubmit) {
-        console.log("No permission");
+      if (!canSubmit) return;
+
+      if (useCustomSection && !customSection.trim()) {
+        alert("Enter section name");
         return;
       }
+
+      if (useCustomSection) {
+        const exists = sectionsFromDB.includes(
+          customSection.toLowerCase()
+        );
+        if (exists) {
+          alert("Section already exists");
+          return;
+        }
+      }
+
+      const finalSection = useCustomSection
+        ? customSection.toLowerCase().trim()
+        : section.toLowerCase().trim();
+
+      if (!finalSection) {
+        alert("Select section");
+        return;
+      }
+
+      if (!name.trim() || !slug.trim()) {
+        alert("Name and slug are required");
+        return;
+      }
+
       if (editingModule) {
         await updateModule({
           variables: {
@@ -76,6 +120,7 @@ export default function ModuleManager() {
             name,
             slug,
             description,
+            section: finalSection,
           },
         });
       } else {
@@ -84,7 +129,7 @@ export default function ModuleManager() {
             name,
             slug,
             description,
-            section: "privilege",
+            section: finalSection,
           },
         });
       }
@@ -108,7 +153,6 @@ export default function ModuleManager() {
       header: "Actions",
       render: (row) => (
         <div className="flex justify-center gap-3">
-          {/* EDIT */}
           <button
             disabled={!canEdit}
             onClick={() => {
@@ -116,14 +160,14 @@ export default function ModuleManager() {
               setEditingModule(row);
               setOpenModal(true);
             }}
-            className={`px-3 py-1 text-xs rounded ${!canEdit
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-500 text-white"
-              }`}
+            className={`px-3 py-1 text-xs rounded ${
+              !canEdit
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-500 text-white"
+            }`}
           >
             Edit
           </button>
-
 
           <ProtectedActionButton
             module="modules"
@@ -156,7 +200,7 @@ export default function ModuleManager() {
         Create Module
       </ProtectedActionButton>
 
-      {/* GLOBAL CONFIRM MODAL */}
+      {/* CONFIRM MODAL */}
       <ConfirmModal
         open={!!confirmState}
         onCancel={() => setConfirmState(null)}
@@ -178,22 +222,80 @@ export default function ModuleManager() {
               {editingModule ? "Edit Module" : "Create Module"}
             </h2>
 
+            {/* NAME */}
             <input
               type="text"
               placeholder="Name"
               className="w-full border p-2 rounded"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setName(val);
+
+                // 🔥 auto slug
+                if (!editingModule) {
+                  const generatedSlug = val
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, "");
+
+                  setSlug(generatedSlug);
+                }
+              }}
             />
 
+            {/* SLUG */}
             <input
               type="text"
               placeholder="Slug"
-              className="w-full border p-2 rounded"
+              className="w-full border p-2 rounded bg-gray-100"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              readOnly={!editingModule}
             />
 
+            {/* SECTION */}
+            <div>
+              <label className="text-sm font-medium">Section</label>
+
+              <select
+                value={useCustomSection ? "custom" : section}
+                onChange={(e) => {
+                  if (e.target.value === "custom") {
+                    setUseCustomSection(true);
+                    setSection("");
+                  } else {
+                    setUseCustomSection(false);
+                    setCustomSection("");
+                    setSection(e.target.value);
+                  }
+                }}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">Select Section</option>
+
+                {sectionsFromDB.map((sec) => (
+                  <option key={sec} value={sec}>
+                    {sec}
+                  </option>
+                ))}
+
+                <option value="custom">+ Create New Section</option>
+              </select>
+            </div>
+
+            {/* CUSTOM SECTION */}
+            {useCustomSection && (
+              <input
+                type="text"
+                placeholder="Enter new section"
+                value={customSection}
+                onChange={(e) => setCustomSection(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+            )}
+
+            {/* DESCRIPTION */}
             <textarea
               placeholder="Description"
               className="w-full border p-2 rounded"
@@ -201,6 +303,7 @@ export default function ModuleManager() {
               onChange={(e) => setDescription(e.target.value)}
             />
 
+            {/* ACTIONS */}
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => {

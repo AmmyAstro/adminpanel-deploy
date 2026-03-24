@@ -14,10 +14,7 @@ export default function ClientSideLayout({ children }) {
     { match: "/Admindash/managecms", type: "cmsSide" },
     { match: "/Admindash/giftpage", type: "giftSide" },
     { match: "/Admindash/testimonialmain", type: "testimonialSide" },
-    { match: "/Admindash/couponmain", type: "couponSide" },
-    { match: "/Admindash/packages", type: "packageSide" },
     { match: "/Admindash/blogmain", type: "blogSide" },
-    { match: "/Admindash/privilegemain", type: "previlegeSide" },
     { match: "/Admindash/astromain", type: "astrologerSide" },
     { match: "/Admindash/editTestimonial", type: "testimonialSide" },
     { match: "/Admindash/custommain", type: "customerSide" },
@@ -30,7 +27,7 @@ export default function ClientSideLayout({ children }) {
   const showHomeside = !activeSidebar;
 
   return (
-    <div className="flex pt-[3.5rem] pb-[2.5rem]">
+    <div className="flex bg-gray-100 items-center pt-[3.5rem] pb-[2.5rem]">
 
       {showHomeside && <Homeside />}
 

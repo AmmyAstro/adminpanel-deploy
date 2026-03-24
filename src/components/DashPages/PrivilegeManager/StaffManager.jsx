@@ -54,7 +54,12 @@ export default function StaffManager() {
 
   const { data: depData } = useQuery(GET_DEPARTMENTS);
   const { data: roleData } = useQuery(GET_ROLES);
-  const { data: permData } = useQuery(GET_PERMISSIONS);
+ const { data: permData } = useQuery(GET_PERMISSIONS, {
+  variables: {
+    page: 1,
+    limit: 1000, 
+  },
+});
 
   const staffList = data?.getStaff?.data || [];
   const departments = depData?.getDepartments?.data || [];

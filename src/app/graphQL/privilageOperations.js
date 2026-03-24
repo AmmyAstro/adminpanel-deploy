@@ -26,6 +26,7 @@ export const GET_MODULES = gql`
         isActive
         createdAt
         updatedAt
+         section  
       }
       totalCount
       currentPage

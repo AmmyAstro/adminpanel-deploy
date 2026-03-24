@@ -90,7 +90,7 @@ const cards = [
   {
     title: "Privilege Manager",
     img: "/admin-img/prm.gif",
-    link: "/Admindash/privilegemain",
+    link: "/Admindash/privilege",
     bg: "bg-[#7569b6da]",
     rounded: true,
   },
