@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 const CustomDropdown = ({
   label,
@@ -8,12 +8,13 @@ const CustomDropdown = ({
   id,
   required,
   className,
-  children
+  options = [],
+  children,
 }) => {
   return (
     <div>
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium mb-1 text-gray-600">
+        <label className="block text-sm font-medium mb-1 text-gray-600">
           {label}
         </label>
       )}
@@ -21,12 +22,25 @@ const CustomDropdown = ({
       <select
         id={id}
         name={name}
-        value={value}
-        onChange={onChange}
+        value={value || ""}
+        onChange={(e) => onChange(e)}
         required={required}
         className={`w-full border rounded-full border-gray-300 p-2 ${className || ""}`}
       >
-        {children}
+        {/* 🔥 Priority: children > options */}
+
+        {children
+          ? children
+          : (
+            <>
+              <option value="">Select {label}</option>
+              {options.map((opt, i) => (
+                <option key={i} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </>
+          )}
       </select>
     </div>
   );

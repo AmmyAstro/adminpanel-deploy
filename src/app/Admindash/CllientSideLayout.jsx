@@ -7,36 +7,25 @@ import Homeside from "@/components/DashPages/SideBar/Homeside";
 export default function ClientSideLayout({ children }) {
   const pathname = usePathname();
 
+
   const isDashboardRoot = pathname === "/Admindash";
 
-  const sidebarConfig = [
-    { match: "/Admindash/razordash", type: "razorSide" },
-    { match: "/Admindash/managecms", type: "cmsSide" },
-    { match: "/Admindash/giftpage", type: "giftSide" },
-    { match: "/Admindash/testimonialmain", type: "testimonialSide" },
-    { match: "/Admindash/blogmain", type: "blogSide" },
-    { match: "/Admindash/astromain", type: "astrologerSide" },
-    { match: "/Admindash/editTestimonial", type: "testimonialSide" },
-    { match: "/Admindash/custommain", type: "customerSide" },
-  ];
-
-  const activeSidebar = sidebarConfig.find(item =>
-    pathname.startsWith(item.match)
-  );
-
-  const showHomeside = !activeSidebar;
+ 
+  const section = pathname.split("/")[2]; 
+ 
 
   return (
-    <div className="flex bg-gray-100 items-center pt-[3.5rem] pb-[2.5rem]">
+    <div className="flex gap-7 h-full bg-gray-100  pt-[3.5rem] pb-[2.5rem]">
 
-      {showHomeside && <Homeside />}
+     
+      {isDashboardRoot && <Homeside />}
 
-      {activeSidebar && <SideBarMain type={activeSidebar.type} />}
+     
+      {!isDashboardRoot && section && (
+        <SideBarMain section={section} />
+      )}
 
-      <main
-        className={`${isDashboardRoot ? "ml-0" : "ml-20 md:ml-48"
-          } flex-1 h-[calc(100vh-3.5rem-2.5rem)] mt-0 mb-0 overflow-y-auto bg-gray-100 py-6 px-8`}
-      >
+      <main className="flex-1 h-[calc(100vh-3.5rem-2.5rem)] overflow-y-auto bg-gray-100 px-2 pe-8 py-6">
         {children}
       </main>
     </div>

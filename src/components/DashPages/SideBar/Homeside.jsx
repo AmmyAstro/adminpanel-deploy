@@ -27,7 +27,7 @@ export default function Homeside() {
   if (error) return <p className="text-red-500">Error</p>;
 
   return (
-    <aside className="h-fit bg-[#2c0a4d] text-yellow-400 flex flex-col py-6 rounded-r-xl w-20">
+    <aside className="place-self-center bg-[#2c0a4d] text-yellow-400 flex flex-col py-6 rounded-r-xl w-30">
       <div className="flex flex-col space-y-3">
         {sections.map((item) => (
           <Link

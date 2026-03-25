@@ -41,9 +41,9 @@ export default function AdminPanel() {
     razordash: <Razordash />,
     managecms: <ManageCMS />,
     giftpage: <Giftpage />,
-    couponmain: <CouponMain />,
+    // couponmain: <CouponMain />,
     blogmain: <BlogMain />,
-    astromain: <AstrologerMain />,
+    // astromain: <AstrologerMain />,
     testimonialmain: <TestimonialList />,
     custommain: <CustomerMain />,
   };
@@ -60,7 +60,7 @@ export default function AdminPanel() {
 
 
     astromain: {
-      addastro: <AddAstro />,
+      // addastro: <AddAstro />,
       astrolist: <AstroList />,
     },
 

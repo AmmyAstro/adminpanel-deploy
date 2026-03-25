@@ -23,8 +23,8 @@ export default function SideBarMain() {
   });
 
   const modules = data?.getModulesBySection || [];
-console.log("pathname:", pathname);
-console.log("section:", section);
+  console.log("pathname:", pathname);
+  console.log("section:", section);
 
   const allowedModules = modules.filter(
     (mod) => isSuperAdmin || can(mod.slug, "read")
@@ -58,7 +58,7 @@ console.log("section:", section);
   };
 
   return (
-    <aside className="fixed px-3 top-14 bottom-10 left-0 w-20 md:w-48 bg-[#2c0a4d] flex flex-col py-6 space-y-3 overflow-y-auto">
+    <aside className="h-[87dvh] px-3 top-14 bottom-10 left-0 py-8 w-20 md:w-48 bg-[#2c0a4d] flex flex-col py-6 space-y-3 overflow-y-auto">
 
       {sidebarConfig.static.map((item) => renderItem(item))}
 

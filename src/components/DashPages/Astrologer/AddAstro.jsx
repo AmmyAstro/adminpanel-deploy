@@ -15,18 +15,21 @@ import CSC from "@/components/Custom/CSC";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
+import toast from "react-hot-toast";
 
 
 const ADD_ASTROLOGER = gql`
 mutation AddAstrologer($data: AddAstrologerInput!) {
   addAstrologer(data: $data) {
-    id
-    name
-    email
-    approvalStatus
+    success
+    message
+    data {
+      id
+      name
+      email
+    }
   }
-}
-`;
+}`;
 
 export default function AddAstro() {
 
@@ -45,10 +48,10 @@ export default function AddAstro() {
     } = useForm({
         resolver: zodResolver(addAstrologerSchema),
         defaultValues: {
-            gender: "Male",
+            gender: "MALE",
             tzone: "In",
-            tags: "new",
-            vtags: "noverify",
+            tags: "New",
+            vtags: "not verified",
             expertise: [],
             languages: [],
             problems: [],
@@ -134,35 +137,39 @@ export default function AddAstro() {
 
 
 
- const onSubmit = async (formData) => {
-  const fd = new FormData();
+    const onSubmit = async (formData) => {
+        try {
+            const fd = new FormData();
 
-  fd.append("aadhaar", formData.documents.aadhaar);
-  fd.append("panCard", formData.documents.panCard);
-  fd.append("passbook", formData.documents.passbook);
-  fd.append("profilePic", formData.documents.profilePic);
+            Object.entries(formData.documents).forEach(([key, file]) => {
+                if (file) fd.append(key, file);
+            });
 
-  const uploadRes = await fetch(
-    "http://localhost:4001/api/upload-documents",
-    {
-      method: "POST",
-      body: fd,
-    }
-  );
+            const uploadRes = await fetch(
+                "http://localhost:4001/api/upload-documents",
+                {
+                    method: "POST",
+                    body: fd,
+                }
+            );
 
-  const uploadedFiles = await uploadRes.json();
+            const uploadedFiles = await uploadRes.json();
 
-  const payload = mapAstrologerPayload({
-    ...formData,
-    documents: uploadedFiles,
-  });
-  console.log("xxxxxxxxxxxxxxxxxxxxxxxxxx",payload);
-  
+            const payload = mapAstrologerPayload({
+                ...formData,
+                documents: uploadedFiles,
+            });
 
-  await addAstrologer({
-    variables: { data: payload },
-  });
-};
+            const res = await addAstrologer({ variables: { data: payload } });
+
+            toast.success(res.data.addAstrologer.message);
+            reset();
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Something went wrong ❌");
+        }
+    };
 
 
 
@@ -304,6 +311,7 @@ export default function AddAstro() {
                                     { value: "MALE", label: "Male" },
                                     { value: "FEMALE", label: "Female" },
                                     { value: "OTHER", label: "Other" },
+
                                 ]}
                             />
                         )}
@@ -460,6 +468,7 @@ export default function AddAstro() {
                         )}
                     </div>
 
+
                     <Controller
                         name="tzone"
                         control={control}
@@ -609,9 +618,7 @@ export default function AddAstro() {
                         render={({ field }) => (
                             <CustomDropdown
                                 {...field}
-                                className="focus:outline-none  focus:ring-0"
-                                label="Astrologer Tag"
-
+                                label="Tag"
                                 options={[
                                     { value: "New", label: "New" },
                                     { value: "Rising Star", label: "Rising Star" },
@@ -620,27 +627,26 @@ export default function AddAstro() {
                                     { value: "Top Choice", label: "Top Choice" },
                                 ]}
                             />
-                        )} />
+                        )}
+                    />
+
                     {errors.tags && (
                         <p className="text-red-500 text-xs">{errors.tags.message}</p>
                     )}
-
                     <Controller
                         name="vtags"
                         control={control}
                         render={({ field }) => (
                             <CustomDropdown
                                 {...field}
-                                className="focus:outline-none  focus:ring-0"
-                                label="Astrologer Verification Tag"
-
-
-                                required
+                                label="Verification"
                                 options={[
-                                    { value: "verify", label: "Verified" },
-                                    { value: "noverify", label: "Not Verified" },
+                                    { value: "verified", label: "Verified" },
+                                    { value: "not verified", label: "Not Verified" },
                                 ]}
-                            />)} />
+                            />
+                        )}
+                    />
                     {errors.vtags && (
                         <p className="text-red-500 text-xs">{errors.vtags.message}</p>
                     )}

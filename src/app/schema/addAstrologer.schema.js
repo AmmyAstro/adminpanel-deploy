@@ -28,7 +28,7 @@ export const addAstrologerSchema = z.object({
     "Top Choice",
   ]),
 
-  vtags: z.enum(["verify", "noverify"]),
+  vtags: z.enum(["verified", "not verified"]),
 
   countryStateCity: z.object({
     country: z.string().min(1, "Country is required"),

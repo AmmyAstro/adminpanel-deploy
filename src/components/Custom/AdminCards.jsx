@@ -125,10 +125,10 @@ const cards = [
     rounded: true,
   },
   {
-    title: "Astrologer",
-    subtitle: "Chat",
+    title: "Dhwani",
+    subtitle: "Services",
     img: "/admin-img/chat.gif",
-    link: "#",
+    link: "/Admindash/dhwani-services",
     bg: "bg-[#E1AFD1]",
     rounded: true,
   },
@@ -136,7 +136,7 @@ const cards = [
 
 export default function AdminCards() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-7 pt-6 h-full px-15 z-50">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-7 pt-2 h-full px-2 z-50">
       {cards.map((card, idx) => (
         <Link className="" key={idx} href={card.link}>
           <div
