@@ -1,221 +1,315 @@
 "use client";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addGiftRequest,
-  deleteGiftRequest,
-  fetchGiftRequest,
-} from "@/app/redux/slices/addGiftSlice";
-import CustomButton from "@/components/Custom/CustomButtom";
-import CustomDropdown from "@/components/Custom/CustomDropdown";
-import CustomInput from "@/components/Custom/CustomInput";
-import { useEffect, useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@apollo/client/react";
+
+import DataTable from "@/components/utils/DataTable";
+import { usePermissions } from "@/context/PermissionContext";
+import { useActionHandler } from "@/hooks/useActionHandler";
+import ConfirmModal from "@/components/Custom/ConfirmModal";
+import ProtectedActionButton from "@/components/Custom/ActionButton";
 import toast from "react-hot-toast";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 
-export default function Giftpage() {
-  const dispatch = useDispatch();
+import {
+  CREATE_GIFT,
+  DELETE_GIFT,
+  GET_GIFTS,
+  UPDATE_GIFT,
+} from "@/app/graphQL/homeGql";
 
-  const [showForm, setShowForm] = useState(false);
+export default function GiftManager() {
+  const { can, isSuperAdmin } = usePermissions();
 
-  const [formData, setFormData] = useState({
-    title: "",
-    amount: "",
-    status: "",
-    // image: null,
-  });
+  const {
+    confirmState,
+    setConfirmState,
+    executeAction,
+    handleConfirm,
+  } = useActionHandler();
 
+  const { data, loading, error, refetch } = useQuery(GET_GIFTS);
+  const gifts = data?.getGifts?.data || data?.getGifts || [];
 
-  useEffect(() => { dispatch(fetchGiftRequest()); }, [dispatch]);
-  const reduxState = useSelector(state => state.gift.list.data);
+  const [createGift] = useMutation(CREATE_GIFT);
+  const [updateGift] = useMutation(UPDATE_GIFT);
+  const [deleteGift] = useMutation(DELETE_GIFT);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [editingGift, setEditingGift] = useState(null);
+
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [status, setStatus] = useState("active");
+  const [submitting, setSubmitting] = useState(false);
+
+  const canCreate = isSuperAdmin || can("gifts", "create");
+  const canUpdate = isSuperAdmin || can("gifts", "update");
 
   useEffect(() => {
-    console.log("Redux state changed:", reduxState);
-  }, [reduxState]);
+    if (editingGift) {
+      setName(editingGift.name);
+      setAmount(editingGift.amount);
+      setStatus(editingGift.status);
+      setPreview(`http://localhost:4001${editingGift.image}`);
+      setFile(null);
+    } else {
+      resetForm();
+    }
+  }, [editingGift]);
 
-
-  const gifts = useSelector(state => state.gift.list.data);
-  const loading = useSelector(state => state.gift.list.loading);
-  const error = useSelector(state => state.gift.list.error);
-
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "amount" ? Number(value) : value,
-    }));
+  const resetForm = () => {
+    setName("");
+    setAmount("");
+    setFile(null);
+    setPreview(null);
+    setStatus("active");
+    setEditingGift(null);
   };
 
-  const handleSubmit = (e) => {
-    dispatch(addGiftRequest({ formData }));
-    setFormData({
-      title: "",
-      amount: "",
-      status: "",
-    });
-    setShowForm(false);
-    toast.success("Gift added successfully!");
+  // 🔥 FILE VALIDATION + PREVIEW
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
 
-  };
+    if (!selected) return;
 
-   const handleDelete = (id) => {
-    if (!id) {
-      console.error("Invalid coupon id");
+    if (!selected.type.startsWith("image/")) {
+      toast.error("Only image files allowed");
       return;
     }
 
-    if (confirm("Are you sure to delete this gift?")) {
-      dispatch(deleteGiftRequest(id));
+    if (selected.size > 2 * 1024 * 1024) {
+      toast.error("Max file size is 2MB");
+      return;
     }
-    toast.success(" Gift Deleted Successfully");
+
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
   };
 
+  // 🔥 MAIN SUBMIT LOGIC
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+
+      let imageUrl = editingGift?.image || "";
+
+      // STEP 1: upload file
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("http://localhost:4001/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) throw new Error("Upload failed");
+
+        const data = await res.json();
+
+        if (!data.url) throw new Error("Invalid upload response");
+
+        imageUrl = data.url;
+      }
+
+      // STEP 2: GraphQL mutation
+      if (editingGift) {
+        await updateGift({
+          variables: {
+            id: editingGift.id,
+            input: {
+              name,
+              amount: Number(amount),
+              image: imageUrl,
+              status,
+            },
+          },
+        });
+
+        toast.success("Gift updated");
+      } else {
+        await createGift({
+          variables: {
+            input: {
+              name,
+              amount: Number(amount),
+              image: imageUrl,
+              status,
+            },
+          },
+        });
+
+        toast.success("Gift created");
+      }
+
+      setOpenModal(false);
+      resetForm();
+      refetch();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const giftColumns = [
+    { header: "Name", accessor: "name" },
+    { header: "Amount", accessor: "amount" },
+    {
+      header: "Image",
+      render: (row) => (
+        <img
+          src={
+            row.image
+              ? `http://localhost:4001${row.image}`
+              : "/placeholder.png"
+          }
+          className="h-10 w-10 object-cover mx-auto rounded"
+        />
+      ),
+    },
+    { header: "Status", accessor: "status" },
+    {
+      header: "Actions",
+      render: (row) => (
+        <div className="flex justify-center gap-3">
+
+          {canUpdate && (
+            <button
+              onClick={() => {
+                setEditingGift(row);
+                setOpenModal(true);
+              }}
+              className="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+            >
+              Edit
+            </button>
+          )}
+
+          <ProtectedActionButton
+            module="gifts"
+            action="delete"
+            executeAction={executeAction}
+            mutationFn={deleteGift}
+            variables={{ id: row.id }}
+            onSuccess={refetch}
+            className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+          >
+            Delete
+          </ProtectedActionButton>
+
+        </div>
+      ),
+    },
+  ];
+
+  if (loading) return <p className="p-10">Loading...</p>;
+  if (error) return <p className="p-10 text-red-500">{error.message}</p>;
+
   return (
-    <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="heading-banner">Gifts</h3>
-        <CustomButton
-          variant={"green"}
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 text-white  "
-        >
-          Add New Gift
-        </CustomButton>
-      </div>
+    <div className="p-10 space-y-5">
 
-      {showForm && (
-        <div className="bg-white p-6 rounded-lg flex flex-col gap-5 shadow-md mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex flex-col">
-              <CustomInput
-                label="Title"
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                className=" p-2 outline-none"
-                placeholder="Enter gift title"
-                required
+      {/* CREATE BUTTON */}
+      <button
+        disabled={!canCreate}
+        onClick={() => {
+          resetForm();
+          setOpenModal(true);
+        }}
+        className={`px-5 py-2 rounded ${
+          canCreate
+            ? "bg-yellow-500 text-black"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        Add Gift
+      </button>
+
+      {/* CONFIRM MODAL */}
+      <ConfirmModal
+        open={!!confirmState}
+        onCancel={() => setConfirmState(null)}
+        onConfirm={handleConfirm}
+      />
+
+      {/* TABLE */}
+      <DataTable columns={giftColumns} data={gifts} />
+
+      {/* MODAL */}
+      {openModal && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
+
+            <h2 className="text-lg font-semibold">
+              {editingGift ? "Edit Gift" : "Create Gift"}
+            </h2>
+
+            <input
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              type="number"
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full border p-2 rounded"
+            />
+
+            {/* IMAGE PREVIEW */}
+            {preview && (
+              <img
+                src={preview}
+                className="h-20 mx-auto object-cover rounded"
               />
-            </div>
+            )}
 
-            <div className="flex flex-col">
-              <CustomInput
-                label="Amount"
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleInputChange}
-                className="  p-2 outline-none"
-                placeholder="Enter amount"
-                required
-              />
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full border p-2 rounded"
+            />
 
-            <div className="flex flex-col">
-              <CustomDropdown
-                label="Status"
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-                required
-                options={[
-                  { value: "active", label: "Active" },
-                  { value: "inactive", label: "Inactive" },
-                ]}
-              />
-            </div>
-            {/* <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Upload Image
-                </label>
-                <input
-                  type="file"
-                  name="image"
-                  onChange={handleInputChange}
-                  className="border p-2 rounded-md"
-                />
-              </div>
-
-            </div> */}
-          </div>
-
-          <div className="flex gap-4">
-            <CustomButton
-              variant={"green"}
-              type="submit"
-              onClick={handleSubmit}
-              className="px-4 py-2  hover:bg-green-700"
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full border p-2 rounded"
             >
-              Submit
-            </CustomButton>
-            <CustomButton
-              variant={"gray"}
-              type="button"
-              // onClick={handleSubmit}
-              className="px-4 py-2  hover:bg-gray-500"
-            >
-              Cancel
-            </CustomButton>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setOpenModal(false)}
+                className="px-4 py-2 border rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="px-4 py-2 bg-black text-white rounded"
+              >
+                {submitting
+                  ? "Processing..."
+                  : editingGift
+                  ? "Update"
+                  : "Create"}
+              </button>
+            </div>
+
           </div>
         </div>
       )}
-
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h5 className="text-lg font-semibold mb-4">Gift List</h5>
-
-        {loading && <p>Loading...</p>}
-
-        {!loading && Array.isArray(gifts) && gifts.length === 0 && (
-          <p className="text-gray-500">No gifts found</p>
-        )}
-
-        <div className="grid grid-cols-4 gap-5">
-          {Array.isArray(gifts) &&
-            gifts.map((gift) => (
-              <div
-                key={gift.id}
-                className=" last:border-b-0 bg-purple-50 uppe rounded-xl p-3 gap-2 flex flex-col items-center justify-center "
-              >
-                <h4 className="tracking-wide uppercase font-semibold">{gift.title}</h4>
-                <p>Amount: ₹{gift.amount}</p>
-                <p>
-                  Status:{" "}
-                  <span
-                    className={
-                      gift.status === "active"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }
-                  >
-                    {gift.status === "active" ? "Active" : "Inactive"}
-                  </span>
-                </p>
-                <div className=" flex gap-6 text-center items-center justify-between">
-                  <button
-                    className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 cursor-pointer"
-                    onClick={() => handleEdit(gift)}>
-                  
-                    <FaEdit />
-                  </button>
-
-                  <button
-                    className="px-2 py-1 bg-red-400 text-white rounded hover:bg-red-500 cursor-pointer"
-                    onClick={() => handleDelete(gift.id)}
-                  >
-                    <MdDelete />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-      </div>
-
-
     </div>
   );
 }
