@@ -35,3 +35,71 @@ export const DELETE_GIFT = gql`
     deleteGift(id: $id)
   }
 `;
+
+export const GET_TESTIMONIALS = gql`
+  query {
+    testimonials {
+      id
+      name
+      address
+      content
+      image
+      rating
+    }
+  }
+`;
+
+export const CREATE_TESTIMONIAL = gql`
+  mutation ($input: CreateTestimonialInput!) {
+    createTestimonial(input: $input) {
+      id
+      name
+    }
+  }
+`;
+
+export const UPDATE_TESTIMONIAL = gql`
+  mutation ($id: ID!, $input: UpdateTestimonialInput!) {
+    updateTestimonial(id: $id, input: $input) {
+      id
+    }
+  }
+`;
+
+export const DELETE_TESTIMONIAL = gql`
+  mutation ($id: ID!) {
+    deleteTestimonial(id: $id)
+  }
+`;
+
+export const GET_FAQS = gql`
+  query {
+    faqs {
+      id
+      question
+      answer
+    }
+  }
+`;
+
+export const CREATE_FAQ = gql`
+  mutation ($input: CreateFaqInput!) {
+    createFaq(input: $input) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_FAQ = gql`
+  mutation ($id: ID!, $input: UpdateFaqInput!) {
+    updateFaq(id: $id, input: $input) {
+      id
+    }
+  }
+`;
+
+export const DELETE_FAQ = gql`
+  mutation ($id: ID!) {
+    deleteFaq(id: $id)
+  }
+`;

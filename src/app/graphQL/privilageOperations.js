@@ -177,6 +177,7 @@ export const CREATE_PERMISSION = gql`
     }
   }
 `;
+
 export const UPDATE_PERMISSION = gql`
   mutation ($permissionId: ID!, $name: String, $moduleIds: [ID!]) {
     updatePermission(
@@ -189,6 +190,7 @@ export const UPDATE_PERMISSION = gql`
     }
   }
 `;
+
 export const DELETE_PERMISSION = gql`
   mutation ($permissionId: ID!) {
     deletePermission(permissionId: $permissionId)
@@ -295,6 +297,7 @@ export const UPDATE_STAFF = gql`
     }
   }
 `;
+
 export const DELETE_STAFF = gql`
   mutation ($staffId: ID!) {
     deleteStaff(staffId: $staffId)

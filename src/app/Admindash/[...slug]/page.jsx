@@ -3,23 +3,22 @@
 import { useParams } from "next/navigation";
 
 import Razordash from "@/components/DashPages/Razor/Razordash";
-import ManageCMS from "@/components/DashPages/SideBar/HomesidePage/manageCMS";
+// import ManageCMS from "@/components/DashPages/SideBar/HomesidePage/manageCMS";
 import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannermanager";
-import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
-import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/Testimonial/addTestimonial";
-import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
+// import Giftpage from "@/components/DashPages/SideBar/HomesidePage/giftPage";
+// import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/Testimonial/addTestimonial";
+// import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
 // import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
 import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
 
-import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
+// import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
 
-import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
-import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
+// import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
+// import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
 import AstroProfile from "@/app/astroprofile/[id]/page";
 
-import TestimonialList from "@/components/DashPages/SideBar/HomesidePage/Testimonial/testimonialList";
-import EditTestimonial from "../editTestimonial/[id]/page";
+
 
 import CustomerMain from "@/components/DashPages/Customer/CustomerMain";
 import CustomerList from "@/components/DashPages/Customer/customerList";
@@ -39,13 +38,13 @@ export default function AdminPanel() {
 
   const firstLevel = {
     razordash: <Razordash />,
-    managecms: <ManageCMS />,
-    giftpage: <Giftpage />,
+    // managecms: <ManageCMS />,
+    // giftpage: <Giftpage />,
     // couponmain: <CouponMain />,
     blogmain: <BlogMain />,
     // astromain: <AstrologerMain />,
-    testimonialmain: <TestimonialList />,
-    custommain: <CustomerMain />,
+    // testimonialmain: <TestimonialList />,
+    // custommain: <CustomerMain />,
   };
 
   /* ---------------------------
@@ -65,8 +64,8 @@ export default function AdminPanel() {
     },
 
     testimonialmain: {
-      addtesti: <AddTestimonial />,
-      edittestimonial: <EditTestimonial />,
+      // addtesti: <AddTestimonial />,
+      // edittestimonial: <EditTestimonial />,
     },
 
     custommain: {
