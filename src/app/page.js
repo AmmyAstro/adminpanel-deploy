@@ -38,11 +38,10 @@ export default function StaffLogin() {
   const [loginStaff, { loading }] = useMutation(LOGIN_STAFF, {
     onCompleted: async (data) => {
       const { accessToken, user } = data.loginStaff;
+      console.log("loading:", loading);
 
-    
       authTokenVar(accessToken);
 
-    
       localStorage.setItem("token", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
       toast.success(`Welcome ${user.name}`);
@@ -56,7 +55,7 @@ export default function StaffLogin() {
       toast.error(err.message || "Login failed");
     },
   });
-
+console.log("loading:", loading);
   const handleChange = (e) => {
     setForm((prev) => ({
       ...prev,

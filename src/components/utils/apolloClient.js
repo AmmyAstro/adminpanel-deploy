@@ -13,7 +13,8 @@ export const authTokenVar = makeVar(null);
 
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4001/graphql",
+  // uri: "http://localhost:4001/graphql",
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
 });
 
 

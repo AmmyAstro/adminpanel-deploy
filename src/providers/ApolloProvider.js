@@ -11,7 +11,7 @@ export default function ApolloWrapper({ children }) {
 
     if (token) {
       authTokenVar(token);
-      console.log("Hydrated token:", token); // debug
+      console.log("Hydrated token:", token); 
     }
   }, []);
 
