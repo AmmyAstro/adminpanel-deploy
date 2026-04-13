@@ -1,243 +1,414 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { MdCancel } from "react-icons/md";
-import CustomButton from "@/components/Custom/CustomButtom";
-import CustomInput from "@/components/Custom/CustomInput";
-import CustomDropdown from "@/components/Custom/CustomDropdown";
-import { addbannerRequest, deleteBannerRequest, fetchBannerRequest } from "@/app/redux/slices/bannerSlice";
+
+import { useState, useEffect } from "react";
+import DataTable from "@/components/utils/DataTable";
+import { usePermissions } from "@/context/PermissionContext";
+import { useActionHandler } from "@/hooks/useActionHandler";
+import ConfirmModal from "@/components/Custom/ConfirmModal";
+import ProtectedActionButton from "@/components/Custom/ActionButton";
 import toast from "react-hot-toast";
-
-// Debounce helper
-function useDebounce(value, delay = 500) {
-  const [debounced, setDebounced] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebounced(value), delay);
-
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debounced;
-}
+import {
+  CREATE_BANNER,
+  DELETE_BANNER,
+  GET_BANNERS,
+  UPDATE_BANNER,
+} from "@/app/graphQL/homeGql";
+import { useMutation, useQuery } from "@apollo/client/react";
 
 export default function BannerManager() {
-  const dispatch = useDispatch();
- 
+  const { can, isSuperAdmin } = usePermissions();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const canRead = isSuperAdmin || can("banners", "read");
+  const canCreate = isSuperAdmin || can("banners", "create");
+  const canUpdate = isSuperAdmin || can("banners", "update");
 
-  const [tempData, setTempData] = useState({
+  const {
+    confirmState,
+    setConfirmState,
+    executeAction,
+    handleConfirm,
+  } = useActionHandler();
+
+  const { data, loading, error, refetch } = useQuery(GET_BANNERS, {
+    skip: !canRead,
+  });
+
+  const [localBanners, setLocalBanners] = useState([]);
+
+  useEffect(() => {
+    if (data?.getBanners) {
+      setLocalBanners(data.getBanners);
+    }
+  }, [data]);
+
+  const [createBanner] = useMutation(CREATE_BANNER);
+  const [updateBanner] = useMutation(UPDATE_BANNER);
+  const [deleteBanner] = useMutation(DELETE_BANNER);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [editingBanner, setEditingBanner] = useState(null);
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [loadingId, setLoadingId] = useState(null);
+
+  const [form, setForm] = useState({
     heading: "",
     subheading: "",
     slug: "",
     sortorder: "",
     bannerlink: "",
     language: "en",
-    imageUrl: "hello",
   });
 
-  const formData = useDebounce(tempData, 600);
+  useEffect(() => {
+    if (editingBanner) {
+      setForm(editingBanner);
+    } else {
+      resetForm();
+    }
+  }, [editingBanner]);
 
+  const resetForm = () => {
+    setForm({
+      heading: "",
+      subheading: "",
+      slug: "",
+      sortorder: "",
+      bannerlink: "",
+      language: "en",
+    });
+    setFile(null);
+    setEditingBanner(null);
+  };
+
+  // 🔥 Auto slug
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
+    const { name, value } = e.target;
 
-    setTempData((prev) => ({
+    if (name === "heading") {
+      const slug = value
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+
+      setForm((prev) => ({
+        ...prev,
+        heading: value,
+        slug,
+      }));
+      return;
+    }
+
+    if (name === "sortorder") {
+      setForm((prev) => ({
+        ...prev,
+        sortorder: Math.max(0, Number(value)),
+      }));
+      return;
+    }
+
+    setForm((prev) => ({
       ...prev,
-      [name]:
-        type === "file"
-          ? files[0]
-          : name === "sortorder"
-            ? Number(value)
-            : value,
+      [name]: value,
     }));
   };
 
-  useEffect(() => { dispatch(fetchBannerRequest()); }, [dispatch]);
-  const reduxState = useSelector(state => state.banner.listBanner.data);
+  // 🔥 Upload (multer)
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
 
-  useEffect(() => {
-    console.log("Redux state changed:", reduxState);
-  }, [reduxState]);
-  const bannerList = useSelector(state => state.banner.listBanner.data);
-  const loading = useSelector(state => state.banner.listBanner.loading);
+    const res = await fetch(
+      "http://localhost:4001/api/upload-banner", // 🔥 NEW
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
-  const handleSubmit = () => {
-    console.log("banner inputssss", formData);
-    dispatch(addbannerRequest({ formData }));
-    setIsOpen(false);
-    toast.success("Banner added successfully!");
+    const data = await res.json();
+    return data.url;
   };
-     const handleDelete = (id) => {
-      if (!id) {
-        console.error("Invalid coupon id"); 
+
+  // 🔥 Submit
+  const handleSubmit = async () => {
+    try {
+      if (!form.heading || !form.slug) {
+        toast.error("Heading & slug required");
         return;
       }
-  
-      if (confirm("Are you sure to delete this gift?")) {
-        dispatch(deleteBannerRequest(id));
+
+      let imageUrl;
+
+      if (file) {
+        setUploading(true);
+        imageUrl = await uploadFile(file);
+        setUploading(false);
       }
-      toast.success(" Gift Deleted Successfully");
-    };
+
+      const input = {
+        ...form,
+        ...(imageUrl && { imageUrl })
+      };
+
+      if (editingBanner) {
+        await updateBanner({
+          variables: {
+            id: editingBanner.id,
+            input,
+          },
+        });
+        toast.success("Updated 🚀");
+      } else {
+        await createBanner({
+          variables: { input },
+        });
+        toast.success("Created 🚀");
+      }
+
+      setOpenModal(false);
+      resetForm();
+      refetch();
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    }
+  };
+
+  if (!canRead) return <p className="p-10">No permission</p>;
+  if (loading) return <p className="p-10">Loading...</p>;
+  if (error) return <p className="p-10 text-red-500">Error</p>;
+
+  const bannerColumns = [
+    { header: "Heading", accessor: "heading" },
+    { header: "Language", accessor: "language" },
+    { header: "Sort", accessor: "sortorder" },
+
+    // 🔥 STATUS TOGGLE
+    {
+      header: "Status",
+      render: (row) => (
+        <label className="inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={row.status}
+            disabled={loadingId === row.id}
+            onChange={async () => {
+              if (!canUpdate) return;
+
+              // optimistic
+              setLocalBanners((prev) =>
+                prev.map((b) =>
+                  b.id === row.id
+                    ? { ...b, status: !b.status }
+                    : b
+                )
+              );
+
+              try {
+                setLoadingId(row.id);
+
+                await updateBanner({
+                  variables: {
+                    id: row.id,
+                    input: { status: !row.status },
+                  },
+                });
+
+                toast.success("Updated");
+              } catch {
+                toast.error("Failed");
+              } finally {
+                setLoadingId(null);
+              }
+            }}
+            className="sr-only peer"
+          />
+
+          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 relative transition">
+            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-5"></div>
+          </div>
+        </label>
+      ),
+    },
+
+    // 🔥 IMAGE
+    {
+      header: "Image",
+      render: (row) => (
+        <img
+          src={
+            row.imageUrl
+              ? `http://localhost:4000${row.imageUrl}`
+              : "/no-image.png"
+          }
+          onError={(e) => (e.target.src = "/no-image.png")}
+          className="h-12 w-20 object-cover rounded"
+        />
+      ),
+    },
+
+    // 🔥 ACTIONS
+    {
+      header: "Actions",
+      render: (row) => (
+        <div className="flex gap-2">
+          <button
+            disabled={!canUpdate}
+            onClick={() => {
+              setEditingBanner(row);
+              setOpenModal(true);
+            }}
+            className="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+          >
+            Edit
+          </button>
+
+          <ProtectedActionButton
+            module="banners"
+            action="delete"
+            executeAction={executeAction}
+            mutationFn={deleteBanner}
+            variables={{ id: row.id }}
+            onSuccess={refetch}
+            className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+          >
+            Delete
+          </ProtectedActionButton>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
-      {isOpen && (
-        <div className="fixed z-50 inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
-            <div className="flex justify-between items-center border-b pb-2 mb-4">
-              <h6 className="text-lg text-center font-semibold">
-                Enter Banner Details :
-              </h6>
-              <CustomButton onClick={() => setIsOpen(false)}>
-                <MdCancel className="text-2xl text-gray-600 hover:text-red-500" />
-              </CustomButton>
-            </div>
+    <div className="p-10 space-y-5">
+      {/* CREATE */}
+      <button
+        disabled={!canCreate}
+        onClick={() => {
+          resetForm();
+          setOpenModal(true);
+        }}
+        className="px-5 py-2 bg-purple-500 text-white rounded"
+      >
+        Add Banner
+      </button>
 
-            <div className="space-y-4 flex flex-col">
-              <div className="grid grid-cols-2 gap-4">
-                <CustomDropdown
-                  label="Language"
-                  id="language"
-                  name="language"
-                  value={tempData.language}
-                  onChange={handleChange}
-                  required
-                  options={[
-                    { value: "en", label: "English" },
-                    { value: "hi", label: "Hindi" },
-                  ]}
-                />
+      {/* CONFIRM */}
+      <ConfirmModal
+        open={!!confirmState}
+        onCancel={() => setConfirmState(null)}
+        onConfirm={handleConfirm}
+      />
 
-                <CustomInput
-                  label="Heading"
-                  type="text"
-                  id="heading"
-                  name="heading"
-                  value={tempData.heading}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter main banner heading"
-                />
+      {/* EMPTY */}
+      {localBanners.length === 0 && (
+        <p className="text-center py-10 text-gray-500">
+          No banners found 🚫
+        </p>
+      )}
 
-                <CustomInput
-                  label="Sub Heading"
-                  type="text"
-                  id="subheading"
-                  name="subheading"
-                  value={tempData.subheading}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter banner sub heading"
-                />
+      {/* TABLE */}
+      <DataTable columns={bannerColumns} data={localBanners} />
 
-                <CustomInput
-                  label="Banner Link"
-                  type="text"
-                  id="bannerlink"
-                  name="bannerlink"
-                  value={tempData.bannerlink}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter banner link"
-                />
+      {/* MODAL */}
+      {openModal && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
+          <div className="bg-white p-6 rounded w-[500px] space-y-3">
+            <h2 className="text-xl font-semibold">
+              {editingBanner ? "Edit" : "Create"}
+            </h2>
 
-                <CustomInput
-                  label="Sort Order"
-                  type="number"
-                  id="sortorder"
-                  name="sortorder"
-                  value={tempData.sortorder}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter sort order"
-                />
+            <input
+              name="heading"
+              placeholder="Heading"
+              value={form.heading}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
 
-                <CustomInput
-                  label="Slug"
-                  type="text"
-                  id="slug"
-                  name="slug"
-                  value={tempData.slug}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter slug"
-                />
-              </div>
+            <input
+              name="subheading"
+              placeholder="Subheading"
+              value={form.subheading}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
 
-              <div className="flex justify-center">
-                <CustomButton
-                  variant="green"
-                  onClick={handleSubmit}
-                  className="w-fit px-10 rounded-full bg-purple-600 text-white py-2 font-semibold hover:bg-purple-700 transition disabled:opacity-50">
-                  Submit
-                </CustomButton>
-              </div>
+            <input
+              name="slug"
+              placeholder="Slug"
+              value={form.slug}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              name="bannerlink"
+              placeholder="Link"
+              value={form.bannerlink}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              name="sortorder"
+              type="number"
+              placeholder="Sort"
+              value={form.sortorder}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+
+            {file && (
+              <img
+                src={URL.createObjectURL(file)}
+                className="h-20"
+              />
+            )}
+
+            {editingBanner?.imageUrl && !file && (
+              <img
+                src={`http://localhost:4000${editingBanner.imageUrl}`}
+                className="h-20"
+              />
+            )}
+
+            <select
+              name="language"
+              value={form.language}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            >
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+            </select>
+
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setOpenModal(false)}>
+                Cancel
+              </button>
+
+              <button
+                onClick={handleSubmit}
+                disabled={uploading}
+                className="px-4 py-2 bg-black text-white rounded"
+              >
+                {uploading
+                  ? "Uploading..."
+                  : editingBanner
+                    ? "Update"
+                    : "Create"}
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      <div className="flex justify-between items-center p-4">
-        <h3 className="heading-banner">Manage Banners</h3>
-        <CustomButton
-          variant="green"
-          onClick={() => setIsOpen(true)}
-          className="px-3 py-1"
-        >
-          Add New Banner
-        </CustomButton>
-      </div>
-
-
-      <div className="p-4 flex flex-col gap-3">
-     
-        <div className="grid grid-cols-6 place-items-center font-semibold border-b py-5 bg-[#7a5ba3] rounded-lg text-white px-4">
-          <div>S.no</div>
-          <div>Banner Name</div>
-          <div>Language</div>
-          <div>Banner Image</div>
-          <div>Status</div>
-          <div>Actions</div>
-        </div>
-           {loading && <p>Loading...</p>}
-
-        {!loading && Array.isArray(bannerList) && bannerList.length === 0 && (
-          <p className="text-gray-500">No banners found</p>
-        )}
-        {Array.isArray(bannerList) &&
-          bannerList.map((banner, index) => (
-            <div key={index} className="grid grid-cols-6 place-items-center border-b py-5 px-4">
-              <div>{index + 1}</div>
-              <div>{banner.heading}</div>
-              {/* <div>{banner.subheading}</div> */}
-
-              <div>{banner.language}</div>
-              <div>{banner.imageUrl}</div>
-              <div>{banner.status}</div> 
-              {/* <div>{banner.link}</div> */}
-
-              {/* <div>{banner.slug}</div> */}
-
-              <div className="flex gap-2">
-                <CustomButton
-                  variant="green"
-                  onClick={() => handleEdit(banner)}
-                  className="px-3 py-1"
-                >
-                  Edit
-                </CustomButton>
-                <CustomButton
-                  variant="red"
-                  onClick={() => handleDelete(banner.id)}
-                  className="px-3 py-1"
-                >
-                  Delete
-                </CustomButton>
-              </div>
-            </div>
-          ))}
-      </div>
     </div>
   );
 }

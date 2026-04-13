@@ -103,3 +103,43 @@ export const DELETE_FAQ = gql`
     deleteFaq(id: $id)
   }
 `;
+
+export const GET_BANNERS = gql`
+  query {
+    getBanners {
+      id
+      heading
+      subheading
+      slug
+      sortorder
+      bannerlink
+      language
+     imageUrl
+      status
+    }
+  }
+`;
+
+export const CREATE_BANNER = gql`
+  mutation ($input: BannerInput!) {
+    createBanner(input: $input) {
+      id
+      heading
+    }
+  }
+`;
+
+export const UPDATE_BANNER = gql`
+  mutation ($id: ID!, $input: BannerInput!) {
+    updateBanner(id: $id, input: $input) {
+      id
+      heading
+    }
+  }
+`;
+
+export const DELETE_BANNER = gql`
+  mutation ($id: ID!) {
+    deleteBanner(id: $id)
+  }
+`;

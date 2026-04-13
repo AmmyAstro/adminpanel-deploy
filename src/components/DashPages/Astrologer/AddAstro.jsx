@@ -146,7 +146,7 @@ export default function AddAstro() {
             });
 
             const uploadRes = await fetch(
-               "http://localhost:4001/api/upload-documents",
+                "http://localhost:4001/api/upload-documents",
                 {
                     method: "POST",
                     body: fd,
