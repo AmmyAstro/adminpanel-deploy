@@ -16,6 +16,7 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
 import toast from "react-hot-toast";
+import CustomToggle from "@/components/Custom/CustomToggle";
 
 
 const ADD_ASTROLOGER = gql`
@@ -63,15 +64,12 @@ export default function AddAstro() {
                 city: "",
             },
 
-            charges: {
-                callChatCharges: "",
-                callChatOfferCharges: "",
-                callChatCommission: "",
-                videocall_charges: "",
-                audiocall_charges: "",
-                audiovideocall_offer_charges: "",
-            },
-
+            pricing: [
+    { type: "CHAT", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+    { type: "CALL", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+    { type: "VIDEO", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+    { type: "AUDIO", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+  ],
             bankDetails: {
                 accountHolderName: "",
                 accountNumber: "",
@@ -146,7 +144,7 @@ export default function AddAstro() {
             });
 
             const uploadRes = await fetch(
-                "http://localhost:4001/api/upload-documents",
+                "http://localhost:8008/api/upload-documents",
                 {
                     method: "POST",
                     body: fd,
@@ -200,6 +198,29 @@ export default function AddAstro() {
             console.log("❌ FORM ERRORS:", errors);
         }
     }, [errors]);
+
+    const SERVICE_INDEX = {
+        CHAT: 0,
+        CALL: 1,
+        VIDEO: 2,
+        AUDIO: 3,
+    };
+
+    const Toggle = ({ value, onChange }) => (
+  <button
+    type="button"
+    onClick={() => onChange(!value)}
+    className={`w-8 h-4 flex items-center rounded-full p-1 ${
+      value ? "bg-green-500" : "bg-gray-300"
+    }`}
+  >
+    <div
+      className={`bg-white w-3 h-3 rounded-full shadow transform ${
+        value ? "translate-x-4" : ""
+      }`}
+    />
+  </button>
+);
 
 
     return (
@@ -552,57 +573,46 @@ export default function AddAstro() {
                             </h2>
 
 
-                            <div className="flex gap-3 justify-center">
-                                {AstroProCharge.map((tab) => (
-                                    <button
-                                        type="button"
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`px-4 py-1 text-sm font-medium rounded-full transition ${activeTab === tab.id
-                                            ? "bg-purple-400 text-white"
-                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                            }`}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
+                       <div className="grid grid-cols-2 gap-5">     {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => (
+                                <div key={type} className="border border-gray-200 p-2 rounded-lg ">
 
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="block text-sm font-medium text-gray-500 mb-1">{type}</h3>
 
-                            <div className="p-4 shadow rounded-lg bg-purple-100">
-                                {AstroProCharge.map(
-                                    (tab) =>
-                                        activeTab === tab.id && (
-                                            <table key={tab.id} className="w-full text-sm">
-                                                <tbody>
-                                                    {tab.fields.map((field, idx) => (
-                                                        <tr key={idx}>
-                                                            <td className="py-2 pr-4">{field.label} :</td>
-                                                            <td>
-                                                                {field.prefix}
-                                                                <Controller
-                                                                    name={field.name}
-                                                                    control={control}
-                                                                    render={({ field: rhfField }) => (
-                                                                        <input
-                                                                            {...rhfField}
-                                                                            type="number"
-                                                                            max={field.max}
-                                                                            className="border rounded-md px-2 py-1 w-20 ml-1 text-center"
-                                                                            onChange={(e) =>
-                                                                                rhfField.onChange(Number(e.target.value))
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        )
-                                )}
-                            </div>
+                                        <Controller
+                                            control={control}
+                                            name={`pricing.${index}.isActive`}
+                                            render={({ field }) => (
+                                                <Toggle value={field.value} onChange={field.onChange} />
+                                            )}
+                                        />
+                                    </div>
+
+                                    {watch(`pricing.${index}.isActive`) && (
+                                        <div className="flex justify-evenly  gap-2">
+
+                                            <input
+                                                {...register(`pricing.${index}.price`)}
+                                                placeholder="Price"
+                                                className="border border-gray-100 rounded-full p-1 text-sm w-1/3 "
+                                            />
+
+                                            <input
+                                                {...register(`pricing.${index}.offerPrice`)}
+                                                placeholder="Offer"
+                                                className="border border-gray-100 rounded-full p-1 text-sm w-1/3  "
+                                            />
+
+                                            <input
+                                                {...register(`pricing.${index}.commissionPercent`)}
+                                                placeholder="%"
+                                                className="border border-gray-100 rounded-full p-1 text-sm w-1/3  "
+                                            />
+
+                                        </div>
+                                    )}
+                                </div>
+                            ))}</div>
                         </div>
                     </div>
 

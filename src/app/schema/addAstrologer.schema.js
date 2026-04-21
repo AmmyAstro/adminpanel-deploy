@@ -5,6 +5,14 @@ const fileSchema = z
   .instanceof(File)
   .refine((file) => file.size <= 1024 * 1024, "Max file size is 1MB");
 
+  const pricingItem = z.object({
+  type: z.enum(["CHAT", "CALL", "VIDEO", "AUDIO"]),
+  price: z.coerce.number().min(1).max(500),
+  offerPrice: z.coerce.number().optional(),
+  commissionPercent: z.coerce.number().min(0).max(100),
+  isActive: z.boolean(),
+});
+
 export const addAstrologerSchema = z.object({
   astroname: z.string().min(2, "Name is required"),
   displayName: z.string().min(2, "Display name required"),
@@ -40,17 +48,7 @@ export const addAstrologerSchema = z.object({
   languages: z.array(z.string()).min(1, "Select at least one language"),
   problems: z.array(z.string()).min(1, "Select at least one problem"),
 
-  charges: z.object({
-    callChatCharges: chargeField.max(500),
-    callChatOfferCharges: chargeField.max(50),
-
-    callChatCommission: chargeField.max(500),
-    videocall_charges: chargeField.max(50),
-
-    audiocall_charges: chargeField.max(500),
-    audiovideocall_offer_charges: chargeField.max(50),
-  }),
-
+    pricing: z.array(pricingItem),
   address: z.string().min(10, "Address must be at least 10 characters"),
 
   password: z.string().min(6, "Password must be at least 6 characters"),

@@ -20,16 +20,17 @@ export const mapAstrologerPayload = (formData) => {
     tags: formData.tags,
     vtags: formData.vtags,
 
-    charges: {
-      callChatCharges: Number(formData.charges.callChatCharges),
-      callChatOfferCharges: Number(formData.charges.callChatOfferCharges),
-      callChatCommission: Number(formData.charges.callChatCommission),
-      videocall_charges: Number(formData.charges.videocall_charges),
-      audiocall_charges: Number(formData.charges.audiocall_charges),
-      audiovideocall_offer_charges: Number(
-        formData.charges.audiovideocall_offer_charges,
-      ),
-    },
+    pricing: formData.pricing
+      .filter((p) => p.isActive) 
+      .map((p) => ({
+        type: p.type,
+        price: Number(p.price),
+        offerPrice: p.offerPrice ? Number(p.offerPrice) : null,
+        commissionPercent: p.commissionPercent
+          ? Number(p.commissionPercent)
+          : null,
+        isActive: p.isActive,
+      })),
 
     address: {
       street: formData.address,

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { GET_DEPARTMENTS, GET_ROLES, GET_STAFF } from "@/app/graphQL/privilageOperations";
 import { useQuery } from "@apollo/client/react";
+import { GET_BANNERS, GET_FAQS, GET_TESTIMONIALS } from "@/app/graphQL/homeGql";
 
 export default function Page() {
   const [userName, setUserName] = useState("");
@@ -16,21 +17,21 @@ export default function Page() {
   }, []);
 
   
-  const { data: deptData, loading: deptLoading } = useQuery(GET_DEPARTMENTS, {
+  const { data: faqData, loading: faqLoading } = useQuery(GET_FAQS, {
     variables: { page: 1, limit: 50 },
   });
 
-  const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES, {
+  const { data: testimonialData, loading: testimonialLoading } = useQuery(GET_TESTIMONIALS, {
     variables: { page: 1, limit: 50 },
   });
 
-  const { data: staffData, loading: staffLoading } = useQuery(GET_STAFF, {
+  const { data: bannerData, loading: bannerLoading } = useQuery(GET_BANNERS, {
     variables: { page: 1, limit: 50 },
   });
 
-const departments = deptData?.getDepartments?.data || [];
-  const roles = roleData?.getRoles.data || [];
-  const staff = staffData?.getStaff.data || [];
+const faqs = faqData?.faqs || [];
+  const testimonials = testimonialData?.testimonials || [];
+  const banners = bannerData?.getBanners?.data || [];
 
   return (
     <div className="p-6 space-y-6 bg-[#1a012b]  rounded-xl text-white">
@@ -48,15 +49,15 @@ const departments = deptData?.getDepartments?.data || [];
        
         <div className="bg-[#2c0a4d] p-5 rounded-xl shadow">
           <h2 className="text-lg font-semibold mb-2 text-yellow-400">
-            Departments ({departments.length})
+            FAQs ({faqs.length})
           </h2>
 
-          {deptLoading ? (
+          {faqLoading ? (
             <p className="text-sm text-gray-400">Loading...</p>
           ) : (
             <ul className="text-sm space-y-1 max-h-40 overflow-y-auto">
-              {departments.map((d) => (
-                <li key={d.id}>• {d.name}</li>
+              {faqs.map((f) => (
+                <li key={f.id}>• {f.question}</li>
               ))}
             </ul>
           )}
@@ -65,15 +66,15 @@ const departments = deptData?.getDepartments?.data || [];
       
         <div className="bg-[#2c0a4d] p-5 rounded-xl shadow">
           <h2 className="text-lg font-semibold mb-2 text-yellow-400">
-            Roles ({roles.length})
+            Testimonials ({testimonials.length})
           </h2>
 
-          {roleLoading ? (
+          {testimonialLoading ? (
             <p className="text-sm text-gray-400">Loading...</p>
           ) : (
             <ul className="text-sm space-y-1 max-h-40 overflow-y-auto">
-              {roles.map((r) => (
-                <li key={r.id}>• {r.name}</li>
+              {testimonials.map((t) => (
+                <li key={t.id}>• {t.name}</li>
               ))}
             </ul>
           )}
@@ -82,14 +83,14 @@ const departments = deptData?.getDepartments?.data || [];
       
         <div className="bg-[#2c0a4d] p-5 rounded-xl shadow">
           <h2 className="text-lg font-semibold mb-2 text-yellow-400">
-            Staff ({staff.length})
+            Banners ({banners.length})
           </h2>
 
-          {staffLoading ? (
+          {bannerLoading ? (
             <p className="text-sm text-gray-400">Loading...</p>
           ) : (
             <p className="text-sm text-gray-300">
-              Total Staff Members: {staff.length}
+              Total Banners: {banners.length}
             </p>
           )}
         </div>
