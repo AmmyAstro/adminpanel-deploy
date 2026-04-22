@@ -62,7 +62,7 @@ const cards = [
     title: "New Astrologer",
     subtitle: "Hiring",
     img: "/admin-img/grp.gif",
-    link: "#",
+    link: "/Admindash/newastrologer",
     bg: "bg-[#C683D7]",
     rounded: true,
   },
