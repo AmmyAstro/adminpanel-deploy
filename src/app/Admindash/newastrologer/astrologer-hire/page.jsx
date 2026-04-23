@@ -7,277 +7,349 @@ import DataTable from "@/components/utils/DataTable";
 import { usePermissions } from "@/context/PermissionContext";
 
 import {
-    GET_NEW_ASTROLOGERS,
-    SCHEDULE_INTERVIEW,
-    UPDATE_INTERVIEW_STATUS,
-    UPDATE_DOCUMENT_STATUS,
-    UPDATE_APPROVAL_STATUS,
-    GET_PENDING_APPLICATIONS,
+  GET_APPLICATIONS,
+  SCHEDULE_INTERVIEW,
+  UPDATE_DOCUMENT_STATUS,
+  UPDATE_APPROVAL_STATUS,
 } from "@/app/graphQL/astroHiring";
+
 import { GET_INTERVIEWERS } from "@/app/graphQL/astroHiring";
 
 export default function AstrologerHiring() {
-    const { can, isSuperAdmin } = usePermissions();
+  const { can } = usePermissions();
 
-    const { data } = useQuery(GET_PENDING_APPLICATIONS);
+  const { data, refetch } = useQuery(GET_APPLICATIONS);
+  const { data: interviewerData } = useQuery(GET_INTERVIEWERS);
 
-    const [scheduleInterview] = useMutation(SCHEDULE_INTERVIEW);
-    const [updateInterviewStatus] = useMutation(UPDATE_INTERVIEW_STATUS);
-    const [updateDocumentStatus] = useMutation(UPDATE_DOCUMENT_STATUS);
-    const [updateApprovalStatus] = useMutation(UPDATE_APPROVAL_STATUS);
-    const { data: interviewerData } = useQuery(GET_INTERVIEWERS);
-    const interviewers = interviewerData?.getInterviewers || [];
-    const astrologers = data?.getPendingApplications || [];
-console.log("API DATA:", data);
-    const [openModal, setOpenModal] = useState(false);
-    const [selected, setSelected] = useState(null);
-    const [activeTab, setActiveTab] = useState("interview");
+  const [scheduleInterview] = useMutation(SCHEDULE_INTERVIEW);
+  const [updateDocumentStatus] = useMutation(UPDATE_DOCUMENT_STATUS);
+  const [updateApprovalStatus] = useMutation(UPDATE_APPROVAL_STATUS);
 
-    const [form, setForm] = useState({
-        interviewer: "",
-        date: "",
-        time: "",
-        round: "1",
+  const [mainTab, setMainTab] = useState("PENDING");
+  const [openModal, setOpenModal] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [activeTab, setActiveTab] = useState("interview");
+
+  const [form, setForm] = useState({
+    interviewerId: "",
+    date: "",
+    time: "",
+    round: "1",
+  });
+
+  const interviewers = interviewerData?.getInterviewers || [];
+  const allData = data?.getApplications || [];
+
+  // 🔥 FILTER
+  const astrologers = allData.filter((item) => {
+    if (mainTab === "PENDING") return item.applicationStatus === "PENDING";
+    if (mainTab === "SCHEDULED") return item.interviewStatus === "SCHEDULED";
+    if (mainTab === "PASSED") return item.interviewStatus === "PASSED";
+    if (mainTab === "APPROVED") return item.approvalStatus === "APPROVED";
+    return true;
+  });
+
+  // 🔥 STATUS COLORS
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "text-yellow-800";
+      case "SCHEDULED":
+        return "text-orange-700";
+      case "VERIFIED":
+      case "PASSED":
+        return "text-green-700";
+      case "REJECTED":
+        return "text-red-700";
+      default:
+        return "text-gray-600";
+    }
+  };
+
+  const StatusBadge = ({ status }) => (
+    <span className={`text-[10px] ${getStatusStyle(status)}`}>
+      {status}
+    </span>
+  );
+
+  // 🔥 SCHEDULE
+  const handleSchedule = async () => {
+    if (!form.interviewerId) return alert("Select interviewer");
+
+    const res = await scheduleInterview({
+      variables: {
+        astrologerId: selected.id,
+        interviewerId: form.interviewerId,
+        interviewDate: form.date,
+        interviewTime: form.time,
+        round: Number(form.round),
+      },
     });
 
-    const handleSchedule = async () => {
-        await scheduleInterview({
-            variables: {
-                astrologerId: selected.id,
-                interviewer: form.interviewer,
-                interviewDate: form.date,
-                interviewTime: form.time,
-                round: Number(form.round),
-            },
-        });
+    const updatedId = res.data.scheduleInterview.id;
 
-        refetch();
-    };
+    // 🔥 fetch fresh data
+    const freshData = await refetch();
 
-    const columns = [
-        { header: "Name", accessor: "name" },
-        { header: "Gender", accessor: "gender" },
-        { header: "Phone", accessor: "phoneNumber" },
-      {
-  header: "Skills",
-  render: (row) => row.skills.join(", "),
-},
-{
-  header: "Languages",
-  render: (row) => row.languages.join(", "),
-},
+    const fresh = freshData.data.getApplications.find(
+      (a) => a.id === updatedId
+    );
 
-        {
-            header: "Insights",
-            render: (row) => (
-                <div className="flex gap-1 items-center justify-start">
-                    <button
-                        onClick={() => {
-                            setSelected(row);
-                            setOpenModal(true);
-                            setActiveTab("interview");
-                        }}
-                        className="px-3 py-1 text-xs cursor-pointer hover:scale-103 bg-purple-500 text-white rounded-full"
-                    >
-                        Insights
-                    </button>
-                    <div className="flex text-violet-400 flex-col text-[10px] items-center justify-end"><span>Interview :{selected?.interviewStatus}</span>
-                        <span>Documents :{selected?.documentStatus}</span></div>
-                </div>
-            ),
-        },
+    setSelected(fresh);
+  };
 
-        {
-            header: "Approval",
-            render: (row) => (
-                <select
-                    value={row.approvalStatus}
-                    disabled={row.documentStatus !== "VERIFIED"}
-                    onChange={(e) =>
-                        updateApprovalStatus({
-                            variables: {
-                                astrologerId: row.id,
-                                status: e.target.value,
-                            },
-                        })
-                    }
-                    className="border p-1 rounded"
-                >
-                    <option value="PENDING">Pending</option>
-                    <option value="APPROVED">Approved</option>
-                    <option value="REJECTED">Rejected</option>
-                </select>
-            ),
-        },
-    ];
+  const columns = [
+    { header: "Name", accessor: "name" },
+    { header: "Gender", accessor: "gender" },
+    { header: "Phone", accessor: "phoneNumber" },
 
-    return (
-        <div className="p-10 space-y-5">
-            <DataTable columns={columns} data={astrologers} />
+    {
+      header: "Skills",
+      render: (row) => row.skills?.join(", ") || "-",
+    },
+    {
+      header: "Languages",
+      render: (row) => row.languages?.join(", ") || "-",
+    },
 
-            <div className="flex justify-end">
-                <button className="bg-purple-600 text-white px-5 py-2 rounded">
-                    Final Save
-                </button>
+    {
+      header: "Insights",
+      render: (row) => (
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => {
+              setSelected(row);
+              setOpenModal(true);
+              setActiveTab("interview");
+            }}
+            className="px-3 py-1 text-xs bg-purple-500 text-white rounded-full"
+          >
+            Insights
+          </button>
+
+          <div className="text-[10px]">
+            <div>
+              <b>I:</b> <StatusBadge status={row.interviewStatus} />
+            </div>
+            <div>
+              <b>D:</b> <StatusBadge status={row.documentStatus} />
+            </div>
+          </div>
+        </div>
+      ),
+    },
+
+    {
+      header: "Approval",
+      render: (row) =>
+        can("approve_astrologer") ? (
+          <select
+            value={row.approvalStatus}
+            disabled={row.documentStatus !== "VERIFIED"}
+            onChange={(e) =>
+              updateApprovalStatus({
+                variables: {
+                  astrologerId: row.id,
+                  status: e.target.value,
+                },
+              }).then(() => refetch())
+            }
+            className="border p-1 rounded"
+          >
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        ) : (
+          <span>{row.approvalStatus}</span>
+        ),
+    },
+  ];
+
+  return (
+    <div className="p-10 space-y-5">
+
+      {/* TABS */}
+      <div className="flex gap-4">
+        {["PENDING", "SCHEDULED", "PASSED", "APPROVED"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setMainTab(tab)}
+            className={`px-4 py-2 rounded-full text-sm ${
+              mainTab === tab
+                ? "bg-purple-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <DataTable columns={columns} data={astrologers} />
+
+      {/* MODAL */}
+      {openModal && selected && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
+          <div className="bg-white w-[700px] rounded-xl p-5 space-y-4">
+
+            {/* HEADER */}
+            <div className="flex justify-between">
+              <h2>{selected.name}</h2>
+              <button onClick={() => setOpenModal(false)}>✕</button>
             </div>
 
-            {/* MODAL */}
-            {openModal && selected && (
-                <div className="fixed inset-0  bg-black/40 flex justify-center items-center">
-                    <div className="bg-white w-[800px] rounded-xl p-5 space-y-2">
-                        {/* HEADER */}
-                        <div className="flex justify-between">
-                            <h2> {selected.name}</h2>
-                            <button onClick={() => setOpenModal(false)}>✕</button>
-                        </div>
+            {/* TABS */}
+            <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl">
+              <button onClick={() => setActiveTab("interview")}>
+                Interview
+              </button>
 
-                        {/* TABS */}
-                        <div className="flex gap-5 items-center justify-evenly bg-purple-200 rounded-xl w-full p-2">
-                            <div className="flex gap-2 items-center">
-                                <button
-                                    onClick={() => setActiveTab("interview")}
-                                    className={`px-4 py-2 rounded-lg transition-all
-                                     ${activeTab === "interview"
-                                            ? "border-b-2 border-purple-600 shadow-xl font-semibold"
-                                            : "text-gray-600"
-                                        }
-                                         `}
-                                >
-                                    Interview
-                                </button>
+              <button
+                disabled={selected.interviewStatus !== "PASSED"}
+                className={
+                  selected.interviewStatus !== "PASSED"
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }
+                onClick={() => setActiveTab("documents")}
+              >
+                Documents
+              </button>
+            </div>
 
-                                <div>
-                                    <h5 className="text-xs bg-purple-200 font-semibold text-purple-600 rounded-lg">Status: <span>{selected?.interviewStatus}</span></h5>
-                                </div>
-                            </div>
+            {/* INTERVIEW */}
+            {activeTab === "interview" && (
+              <>
+                {/* CREATE MODE */}
+                {selected.interviewStatus === "PENDING" && (
+                  <div className="grid grid-cols-2 gap-4">
 
-                            <button
-                                disabled={selected?.interviewStatus !== "PASSED"}
-                                onClick={() => setActiveTab("documents")}
-                                className={`px-4 py-2 rounded-lg transition-all
-      ${activeTab === "documents"
-                                        ? "border-b-2 border-purple-600 shadow-xl font-semibold"
-                                        : "text-gray-600"
-                                    }
-      ${selected?.interviewStatus !== "PASSED" ? "opacity-50 cursor-not-allowed" : ""}
-    `}
-                            >
-                                Documents
-                            </button>
-                        </div>
+                    <select
+                      onChange={(e) =>
+                        setForm({ ...form, interviewerId: e.target.value })
+                      }
+                    >
+                      <option>Select Interviewer</option>
+                      {interviewers.map((i) => (
+                        <option key={i.id} value={i.id}>
+                          {i.name}
+                        </option>
+                      ))}
+                    </select>
 
-                        {/* INTERVIEW */}
-                        {activeTab === "interview" && (
-                            <div className="p-5 shadow-xl rounded-xl border border-gray-200 space-y-4">
-                                {/* <select
-                                    value={selected.interviewStatus}
-                                    onChange={(e) =>
-                                        updateInterviewStatus({
-                                            variables: {
-                                                astrologerId: selected.id,
-                                                status: e.target.value,
-                                            },
-                                        })
-                                    }
-                                    className="border p-2 w-full"
-                                >
-                                    <option value="PENDING">Pending</option>
-                                    <option value="SCHEDULED">Scheduled</option>
-                                    <option value="PASSED">Passed</option>
-                                    <option value="REJECTED">Rejected</option>
-                                </select> */}
+                    <input
+                      type="date"
+                      onChange={(e) =>
+                        setForm({ ...form, date: e.target.value })
+                      }
+                    />
 
-                                {selected?.interviewStatus !== "SCHEDULED" ? (
-                                    <div className="grid grid-cols-2 gap-5 ">
-                                        <select
-                                            className="w-full border border-gray-100 rounded-full shadow-lg p-2"
-                                            onChange={(e) =>
-                                                setForm({ ...form, interviewerId: e.target.value })
-                                            }
-                                        >
-                                            <option value="">Select Interviewer</option>
+                    <input
+                      type="time"
+                      onChange={(e) =>
+                        setForm({ ...form, time: e.target.value })
+                      }
+                    />
 
-                                            {interviewers.map((item) => (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                    <select
+                      onChange={(e) =>
+                        setForm({ ...form, round: e.target.value })
+                      }
+                    >
+                      <option value="1">Round 1</option>
+                      <option value="2">Round 2</option>
+                    </select>
 
-                                        <input
-                                            type="date"
-                                            className="w-full border border-gray-100 rounded-full shadow-lg p-2"
-                                            onChange={(e) =>
-                                                setForm({ ...form, date: e.target.value })
-                                            }
-                                        />
+                    <button
+                      onClick={handleSchedule}
+                      className="col-span-2 bg-black text-white py-2 rounded"
+                    >
+                      Schedule
+                    </button>
+                  </div>
+                )}
 
-                                        <input
-                                            type="time"
-                                            className="w-full border border-gray-100 rounded-full shadow-lg p-2"
-                                            onChange={(e) =>
-                                                setForm({ ...form, time: e.target.value })
-                                            }
-                                        />
+                {/* DETAILS MODE */}
+                {["SCHEDULED", "PASSED"].includes(
+                  selected.interviewStatus
+                ) && (
+                  <div className="bg-gray-50 p-4 rounded-xl space-y-2">
 
-                                        <select
-                                            className="w-full border border-gray-100 rounded-full shadow-lg p-2"
-                                            onChange={(e) =>
-                                                setForm({ ...form, round: e.target.value })
-                                            }
-                                        >
-                                            <option value="1">Round 1</option>
-                                            <option value="2">Round 2</option>
-                                            <option value="3">Round 3</option>
-                                        </select>
+                    <p>
+                      <b>Interviewer:</b>{" "}
+                      {interviewers.find(
+                        (i) => i.id === selected.interviewerId
+                      )?.name || "-"}
+                    </p>
 
-                                        <button
-                                            onClick={handleSchedule}
-                                            className="bg-black text-white rounded-full place-self-center col-span-2 px-4 py-2"
-                                        >
-                                            Schedule
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="border p-3">
-                                        <p>{selected.interviewer}</p>
-                                        <p>{selected.interviewDate}</p>
-                                        <p>{selected.interviewTime}</p>
-                                        <p>Round: {selected.round}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                    <p>
+                      <b>Date:</b>{" "}
+                      {selected.interviewDate
+                        ? new Date(
+                            selected.interviewDate
+                          ).toLocaleDateString()
+                        : "-"}
+                    </p>
 
-                        {/* DOCUMENTS */}
-                        {activeTab === "documents" && (
-                            <div className="space-y-4">
-                                <select
-                                    value={selected.documentStatus}
-                                    onChange={(e) =>
-                                        updateDocumentStatus({
-                                            variables: {
-                                                astrologerId: selected.id,
-                                                status: e.target.value,
-                                            },
-                                        })
-                                    }
-                                    className="border p-2 w-full"
-                                >
-                                    <option value="PENDING">Pending</option>
-                                    <option value="VERIFIED">Verified</option>
-                                    <option value="REJECTED">Rejected</option>
-                                </select>
+                    <p>
+                      <b>Time:</b> {selected.interviewTime || "-"}
+                    </p>
 
-                                <input type="file" />
-                                <input type="file" />
-                                <input type="file" />
-                                <input type="file" />
-                            </div>
-                        )}
-                    </div>
-                </div>
+                    <p>
+                      <b>Round:</b> {selected.round || "-"}
+                    </p>
+
+                    <button
+                      onClick={() => {
+                        setSelected({
+                          ...selected,
+                          interviewStatus: "PENDING",
+                        });
+
+                        setForm({
+                          interviewerId:
+                            selected.interviewerId || "",
+                          date:
+                            selected.interviewDate?.split("T")[0] ||
+                            "",
+                          time: selected.interviewTime || "",
+                          round: selected.round || "1",
+                        });
+                      }}
+                      className="bg-orange-500 text-white px-4 py-2 rounded"
+                    >
+                      Reschedule
+                    </button>
+                  </div>
+                )}
+              </>
             )}
+
+            {/* DOCUMENTS */}
+            {activeTab === "documents" && (
+              <select
+                value={selected.documentStatus}
+                onChange={async (e) => {
+                  const res = await updateDocumentStatus({
+                    variables: {
+                      astrologerId: selected.id,
+                      status: e.target.value,
+                    },
+                  });
+
+                  setSelected(res.data.updateDocumentStatus);
+                  refetch();
+                }}
+              >
+                <option value="PENDING">Pending</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            )}
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 }

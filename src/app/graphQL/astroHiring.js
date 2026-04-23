@@ -1,29 +1,10 @@
 import { gql } from "@apollo/client";
 
-// 🔥 GET
-export const GET_NEW_ASTROLOGERS = gql`
-  query {
-    getNewAstrologers {
-      id
-      name
-      phoneNumber
-      gender
-      skills
-      experience
-      interviewStatus
-      interviewer
-      interviewDate
-      interviewTime
-      round
-      documentStatus
-      approvalStatus
-    }
-  }
-`;
 
-export const GET_PENDING_APPLICATIONS = gql`
+// 🔥 GET ALL APPLICATIONS (single source of truth)
+export const GET_APPLICATIONS = gql`
   query {
-    getPendingApplications {
+    getApplications {
       id
       name
       phoneNumber
@@ -32,13 +13,25 @@ export const GET_PENDING_APPLICATIONS = gql`
       skills
       languages
       experience
+
+      applicationStatus
+      interviewStatus
+      documentStatus
+      approvalStatus
+
+      interviewDate
+      interviewTime
+      round
+
       createdAt
     }
   }
 `;
 
+
+// 🔥 INTERVIEWERS
 export const GET_INTERVIEWERS = gql`
-  query GetInterviewers {
+  query {
     getInterviewers {
       id
       name
@@ -47,41 +40,36 @@ export const GET_INTERVIEWERS = gql`
   }
 `;
 
-// 🔥 SCHEDULE
+
+// 🔥 SCHEDULE INTERVIEW
 export const SCHEDULE_INTERVIEW = gql`
   mutation (
     $astrologerId: ID!
-    $interviewer: String!
+    $interviewerId: String!
     $interviewDate: String!
     $interviewTime: String!
     $round: Int!
   ) {
     scheduleInterview(
       astrologerId: $astrologerId
-      interviewer: $interviewer
+      interviewerId: $interviewerId
       interviewDate: $interviewDate
       interviewTime: $interviewTime
       round: $round
     ) {
       id
       interviewStatus
+      interviewDate
+      interviewTime
+      round
     }
   }
 `;
 
-// 🔥 INTERVIEW STATUS
-export const UPDATE_INTERVIEW_STATUS = gql`
-  mutation ($astrologerId: ID!, $status: String!) {
-    updateInterviewStatus(astrologerId: $astrologerId, status: $status) {
-      id
-      interviewStatus
-    }
-  }
-`;
 
 // 🔥 DOCUMENT STATUS
 export const UPDATE_DOCUMENT_STATUS = gql`
-  mutation ($astrologerId: ID!, $status: String!) {
+  mutation ($astrologerId: ID!, $status: DocumentStatus!) {
     updateDocumentStatus(astrologerId: $astrologerId, status: $status) {
       id
       documentStatus
@@ -89,9 +77,10 @@ export const UPDATE_DOCUMENT_STATUS = gql`
   }
 `;
 
+
 // 🔥 APPROVAL STATUS
 export const UPDATE_APPROVAL_STATUS = gql`
-  mutation ($astrologerId: ID!, $status: String!) {
+  mutation ($astrologerId: ID!, $status: ApprovalStatus!) {
     updateApprovalStatus(astrologerId: $astrologerId, status: $status) {
       id
       approvalStatus
