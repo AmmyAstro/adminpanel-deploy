@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-
 // 🔥 GET ALL APPLICATIONS (single source of truth)
 export const GET_APPLICATIONS = gql`
   query {
@@ -18,7 +17,7 @@ export const GET_APPLICATIONS = gql`
       interviewStatus
       documentStatus
       approvalStatus
-
+      interviewerId
       interviewDate
       interviewTime
       round
@@ -27,7 +26,6 @@ export const GET_APPLICATIONS = gql`
     }
   }
 `;
-
 
 // 🔥 INTERVIEWERS
 export const GET_INTERVIEWERS = gql`
@@ -39,7 +37,6 @@ export const GET_INTERVIEWERS = gql`
     }
   }
 `;
-
 
 // 🔥 SCHEDULE INTERVIEW
 export const SCHEDULE_INTERVIEW = gql`
@@ -66,7 +63,6 @@ export const SCHEDULE_INTERVIEW = gql`
   }
 `;
 
-
 // 🔥 DOCUMENT STATUS
 export const UPDATE_DOCUMENT_STATUS = gql`
   mutation ($astrologerId: ID!, $status: DocumentStatus!) {
@@ -76,7 +72,6 @@ export const UPDATE_DOCUMENT_STATUS = gql`
     }
   }
 `;
-
 
 // 🔥 APPROVAL STATUS
 export const UPDATE_APPROVAL_STATUS = gql`

@@ -40,6 +40,20 @@ export default function AstrologerHiring() {
   const interviewers = interviewerData?.getInterviewers || [];
   const allData = data?.getApplications || [];
 
+  // 🔥 MAP (optimized lookup)
+  const interviewerMap = Object.fromEntries(
+    interviewers.map((i) => [i.id, i.name])
+  );
+
+  // 🔥 DATE FORMAT
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    return isNaN(date.getTime())
+      ? "Invalid Date"
+      : date.toLocaleDateString("en-IN");
+  };
+
   // 🔥 FILTER
   const astrologers = allData.filter((item) => {
     if (mainTab === "PENDING") return item.applicationStatus === "PENDING";
@@ -49,14 +63,13 @@ export default function AstrologerHiring() {
     return true;
   });
 
-  // 🔥 STATUS COLORS
+  // 🔥 STATUS STYLE
   const getStatusStyle = (status) => {
     switch (status) {
       case "PENDING":
         return "text-yellow-800";
       case "SCHEDULED":
         return "text-orange-700";
-      case "VERIFIED":
       case "PASSED":
         return "text-green-700";
       case "REJECTED":
@@ -88,7 +101,6 @@ export default function AstrologerHiring() {
 
     const updatedId = res.data.scheduleInterview.id;
 
-    // 🔥 fetch fresh data
     const freshData = await refetch();
 
     const fresh = freshData.data.getApplications.find(
@@ -98,6 +110,7 @@ export default function AstrologerHiring() {
     setSelected(fresh);
   };
 
+  // 🔥 TABLE COLUMNS
   const columns = [
     { header: "Name", accessor: "name" },
     { header: "Gender", accessor: "gender" },
@@ -134,6 +147,21 @@ export default function AstrologerHiring() {
             <div>
               <b>D:</b> <StatusBadge status={row.documentStatus} />
             </div>
+          </div>
+        </div>
+      ),
+    },
+
+    // 🔥 NEW INTERVIEW RESULT COLUMN
+    {
+      header: "Interview",
+      render: (row) => (
+        <div className="text-[11px] space-y-1">
+          <div>
+            <b>Status:</b> {row.interviewStatus}
+          </div>
+          <div>
+            <b>Remarks:</b> {row.interviewRemarks || "-"}
           </div>
         </div>
       ),
@@ -193,13 +221,11 @@ export default function AstrologerHiring() {
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
           <div className="bg-white w-[700px] rounded-xl p-5 space-y-4">
 
-            {/* HEADER */}
             <div className="flex justify-between">
               <h2>{selected.name}</h2>
               <button onClick={() => setOpenModal(false)}>✕</button>
             </div>
 
-            {/* TABS */}
             <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl">
               <button onClick={() => setActiveTab("interview")}>
                 Interview
@@ -221,7 +247,6 @@ export default function AstrologerHiring() {
             {/* INTERVIEW */}
             {activeTab === "interview" && (
               <>
-                {/* CREATE MODE */}
                 {selected.interviewStatus === "PENDING" && (
                   <div className="grid grid-cols-2 gap-4">
 
@@ -270,26 +295,19 @@ export default function AstrologerHiring() {
                   </div>
                 )}
 
-                {/* DETAILS MODE */}
-                {["SCHEDULED", "PASSED"].includes(
+                {/* DETAILS */}
+                {["SCHEDULED", "PASSED", "REJECTED"].includes(
                   selected.interviewStatus
                 ) && (
                   <div className="bg-gray-50 p-4 rounded-xl space-y-2">
 
                     <p>
                       <b>Interviewer:</b>{" "}
-                      {interviewers.find(
-                        (i) => i.id === selected.interviewerId
-                      )?.name || "-"}
+                      {interviewerMap[selected?.interviewerId] || "-"}
                     </p>
 
                     <p>
-                      <b>Date:</b>{" "}
-                      {selected.interviewDate
-                        ? new Date(
-                            selected.interviewDate
-                          ).toLocaleDateString()
-                        : "-"}
+                      <b>Date:</b> {formatDate(selected.interviewDate)}
                     </p>
 
                     <p>
@@ -300,6 +318,19 @@ export default function AstrologerHiring() {
                       <b>Round:</b> {selected.round || "-"}
                     </p>
 
+                    {/* 🔥 NEW */}
+                    <p>
+                      <b>Status:</b>{" "}
+                      <span className="font-semibold">
+                        {selected.interviewStatus}
+                      </span>
+                    </p>
+
+                    <p>
+                      <b>Remarks:</b>{" "}
+                      {selected.interviewRemarks || "Not added"}
+                    </p>
+
                     <button
                       onClick={() => {
                         setSelected({
@@ -308,11 +339,9 @@ export default function AstrologerHiring() {
                         });
 
                         setForm({
-                          interviewerId:
-                            selected.interviewerId || "",
+                          interviewerId: selected.interviewerId || "",
                           date:
-                            selected.interviewDate?.split("T")[0] ||
-                            "",
+                            selected.interviewDate?.split("T")[0] || "",
                           time: selected.interviewTime || "",
                           round: selected.round || "1",
                         });
