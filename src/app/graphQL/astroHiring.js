@@ -82,3 +82,57 @@ export const UPDATE_APPROVAL_STATUS = gql`
     }
   }
 `;
+
+
+// docs uload 
+export const UPLOAD_IMAGE = gql`
+  mutation UploadImage($file: Upload!) {
+    uploadImage(file: $file) {
+      url
+      filename
+    }
+  }
+`;
+
+export const SAVE_AND_VERIFY_KYC = gql`
+  mutation SaveAndVerifyKyc(
+    $astrologerId: ID!
+    $accountHolderName: String
+    $accountNumber: String
+    $bankName: String
+    $ifsc: String
+    $branchName: String
+    $panNumber: String
+    $profileImage: String
+    $aadhaarImage: String
+    $panImage: String
+    $passbookImage: String
+    $status: DocumentStatus!
+  ) {
+    saveAndVerifyKyc(
+      astrologerId: $astrologerId
+      accountHolderName: $accountHolderName
+      accountNumber: $accountNumber
+      bankName: $bankName
+      ifsc: $ifsc
+      branchName: $branchName
+      panNumber: $panNumber
+      profileImage: $profileImage
+      aadhaarImage: $aadhaarImage
+      panImage: $panImage
+      passbookImage: $passbookImage
+      status: $status
+    ) {
+      id
+    }
+  }
+`;
+
+export const REJECT_KYC = gql`
+  mutation RejectKyc($astrologerId: ID!) {
+    rejectKyc(astrologerId: $astrologerId) {
+      id
+      status
+    }
+  }
+`;
