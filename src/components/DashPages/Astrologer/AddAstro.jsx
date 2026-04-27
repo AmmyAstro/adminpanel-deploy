@@ -13,10 +13,11 @@ import AstroProCharge from "@/components/Data/AstroProCharge";
 import { useEffect, useState } from "react";
 import CSC from "@/components/Custom/CSC";
 import { gql } from "@apollo/client";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
 import toast from "react-hot-toast";
 import CustomToggle from "@/components/Custom/CustomToggle";
+import { useSearchParams } from "next/navigation";
 
 
 const ADD_ASTROLOGER = gql`
@@ -32,9 +33,44 @@ mutation AddAstrologer($data: AddAstrologerInput!) {
   }
 }`;
 
-export default function AddAstro() {
+const GET_APPLICATION_BY_ID = gql`
+  query ($id: String!) {
+    getApplicationById(id: $id) {
+      id
+      name
+      email
+      phoneNumber
+      gender
+      experience
+      languages
+      skills
+      about
+      address
+      pincode
+      kycDetail {
+        accountHolderName
+        accountNumber
+        bankName
+        ifsc
+        branchName
+        panNumber
+          profileImage
+        aadhaarImage
+        panImage
+        passbookImage
+      }
+    }
+  }
+`;
 
-    const [activeTab, setActiveTab] = useState("call");
+export default function AddAstro() {
+    const params = useSearchParams();
+    const appId = params.get("appId");
+    const [existingDocs, setExistingDocs] = useState({});
+    const { data: appData, loading: appLoading } = useQuery(GET_APPLICATION_BY_ID, {
+        variables: { id: appId },
+        skip: !appId,
+    });
 
     const [addAstrologer, { loading, error }] = useMutation(ADD_ASTROLOGER);
 
@@ -65,11 +101,11 @@ export default function AddAstro() {
             },
 
             pricing: [
-    { type: "CHAT", price: "", offerPrice: "", commissionPercent: "", isActive: true },
-    { type: "CALL", price: "", offerPrice: "", commissionPercent: "", isActive: true },
-    { type: "VIDEO", price: "", offerPrice: "", commissionPercent: "", isActive: true },
-    { type: "AUDIO", price: "", offerPrice: "", commissionPercent: "", isActive: true },
-  ],
+                { type: "CHAT", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
+                { type: "CALL", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
+                { type: "VIDEO", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
+                { type: "AUDIO", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
+            ],
             bankDetails: {
                 accountHolderName: "",
                 accountNumber: "",
@@ -87,6 +123,53 @@ export default function AddAstro() {
             },
         },
     });
+
+    useEffect(() => {
+        if (!appData?.getApplicationById) return;
+
+        const app = appData.getApplicationById;
+
+        reset({
+            astroname: app.name,
+            displayName: app.name,
+            email: app.email,
+            phoneNumber: app.phoneNumber,
+            gender: app.gender,
+            experience: app.experience,
+            address: app.address,
+            pincode: app.pincode,
+
+            expertise: app.skills || [],
+            languages: app.languages || [],
+            aboutEnglish: app.about || "",
+
+            bankDetails: {
+                accountHolderName: app.kycDetail?.accountHolderName || "",
+                accountNumber: app.kycDetail?.accountNumber || "",
+                bankName: app.kycDetail?.bankName || "",
+                ifscCode: app.kycDetail?.ifsc || "",
+                branchName: app.kycDetail?.branchName || "",
+                panCardNumber: app.kycDetail?.panNumber || "",
+            },
+
+        });
+        console.log("KYC DATA:", app.kycDetail);
+        const BASE_URL = "http://localhost:8008";
+        setExistingDocs({
+            profilePic: app.kycDetail?.profileImage
+                ? BASE_URL + app.kycDetail.profileImage
+                : null,
+            aadhaar: app.kycDetail?.aadhaarImage
+                ? BASE_URL + app.kycDetail.aadhaarImage
+                : null,
+            panCard: app.kycDetail?.panImage
+                ? BASE_URL + app.kycDetail.panImage
+                : null,
+            passbook: app.kycDetail?.passbookImage
+                ? BASE_URL + app.kycDetail.passbookImage
+                : null,
+        });
+    }, [appData, reset]);
 
 
 
@@ -155,6 +238,7 @@ export default function AddAstro() {
 
             const payload = mapAstrologerPayload({
                 ...formData,
+                applicationId: appId,
                 documents: uploadedFiles,
             });
 
@@ -194,7 +278,7 @@ export default function AddAstro() {
 
 
     useEffect(() => {
-        if (Object.keys(errors).length > 0) {
+        if (errors && Object.keys(errors).length) {
             console.log("❌ FORM ERRORS:", errors);
         }
     }, [errors]);
@@ -207,20 +291,18 @@ export default function AddAstro() {
     };
 
     const Toggle = ({ value, onChange }) => (
-  <button
-    type="button"
-    onClick={() => onChange(!value)}
-    className={`w-8 h-4 flex items-center rounded-full p-1 ${
-      value ? "bg-green-500" : "bg-gray-300"
-    }`}
-  >
-    <div
-      className={`bg-white w-3 h-3 rounded-full shadow transform ${
-        value ? "translate-x-4" : ""
-      }`}
-    />
-  </button>
-);
+        <button
+            type="button"
+            onClick={() => onChange(!value)}
+            className={`w-8 h-4 flex items-center rounded-full p-1 ${value ? "bg-green-500" : "bg-gray-300"
+                }`}
+        >
+            <div
+                className={`bg-white w-3 h-3 rounded-full shadow transform ${value ? "translate-x-4" : ""
+                    }`}
+            />
+        </button>
+    );
 
 
     return (
@@ -238,6 +320,10 @@ export default function AddAstro() {
                     className="rounded-full"
                 />
             </div>
+
+            {appId && !appData && (
+                <div className="text-center py-4">Loading application...</div>
+            )}
 
             <form
                 onSubmit={handleSubmit(onSubmit)}
@@ -353,9 +439,10 @@ export default function AddAstro() {
                                 className="input-img-side"
                             />
                             <CustomInput className="w-full outline-none border-0 border-none bg-transparent"
-                                type="number"
                                 placeholder="Enter phone number"
-                                {...register("phoneNumber", { valueAsNumber: true })}
+                                type="text"
+                                inputMode="numeric"
+                                {...register("phoneNumber")}
                             />
                         </div>
                         {errors.phoneNumber && (
@@ -380,8 +467,10 @@ export default function AddAstro() {
                                 {...register("experience", { valueAsNumber: true })}
                             />
                         </div>
-                        {errors.address && (
-                            <p className="text-red-500 text-xs">{errors.address.message}</p>
+                        {errors.experience && (
+                            <p className="text-red-500 text-xs">
+                                {errors.experience.message}
+                            </p>
                         )}
                     </div>
 
@@ -538,46 +627,57 @@ export default function AddAstro() {
                         )}
 
                     </div>
+                </div>
 
 
 
-                    <div className="flex flex-col gap-2">
-                        {selectFields.map((field, idx) => (
-                            <Controller
-                                key={idx}
-                                name={field.name}
-                                control={control}
-                                render={({ field: rhfField }) => (
-                                    <MultiSelect
-                                        label={field.label}
-                                        options={field.options}
-                                        placeholder={field.placeholder}
-                                        multiple
-                                        selected={rhfField.value}
-                                        setSelected={rhfField.onChange}
+                <div className="flex flex-col gap-2">
+                    {selectFields.map((field, idx) => (
+                        <Controller
+                            key={idx}
+                            name={field.name}
+                            control={control}
+                            render={({ field: rhfField }) => (
+                                <MultiSelect
+                                    label={field.label}
+                                    options={field.options}
+                                    placeholder={field.placeholder}
+                                    multiple
+                                    selected={rhfField.value}
+                                    setSelected={rhfField.onChange}
+                                />
+                            )}
+                        />
+                    ))}
+                    {errors.label && (
+                        <p className="text-red-500 text-xs">{errors.label.message}</p>
+                    )}
+                </div>
+
+
+
+                <div className="flex w-full">
+                    <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-200 bg-white w-full">
+                        <h2 className="font-semibold text-sm text-center">
+                            Astrologer Charges
+                        </h2>
+
+
+                        <div className="grid grid-cols-2 gap-5">
+                            {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => (
+                                <div key={type} className="border border-gray-200 p-2 rounded-lg">
+
+                                    {/* hidden type */}
+                                    <input
+                                        type="hidden"
+                                        value={type}
+                                        {...register(`pricing.${index}.type`)}
                                     />
-                                )}
-                            />
-                        ))}
-                        {errors.label && (
-                            <p className="text-red-500 text-xs">{errors.label.message}</p>
-                        )}
-                    </div>
-
-
-
-                    <div className="flex w-full">
-                        <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-200 bg-white w-full">
-                            <h2 className="font-semibold text-sm text-center">
-                                Astrologer Charges
-                            </h2>
-
-
-                       <div className="grid grid-cols-2 gap-5">     {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => (
-                                <div key={type} className="border border-gray-200 p-2 rounded-lg ">
 
                                     <div className="flex justify-between items-center mb-2">
-                                        <h3 className="block text-sm font-medium text-gray-500 mb-1">{type}</h3>
+                                        <h3 className="block text-sm font-medium text-gray-500 mb-1">
+                                            {type}
+                                        </h3>
 
                                         <Controller
                                             control={control}
@@ -589,38 +689,47 @@ export default function AddAstro() {
                                     </div>
 
                                     {watch(`pricing.${index}.isActive`) && (
-                                        <div className="flex justify-evenly  gap-2">
+                                        <>
+                                            <div className="flex justify-evenly gap-2">
 
-                                            <input
-                                                {...register(`pricing.${index}.price`)}
-                                                placeholder="Price"
-                                                className="border border-gray-100 rounded-full p-1 text-sm w-1/3 "
-                                            />
+                                                <input
+                                                    {...register(`pricing.${index}.price`, { valueAsNumber: true })}
+                                                    placeholder="Price"
+                                                    className="border border-gray-100 rounded-full p-1 text-sm w-1/3"
+                                                />
 
-                                            <input
-                                                {...register(`pricing.${index}.offerPrice`)}
-                                                placeholder="Offer"
-                                                className="border border-gray-100 rounded-full p-1 text-sm w-1/3  "
-                                            />
+                                                <input
+                                                    {...register(`pricing.${index}.offerPrice`, { valueAsNumber: true })}
+                                                    placeholder="Offer"
+                                                    className="border border-gray-100 rounded-full p-1 text-sm w-1/3"
+                                                />
 
-                                            <input
-                                                {...register(`pricing.${index}.commissionPercent`)}
-                                                placeholder="%"
-                                                className="border border-gray-100 rounded-full p-1 text-sm w-1/3  "
-                                            />
+                                                <input
+                                                    {...register(`pricing.${index}.commissionPercent`, { valueAsNumber: true })}
+                                                    placeholder="%"
+                                                    className="border border-gray-100 rounded-full p-1 text-sm w-1/3"
+                                                />
 
-                                        </div>
+                                            </div>
+
+                                            {/* 🔥 ERROR DISPLAY (inside map) */}
+                                            {errors?.pricing?.[index]?.price && (
+                                                <p className="text-red-500 text-xs mt-1">
+                                                    {errors.pricing[index].price.message}
+                                                </p>
+                                            )}
+
+                                            {errors?.pricing?.[index]?.commissionPercent && (
+                                                <p className="text-red-500 text-xs mt-1">
+                                                    {errors.pricing[index].commissionPercent.message}
+                                                </p>
+                                            )}
+                                        </>
                                     )}
                                 </div>
-                            ))}</div>
+                            ))}
                         </div>
                     </div>
-
-                    {errors?.charges?.callCharges && (
-                        <p className="text-red-500 text-xs">
-                            {errors.charges.callCharges.message}
-                        </p>
-                    )}
 
                     <Controller
                         name="tags"
@@ -832,18 +941,24 @@ export default function AddAstro() {
                                                 {item.label} :
                                             </label>
 
+                                            {/* 🔥 Existing file preview */}
+                                            {existingDocs[item.name] && (
+                                                <a
+                                                    href={existingDocs[item.name]}
+                                                    target="_blank"
+                                                    className="text-blue-600 text-xs underline"
+                                                >
+                                                    View
+                                                </a>
+                                            )}
+
+                                            {/* Upload new */}
                                             <Controller
                                                 name={`documents.${item.name}`}
                                                 control={control}
                                                 render={({ field }) => (
                                                     <input
                                                         type="file"
-                                                        accept=".jpg,.jpeg,.png,.pdf"
-                                                        className="block w-full text-sm text-gray-600 file:mr-4 file:py-1 file:px-3 
-                                                                        file:rounded-full file:border-0 
-                                                                        file:text-sm file:font-medium 
-                                                                        file:bg-purple-50 file:text-purple-700 
-                                                                        hover:file:bg-purple-100"
                                                         onChange={(e) => field.onChange(e.target.files?.[0])}
                                                     />
                                                 )}

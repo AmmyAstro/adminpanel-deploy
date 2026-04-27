@@ -11,11 +11,25 @@ import {
   SCHEDULE_INTERVIEW,
   UPDATE_APPROVAL_STATUS,
   UPLOAD_IMAGE,
-  SAVE_AND_VERIFY_KYC,
+  // SAVE_AND_VERIFY_KYC,
   REJECT_KYC,
 } from "@/app/graphQL/astroHiring";
 
+const SAVE_AND_VERIFY_KYC = gql`
+  mutation SaveKyc($astrologerId: String!, $input: KycDetailInput!) {
+    saveAndVerifyKyc(
+      astrologerId: $astrologerId
+      input: $input
+    ) {
+      id
+      status
+    }
+  }
+`;
+
 import { GET_INTERVIEWERS } from "@/app/graphQL/astroHiring";
+import toast from "react-hot-toast";
+import { gql } from "@apollo/client";
 
 export default function AstrologerHiring() {
   const { can } = usePermissions();
@@ -26,7 +40,7 @@ export default function AstrologerHiring() {
   const [scheduleInterview] = useMutation(SCHEDULE_INTERVIEW);
   const [updateApprovalStatus] = useMutation(UPDATE_APPROVAL_STATUS);
   const [uploadImage] = useMutation(UPLOAD_IMAGE);
-  const [saveAndVerifyKyc] = useMutation(SAVE_AND_VERIFY_KYC);
+const [saveAndVerifyKyc] = useMutation(SAVE_AND_VERIFY_KYC);
   const [rejectKyc] = useMutation(REJECT_KYC);
 
   const [openModal, setOpenModal] = useState(false);
@@ -78,35 +92,52 @@ export default function AstrologerHiring() {
   };
 
   // 🔥 Upload Docs
-  const handleUpload = async (key, file) => {
-    if (!file) return;
+const handleUpload = async (key, file) => {
+  if (!file) return;
 
-    const res = await uploadImage({ variables: { file } });
-    const url = res.data.uploadImage.url;
+  const res = await uploadImage({ variables: { file } });
+  const url = res.data.uploadImage.url;
 
-    setSelected((prev) => ({
-      ...prev,
-      kyc: {
-        ...prev.kyc,
-        [key]: url,
-      },
-    }));
-  };
-
+  setSelected((prev) => ({
+    ...prev,
+    kyc: {
+      ...(prev.kyc || {}), 
+      [key]: url,
+    },
+  }));
+};
   // 🔥 Save & Verify
   const handleSave = async () => {
-    await saveAndVerifyKyc({
-      variables: {
-        astrologerId: selected.id,
-        ...selected.kyc,
-        status: "VERIFIED",
-      },
-    });
+await saveAndVerifyKyc({
+  variables: {
+    astrologerId: selected.id,   // must be string
+    input: {
+      accountHolderName: selected.kyc?.accountHolderName,
+      accountNumber: selected.kyc?.accountNumber,
+      bankName: selected.kyc?.bankName,
+      ifsc: selected.kyc?.ifsc,
+      branchName: selected.kyc?.branchName,
+      panNumber: selected.kyc?.panNumber,
+
+      profileImage: selected.kyc?.profileImage,
+      aadhaarImage: selected.kyc?.aadhaarImage,
+      panImage: selected.kyc?.panImage,
+      passbookImage: selected.kyc?.passbookImage,
+
+      status: "VERIFIED",
+    },
+  },
+});
+    setOpenModal(false);
+    toast.success("Docs Verified Successfully !")
+
     refetch();
   };
 
   const handleReject = async () => {
     await rejectKyc({ variables: { astrologerId: selected.id } });
+    setOpenModal(false);
+    toast.error("Docs Rejected !")
     refetch();
   };
 
@@ -176,6 +207,31 @@ export default function AstrologerHiring() {
           row.approvalStatus
         ),
     },
+
+    {
+      header: "Profile",
+      render: (row) => (
+        <button
+          disabled={row.approvalStatus !== "APPROVED"}
+          onClick={() => {
+            window.location.href = `/Admindash/astromain/add-astrologer?appId=${row.id}`;
+          }}
+          className={`px-3 py-1 rounded text-xs ${row.approvalStatus === "APPROVED"
+              ? "bg-green-600 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+        >
+          Go to Profile
+        </button>
+      ),
+    }
+  ];
+
+  const docFields = [
+    { label: "Profile Pic", key: "profileImage" },
+    { label: "Aadhaar", key: "aadhaarImage" },
+    { label: "Pancard", key: "panImage" },
+    { label: "Bank Passbook", key: "passbookImage" },
   ];
 
   return (
@@ -193,7 +249,9 @@ export default function AstrologerHiring() {
 
             {/* Tabs */}
             <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl">
-              <button onClick={() => setActiveTab("interview")}>Interview</button>
+              <button onClick={() => setActiveTab("interview")}
+
+              >Interview</button>
               <button
                 disabled={selected.interviewStatus !== "PASSED"}
                 onClick={() => setActiveTab("documents")}
@@ -208,8 +266,10 @@ export default function AstrologerHiring() {
 
                 {/* IF NOT SCHEDULED */}
                 {selected.interviewStatus === "PENDING" && (
-                  <>
+                  <div className="grid grid-cols-2 gap-4">
+
                     <select
+                      className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
                       onChange={(e) =>
                         setForm({ ...form, interviewerId: e.target.value })
                       }
@@ -222,13 +282,36 @@ export default function AstrologerHiring() {
                       ))}
                     </select>
 
-                    <input type="date" onChange={(e) => setForm({ ...form, date: e.target.value })} />
-                    <input type="time" onChange={(e) => setForm({ ...form, time: e.target.value })} />
+                    <input className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                      type="date"
+                      onChange={(e) =>
+                        setForm({ ...form, date: e.target.value })
+                      }
+                    />
 
-                    <button onClick={handleSchedule} className="bg-black text-white px-4 py-2 rounded">
-                      Schedule Interview
+                    <input className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                      type="time"
+                      onChange={(e) =>
+                        setForm({ ...form, time: e.target.value })
+                      }
+                    />
+
+                    <select className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                      onChange={(e) =>
+                        setForm({ ...form, round: e.target.value })
+                      }
+                    >
+                      <option value="1">Round 1</option>
+                      <option value="2">Round 2</option>
+                    </select>
+
+                    <button
+                      onClick={handleSchedule}
+                      className="col-span-2 bg-black text-white py-2 w-[40%] rounded-xl justify-self-center "
+                    >
+                      Schedule
                     </button>
-                  </>
+                  </div>
                 )}
 
                 {/* IF SCHEDULED / PASSED */}
@@ -266,7 +349,7 @@ export default function AstrologerHiring() {
 
                 {/* BANK */}
                 <div className="grid grid-cols-2 gap-2">
-                  {["accountHolderName","accountNumber","bankName","ifsc","branchName","panNumber"].map((field) => (
+                  {["accountHolderName", "accountNumber", "bankName", "ifsc", "branchName", "panNumber"].map((field) => (
                     <input
                       key={field}
                       placeholder={field}
@@ -277,25 +360,30 @@ export default function AstrologerHiring() {
                           kyc: { ...prev.kyc, [field]: e.target.value },
                         }))
                       }
-                      className="border p-2 rounded text-xs"
+                      className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
                     />
                   ))}
                 </div>
 
                 {/* DOCS */}
-                {["profileImage","aadhaarImage","panImage","passbookImage"].map((key) => (
-                  <div key={key} className="flex justify-between text-xs">
-                    <span>{key}</span>
-                    {selected.kyc?.[key] && <a href={selected.kyc[key]} target="_blank">View</a>}
-                    <input type="file" onChange={(e) => handleUpload(key, e.target.files[0])} />
+
+              {docFields.map(({ label, key }) => (
+  <div key={key} className="flex justify-between text-xs">
+
+    <span>{label}</span>
+                    {selected.kyc?.[key] && (
+                      <a href={selected.kyc[key]} target="_blank">View</a>
+                    )}
+                    <input type="file" className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                      onChange={(e) => handleUpload(key, e.target.files[0])} />
                   </div>
                 ))}
 
-                <div className="flex gap-3">
-                  <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded">
+                <div className="flex items-center justify-center gap-3">
+                  <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded-lg">
                     Save & Verify
                   </button>
-                  <button onClick={handleReject} className="bg-red-600 text-white px-4 py-2 rounded">
+                  <button onClick={handleReject} className="bg-red-600 text-white px-4 py-2 rounded-lg">
                     Reject
                   </button>
                 </div>

@@ -12,6 +12,10 @@
     }
 }
 
+button{
+    cursor: pointer;
+}
+
 /* editor custom css  */
 .prose h1 {
   font-size: 2rem;
