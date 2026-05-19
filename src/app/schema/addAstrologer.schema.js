@@ -9,10 +9,28 @@ const fileSchema = z.union([
 
 const pricingItem = z.object({
   type: z.enum(["CHAT", "CALL", "VIDEO", "AUDIO"]),
-  price: z.coerce.number().min(0).max(500),
- offerPrice: z.coerce.number().nullable().optional(),
-  commissionPercent: z.coerce.number().min(0).max(100),
+  price: z.coerce.number().optional(),
+  offerPrice: z.coerce.number().nullable().optional(),
+  commissionPercent: z.coerce.number().optional(),
   isActive: z.boolean(),
+}).superRefine((data, ctx) => {
+  if (data.isActive) {
+    if (data.price == null || data.price <= 0) {
+      ctx.addIssue({
+        path: ["price"],
+        message: "Price is required when active",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (data.commissionPercent == null) {
+      ctx.addIssue({
+        path: ["commissionPercent"],
+        message: "Commission is required when active",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  }
 });
 
 export const addAstrologerSchema = z.object({
@@ -52,7 +70,7 @@ pricing: z.array(pricingItem).min(1, "At least one pricing required"),
 
   password: z.string().min(6, "Password must be at least 6 characters"),
 
-  aboutEnglish: z.string().min(20, "About is required"),
+  aboutEnglish: z.string().min(20, "Write minimum of 20-30 words."),
 
   bankDetails: z.object({
     accountHolderName: z.string().min(3, "Account holder name is required"),

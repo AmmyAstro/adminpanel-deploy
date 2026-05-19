@@ -40,7 +40,7 @@ export default function AstrologerHiring() {
   const [scheduleInterview] = useMutation(SCHEDULE_INTERVIEW);
   const [updateApprovalStatus] = useMutation(UPDATE_APPROVAL_STATUS);
   const [uploadImage] = useMutation(UPLOAD_IMAGE);
-const [saveAndVerifyKyc] = useMutation(SAVE_AND_VERIFY_KYC);
+  const [saveAndVerifyKyc] = useMutation(SAVE_AND_VERIFY_KYC);
   const [rejectKyc] = useMutation(REJECT_KYC);
 
   const [openModal, setOpenModal] = useState(false);
@@ -87,47 +87,49 @@ const [saveAndVerifyKyc] = useMutation(SAVE_AND_VERIFY_KYC);
         round: Number(form.round),
       },
     });
+    setOpenModal(false);
+    toast.success("Interview Scheduled !")
 
     refetch();
   };
 
-  // 🔥 Upload Docs
-const handleUpload = async (key, file) => {
-  if (!file) return;
 
-  const res = await uploadImage({ variables: { file } });
-  const url = res.data.uploadImage.url;
+  const handleUpload = async (key, file) => {
+    if (!file) return;
 
-  setSelected((prev) => ({
-    ...prev,
-    kyc: {
-      ...(prev.kyc || {}), 
-      [key]: url,
-    },
-  }));
-};
-  // 🔥 Save & Verify
+    const res = await uploadImage({ variables: { file } });
+    const url = res.data.uploadImage.url;
+
+    setSelected((prev) => ({
+      ...prev,
+      kyc: {
+        ...(prev.kyc || {}),
+        [key]: url,
+      },
+    }));
+  };
+ 
   const handleSave = async () => {
-await saveAndVerifyKyc({
-  variables: {
-    astrologerId: selected.id,   // must be string
-    input: {
-      accountHolderName: selected.kyc?.accountHolderName,
-      accountNumber: selected.kyc?.accountNumber,
-      bankName: selected.kyc?.bankName,
-      ifsc: selected.kyc?.ifsc,
-      branchName: selected.kyc?.branchName,
-      panNumber: selected.kyc?.panNumber,
+    await saveAndVerifyKyc({
+      variables: {
+        astrologerId: selected.id,   
+        input: {
+          accountHolderName: selected.kyc?.accountHolderName,
+          accountNumber: selected.kyc?.accountNumber,
+          bankName: selected.kyc?.bankName,
+          ifsc: selected.kyc?.ifsc,
+          branchName: selected.kyc?.branchName,
+          panNumber: selected.kyc?.panNumber,
 
-      profileImage: selected.kyc?.profileImage,
-      aadhaarImage: selected.kyc?.aadhaarImage,
-      panImage: selected.kyc?.panImage,
-      passbookImage: selected.kyc?.passbookImage,
+          profileImage: selected.kyc?.profileImage,
+          aadhaarImage: selected.kyc?.aadhaarImage,
+          panImage: selected.kyc?.panImage,
+          passbookImage: selected.kyc?.passbookImage,
 
-      status: "VERIFIED",
-    },
-  },
-});
+          status: "VERIFIED",
+        },
+      },
+    });
     setOpenModal(false);
     toast.success("Docs Verified Successfully !")
 
@@ -141,7 +143,7 @@ await saveAndVerifyKyc({
     refetch();
   };
 
-  // 🔥 TABLE COLUMNS
+
   const columns = [
     { header: "Name", accessor: "name" },
     { header: "Phone", accessor: "phoneNumber" },
@@ -153,6 +155,10 @@ await saveAndVerifyKyc({
     {
       header: "Languages",
       render: (row) => row.languages?.join(", ") || "-",
+    },
+    {
+      header: "Problems",
+      render: (row) => row.problems?.join(", ") || "-",
     },
     {
       header: "Experience",
@@ -217,11 +223,11 @@ await saveAndVerifyKyc({
             window.location.href = `/Admindash/astromain/add-astrologer?appId=${row.id}`;
           }}
           className={`px-3 py-1 rounded text-xs ${row.approvalStatus === "APPROVED"
-              ? "bg-green-600 text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            ? "bg-green-600 text-white"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
         >
-          Go to Profile
+          ADD
         </button>
       ),
     }
@@ -247,7 +253,7 @@ await saveAndVerifyKyc({
               <button onClick={() => setOpenModal(false)}>✕</button>
             </div>
 
-            {/* Tabs */}
+     
             <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl">
               <button onClick={() => setActiveTab("interview")}
 
@@ -260,11 +266,11 @@ await saveAndVerifyKyc({
               </button>
             </div>
 
-            {/* 🔥 INTERVIEW TAB */}
+          
             {activeTab === "interview" && (
               <div className="space-y-3">
 
-                {/* IF NOT SCHEDULED */}
+              
                 {selected.interviewStatus === "PENDING" && (
                   <div className="grid grid-cols-2 gap-4">
 
@@ -314,7 +320,7 @@ await saveAndVerifyKyc({
                   </div>
                 )}
 
-                {/* IF SCHEDULED / PASSED */}
+               
                 {["SCHEDULED", "PASSED", "REJECTED"].includes(selected.interviewStatus) && (
                   <div className="bg-gray-100 p-3 rounded space-y-2 text-sm">
 
@@ -343,11 +349,11 @@ await saveAndVerifyKyc({
               </div>
             )}
 
-            {/* 🔥 DOCUMENT TAB */}
+
             {activeTab === "documents" && (
               <div className="space-y-4">
 
-                {/* BANK */}
+
                 <div className="grid grid-cols-2 gap-2">
                   {["accountHolderName", "accountNumber", "bankName", "ifsc", "branchName", "panNumber"].map((field) => (
                     <input
@@ -365,12 +371,12 @@ await saveAndVerifyKyc({
                   ))}
                 </div>
 
-                {/* DOCS */}
 
-              {docFields.map(({ label, key }) => (
-  <div key={key} className="flex justify-between text-xs">
 
-    <span>{label}</span>
+                {docFields.map(({ label, key }) => (
+                  <div key={key} className="flex justify-between text-xs">
+
+                    <span>{label}</span>
                     {selected.kyc?.[key] && (
                       <a href={selected.kyc[key]} target="_blank">View</a>
                     )}

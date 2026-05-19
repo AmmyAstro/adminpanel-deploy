@@ -3,20 +3,17 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addAstrologerSchema } from "../../../app/schema/addAstrologer.schema";
 import Image from "next/image";
-
+import { useWatch } from "react-hook-form";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomButton from "@/components/Custom/CustomButtom";
 import TapEditor from "@/components/Custom/TapEditor";
 import MultiSelect from "@/components/Custom/MultiSelect";
-import AstroProCharge from "@/components/Data/AstroProCharge";
 import { useEffect, useState } from "react";
-import CSC from "@/components/Custom/CSC";
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
 import toast from "react-hot-toast";
-import CustomToggle from "@/components/Custom/CustomToggle";
 import { useSearchParams } from "next/navigation";
 
 
@@ -43,6 +40,7 @@ const GET_APPLICATION_BY_ID = gql`
       gender
       experience
       languages
+      problems
       skills
       about
       address
@@ -74,6 +72,53 @@ export default function AddAstro() {
 
     const [addAstrologer, { loading, error }] = useMutation(ADD_ASTROLOGER);
 
+    const emptyForm = {
+        astroname: "",
+        displayName: "",
+        email: "",
+        phoneNumber: "",
+        experience: "",
+        address: "",
+        pincode: "",
+        gender: "",
+        tzone: "",
+        tags: "",
+        vtags: "",
+        expertise: [],
+        languages: [],
+        problems: [],
+        aboutEnglish: "",
+
+        countryStateCity: {
+            country: "",
+            state: "",
+            city: "",
+        },
+
+        pricing: [
+            { type: "CHAT", price: "", offerPrice: "", commissionPercent: "", isActive: false },
+            { type: "CALL", price: "", offerPrice: "", commissionPercent: "", isActive: false },
+            { type: "VIDEO", price: "", offerPrice: "", commissionPercent: "", isActive: false },
+            { type: "AUDIO", price: "", offerPrice: "", commissionPercent: "", isActive: false },
+        ],
+
+        bankDetails: {
+            accountHolderName: "",
+            accountNumber: "",
+            bankName: "",
+            ifscCode: "",
+            panCardNumber: "",
+            branchName: "",
+        },
+
+        documents: {
+            profilePic: null,
+            aadhaar: null,
+            panCard: null,
+            passbook: null,
+        },
+    };
+
     const {
         register,
         handleSubmit,
@@ -101,10 +146,10 @@ export default function AddAstro() {
             },
 
             pricing: [
-                { type: "CHAT", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
-                { type: "CALL", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
-                { type: "VIDEO", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
-                { type: "AUDIO", price: 0, offerPrice: 0, commissionPercent: 0, isActive: true },
+                { type: "CHAT", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+                { type: "CALL", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+                { type: "VIDEO", price: "", offerPrice: "", commissionPercent: "", isActive: true },
+                { type: "AUDIO", price: "", offerPrice: "", commissionPercent: "", isActive: true },
             ],
             bankDetails: {
                 accountHolderName: "",
@@ -141,6 +186,8 @@ export default function AddAstro() {
 
             expertise: app.skills || [],
             languages: app.languages || [],
+            problems: app.problems || [],
+
             aboutEnglish: app.about || "",
 
             bankDetails: {
@@ -244,8 +291,13 @@ export default function AddAstro() {
 
             const res = await addAstrologer({ variables: { data: payload } });
 
-            toast.success(res.data.addAstrologer.message);
-            reset();
+
+            if (res?.data?.addAstrologer?.success) {
+                toast.success(res.data.addAstrologer.message);
+
+                reset(emptyForm);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
 
         } catch (err) {
             console.log(err);
@@ -283,12 +335,7 @@ export default function AddAstro() {
         }
     }, [errors]);
 
-    const SERVICE_INDEX = {
-        CHAT: 0,
-        CALL: 1,
-        VIDEO: 2,
-        AUDIO: 3,
-    };
+
 
     const Toggle = ({ value, onChange }) => (
         <button
@@ -303,6 +350,7 @@ export default function AddAstro() {
             />
         </button>
     );
+
 
 
     return (
@@ -560,23 +608,7 @@ export default function AddAstro() {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-500    mb-1">
-                            Password
-                        </label>
-                        <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
-                            <img
-                                src="/admin-img/userte.png"
-                                alt="user"
-                                className="input-img-side"
-                            />
-                            <CustomInput type="password" className="w-full outline-none border-0 border-none bg-transparent" {...register("password")} />
 
-                        </div>
-                        {errors.password && (
-                            <p className="text-red-500 text-xs">{errors.password.message}</p>
-                        )}
-                    </div>
 
 
                     <Controller
@@ -630,33 +662,29 @@ export default function AddAstro() {
                 </div>
 
 
-
-                <div className="flex flex-col gap-2">
-                    {selectFields.map((field, idx) => (
-                        <Controller
-                            key={idx}
-                            name={field.name}
-                            control={control}
-                            render={({ field: rhfField }) => (
-                                <MultiSelect
-                                    label={field.label}
-                                    options={field.options}
-                                    placeholder={field.placeholder}
-                                    multiple
-                                    selected={rhfField.value}
-                                    setSelected={rhfField.onChange}
-                                />
-                            )}
-                        />
-                    ))}
-                    {errors.label && (
-                        <p className="text-red-500 text-xs">{errors.label.message}</p>
-                    )}
-                </div>
-
-
-
-                <div className="flex w-full">
+                <div className="grid grid-cols-2 gap-5 ">
+                    <div className="flex flex-col gap-2">
+                        {selectFields.map((field, idx) => (
+                            <Controller
+                                key={idx}
+                                name={field.name}
+                                control={control}
+                                render={({ field: rhfField }) => (
+                                    <MultiSelect
+                                        label={field.label}
+                                        options={field.options}
+                                        placeholder={field.placeholder}
+                                        multiple
+                                        selected={rhfField.value}
+                                        setSelected={rhfField.onChange}
+                                    />
+                                )}
+                            />
+                        ))}
+                        {errors.label && (
+                            <p className="text-red-500 text-xs">{errors.label.message}</p>
+                        )}
+                    </div>
                     <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-200 bg-white w-full">
                         <h2 className="font-semibold text-sm text-center">
                             Astrologer Charges
@@ -664,72 +692,91 @@ export default function AddAstro() {
 
 
                         <div className="grid grid-cols-2 gap-5">
-                            {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => (
-                                <div key={type} className="border border-gray-200 p-2 rounded-lg">
+                            {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => {
+                                const isActive = useWatch({
+                                    control,
+                                    name: `pricing.${index}.isActive`,
+                                    defaultValue: true,
+                                });
 
-                                    {/* hidden type */}
-                                    <input
-                                        type="hidden"
-                                        value={type}
-                                        {...register(`pricing.${index}.type`)}
-                                    />
+                                return (
+                                    <div key={type} className="border border-gray-200 p-2 rounded-lg">
 
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h3 className="block text-sm font-medium text-gray-500 mb-1">
-                                            {type}
-                                        </h3>
-
-                                        <Controller
-                                            control={control}
-                                            name={`pricing.${index}.isActive`}
-                                            render={({ field }) => (
-                                                <Toggle value={field.value} onChange={field.onChange} />
-                                            )}
+                                        <input
+                                            type="hidden"
+                                            value={type}
+                                            {...register(`pricing.${index}.type`)}
                                         />
+
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h3 className="text-sm text-gray-500">{type}</h3>
+
+                                            <Controller
+                                                control={control}
+                                                name={`pricing.${index}.isActive`}
+                                                render={({ field }) => (
+                                                    <Toggle
+                                                        value={field.value ?? true}
+
+                                                        onChange={(val) => {
+                                                            field.onChange(val);
+
+                                                            if (!val) {
+                                                                setValue(`pricing.${index}.price`, 0);
+                                                                setValue(`pricing.${index}.offerPrice`, 0);
+                                                                setValue(`pricing.${index}.commissionPercent`, 0);
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
+
+                                        {isActive && (
+                                            <>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        {...register(`pricing.${index}.price`, { valueAsNumber: true })}
+                                                        placeholder="Price"
+                                                        className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                                                    />
+
+                                                    <input
+                                                        {...register(`pricing.${index}.offerPrice`, { valueAsNumber: true })}
+                                                        placeholder="Offer"
+                                                        className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                                                    />
+
+                                                    <input
+                                                        {...register(`pricing.${index}.commissionPercent`, { valueAsNumber: true })}
+                                                        placeholder="%"
+                                                        className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                                                    />
+                                                </div>
+
+                                                {errors?.pricing?.[index]?.price && (
+                                                    <p className="text-red-500 text-xs">
+                                                        {errors.pricing[index].price.message}
+                                                    </p>
+                                                )}
+
+                                                {errors?.pricing?.[index]?.commissionPercent && (
+                                                    <p className="text-red-500 text-xs">
+                                                        {errors.pricing[index].commissionPercent.message}
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
-
-                                    {watch(`pricing.${index}.isActive`) && (
-                                        <>
-                                            <div className="flex justify-evenly gap-2">
-
-                                                <input
-                                                    {...register(`pricing.${index}.price`, { valueAsNumber: true })}
-                                                    placeholder="Price"
-                                                    className="border border-gray-100 rounded-full p-1 text-sm w-1/3"
-                                                />
-
-                                                <input
-                                                    {...register(`pricing.${index}.offerPrice`, { valueAsNumber: true })}
-                                                    placeholder="Offer"
-                                                    className="border border-gray-100 rounded-full p-1 text-sm w-1/3"
-                                                />
-
-                                                <input
-                                                    {...register(`pricing.${index}.commissionPercent`, { valueAsNumber: true })}
-                                                    placeholder="%"
-                                                    className="border border-gray-100 rounded-full p-1 text-sm w-1/3"
-                                                />
-
-                                            </div>
-
-                                            {/* 🔥 ERROR DISPLAY (inside map) */}
-                                            {errors?.pricing?.[index]?.price && (
-                                                <p className="text-red-500 text-xs mt-1">
-                                                    {errors.pricing[index].price.message}
-                                                </p>
-                                            )}
-
-                                            {errors?.pricing?.[index]?.commissionPercent && (
-                                                <p className="text-red-500 text-xs mt-1">
-                                                    {errors.pricing[index].commissionPercent.message}
-                                                </p>
-                                            )}
-                                        </>
-                                    )}
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
+                </div>
+
+
+                <div className="grid grid-cols-2 gap-5 w-full">
+
 
                     <Controller
                         name="tags"
@@ -921,7 +968,7 @@ export default function AddAstro() {
                         </div>
 
                         <div className="mt-3 flex gap-6 col-span-3">
-                            <div className="flex-shrink-0 bg-[#2f1254] rounded-2xl items-center justify-start flex p-1 ">
+                            <div className="shrink-0 bg-[#2f1254] rounded-2xl items-center justify-start flex p-1 ">
                                 <img
                                     src="/admin-img/userte.png"
                                     alt="Preview"
@@ -937,7 +984,7 @@ export default function AddAstro() {
                                         { label: "Passbook Image", name: "passbook" },
                                     ].map((item, idx) => (
                                         <div key={idx} className="flex items-center gap-3">
-                                            <label className="w-[10rem] text-sm font-medium text-gray-600">
+                                            <label className="w-40 text-sm font-medium text-gray-600">
                                                 {item.label} :
                                             </label>
 
@@ -1009,7 +1056,7 @@ export default function AddAstro() {
                         type="button"
                         variant="gray"
                         className="px-4 py-1"
-                        onClick={() => reset()}
+                        onClick={() => reset(emptyForm)}
                     >
                         Reset
                     </CustomButton>

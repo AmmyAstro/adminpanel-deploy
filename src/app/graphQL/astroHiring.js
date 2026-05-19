@@ -11,6 +11,7 @@ export const GET_APPLICATIONS = gql`
       gender
       skills
       languages
+      problems
       experience
 
       applicationStatus
