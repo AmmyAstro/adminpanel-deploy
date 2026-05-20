@@ -23,6 +23,8 @@ export const PermissionProvider = ({ children }) => {
 
   const isSuperAdmin = useMemo(() => {
     if (!permissions.length) return false;
+    console.log("xxxxxxxxxxxxxxxxxxxxxx");
+    
 
     // if all modules coming → assume superadmin
     return permissions.every(
