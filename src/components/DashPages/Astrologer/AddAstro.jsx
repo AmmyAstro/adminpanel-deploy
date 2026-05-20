@@ -144,7 +144,7 @@ export default function AddAstro() {
             });
 
             const uploadRes = await fetch(
-                "http://localhost:8008/api/upload-documents",
+                "https://dhwaniastro.com/adminAuth/api/upload-documents",
                 {
                     method: "POST",
                     body: fd,
