@@ -31,7 +31,9 @@ export default function PackageMain() {
     name: "",
     description: "",
     price: "",
+    coins: "",
     talktime: "",
+    validityDays: "",
     isActive: true,
   });
 
@@ -42,12 +44,8 @@ export default function PackageMain() {
   const canUpdate = isSuperAdmin || can("walletpackages", "update");
 
   // 🔥 Action handler (for delete confirm)
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   // 🔥 Query
   const { data, loading, refetch } = useQuery(GET_RECHARGE_PACKS, {
@@ -76,12 +74,14 @@ export default function PackageMain() {
       name: "",
       description: "",
       price: "",
+      coins: "",
       talktime: "",
+      validityDays: "",
       isActive: true,
     });
+
     setEditPack(null);
   };
-
   const handleSubmit = async () => {
     const canSubmit =
       isSuperAdmin ||
@@ -99,7 +99,9 @@ export default function PackageMain() {
         name: form.name,
         description: form.description,
         price: parseFloat(form.price),
+        coins: parseInt(form.coins),
         talktime: parseInt(form.talktime),
+        validityDays: parseInt(form.validityDays),
         isActive: form.isActive,
       };
 
@@ -155,7 +157,6 @@ export default function PackageMain() {
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
       <div className="max-w-5xl mx-auto">
-
         {/* HEADER */}
         <div className="flex justify-between mb-6">
           <h3 className="text-xl font-semibold">Manage Wallet Packages</h3>
@@ -167,7 +168,9 @@ export default function PackageMain() {
               resetForm();
               setOpen(true);
             }}
-            className={!canCreate ? "opacity-50 cursor-not-allowed" : "px-2 py-1"}
+            className={
+              !canCreate ? "opacity-50 cursor-not-allowed" : "px-2 py-1"
+            }
           >
             Create Package
           </CustomButton>
@@ -219,6 +222,22 @@ export default function PackageMain() {
                 />
 
                 <CustomInput
+                  name="coins"
+                  type="number"
+                  value={form.coins}
+                  onChange={handleChange}
+                  placeholder="Coins"
+                />
+
+                <CustomInput
+                  name="validityDays"
+                  type="number"
+                  value={form.validityDays}
+                  onChange={handleChange}
+                  placeholder="Validity Days"
+                />
+
+                <CustomInput
                   name="description"
                   value={form.description}
                   onChange={handleChange}
@@ -237,7 +256,11 @@ export default function PackageMain() {
               </div>
 
               <div className="flex justify-end">
-                <CustomButton className="px-2 py-1" variant="green" onClick={handleSubmit}>
+                <CustomButton
+                  className="px-2 py-1"
+                  variant="green"
+                  onClick={handleSubmit}
+                >
                   {editPack ? "Update" : "Create"}
                 </CustomButton>
               </div>
@@ -250,11 +273,13 @@ export default function PackageMain() {
 
         {/* TABLE */}
         <div className="mt-10">
-          <div className="grid grid-cols-7 bg-purple-300 p-2 font-semibold text-center">
+          <div className="grid grid-cols-9 bg-purple-300 p-2 font-semibold text-center">
             <div>S.No</div>
             <div>Name</div>
             <div>Price</div>
             <div>Talktime</div>
+            <div>Coins</div>
+<div>Validity</div>
             <div>Status</div>
             <div>Created</div>
             <div>Action</div>
@@ -263,12 +288,14 @@ export default function PackageMain() {
           {packs.map((pkg, index) => (
             <div
               key={pkg.id}
-              className="grid grid-cols-7 text-center border-b p-3 items-center"
+              className="grid grid-cols-9 text-center border-b p-3 items-center"
             >
               <div>{index + 1}</div>
               <div>{pkg.name}</div>
               <div>₹{pkg.price}</div>
               <div>{pkg.talktime}</div>
+              <div>{pkg.coins}</div>
+<div>{pkg.validityDays} Days</div>
 
               <div className="flex justify-center">
                 <CustomToggle
