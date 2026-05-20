@@ -13,6 +13,8 @@ export default function Page() {
     if (user?.name) {
       setUserName(user.name);
     }
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    
   }, []);
 
   
