@@ -51,9 +51,9 @@ export const addAstrologerSchema = z.object({
     pricing: z.array(pricingItem),
   address: z.string().min(10, "Address must be at least 10 characters"),
 
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  // password: z.string().min(6, "Password must be at least 6 characters"),
 
-  aboutEnglish: z.string().min(20, "About is required"),
+  about: z.string().min(20, "About is required"),
 
   bankDetails: z.object({
     accountHolderName: z.string().min(3, "Account holder name is required"),

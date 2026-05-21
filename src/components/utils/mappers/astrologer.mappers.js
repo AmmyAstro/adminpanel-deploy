@@ -7,7 +7,7 @@ export const mapAstrologerPayload = (formData) => {
     email: formData.email,
 
     phoneNumber: String(formData.phoneNumber),
-    password: formData.password,
+    // password: formData.password,
 
     experience: Number(formData.experience),
 
@@ -15,7 +15,7 @@ export const mapAstrologerPayload = (formData) => {
     languages: formData.languages,
     problems: formData.problems,
 
-    aboutEnglish: formData.aboutEnglish,
+    about: formData.about,
 
     tags: formData.tags,
     vtags: formData.vtags,
