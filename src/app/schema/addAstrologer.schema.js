@@ -68,9 +68,9 @@ phoneNumber: z.string().regex(/^[6-9]\d{9}$/, "Invalid phone number"),
 pricing: z.array(pricingItem).min(1, "At least one pricing required"),
   address: z.string().min(10, "Address must be at least 10 characters"),
 
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  // password: z.string().min(6, "Password must be at least 6 characters"),
 
-  aboutEnglish: z.string().min(20, "Write minimum of 20-30 words."),
+  about: z.string().min(20, "About is required"),
 
   bankDetails: z.object({
     accountHolderName: z.string().min(3, "Account holder name is required"),

@@ -119,7 +119,7 @@ export default function BannerManager() {
     formData.append("image", file);
 
     const res = await fetch(
-      "http://localhost:4001/api/upload-banner", // 🔥 NEW
+      "https://dhwaniastro.com/adminAuth/api/upload-banner", // 🔥 NEW
       {
         method: "POST",
         body: formData,

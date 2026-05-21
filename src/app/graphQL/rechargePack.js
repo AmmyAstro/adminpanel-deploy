@@ -8,6 +8,8 @@ export const GET_RECHARGE_PACKS = gql`
       description
       price
       talktime
+      coins
+validityDays
       isActive
       createdAt
     }
@@ -21,6 +23,8 @@ export const CREATE_RECHARGE_PACK = gql`
       name
       price
       talktime
+      coins
+validityDays
       isActive
     }
   }
@@ -33,6 +37,8 @@ export const UPDATE_RECHARGE_PACK = gql`
       name
       price
       talktime
+      coins
+validityDays
       isActive
     }
   }
