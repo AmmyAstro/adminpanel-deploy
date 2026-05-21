@@ -3,20 +3,18 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addAstrologerSchema } from "../../../app/schema/addAstrologer.schema";
 import Image from "next/image";
-
+import { useWatch } from "react-hook-form";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomButton from "@/components/Custom/CustomButtom";
 import TapEditor from "@/components/Custom/TapEditor";
 import MultiSelect from "@/components/Custom/MultiSelect";
-import AstroProCharge from "@/components/Data/AstroProCharge";
 import { useEffect, useState } from "react";
-import CSC from "@/components/Custom/CSC";
 import { gql } from "@apollo/client";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
 import toast from "react-hot-toast";
-import CustomToggle from "@/components/Custom/CustomToggle";
+import { useSearchParams } from "next/navigation";
 
 const ADD_ASTROLOGER = gql`
   mutation AddAstrologer($data: AddAstrologerInput!) {
@@ -580,6 +578,28 @@ export default function AddAstro() {
                         )}
                       />
                     </div>
+                    <div className="p-4 rounded-xl flex flex-col gap-2 border border-gray-200 bg-white w-full">
+                        <h2 className="font-semibold text-sm text-center">
+                            Astrologer Charges
+                        </h2>
+
+
+                        <div className="grid grid-cols-2 gap-5">
+                            {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => {
+                                const isActive = useWatch({
+                                    control,
+                                    name: `pricing.${index}.isActive`,
+                                    defaultValue: true,
+                                });
+
+                                return (
+                                    <div key={type} className="border border-gray-200 p-2 rounded-lg">
+
+                                        <input
+                                            type="hidden"
+                                            value={type}
+                                            {...register(`pricing.${index}.type`)}
+                                        />
 
                     {watch(`pricing.${index}.isActive`) && (
                       <div className="flex justify-evenly  gap-2">

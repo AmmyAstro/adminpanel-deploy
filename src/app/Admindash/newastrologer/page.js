@@ -10,11 +10,11 @@ export default function Page() {
   // ✅ Get user from localStorage
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    
     if (user?.name) {
       setUserName(user.name);
     }
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-    
   }, []);
 
   
