@@ -33,8 +33,8 @@ const GET_ASTRO_LIST = gql`
 `;
 
 const DELETE_ASTRO = gql`
-  mutation DeleteAstrologer($id: ID!) {
-    deleteAstrologer(id: $id)
+  mutation DeleteAstrologer($astrologerId: ID!) {
+    deleteAstrologer(astrologerId: $astrologerId)
   }
 `;
 
@@ -167,7 +167,7 @@ export default function AstroList() {
             action="delete"
             executeAction={executeAction}
             mutationFn={deleteAstrologer}
-            variables={{ id: row.id }}
+              variables={{ astrologerId: row.id }}
             onSuccess={refetch}
             className="px-2 py-1 text-xs bg-red-500 text-white rounded"
           >

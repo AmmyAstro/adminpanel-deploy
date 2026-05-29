@@ -22,12 +22,8 @@ export default function BannerManager() {
   const canCreate = isSuperAdmin || can("banners", "create");
   const canUpdate = isSuperAdmin || can("banners", "update");
 
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const { data, loading, error, refetch } = useQuery(GET_BANNERS, {
     skip: !canRead,
@@ -119,11 +115,11 @@ export default function BannerManager() {
     formData.append("image", file);
 
     const res = await fetch(
-      "https://dhwaniastro.com/adminAuth/api/upload-banner", // 🔥 NEW
+      "https://dhwaniastro.com/adminAuth/api/upload-banner",
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     const data = await res.json();
@@ -148,7 +144,7 @@ export default function BannerManager() {
 
       const input = {
         ...form,
-        ...(imageUrl && { imageUrl })
+        ...(imageUrl && { imageUrl }),
       };
 
       if (editingBanner) {
@@ -199,10 +195,8 @@ export default function BannerManager() {
               // optimistic
               setLocalBanners((prev) =>
                 prev.map((b) =>
-                  b.id === row.id
-                    ? { ...b, status: !b.status }
-                    : b
-                )
+                  b.id === row.id ? { ...b, status: !b.status } : b,
+                ),
               );
 
               try {
@@ -233,20 +227,20 @@ export default function BannerManager() {
     },
 
     // 🔥 IMAGE
-    {
-      header: "Image",
-      render: (row) => (
-        <img
-          src={
-            row.imageUrl
-              ? `http://localhost:4000${row.imageUrl}`
-              : "/no-image.png"
-          }
-          onError={(e) => (e.target.src = "/no-image.png")}
-          className="h-12 w-20 object-cover rounded"
-        />
-      ),
-    },
+    // {
+    //   header: "Image",
+    //   render: (row) => (
+    //     <img
+    //       src={
+    //         row.imageUrl
+    //           ? `http://localhost:4000${row.imageUrl}`
+    //           : "/no-image.png"
+    //       }
+    //       onError={(e) => (e.target.src = "/no-image.png")}
+    //       className="h-12 w-20 object-cover rounded"
+    //     />
+    //   ),
+    // },
 
     // 🔥 ACTIONS
     {
@@ -303,9 +297,7 @@ export default function BannerManager() {
 
       {/* EMPTY */}
       {localBanners.length === 0 && (
-        <p className="text-center py-10 text-gray-500">
-          No banners found 🚫
-        </p>
+        <p className="text-center py-10 text-gray-500">No banners found 🚫</p>
       )}
 
       {/* TABLE */}
@@ -360,17 +352,9 @@ export default function BannerManager() {
               className="w-full border p-2 rounded"
             />
 
-            <input
-              type="file"
-              onChange={(e) => setFile(e.target.files[0])}
-            />
+            <input type="file" onChange={(e) => setFile(e.target.files[0])} />
 
-            {file && (
-              <img
-                src={URL.createObjectURL(file)}
-                className="h-20"
-              />
-            )}
+            {file && <img src={URL.createObjectURL(file)} className="h-20" />}
 
             {editingBanner?.imageUrl && !file && (
               <img
@@ -390,9 +374,7 @@ export default function BannerManager() {
             </select>
 
             <div className="flex justify-end gap-2">
-              <button onClick={() => setOpenModal(false)}>
-                Cancel
-              </button>
+              <button onClick={() => setOpenModal(false)}>Cancel</button>
 
               <button
                 onClick={handleSubmit}

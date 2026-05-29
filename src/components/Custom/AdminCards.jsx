@@ -7,14 +7,14 @@ const cards = [
     title: "Razorpay",
     subtitle: "Dashboard",
     img: "/admin-img/gif/razorpay.gif",
-    link: "/Admindash/razordash",
+    link: "/Admindash/razorpay",
     bg: "bg-[#7569b6da]",
   },
   {
     title: "Dhwani",
     subtitle: "Revenue",
     img: "/admin-img/gif/revenue.gif",
-    link: "#",
+    link: "/Admindash/dhwanirevenue",
     bg: "bg-[#AD88C6]",
   },
   {
@@ -24,9 +24,9 @@ const cards = [
     bg: "bg-[#C683D7]",
   },
   {
-    title: "Customers",
+    title: "Users",
     img: "/admin-img/gif/1.gif",
-    link: "/Admindash/custommain",
+    link: "/Admindash/usermain",
     bg: "bg-[#a682a7ce]",
   },
   {
@@ -70,7 +70,7 @@ const cards = [
     title: "Fraud",
     subtitle: "Flags",
     img: "/admin-img/gif/fraud.gif",
-    link: "#",
+    link: "/Admindash/fraudflags",
     bg: "bg-[#a682a7ce]",
   },
   {

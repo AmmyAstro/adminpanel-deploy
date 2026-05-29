@@ -31,6 +31,7 @@ import { GET_INTERVIEWERS } from "@/app/graphQL/astroHiring";
 import toast from "react-hot-toast";
 import { gql } from "@apollo/client";
 
+
 export default function AstrologerHiring() {
   const { can } = usePermissions();
 
@@ -98,7 +99,10 @@ export default function AstrologerHiring() {
     if (!file) return;
 
     const res = await uploadImage({ variables: { file } });
+
     const url = res.data.uploadImage.url;
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",url , res);
+    
 
     setSelected((prev) => ({
       ...prev,
@@ -234,7 +238,7 @@ export default function AstrologerHiring() {
   ];
 
   const docFields = [
-    { label: "Profile Pic", key: "profileImage" },
+  
     { label: "Aadhaar", key: "aadhaarImage" },
     { label: "Pancard", key: "panImage" },
     { label: "Bank Passbook", key: "passbookImage" },

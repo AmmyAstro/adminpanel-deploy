@@ -2,7 +2,8 @@ export const mapAstrologerPayload = (formData) => {
   return {
     astroname: formData.astroname,
     displayName: formData.displayName,
-
+   status: formData.status ?? true,  
+    profilePic: formData.profilePic,
     gender: formData.gender,
     email: formData.email,
 
@@ -21,7 +22,7 @@ export const mapAstrologerPayload = (formData) => {
     vtags: formData.vtags,
 
     pricing: formData.pricing
-      .filter((p) => p.isActive) 
+      .filter((p) => p.isActive)
       .map((p) => ({
         type: p.type,
         price: Number(p.price),
@@ -47,6 +48,7 @@ export const mapAstrologerPayload = (formData) => {
       ifscCode: formData.bankDetails.ifscCode,
       panCardNumber: formData.bankDetails.panCardNumber,
       branchName: formData.bankDetails.branchName,
+       status: "VERIFIED", 
     },
     documents: {
       aadhaar: formData.documents?.aadhaar || null,

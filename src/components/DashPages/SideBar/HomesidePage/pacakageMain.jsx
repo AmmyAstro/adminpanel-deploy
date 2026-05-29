@@ -279,7 +279,7 @@ export default function PackageMain() {
             <div>Price</div>
             <div>Talktime</div>
             <div>Coins</div>
-<div>Validity</div>
+            <div>Validity</div>
             <div>Status</div>
             <div>Created</div>
             <div>Action</div>
@@ -295,7 +295,7 @@ export default function PackageMain() {
               <div>₹{pkg.price}</div>
               <div>{pkg.talktime}</div>
               <div>{pkg.coins}</div>
-<div>{pkg.validityDays} Days</div>
+              <div>{pkg.validityDays} Days</div>
 
               <div className="flex justify-center">
                 <CustomToggle

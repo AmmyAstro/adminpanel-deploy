@@ -23,10 +23,12 @@ export default function DataTable({ columns, data }) {
           {data.map((row, rowIndex) => (
             <tr
               key={row.id || rowIndex}
-              className={`hover:bg-gray-50 border-b grid grid-cols-${updatedColumns.length}`}
+              className={`hover:bg-gray-50 border-b grid `}   style={{
+              gridTemplateColumns: `repeat(${updatedColumns.length}, 1fr)`,
+            }}
             >
               {updatedColumns.map((col, i) => (
-                <td key={i} className="px-5 py-4 text-sm text-center">
+                <td key={i} className="px-5 py-2 text-sm text-center">
                   {/* 🔥 SR NO logic */}
                   {col.accessor === "srNo"
                     ? rowIndex + 1

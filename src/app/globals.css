@@ -153,6 +153,6 @@ tr{
     /* align-items: center; */
     /* place-self: center; */
 
-    display: flex;
+    /* display: flex; */
     justify-content: space-around;
 }

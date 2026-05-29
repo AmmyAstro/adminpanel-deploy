@@ -98,9 +98,9 @@ export default function GiftManager() {
       // STEP 1: upload file
       if (file) {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("image", file);
 
-        const res = await fetch("http://localhost:4001/api/upload", {
+        const res = await fetch("https://dhwaniastro.com/adminAuth/api/upload-gifts", {
           method: "POST",
           body: formData,
         });

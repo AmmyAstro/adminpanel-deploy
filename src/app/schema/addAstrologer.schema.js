@@ -87,8 +87,9 @@ pricing: z.array(pricingItem).min(1, "At least one pricing required"),
 
     branchName: z.string().min(2, "Branch name is required"),
   }),
+  profilePic: fileSchema,
   documents: z.object({
-    profilePic: fileSchema,
+   
     aadhaar: fileSchema,
     panCard: fileSchema,
     passbook: fileSchema,
