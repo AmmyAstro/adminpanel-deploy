@@ -137,3 +137,72 @@ export const REJECT_KYC = gql`
     }
   }
 `;
+
+
+
+export const GET_OFFERS = gql`
+  query GetOffers {
+    offers {
+      id
+      offerName
+      price
+      description
+      isActive
+      createdAt
+    }
+  }
+`;
+
+export const CREATE_OFFER = gql`
+  mutation CreateOffer(
+    $offerName: String!
+    $price: Float!
+    $description: String!
+  ) {
+    createOffer(
+      data: {
+        offerName: $offerName
+        price: $price
+        description: $description
+      }
+    ) {
+      success
+      message
+      data {
+        id
+      }
+    }
+  }
+`;
+
+export const UPDATE_OFFER = gql`
+  mutation UpdateOffer(
+    $id: ID!
+    $offerName: String!
+    $price: Float!
+    $description: String!
+    $isActive: Boolean!
+  ) {
+    updateOffer(
+      id: $id
+      data: {
+        offerName: $offerName
+        price: $price
+        description: $description
+        isActive: $isActive
+      }
+    ) {
+      success
+      message
+    }
+  }
+`;
+
+export const DELETE_OFFER = gql`
+  mutation DeleteOffer($id: ID!) {
+    deleteOffer(id: $id) {
+      success
+      message
+    }
+  }
+`;
