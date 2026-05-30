@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation } from "@apollo/client";
 
 import {
  GET_OFFERS,
@@ -9,6 +8,7 @@ import {
   UPDATE_OFFER,
   DELETE_OFFER,
 } from "@/app/graphQL/astroHiring";
+import { useMutation, useQuery } from "@apollo/client/react";
 
 
 export default function OffersPage() {
