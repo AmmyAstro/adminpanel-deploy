@@ -63,7 +63,9 @@ const GET_APPLICATION_BY_ID = gql`
 
 export default function AddAstro() {
   const params = useSearchParams();
-  const appId = params.get("appId");
+const appId = params?.get("appId") || "";
+  console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", appId);
+  
   const [existingDocs, setExistingDocs] = useState({});
   const { data: appData, loading: appLoading } = useQuery(
     GET_APPLICATION_BY_ID,
