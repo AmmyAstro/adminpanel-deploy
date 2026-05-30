@@ -19,12 +19,12 @@ export const authTokenVar = makeVar(null);
 
 
 const httpLink = new HttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "https://dhwaniastro.com/adminAuth/graphql",
 });
 
 // upload link
 const uploadLink = new UploadHttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "https://dhwaniastro.com/adminAuth/graphql",
   headers: {
     "apollo-require-preflight": "true",
   },
@@ -36,7 +36,7 @@ const link = split(
     const definition = getMainDefinition(query);
     return definition.kind === "OperationDefinition" &&
       definition.operation === "mutation" &&
-      definition.name?.value === "UploadImage"; // 👈 your upload mutation name
+      definition.name?.value === "UploadImage"; 
   },
   uploadLink,
   httpLink
