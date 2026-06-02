@@ -81,7 +81,7 @@ export default function OfferPage() {
 
     setFormData({
       id: offer.id,
-      name: offer.name,
+      name: offer.offerName,
       description: offer.description,
       price: offer.price,
     });

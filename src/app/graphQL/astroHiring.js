@@ -177,7 +177,7 @@ export const CREATE_OFFER = gql`
 
 export const UPDATE_OFFER = gql`
   mutation UpdateOffer(
-    $id: ID!
+    $id: String!
     $offerName: String!
     $price: Float!
     $description: String!
