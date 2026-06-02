@@ -142,13 +142,13 @@ export const REJECT_KYC = gql`
 
 export const GET_OFFERS = gql`
   query GetOffers {
-    offers {
+    getOffers {
       id
       offerName
-      price
       description
-      isActive
+      price
       createdAt
+      updatedAt
     }
   }
 `;
@@ -181,7 +181,7 @@ export const UPDATE_OFFER = gql`
     $offerName: String!
     $price: Float!
     $description: String!
-    $isActive: Boolean!
+    $isActive: Boolean
   ) {
     updateOffer(
       id: $id
@@ -199,7 +199,7 @@ export const UPDATE_OFFER = gql`
 `;
 
 export const DELETE_OFFER = gql`
-  mutation DeleteOffer($id: ID!) {
+  mutation DeleteOffer($id: String!) {
     deleteOffer(id: $id) {
       success
       message
