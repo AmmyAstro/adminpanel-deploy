@@ -19,6 +19,10 @@ const GET_PRICE = gql`
 const GET_CONFIG = gql`
   query {
     getPricingConfig {
+
+        isGlobalOfferEnabled
+    globalChatPrice
+    globalCallPrice
       isFirstOfferEnabled
       firstChatPrice
       firstCallPrice
@@ -33,27 +37,35 @@ const GET_CONFIG = gql`
 /* ------------------ MUTATION ------------------ */
 
 const UPDATE_CONFIG = gql`
-  mutation UpdatePricing(
-    $isFirstOfferEnabled: Boolean
-    $firstChatPrice: Int
-    $firstCallPrice: Int
+mutation UpdatePricing(
+  $isGlobalOfferEnabled: Boolean
+  $globalChatPrice: Int
+  $globalCallPrice: Int
 
-    $isSecondOfferEnabled: Boolean
-    $secondChatPrice: Int
-    $secondCallPrice: Int
+  $isFirstOfferEnabled: Boolean
+  $firstChatPrice: Int
+  $firstCallPrice: Int
+
+  $isSecondOfferEnabled: Boolean
+  $secondChatPrice: Int
+  $secondCallPrice: Int
+) {
+  updatePricingConfig(
+    isGlobalOfferEnabled: $isGlobalOfferEnabled
+    globalChatPrice: $globalChatPrice
+    globalCallPrice: $globalCallPrice
+
+    isFirstOfferEnabled: $isFirstOfferEnabled
+    firstChatPrice: $firstChatPrice
+    firstCallPrice: $firstCallPrice
+
+    isSecondOfferEnabled: $isSecondOfferEnabled
+    secondChatPrice: $secondChatPrice
+    secondCallPrice: $secondCallPrice
   ) {
-    updatePricingConfig(
-      isFirstOfferEnabled: $isFirstOfferEnabled
-      firstChatPrice: $firstChatPrice
-      firstCallPrice: $firstCallPrice
-
-      isSecondOfferEnabled: $isSecondOfferEnabled
-      secondChatPrice: $secondChatPrice
-      secondCallPrice: $secondCallPrice
-    ) {
-      id
-    }
+    id
   }
+}
 `;
 
 export default function PricingPanel() {
@@ -63,16 +75,22 @@ export default function PricingPanel() {
   const { data: configData } = useQuery(GET_CONFIG);
 
   /* ------------------ STATE ------------------ */
+const [form, setForm] = useState({
+  // Global
+  isGlobalOfferEnabled: false,
+  globalChatPrice: 0,
+  globalCallPrice: 0,
 
-  const [form, setForm] = useState({
-    isFirstOfferEnabled: true,
-    firstChatPrice: 0,
-    firstCallPrice: 0,
+  // First
+  isFirstOfferEnabled: true,
+  firstChatPrice: 0,
+  firstCallPrice: 0,
 
-    isSecondOfferEnabled: false,
-    secondChatPrice: 0,
-    secondCallPrice: 0
-  });
+  // Second
+  isSecondOfferEnabled: false,
+  secondChatPrice: 0,
+  secondCallPrice: 0,
+});
 
   /* ------------------ LOAD CONFIG ------------------ */
 
@@ -100,15 +118,20 @@ export default function PricingPanel() {
   };
 
   const handleSave = async () => {
-    await updateConfig({
-      variables: {
-        ...form,
-        firstChatPrice: Number(form.firstChatPrice),
-        firstCallPrice: Number(form.firstCallPrice),
-        secondChatPrice: Number(form.secondChatPrice),
-        secondCallPrice: Number(form.secondCallPrice)
-      }
-    });
+  await updateConfig({
+  variables: {
+    ...form,
+
+    globalChatPrice: Number(form.globalChatPrice),
+    globalCallPrice: Number(form.globalCallPrice),
+
+    firstChatPrice: Number(form.firstChatPrice),
+    firstCallPrice: Number(form.firstCallPrice),
+
+    secondChatPrice: Number(form.secondChatPrice),
+    secondCallPrice: Number(form.secondCallPrice),
+  },
+});
   };
 
   if (loading) return <p>Loading...</p>;
@@ -128,7 +151,7 @@ export default function PricingPanel() {
         <h2 className="font-semibold">Pricing Config</h2>
 
         {/* ---------- FIRST OFFER ---------- */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-3 gap-5">
           <div className="border border-gray-200 rounded-xl shadow-xl p-4">
             <h3 className="font-semibold font-serif text-center text-sm  mb-2">First Time Offer</h3>
 
@@ -184,6 +207,40 @@ export default function PricingPanel() {
               />
             </div>
           </div>
+
+          <div className="border border-gray-200 rounded-xl shadow-xl p-4">
+  <h3 className="font-semibold font-serif text-center text-sm mb-2">
+    Global Offer
+  </h3>
+
+  <Toggle
+    value={form.isGlobalOfferEnabled}
+    onChange={() =>
+      handleChange(
+        "isGlobalOfferEnabled",
+        !form.isGlobalOfferEnabled
+      )
+    }
+  />
+
+  <div className="flex gap-10">
+    <Input
+      label="Chat Price"
+      value={form.globalChatPrice}
+      onChange={(v) =>
+        handleChange("globalChatPrice", v)
+      }
+    />
+
+    <Input
+      label="Call Price"
+      value={form.globalCallPrice}
+      onChange={(v) =>
+        handleChange("globalCallPrice", v)
+      }
+    />
+  </div>
+</div>
         </div>
 
         {/* SAVE */}
