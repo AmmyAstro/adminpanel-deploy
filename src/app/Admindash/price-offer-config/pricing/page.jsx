@@ -82,7 +82,7 @@ const [form, setForm] = useState({
   globalCallPrice: 0,
 
   // First
-  isFirstOfferEnabled: true,
+  isFirstOfferEnabled: false,
   firstChatPrice: 0,
   firstCallPrice: 0,
 
