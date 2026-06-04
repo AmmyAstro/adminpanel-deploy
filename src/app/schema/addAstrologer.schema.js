@@ -40,6 +40,11 @@ export const addAstrologerSchema = z.object({
 phoneNumber: z.string().regex(/^[6-9]\d{9}$/, "Invalid phone number"),
  pincode: z.coerce.number().min(100000).max(999999),
   email: z.string().email("Invalid email"),
+  dateOfBirth: z
+  .string()
+  .refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date of birth",
+  }),
 
   experience: z.coerce.number().min(0),
 

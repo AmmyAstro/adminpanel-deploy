@@ -37,6 +37,7 @@ const GET_APPLICATION_BY_ID = gql`
       name
       email
       phoneNumber
+        dateOfBirth 
       gender
       experience
       languages
@@ -63,9 +64,9 @@ const GET_APPLICATION_BY_ID = gql`
 
 export default function AddAstro() {
   const params = useSearchParams();
-const appId = params?.get("appId") || "";
+  const appId = params?.get("appId") || "";
   console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", appId);
-  
+
   const [existingDocs, setExistingDocs] = useState({});
   const { data: appData, loading: appLoading } = useQuery(
     GET_APPLICATION_BY_ID,
@@ -82,6 +83,7 @@ const appId = params?.get("appId") || "";
   const emptyForm = {
     astroname: "",
     displayName: "",
+    dateOfBirth: "",
     profilePic: null,
     email: "",
     phoneNumber: "",
@@ -153,6 +155,7 @@ const appId = params?.get("appId") || "";
   const dummyAstrologerData = {
     astroname: "Rahul Sharma",
     displayName: "Astro Rahul",
+      dateOfBirth: "1995-05-15", 
     email: "rahulastro@gmail.com",
     phoneNumber: "9876543210",
     experience: 5,
@@ -257,6 +260,7 @@ const appId = params?.get("appId") || "";
       gender: "MALE",
       tzone: "In",
       tags: "New",
+       dateOfBirth: "",
       profilePic: null,
       vtags: "not verified",
       expertise: [],
@@ -327,6 +331,7 @@ const appId = params?.get("appId") || "";
       displayName: app.name,
       email: app.email,
       phoneNumber: app.phoneNumber,
+       dateOfBirth: app.dateOfBirth || "", 
       gender: app.gender,
       experience: app.experience,
       address: app.address,
@@ -496,14 +501,12 @@ const appId = params?.get("appId") || "";
     <button
       type="button"
       onClick={() => onChange(!value)}
-      className={`w-8 h-4 flex items-center rounded-full p-1 ${
-        value ? "bg-green-500" : "bg-gray-300"
-      }`}
+      className={`w-8 h-4 flex items-center rounded-full p-1 ${value ? "bg-green-500" : "bg-gray-300"
+        }`}
     >
       <div
-        className={`bg-white w-3 h-3 rounded-full shadow transform ${
-          value ? "translate-x-4" : ""
-        }`}
+        className={`bg-white w-3 h-3 rounded-full shadow transform ${value ? "translate-x-4" : ""
+          }`}
       />
     </button>
   );
@@ -681,7 +684,7 @@ const appId = params?.get("appId") || "";
 
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">
-              Phone Number
+              DOB (for age calculation)
             </label>
             <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
               <img
@@ -691,18 +694,19 @@ const appId = params?.get("appId") || "";
               />
               <CustomInput
                 className="w-full outline-none border-0 border-none bg-transparent"
-                placeholder="Enter phone number"
-                type="text"
-                inputMode="numeric"
-                {...register("phoneNumber")}
+                placeholder="Enter date of birth"
+                type="date"
+                {...register("dateOfBirth")}
               />
             </div>
-            {errors.phoneNumber && (
+            {errors.dateOfBirth && (
               <p className="text-red-500 text-xs">
-                {errors.phoneNumber.message}
+                {errors.dateOfBirth.message}
               </p>
             )}
           </div>
+
+
 
           <div>
             <label className="block text-sm font-medium text-gray-500    mb-1">
@@ -768,6 +772,30 @@ const appId = params?.get("appId") || "";
             </div>
             {errors.pincode && (
               <p className="text-red-500 text-xs">{errors.pincode.message}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">
+              Phone Number
+            </label>
+            <div className="flex items-center gap-2 border border-gray-400 rounded-full px-2 p-1">
+              <img
+                src="/admin-img/userte.png"
+                alt="user"
+                className="input-img-side"
+              />
+              <CustomInput
+                className="w-full outline-none border-0 border-none bg-transparent"
+                placeholder="Enter phone number"
+                type="text"
+                inputMode="numeric"
+                {...register("phoneNumber")}
+              />
+            </div>
+            {errors.phoneNumber && (
+              <p className="text-red-500 text-xs">
+                {errors.phoneNumber.message}
+              </p>
             )}
           </div>
 

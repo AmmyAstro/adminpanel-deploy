@@ -9,7 +9,7 @@ export const mapAstrologerPayload = (formData) => {
 
     phoneNumber: String(formData.phoneNumber),
     // password: formData.password,
-
+  dateOfBirth: formData.dateOfBirth, 
     experience: Number(formData.experience),
 
     expertise: formData.expertise,
