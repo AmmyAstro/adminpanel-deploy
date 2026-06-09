@@ -10,6 +10,7 @@ import { useActionHandler } from "@/hooks/useActionHandler";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { gql } from "@apollo/client";
+import { DELETE_CATEGORY, GET_CATEGORIES } from "@/app/graphQL/astroHiring";
 
 /* ------------------ GRAPHQL ------------------ */
 
@@ -27,15 +28,6 @@ const GET_SERVICES = gql`
         id
         name
       }
-    }
-  }
-`;
-
-const GET_CATEGORIES = gql`
-  query getCategories {
-    getCategories {
-      id
-      name
     }
   }
 `;
@@ -75,18 +67,17 @@ const DELETE_SERVICE = gql`
 
 export default function DhwaniServicesAdmin() {
   const client = useApolloClient();
-
+  const { data: catData,  refetch: refetchCategories, } = useQuery(GET_CATEGORIES);
+  const [deleteCategory] = useMutation(DELETE_CATEGORY);
   const { can, isSuperAdmin } = usePermissions();
   const { confirmState, setConfirmState, executeAction, handleConfirm } =
     useActionHandler();
 
-const canRead = isSuperAdmin || can("services", "read");
-const canCreate = isSuperAdmin || can("services", "create");
-const canUpdate = isSuperAdmin || can("services", "update");
+  const canRead = isSuperAdmin || can("services", "read");
+  const canCreate = isSuperAdmin || can("services", "create");
+  const canUpdate = isSuperAdmin || can("services", "update");
 
   const { data, refetch } = useQuery(GET_SERVICES);
-  const { data: catData, refetch: refetchCategories } =
-    useQuery(GET_CATEGORIES);
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
   const [createService] = useMutation(CREATE_SERVICE);
@@ -105,11 +96,12 @@ const canUpdate = isSuperAdmin || can("services", "update");
     longText: "",
     categoryId: "",
   });
+  const [file, setFile] = useState(null);
 
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategoryInput, setNewCategoryInput] = useState("");
   const [preview, setPreview] = useState("");
-
+  const [modalType, setModalType] = useState("service");
   /* ------------------ EDIT PREFILL ------------------ */
 
   useEffect(() => {
@@ -140,7 +132,9 @@ const canUpdate = isSuperAdmin || can("services", "update");
       longText: "",
       categoryId: "",
     });
+
     setPreview("");
+    setFile(null);
     setEditing(null);
     setIsNewCategory(false);
     setNewCategoryInput("");
@@ -149,54 +143,71 @@ const canUpdate = isSuperAdmin || can("services", "update");
   /* ------------------ IMAGE ------------------ */
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
+    const selectedFile = e.target.files[0];
+
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
     }
   };
 
   /* ------------------ SUBMIT ------------------ */
+  const handleDeleteCategory = (id) => {
+    executeAction({
+      mutationFn: deleteCategory,
+      variables: { id },
+      refetch,
+    });
+  };
 
-  const handleSubmit = async () => {
-    try {
-      const allowed =
-        isSuperAdmin ||
-        (editing
-          ? can("services", "update")
-          : can("services", "create"));
+  const handleServiceSubmit = async () => {
+    let imageUrl = "";
 
-      if (!allowed) return;
+    if (file) {
+      const formData = new FormData();
 
-      if (form.type === "CATEGORY" && !form.categoryId) {
-        return toast.error("Category required");
+      formData.append("image", file);
+
+      const res = await fetch(
+        "https://dhwaniastro.com/adminAuth/api/upload-services",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error("Image upload failed");
       }
 
-      const input = {
-        name: form.name,
-        slug: form.slug,
-        type: form.type,
-        price: form.price ? parseFloat(form.price) : null,
-        description: form.description,
-        longText: form.longText,
-        image: preview || "",
-        categoryId:
-          form.type === "CATEGORY" ? form.categoryId : null,
-      };
+      const data = await res.json();
 
-      if (editing) {
-        await updateService({ variables: { id: editing.id, input } });
-        toast.success("Updated ✅");
-      } else {
-        await createService({ variables: { input } });
-        toast.success("Created 🚀");
+      if (!data.url) {
+        throw new Error("Invalid upload response");
       }
 
-      resetForm();
-      setOpen(false);
-      refetch();
-    } catch (err) {
-      toast.error(err.message);
+      imageUrl = data.url;
     }
+
+    await createService({
+      variables: {
+        input: {
+          name: form.name,
+          slug: form.slug,
+          image: imageUrl,
+          price: Number(form.price),
+          description: form.description,
+          longText: form.longText,
+          categoryId: form.categoryId || null,
+        },
+      },
+    });
+
+    toast.success("Service Created");
+
+    refetch();
+    resetForm();
+    setOpen(false);
   };
 
   /* ------------------ DELETE ------------------ */
@@ -209,26 +220,78 @@ const canUpdate = isSuperAdmin || can("services", "update");
     });
   };
 
+  const handleCategorySubmit = async () => {
+    let imageUrl = "";
+
+    if (file) {
+      const formData = new FormData();
+
+      formData.append("image", file);
+
+      const res = await fetch(
+        "https://dhwaniastro.com/adminAuth/api/upload-services",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error("Image upload failed");
+      }
+
+      const data = await res.json();
+
+      if (!data.url) {
+        throw new Error("Invalid upload response");
+      }
+
+      imageUrl = data.url;
+    }
+
+    await createCategory({
+      variables: {
+        input: {
+          name: form.name,
+          slug: form.slug,
+          image: imageUrl,
+        },
+      },
+    });
+
+    toast.success("Category Created");
+
+    refetchCategories();
+    resetForm();
+    setOpen(false);
+  };
   /* ------------------ UI ------------------ */
 
   return (
     <div className="p-6">
+      <div className="flex gap-3 mb-4">
+        <button
+          onClick={() => {
+            resetForm();
+            setModalType("category");
+            setOpen(true);
+          }}
+          className="bg-green-600 text-white px-4 py-2 rounded"
+        >
+          + Add Category
+        </button>
 
-      <button
-        disabled={!canCreate}
-        onClick={() => {
-          if (!canCreate) return;
-          resetForm();
-          setOpen(true);
-        }}
-        className={`px-4 py-2 mb-4 rounded ${
-          !canCreate
-            ? "bg-gray-300 text-gray-500"
-            : "bg-purple-600 text-white"
-        }`}
-      >
-        + Add Service
-      </button>
+        <button
+          onClick={() => {
+            resetForm();
+            setModalType("service");
+            setOpen(true);
+          }}
+          className="bg-purple-600 text-white px-4 py-2 rounded"
+        >
+          + Add Service
+        </button>
+      </div>
 
       <ConfirmModal
         open={!!confirmState}
@@ -236,14 +299,67 @@ const canUpdate = isSuperAdmin || can("services", "update");
         onConfirm={handleConfirm}
       />
 
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  {catData?.getCategories?.map((cat) => (
+    <div
+      key={cat.id}
+      className="bg-white shadow rounded-lg overflow-hidden"
+    >
+      {cat.image && (
+        <Image
+          src={`https://dhwaniastro.com${cat.image}`}
+          alt={cat.name}
+          width={250}
+          height={150}
+          className="w-full h-32 object-cover"
+        />
+      )}
+
+      <div className="p-3">
+        <h3 className="font-semibold">
+          {cat.name}
+        </h3>
+
+        <p className="text-xs text-gray-500 mb-3">
+          {cat.slug}
+        </p>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              setModalType("category");
+              setEditing(cat);
+              setOpen(true);
+            }}
+            className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+          >
+            Edit
+          </button>
+
+          <ProtectedActionButton
+            module="services"
+            action="delete"
+            executeAction={executeAction}
+            mutationFn={deleteCategory}
+            variables={{ id: cat.id }}
+           onSuccess={refetch}
+            className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+          >
+            Delete
+          </ProtectedActionButton>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
       {/* LIST */}
       <div className="grid grid-cols-3 gap-4">
         {data?.getServices?.map((item) => (
           <div key={item.id} className="p-4 bg-white shadow rounded">
-
             {item.image && (
               <Image
-                src={item.image}
+                src={`https://dhwaniastro.com${item.image}`}
                 alt=""
                 width={300}
                 height={150}
@@ -288,176 +404,175 @@ const canUpdate = isSuperAdmin || can("services", "update");
 
       {/* MODAL */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-          <div className="bg-white p-6 rounded w-[420px]">
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-[500px] max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4">
+              {modalType === "category" ? "Add Category" : "Add Service"}
+            </h2>
 
-            <input
-              placeholder="Name"
-              className="border p-2 w-full mb-2"
-              value={form.name}
-              onChange={(e) =>
-                setForm({ ...form, name: e.target.value })
-              }
-            />
+            {/* CATEGORY FORM */}
 
-            <input
-              placeholder="Slug"
-              className="border p-2 w-full mb-2"
-              value={form.slug}
-              onChange={(e) =>
-                setForm({ ...form, slug: e.target.value })
-              }
-            />
-
-            <select
-              className="border p-2 w-full mb-2"
-              value={form.type}
-              onChange={(e) => {
-                setForm({
-                  ...form,
-                  type: e.target.value,
-                  categoryId: "",
-                });
-                setIsNewCategory(false);
-              }}
-            >
-              <option value="DIRECT_SERVICE">Direct</option>
-              <option value="CATEGORY">Category</option>
-            </select>
-
-            {/* CATEGORY */}
-            {form.type === "CATEGORY" && (
+            {modalType === "category" && (
               <>
-                {!isNewCategory ? (
-                  <select
-                    className="border p-2 w-full mb-2"
-                    value={form.categoryId || ""}
-                    onChange={(e) => {
-                      if (e.target.value === "__new__") {
-                        setIsNewCategory(true);
-                      } else {
-                        setForm({
-                          ...form,
-                          categoryId: e.target.value,
-                        });
-                      }
-                    }}
-                  >
-                    <option value="">Select Category</option>
+                <input
+                  placeholder="Category Name"
+                  className="border p-2 w-full mb-3"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    })
+                  }
+                />
 
-                    {catData?.getCategories?.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
+                <input
+                  placeholder="Category Slug"
+                  className="border p-2 w-full mb-3"
+                  value={form.slug}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      slug: e.target.value,
+                    })
+                  }
+                />
 
-                    <option value="__new__">+ Create New</option>
-                  </select>
-                ) : (
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      placeholder="New Category"
-                      className="border p-2 flex-1"
-                      value={newCategoryInput}
-                      onChange={(e) =>
-                        setNewCategoryInput(e.target.value)
-                      }
-                    />
+                <input
+                  type="file"
+                  className="border p-2 w-full mb-3"
+                  onChange={handleImageChange}
+                />
 
-                    <button
-                      className="bg-green-500 text-white px-3"
-                      onClick={async () => {
-                        const name = newCategoryInput.trim().toLowerCase();
-
-                        if (!name) return toast.error("Enter name");
-
-                        const existing = catData?.getCategories?.find(
-                          (c) => c.name.toLowerCase() === name
-                        );
-
-                        if (existing) {
-                          setForm({
-                            ...form,
-                            categoryId: existing.id,
-                          });
-                          setIsNewCategory(false);
-                          setNewCategoryInput("");
-                          return;
-                        }
-
-                        const res = await createCategory({
-                          variables: { input: { name } },
-                        });
-
-                        await refetchCategories(); // 🔥 fix
-
-                        setForm({
-                          ...form,
-                          categoryId: res.data.createCategory.id,
-                        });
-
-                        setIsNewCategory(false);
-                        setNewCategoryInput("");
-                      }}
-                    >
-                      +
-                    </button>
-                  </div>
+                {preview && (
+                  <Image
+                    src={preview}
+                    alt=""
+                    width={300}
+                    height={200}
+                    className="w-full h-40 object-cover rounded mb-3"
+                  />
                 )}
+
+                <button
+                  onClick={handleCategorySubmit}
+                  className="bg-green-600 text-white w-full p-2 rounded"
+                >
+                  Save Category
+                </button>
               </>
             )}
 
-            {/* EXTRA FIELDS */}
-            <input
-              placeholder="Price"
-              className="border p-2 w-full mb-2"
-              value={form.price}
-              onChange={(e) =>
-                setForm({ ...form, price: e.target.value })
-              }
-            />
+            {/* SERVICE FORM */}
 
-            <input
-              placeholder="Description"
-              className="border p-2 w-full mb-2"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-            />
+            {modalType === "service" && (
+              <>
+                <input
+                  placeholder="Service Name"
+                  className="border p-2 w-full mb-3"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    })
+                  }
+                />
 
-            <textarea
-              placeholder="Long Text"
-              className="border p-2 w-full mb-2"
-              value={form.longText}
-              onChange={(e) =>
-                setForm({ ...form, longText: e.target.value })
-              }
-            />
+                <input
+                  placeholder="Service Slug"
+                  className="border p-2 w-full mb-3"
+                  value={form.slug}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      slug: e.target.value,
+                    })
+                  }
+                />
 
-            <input
-              type="file"
-              className="border p-2 w-full mb-2"
-              onChange={handleImageChange}
-            />
+                {/* CATEGORY DROPDOWN */}
 
-            {preview && (
-              <Image
-                src={preview}
-                alt=""
-                width={200}
-                height={200}
-                className="h-32 w-full object-cover"
-              />
+                <select
+                  className="border p-2 w-full mb-3"
+                  value={form.categoryId}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      categoryId: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Direct Service</option>
+
+                  {catData?.getCategories?.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  placeholder="Price"
+                  className="border p-2 w-full mb-3"
+                  value={form.price}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      price: e.target.value,
+                    })
+                  }
+                />
+
+                <input
+                  placeholder="Short Description"
+                  className="border p-2 w-full mb-3"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      description: e.target.value,
+                    })
+                  }
+                />
+
+                <textarea
+                  placeholder="Long Description"
+                  className="border p-2 w-full mb-3"
+                  rows={5}
+                  value={form.longText}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      longText: e.target.value,
+                    })
+                  }
+                />
+
+                <input
+                  type="file"
+                  className="border p-2 w-full mb-3"
+                  onChange={handleImageChange}
+                />
+
+                {preview && (
+                  <Image
+                    src={preview}
+                    alt=""
+                    width={300}
+                    height={200}
+                    className="w-full h-40 object-cover rounded mb-3"
+                  />
+                )}
+
+                <button
+                  onClick={handleServiceSubmit}
+                  className="bg-purple-600 text-white w-full p-2 rounded"
+                >
+                  Save Service
+                </button>
+              </>
             )}
-
-            <button
-              onClick={handleSubmit}
-              className="bg-purple-600 text-white w-full p-2"
-            >
-              Save
-            </button>
-
           </div>
         </div>
       )}

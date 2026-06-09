@@ -279,3 +279,19 @@ export const UPDATE_ASTROLOGER = gql`
     }
   }
 `;
+
+ export const GET_CATEGORIES = gql`
+  query getCategories {
+    getCategories {
+      id
+      name
+      slug
+      image
+    }
+  }
+`;
+export const DELETE_CATEGORY = gql`
+  mutation ($id: ID!) {
+    deleteCategory(id: $id)
+  }
+`;

@@ -88,7 +88,7 @@ export default function GiftManager() {
     setPreview(URL.createObjectURL(selected));
   };
 
-  // 🔥 MAIN SUBMIT LOGIC
+  //  MAIN SUBMIT LOGIC
   const handleSubmit = async () => {
     try {
       setSubmitting(true);

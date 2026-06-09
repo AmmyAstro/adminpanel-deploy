@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-     images: {
-    domains: ['newsite-cvo9.onrender.com'], 
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "dhwaniastro.com",
+      },
+    ],
   },
 };
 
