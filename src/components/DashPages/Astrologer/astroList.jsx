@@ -90,7 +90,7 @@ export default function AstroList() {
   };
 
   const handleEdit = (id) => {
-    router.push(`/astrolist/edit/${id}`);
+    router.push(`/Admindash/astromain/edit-astrologer/${id}`);
   };
 
   /* =========================

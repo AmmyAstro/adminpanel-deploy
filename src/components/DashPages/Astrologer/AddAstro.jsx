@@ -14,8 +14,11 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
 import toast from "react-hot-toast";
-import { useSearchParams } from "next/navigation";
-
+import { useParams, useSearchParams } from "next/navigation";
+import {
+  GET_ASTROLOGER_BY_ID,
+  UPDATE_ASTROLOGER,
+} from "../../../app/graphQL/astroHiring";
 const ADD_ASTROLOGER = gql`
   mutation AddAstrologer($data: AddAstrologerInput!) {
     addAstrologer(data: $data) {
@@ -37,7 +40,7 @@ const GET_APPLICATION_BY_ID = gql`
       name
       email
       phoneNumber
-        dateOfBirth 
+      dateOfBirth
       gender
       experience
       languages
@@ -63,9 +66,33 @@ const GET_APPLICATION_BY_ID = gql`
 `;
 
 export default function AddAstro() {
-  const params = useSearchParams();
-  const appId = params?.get("appId") || "";
-  console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", appId);
+  // const params = useSearchParams();
+  const params = useParams();
+
+  const astrologerId = params?.id;
+
+  const isEditMode = !!astrologerId;
+
+  const {
+    data: astroData,
+    loading: astroLoading,
+    error: astroError,
+  } = useQuery(GET_ASTROLOGER_BY_ID, {
+    variables: {
+      id: astrologerId,
+    },
+    skip: !isEditMode,
+  });
+  const appId = params?.appId || "";
+  console.log("LOADING:", astroLoading);
+  console.log("ERROR:", astroError);
+  console.log("DATA:", astroData);
+  console.log("xxxxxxxxxxxxxxxxxxxxtttttttttttttttttttxxxxxxxxxxx", appId);
+
+  console.log("PARAMSxxxx:", params);
+  console.log("ASTROLOGER IDxxxxxxxxxxxx:", astrologerId);
+  console.log("EDIT MODExxxxxxxxxxxxxx:", isEditMode);
+  console.log("ASTRO DATAxxxxxxxxxxxxxxxxxxx:", astroData);
 
   const [existingDocs, setExistingDocs] = useState({});
   const { data: appData, loading: appLoading } = useQuery(
@@ -76,7 +103,9 @@ export default function AddAstro() {
     },
   );
 
-  const [addAstrologer, { loading, error }] = useMutation(ADD_ASTROLOGER);
+  const [addAstrologer, { loading: addLoading, error }] = useMutation(ADD_ASTROLOGER);
+const [updateAstrologer, { loading: updateLoading }] =
+  useMutation(UPDATE_ASTROLOGER);
 
   const [dummyLoading, setDummyLoading] = useState(false);
 
@@ -155,7 +184,7 @@ export default function AddAstro() {
   const dummyAstrologerData = {
     astroname: "Rahul Sharma",
     displayName: "Astro Rahul",
-      dateOfBirth: "1995-05-15", 
+    dateOfBirth: "1995-05-15",
     email: "rahulastro@gmail.com",
     phoneNumber: "9876543210",
     experience: 5,
@@ -260,7 +289,7 @@ export default function AddAstro() {
       gender: "MALE",
       tzone: "In",
       tags: "New",
-       dateOfBirth: "",
+      dateOfBirth: "",
       profilePic: null,
       vtags: "not verified",
       expertise: [],
@@ -331,7 +360,7 @@ export default function AddAstro() {
       displayName: app.name,
       email: app.email,
       phoneNumber: app.phoneNumber,
-       dateOfBirth: app.dateOfBirth || "", 
+      dateOfBirth: app.dateOfBirth || "",
       gender: app.gender,
       experience: app.experience,
       address: app.address,
@@ -368,6 +397,80 @@ export default function AddAstro() {
   }, [appData, reset]);
 
   const pincode = watch("pincode");
+
+  // edit --------------------
+  useEffect(() => {
+    if (!astroData?.getAstrologerById) return;
+
+    const astro = astroData.getAstrologerById;
+
+    const primaryAddress = astro.addresses?.[0];
+
+    reset({
+      astroname: astro.name || "",
+      displayName: astro.displayName || "",
+
+      email: astro.email || "",
+      phoneNumber: astro.contactNo || "",
+
+      dateOfBirth: astro.dateOfBirth ? astro.dateOfBirth.split("T")[0] : "",
+
+      gender: astro.gender || "MALE",
+
+      experience: astro.experience || 0,
+
+      address: primaryAddress?.street || "",
+
+      pincode: primaryAddress?.pincode || "",
+
+      countryStateCity: {
+        country: primaryAddress?.country || "",
+        state: primaryAddress?.state || "",
+        city: primaryAddress?.city || "",
+      },
+
+      expertise: astro.skills || [],
+      languages: astro.languages || [],
+      problems: astro.problems || [],
+
+      about: astro.about || "",
+
+      tags: astro.tags || "New",
+      vtags: astro.vtags || "not verified",
+
+      pricing: astro.pricing?.length > 0 ? astro.pricing : emptyForm.pricing,
+
+      bankDetails: {
+        accountHolderName: astro.kycDetail?.accountHolderName || "",
+
+        accountNumber: astro.kycDetail?.accountNumber || "",
+
+        bankName: astro.kycDetail?.bankName || "",
+
+        ifscCode: astro.kycDetail?.ifsc || "",
+
+        branchName: astro.kycDetail?.branchName || "",
+
+        panCardNumber: astro.kycDetail?.panNumber || "",
+      },
+    });
+
+    const BASE_URL = "https://dhwaniastro.com/adminAuth/api/upload-documents";
+
+    setExistingDocs({
+      aadhaar: astro.kycDetail?.aadhaarImage
+        ? BASE_URL + astro.kycDetail.aadhaarImage
+        : null,
+
+      panCard: astro.kycDetail?.panImage
+        ? BASE_URL + astro.kycDetail.panImage
+        : null,
+
+      passbook: astro.kycDetail?.passbookImage
+        ? BASE_URL + astro.kycDetail.passbookImage
+        : null,
+    });
+  }, [astroData, reset]);
 
   useEffect(() => {
     if (!pincode || pincode.toString().length !== 6) return;
@@ -454,16 +557,43 @@ export default function AddAstro() {
         status: true, // ✅ top-level status
       });
 
-      console.log("xxxxxxxxxxxxxxxxxxxxxxxx", payload);
+      console.log("PAYLOADxxxxxxxxxxxxxx:", payload);
 
-      const res = await addAstrologer({ variables: { data: payload } });
+      let res;
 
-      if (res?.data?.addAstrologer?.success) {
-        toast.success(res.data.addAstrologer.message);
+      if (isEditMode) {
+        res = await updateAstrologer({
+          variables: {
+            astrologerId,
+            data: payload,
+          },
+        });
+          console.log(
+    "UPDATE RESPONSE:",
+    res?.data?.updateAstrologer
+  );
 
-        reset(emptyForm);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        toast.success("Astrologer updated successfully ✅");
+      } else {
+        res = await addAstrologer({
+          variables: {
+            data: payload,
+          },
+        });
+
+        if (res?.data?.addAstrologer?.success) {
+          toast.success(res.data.addAstrologer.message);
+        }
       }
+
+    if (!isEditMode) {
+  reset(emptyForm);
+}
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } catch (err) {
       console.log(err);
       toast.error("Something went wrong ❌");
@@ -501,15 +631,18 @@ export default function AddAstro() {
     <button
       type="button"
       onClick={() => onChange(!value)}
-      className={`w-8 h-4 flex items-center rounded-full p-1 ${value ? "bg-green-500" : "bg-gray-300"
-        }`}
+      className={`w-8 h-4 flex items-center rounded-full p-1 ${
+        value ? "bg-green-500" : "bg-gray-300"
+      }`}
     >
       <div
-        className={`bg-white w-3 h-3 rounded-full shadow transform ${value ? "translate-x-4" : ""
-          }`}
+        className={`bg-white w-3 h-3 rounded-full shadow transform ${
+          value ? "translate-x-4" : ""
+        }`}
       />
     </button>
   );
+  const isSubmitting = addLoading || updateLoading;
 
   return (
     <div className="min-h-screen">
@@ -534,7 +667,7 @@ export default function AddAstro() {
           />
         </div>
         <h2 className="text-xl font-bold text-purple-900">
-          Add New Astrologer
+          {isEditMode ? "Edit Astrologer" : "Add New Astrologer"}
         </h2>
         <Image
           src="/admin-img/wired-flat-21-avatar.gif"
@@ -705,8 +838,6 @@ export default function AddAstro() {
               </p>
             )}
           </div>
-
-
 
           <div>
             <label className="block text-sm font-medium text-gray-500    mb-1">
@@ -1274,9 +1405,13 @@ export default function AddAstro() {
             type="submit"
             variant="green"
             className="px-4 py-1"
-            disabled={loading}
+           disabled={isSubmitting}
           >
-            {loading ? "Saving..." : "Save Astrologer"}
+            {isSubmitting
+              ? "Saving..."
+              : isEditMode
+                ? "Update Astrologer"
+                : "Save Astrologer"}
           </CustomButton>
 
           <CustomButton

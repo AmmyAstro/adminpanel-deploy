@@ -206,3 +206,76 @@ export const DELETE_OFFER = gql`
     }
   }
 `;
+
+export const GET_ASTROLOGER_BY_ID = gql`
+  query GetAstrologerById($id: ID!) {
+    getAstrologerById(id: $id) {
+      id
+
+      name
+      displayName
+      profilePic
+      dateOfBirth
+
+      email
+      contactNo
+
+      gender
+      experience
+
+      about
+
+      tags
+      vtags
+
+      languages
+      skills
+      problems
+
+      pricing {
+        type
+        price
+        offerPrice
+        commissionPercent
+        isActive
+      }
+
+      kycDetail {
+        accountHolderName
+        accountNumber
+        bankName
+        ifsc
+        branchName
+        panNumber
+
+        profileImage
+        aadhaarImage
+        panImage
+        passbookImage
+      }
+
+      addresses {
+        street
+        city
+        state
+        country
+        pincode
+      }
+    }
+  }
+`;
+export const UPDATE_ASTROLOGER = gql`
+  mutation UpdateAstrologer(
+    $astrologerId: ID!
+    $data: UpdateAstrologerInput!
+  ) {
+    updateAstrologer(
+      astrologerId: $astrologerId
+      data: $data
+    ) {
+      id
+      name
+      email
+    }
+  }
+`;
