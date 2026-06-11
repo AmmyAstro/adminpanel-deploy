@@ -15,18 +15,20 @@ import { DELETE_CATEGORY, GET_CATEGORIES } from "@/app/graphQL/astroHiring";
 /* ------------------ GRAPHQL ------------------ */
 
 const GET_SERVICES = gql`
-  query getServices {
+  query GetServices {
     getServices {
       id
       name
       slug
-      type
-      price
-      description
       image
+      description
+      longText
+      price
+
       category {
         id
         name
+        slug
       }
     }
   }
@@ -67,7 +69,8 @@ const DELETE_SERVICE = gql`
 
 export default function DhwaniServicesAdmin() {
   const client = useApolloClient();
-  const { data: catData,  refetch: refetchCategories, } = useQuery(GET_CATEGORIES);
+  const { data: catData, refetch: refetchCategories } =
+    useQuery(GET_CATEGORIES);
   const [deleteCategory] = useMutation(DELETE_CATEGORY);
   const { can, isSuperAdmin } = usePermissions();
   const { confirmState, setConfirmState, executeAction, handleConfirm } =
@@ -299,107 +302,118 @@ export default function DhwaniServicesAdmin() {
         onConfirm={handleConfirm}
       />
 
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-  {catData?.getCategories?.map((cat) => (
-    <div
-      key={cat.id}
-      className="bg-white shadow rounded-lg overflow-hidden"
-    >
-      {cat.image && (
-        <Image
-          src={`https://dhwaniastro.com${cat.image}`}
-          alt={cat.name}
-          width={250}
-          height={150}
-          className="w-full h-32 object-cover"
-        />
-      )}
-
-      <div className="p-3">
-        <h3 className="font-semibold">
-          {cat.name}
-        </h3>
-
-        <p className="text-xs text-gray-500 mb-3">
-          {cat.slug}
-        </p>
-
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              setModalType("category");
-              setEditing(cat);
-              setOpen(true);
-            }}
-            className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
-          >
-            Edit
-          </button>
-
-          <ProtectedActionButton
-            module="services"
-            action="delete"
-            executeAction={executeAction}
-            mutationFn={deleteCategory}
-            variables={{ id: cat.id }}
-           onSuccess={refetch}
-            className="bg-red-500 text-white px-3 py-1 rounded text-xs"
-          >
-            Delete
-          </ProtectedActionButton>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
-
-      {/* LIST */}
-      <div className="grid grid-cols-3 gap-4">
-        {data?.getServices?.map((item) => (
-          <div key={item.id} className="p-4 bg-white shadow rounded">
-            {item.image && (
-              <Image
-                src={`https://dhwaniastro.com${item.image}`}
-                alt=""
-                width={300}
-                height={150}
-                className="h-32 w-full object-cover rounded mb-2"
-              />
-            )}
-
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-            <p>₹{item.price || "-"}</p>
-            <p>Type: {item.type}</p>
-            <p>Category: {item.category?.name || "None"}</p>
-
-            <div className="flex gap-2 mt-2">
-              <button
-                disabled={!canUpdate}
-                onClick={() => {
-                  if (!canUpdate) return;
-                  setEditing(item);
-                  setOpen(true);
-                }}
-                className="bg-blue-500 text-white px-2 py-1 text-xs"
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2 shadow-xl rounded-xl px-4 py-3">
+          <h2 className="text-2xl font-bold mb-4">Categories</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {catData?.getCategories?.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-white flex items-center justify-evenly shadow rounded-xl p-2 overflow-hidden"
               >
-                Edit
-              </button>
+                {cat.image && (
+                  <Image
+                    src={`https://dhwaniastro.com${cat.image}`}
+                    alt={cat.name}
+                    width={250}
+                    height={150}
+                    className="w-20 h-20 rounded-full object-cover"
+                  />
+                )}
 
-              <ProtectedActionButton
-                module="services"
-                action="delete"
-                executeAction={executeAction}
-                mutationFn={deleteService}
-                variables={{ id: item.id }}
-                onSuccess={refetch}
-                className="bg-red-500 text-white px-2 py-1 text-xs"
-              >
-                Delete
-              </ProtectedActionButton>
-            </div>
+                <div className="p-3">
+                  <h3 className="font-semibold">{cat.name}</h3>
+
+                  <p className="text-xs text-gray-500 mb-3">{cat.slug}</p>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setModalType("category");
+                        setEditing(cat);
+                        setOpen(true);
+                      }}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs"
+                    >
+                      Edit
+                    </button>
+
+                    <ProtectedActionButton
+                      module="services"
+                      action="delete"
+                      executeAction={executeAction}
+                      mutationFn={deleteCategory}
+                      variables={{ id: cat.id }}
+                      onSuccess={refetch}
+                      className="bg-red-500 text-white px-3 py-1 rounded-full text-xs"
+                    >
+                      Delete
+                    </ProtectedActionButton>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* LIST */}
+        <div className="flex flex-col gap-2 shadow-xl rounded-xl px-4 py-3">
+          <h2 className="text-2xl font-bold mb-4">Services</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {data?.getServices?.map((item) => (
+              <div
+                key={item.id}
+                className="p-4 flex items-start justify-between bg-white shadow rounded-xl"
+              >
+                <div className="flex flex-col items-center">
+                  {item.image && (
+                    <Image
+                      src={`https://dhwaniastro.com${item.image}`}
+                      alt=""
+                      width={300}
+                      height={150}
+                      className="h-32 w-full object-cover rounded mb-2"
+                    />
+                  )}
+                  <h3>{item.name}</h3>
+                  <p>₹{item.price || "-"}</p>
+                </div>
+
+                <div className="p-2">
+                  <p>{item.description}</p>
+
+                  <p>Category: {item.category?.name || "None"}</p>
+
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      disabled={!canUpdate}
+                      onClick={() => {
+                        if (!canUpdate) return;
+                        setEditing(item);
+                        setOpen(true);
+                      }}
+                      className="bg-blue-500 text-white px-2 py-1 text-xs"
+                    >
+                      Edit
+                    </button>
+
+                    <ProtectedActionButton
+                      module="services"
+                      action="delete"
+                      executeAction={executeAction}
+                      mutationFn={deleteService}
+                      variables={{ id: item.id }}
+                      onSuccess={refetch}
+                      className="bg-red-500 text-white px-2 py-1 text-xs"
+                    >
+                      Delete
+                    </ProtectedActionButton>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* MODAL */}
