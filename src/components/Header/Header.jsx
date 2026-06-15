@@ -1,4 +1,3 @@
-
 "use client";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,60 +11,59 @@ import { useRouter } from "next/navigation";
 import CustomButton from "../Custom/CustomButtom";
 import cookieHelper from "@/app/helper/cookieHelper";
 
-
 export default function Header() {
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const [isNotifMenuOpen, setNotifMenuOpen] = useState(false);
   const [isPricingOpen, setPricing] = useState(false);
 
-
   const router = useRouter();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-
-  cookieHelper.remove();
+    cookieHelper.remove();
 
     dispatch(logout());
-
 
     router.push("/");
   };
 
-
   return (
-    <header className="fixed top-0 z-100 w-full left-0 flex h-[3.5rem] items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
-
+    <header className="fixed top-0 z-100 w-full left-0 flex h-14 items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
       <div className="flex items-center gap-2">
-        <Link href="/">
+        <Link href="/Admindash">
           <div className="flex items-center gap-2">
-            <Image src="/admin-img/adlogo.png" alt="logo" width={140} height={140} />
-
+            <Image
+              src="/admin-img/adlogo.png"
+              alt="logo"
+              width={140}
+              height={140}
+            />
           </div>
         </Link>
       </div>
 
-
       <div className="flex items-center gap-2 border rounded-full px-3 py-2 w-100 shadow-lg bg-gray-100">
-
         <input
           type="search"
           placeholder="Enter something to search..."
           className="bg-transparent outline-none flex-1 text-sm placeholder:text-gray-400  text-gray-800"
         />
-        <Image src="/admin-img/search.png" alt="search" width={18} height={18} />
+        <Image
+          src="/admin-img/search.png"
+          alt="search"
+          width={18}
+          height={18}
+        />
       </div>
 
-
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-4 relative rounded-full bg-[#ffffff1d] px-3 py-2 border-1 border-[#ffffff36]">
+        <div className="flex items-center gap-4 relative rounded-full bg-[#ffffff1d] px-3 py-2 border border-[#ffffff36]">
           <button onClick={() => setNotifMenuOpen(!isNotifMenuOpen)}>
             <PiChatTeardropTextFill className="text-2xl text-white" />
           </button>
           <button onClick={() => setPricing(!isPricingOpen)}>
             <IoNotifications className="text-2xl text-white" />
           </button>
-
 
           {isNotifMenuOpen && (
             <div className="absolute right-0 top-8 w-48 bg-white border rounded-lg shadow-md">
@@ -105,10 +103,12 @@ export default function Header() {
               >
                 Settings
               </Link>
-              <CustomButton onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" >
+              <CustomButton
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+              >
                 Logout
               </CustomButton>
-
             </div>
           )}
         </div>

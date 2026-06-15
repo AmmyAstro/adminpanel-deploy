@@ -47,7 +47,7 @@ const cards = [
     title: "Notice",
     subtitle: "Board",
     img: "/admin-img/gif/nb.gif",
-    link: "#",
+    link: "/Admindash/notice-board",
     bg: "bg-[#7569b6da]",
   },
   {

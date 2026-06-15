@@ -9,7 +9,7 @@ import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannerman
 // import AddTestimonial from "@/components/DashPages/SideBar/HomesidePage/Testimonial/addTestimonial";
 // import CouponMain from "@/components/DashPages/SideBar/HomesidePage/couponMain";
 // import PacakageMain from "@/components/DashPages/SideBar/HomesidePage/pacakageMain";
-import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
+// import BlogMain from "@/components/DashPages/SideBar/HomesidePage/blogMain";
 
 // import Staffmain from "@/components/DashPages/PrivilegeManager/Staffmain";
 
@@ -41,7 +41,7 @@ export default function AdminPanel() {
     // managecms: <ManageCMS />,
     // giftpage: <Giftpage />,
     // couponmain: <CouponMain />,
-    blogmain: <BlogMain />,
+    // blogmain: <BlogMain />,
     // astromain: <AstrologerMain />,
     // testimonialmain: <TestimonialList />,
     // custommain: <CustomerMain />,
