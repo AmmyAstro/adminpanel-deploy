@@ -263,15 +263,51 @@ export const DELETE_BLOG = gql`
 `;
 
 export const GET_BLOG_BY_SLUG = gql`
-  query GetBlogBySlug($slug: String!) {
-    blogBySlug(slug: $slug) {
+ query GetBlogBySlug($slug: String!) {
+  blogBySlug(slug: $slug) {
+    id
+    title
+    slug
+    language
+    shortDescription
+    content
+    featuredImage
+
+    status
+    publishDate
+
+    hashtags
+
+    metaTitle
+    metaDescription
+    metaKeywords
+
+    schemaMarkup
+
+    categories {
+      id
+      name
+    }
+  }
+}
+`;
+export const GET_BLOG_BY_ID = gql`
+  query GetBlog($id: ID!) {
+    blog(id: $id) {
       id
       title
       slug
+      language
       shortDescription
       content
       featuredImage
-      createdAt
+      hashtags
+      metaTitle
+      metaDescription
+      metaKeywords
+      schemaMarkup
+      status
+      publishDate
 
       categories {
         id
@@ -279,4 +315,19 @@ export const GET_BLOG_BY_SLUG = gql`
       }
     }
   }
+`;
+
+export const UPDATE_BLOG = gql`
+mutation UpdateBlog(
+  $id: ID!
+  $input: CreateBlogInput!
+) {
+  updateBlog(
+    id: $id
+    input: $input
+  ) {
+    id
+    title
+  }
+}
 `;

@@ -1,41 +1,51 @@
 "use client";
 
-import Link from "next/link";
+
 import BlogCard from "./BlogCard";
-import BlogSidebar from "./BlogSidebar";
+
 import {
   DELETE_BLOG,
   GET_BLOGS,
 } from "@/app/graphQL/managecms";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function BlogListPage() {
   const { data: blogData, loading, refetch } = useQuery(GET_BLOGS);
+  const router = useRouter();
 
 
   const [deleteBlog] = useMutation(DELETE_BLOG);
-  const handleDelete = async (id) => {
-    try {
-      const confirmDelete = window.confirm("Delete this blog?");
+const handleDelete = async (id) => {
+  try {
+    const confirmDelete = window.confirm(
+      "Delete this category?"
+    );
 
-      if (!confirmDelete) return;
+    if (!confirmDelete) return;
 
-      await deleteBlog({
-        variables: {
-          id,
-        },
-      });
+    await deleteBlogCategory({
+      variables: {
+        id,
+      },
+    });
 
-      toast.success("Blog deleted successfully");
+    toast.success(
+      "Category deleted successfully"
+    );
 
-      refetch();
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
+    refetch();
+  } catch (error) {
+    toast.error(
+      error.message ||
+        "Unable to delete category"
+    );
+  }
+};
 
   const handleEdit = (blog) => {
-    router.push(`/Admindash/managecms/blogs/edit/${blog.id}`);
+    router.push(`/Admindash/managecms/blogs/edit/${blog.slug}`);
   };
 
   return (

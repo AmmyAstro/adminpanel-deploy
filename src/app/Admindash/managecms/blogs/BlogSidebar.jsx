@@ -3,7 +3,6 @@
 import Image from "next/image";
 
 export default function BlogSidebar({ categories }) {
-
   const recentPosts = [
     {
       title: "How to Use Yantra for Money Growth",
@@ -22,25 +21,18 @@ export default function BlogSidebar({ categories }) {
     },
   ];
 
-
   return (
     <div className="space-y-10">
-
       {/* Recent Posts */}
 
       <div className="bg-white rounded-xl border p-5">
-
         <h3 className="font-semibold text-gray-400 uppercase mb-5">
           Recent Posts
         </h3>
 
         <div className="space-y-5">
-
           {recentPosts.map((post, index) => (
-            <div
-              key={index}
-              className="flex gap-3"
-            >
+            <div key={index} className="flex gap-3">
               <Image
                 src={post.image}
                 alt={post.title}
@@ -50,41 +42,28 @@ export default function BlogSidebar({ categories }) {
               />
 
               <div>
-                <h4 className="text-sm font-medium">
-                  {post.title}
-                </h4>
+                <h4 className="text-sm font-medium">{post.title}</h4>
 
-                <p className="text-xs text-gray-400 mt-1">
-                  {post.date}
-                </p>
+                <p className="text-xs text-gray-400 mt-1">{post.date}</p>
               </div>
             </div>
           ))}
-
         </div>
       </div>
 
       {/* Categories */}
 
       <div className="bg-white rounded-xl border p-5">
-
         <h3 className="font-semibold text-gray-400 uppercase mb-5">
           Categories
         </h3>
 
         <div className="space-y-3">
-
-        {categories.map((cat) => (
-  <div
-    key={cat.id}
-  >
-    {cat.name}
-  </div>
-))}
-
+          {categories.map((cat) => (
+            <div key={cat.id}>{cat.name}</div>
+          ))}
         </div>
       </div>
-
     </div>
   );
 }

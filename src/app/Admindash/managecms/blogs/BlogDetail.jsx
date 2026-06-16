@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function BlogDetails({
   blog,
 }) {
@@ -10,10 +12,12 @@ export default function BlogDetails({
   return (
     <div className="bg-white">
 
-      <img
-        src={`https://dhwaniastro.com${blog.featuredImage}`}
+      <Image
+         src={blog.featuredImage}
         alt={blog.title}
-        className="w-full rounded-xl"
+       width={800}
+  height={400}
+         className="w-full h-[200px] object-cover"
       />
 
       <div className="mt-6">

@@ -16,13 +16,13 @@ export default function BlogCard({ blog, onEdit, onDelete }) {
     };
     return (
         <div className="bg-white rounded-xl overflow-hidden border border-gray-300 shadow-xl ">
-            <Image
-                src={`https://dhwaniastro.com${blog.featuredImage}`}
-                alt={blog.title}
-                width={800}
-                height={400}
-                className="w-full h-[200px] object-cover"
-            />
+    <Image
+  src={blog.featuredImage}
+  alt={blog.title}
+  width={800}
+  height={400}
+  className="w-full h-[200px] object-cover"
+/>
 
             <div className="p-3">
                 <h2 className="text-2xl font-medium mb-2">{blog.title}</h2>
