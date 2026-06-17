@@ -16,7 +16,7 @@ import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannerman
 // import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 // import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
-import AstroProfile from "@/app/astroprofile/[id]/page";
+import AstroProfile from "@/app/Admindash/astromain/page";
 
 
 

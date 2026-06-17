@@ -17,7 +17,7 @@ export default function BlogCard({ blog, onEdit, onDelete }) {
     return (
         <div className="bg-white rounded-xl overflow-hidden border border-gray-300 shadow-xl ">
     <Image
-  src={blog.featuredImage}
+  src={`https://dhwaniastro.com${blog.featuredImage}`}
   alt={blog.title}
   width={800}
   height={400}

@@ -295,3 +295,108 @@ export const DELETE_CATEGORY = gql`
     deleteCategory(id: $id)
   }
 `;
+
+export const GET_ASTROLOGER_DASHBOARD_STATS = gql`
+  query GetAstrologerDashboardStats(
+    $astrologerId: ID!
+  ) {
+    getAstrologerDashboardStats(
+      astrologerId: $astrologerId
+    ) {
+      totalChats
+      totalCalls
+      totalSessions
+
+      totalCoinsEarned
+      totalCoinsDeducted
+      totalCommission
+
+      totalDurationMinutes
+
+      walletBalance
+      totalEarned
+      totalWithdrawn
+
+      totalFollowers
+      totalReviews
+
+      averageRating
+    }
+  }
+`;
+
+export const GET_ASTROLOGER_CHAT_HISTORY = gql`
+  query GetAstrologerChatHistory(
+    $astrologerId: ID!
+    $page: Int
+    $limit: Int
+  ) {
+    getAstrologerChatHistory(
+      astrologerId: $astrologerId
+      page: $page
+      limit: $limit
+    ) {
+      totalCount
+
+      currentPage
+
+      totalPages
+
+      data {
+        sessionId
+
+        userName
+
+        ratePerMin
+
+        durationSec
+
+        coinsEarned
+
+        coinsDeducted
+
+        status
+
+        createdAt
+      }
+    }
+  }
+`;
+
+export const GET_ASTROLOGER_CALL_HISTORY = gql`
+  query GetAstrologerCallHistory(
+    $astrologerId: ID!
+    $page: Int
+    $limit: Int
+  ) {
+    getAstrologerCallHistory(
+      astrologerId: $astrologerId
+      page: $page
+      limit: $limit
+    ) {
+      totalCount
+
+      currentPage
+
+      totalPages
+
+      data {
+        sessionId
+
+        userName
+
+        ratePerMin
+
+        durationSec
+
+        coinsEarned
+
+        coinsDeducted
+
+        status
+
+        createdAt
+      }
+    }
+  }
+`;

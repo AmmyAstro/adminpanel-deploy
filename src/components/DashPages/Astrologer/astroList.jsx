@@ -86,7 +86,7 @@ export default function AstroList() {
 
 
   const viewProfile = (id) => {
-    router.push(`/astrolist/astroprofile/${id}`);
+    router.push(`/Admindash/astromain/astroprofile/${id}`);
   };
 
   const handleEdit = (id) => {
