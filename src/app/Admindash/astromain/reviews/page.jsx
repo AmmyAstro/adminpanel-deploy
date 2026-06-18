@@ -9,6 +9,7 @@ import Link from "next/link";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import { TOGGLE_REVIEW_FLAG } from "@/app/graphQL/astroHiring";
 import { useRouter } from "next/navigation";
+import SessionMessagesModal from "../../usermain/SessionModal";
 
 const GET_USER_REVIEWS = gql`
   query GetUserReviews($searchInput: UserReviewSearchInput!) {
@@ -61,7 +62,8 @@ export default function ReviewsPage() {
   const [startDate, setStartDate] = useState("");
 
   const [endDate, setEndDate] = useState("");
-
+const [openModal, setOpenModal] = useState(false);
+const [selectedSession, setSelectedSession] = useState(null);
   // PAGINATION
   const [page, setPage] = useState(1);
 
@@ -230,22 +232,23 @@ export default function ReviewsPage() {
           </div>
         ),
       },
-      {
-        header: "Chat History",
-        render: (row) =>
-          row.sessionId ? (
-            <button
-              onClick={() =>
-                router.push(`/Admindash/chat-history/${row.sessionId}`)
-              }
-              className="px-3 py-1 bg-black text-white rounded-lg text-xs"
-            >
-              View Chat
-            </button>
-          ) : (
-            <span className="text-gray-400">N/A</span>
-          ),
-      },
+  {
+  header: "Chat History",
+  render: (row) =>
+    row.sessionId ? (
+      <button
+        onClick={() => {
+          setSelectedSession(row.sessionId);
+          setOpenModal(true);
+        }}
+        className="px-3 py-1 bg-black text-white rounded-lg text-xs"
+      >
+        View Chat
+      </button>
+    ) : (
+      <span className="text-gray-400">N/A</span>
+    ),
+},
 
       {
         header: "Flag",
@@ -275,7 +278,7 @@ export default function ReviewsPage() {
         render: (row) => new Date(row.createdAt).toLocaleString(),
       },
     ],
-    [],
+  [toggleReviewFlag]
   );
 
   if (error) {
@@ -441,6 +444,15 @@ export default function ReviewsPage() {
           Next
         </button>
       </div>
+      <SessionMessagesModal
+  open={openModal}
+  onClose={() => {
+    setOpenModal(false);
+    setSelectedSession(null);
+  }}
+  sessionId={selectedSession}
+/>
     </div>
+    
   );
 }

@@ -161,7 +161,7 @@ export default function AstrologerEarningsPage() {
 
 
             <p className="text-xs text-gray-400">
-              {row.email}
+              {row.astrologerId?.slice(0,15)}
             </p>
           </div>
         ),

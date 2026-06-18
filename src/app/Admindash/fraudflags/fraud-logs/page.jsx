@@ -16,6 +16,7 @@ import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { usePermissions } from "@/context/PermissionContext";
 
 import { useActionHandler } from "@/hooks/useActionHandler";
+import SessionMessagesModal from "../../usermain/SessionModal";
 
 // ======================================================
 // QUERIES & MUTATIONS
@@ -32,9 +33,12 @@ const GET_FRAUD_LOGS = gql`
         id
         orderId
         senderName
+        sessionId
         receiverName
         message
         matchedKeywords
+        receiverId
+        senderId
         status
         createdAt
       }
@@ -56,372 +60,377 @@ const UPDATE_FRAUD_STATUS = gql`
 // ======================================================
 
 export default function FraudLogsPage() {
-    // ======================================================
-    // PERMISSIONS
-    // ======================================================
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
 
-    const { can, isSuperAdmin } = usePermissions();
+  const { can, isSuperAdmin } = usePermissions();
 
-    const canUpdate = isSuperAdmin || can("fraud_logs", "update");
+  const canUpdate = isSuperAdmin || can("fraud_logs", "update");
 
-    // ======================================================
-    // ACTION HANDLER
-    // ======================================================
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
-    const { confirmState, setConfirmState, executeAction, handleConfirm } =
-        useActionHandler();
+  const [page, setPage] = useState(1);
 
-    // ======================================================
-    // STATES
-    // ======================================================
+  const [limit] = useState(10);
 
-    const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
-    const [limit] = useState(10);
+  const [status, setStatus] = useState("");
 
-    const [search, setSearch] = useState("");
+  const [getFraudLogs, { data, loading }] = useLazyQuery(GET_FRAUD_LOGS, {
+    fetchPolicy: "network-only",
+  });
 
-    const [status, setStatus] = useState("");
+  const [updateFraudStatus] = useMutation(UPDATE_FRAUD_STATUS);
 
-    // ======================================================
-    // GET FRAUD LOGS
-    // ======================================================
-
-    const [getFraudLogs, { data, loading }] = useLazyQuery(GET_FRAUD_LOGS, {
-        fetchPolicy: "network-only",
+  const fetchFraudLogs = () => {
+    getFraudLogs({
+      variables: {
+        searchInput: {
+          page,
+          limit,
+          query: search,
+          status: status || undefined,
+        },
+      },
     });
+  };
 
-    // ======================================================
-    // UPDATE FRAUD STATUS
-    // ======================================================
+  useEffect(() => {
+    fetchFraudLogs();
+  }, [page, search, status]);
 
-    const [updateFraudStatus] = useMutation(UPDATE_FRAUD_STATUS);
+  const fraudLogs = data?.getFraudLogs?.data || [];
 
-    // ======================================================
-    // FETCH DATA
-    // ======================================================
+  const totalCount = data?.getFraudLogs?.totalCount || 0;
 
-    const fetchFraudLogs = () => {
-        getFraudLogs({
-            variables: {
-                searchInput: {
-                    page,
-                    limit,
-                    query: search,
-                    status: status || undefined,
-                },
-            },
-        });
-    };
+  const totalPages = data?.getFraudLogs?.totalPages || 1;
 
-    useEffect(() => {
-        fetchFraudLogs();
-    }, [page, search, status]);
+  const columns = useMemo(
+    () => [
+      {
+        header: "Order ID",
+        render: (row) => (
+          <div>
+            <p className="font-medium">{row.orderId?.slice(0, 12)}</p>
+          </div>
+        ),
+      },
 
-    // ======================================================
-    // HANDLE STATUS UPDATE
-    // ======================================================
+      {
+        header: "Sender",
+        render: (row) => (
+          <div>
+            <p className="font-medium">{row.senderName}</p>
+            <p className="font-medium">{row.senderId?.slice(0, 12)}</p>
+          </div>
+        ),
+      },
 
-    //   const handleUpdateStatus = async (variables) => {
-    //     const res = await updateFraudStatus({
-    //       variables,
-    //     });
+      {
+        header: "Receiver",
+        render: (row) => (
+          <div>
+            <p className="font-medium">{row.receiverName}</p>
+            <p className="font-medium">{row.receiverId?.slice(0, 12)}</p>
+          </div>
+        ),
+      },
 
-    //     return {
-    //       data: {
-    //         updateFraudLogStatus: {
-    //           success: true,
-    //           message: `Marked as ${variables.status}`,
-    //         },
-    //       },
-    //     };
-    //   };
+      {
+        header: "Keywords",
+        render: (row) => (
+          <div className="flex flex-wrap gap-2">
+            {row?.matchedKeywords?.map((keyword, index) => (
+              <span
+                key={index}
+                className="bg-red-100 text-red-600 px-2 py-1 rounded-lg text-xs"
+              >
+                {keyword}
+              </span>
+            ))}
+          </div>
+        ),
+      },
 
-    // ======================================================
-    // DATA
-    // ======================================================
+      {
+        header: "Message",
+        render: (row) => (
+          <div className="max-w-[350px]">
+            <p className="text-sm text-gray-700 line-clamp-3">{row.message}</p>
+          </div>
+        ),
+      },
 
-    const fraudLogs = data?.getFraudLogs?.data || [];
+      {
+        header: "Status",
 
-    const totalCount = data?.getFraudLogs?.totalCount || 0;
-
-    const totalPages = data?.getFraudLogs?.totalPages || 1;
-
-    // ======================================================
-    // TABLE COLUMNS
-    // ======================================================
-
-    const columns = useMemo(
-        () => [
-            {
-                header: "Order ID",
-                accessor: "orderId",
-            },
-
-            {
-                header: "Sender",
-                render: (row) => (
-                    <div>
-                        <p className="font-medium">{row.senderName}</p>
-                    </div>
-                ),
-            },
-
-            {
-                header: "Receiver",
-                render: (row) => (
-                    <div>
-                        <p className="font-medium">{row.receiverName}</p>
-                    </div>
-                ),
-            },
-
-            {
-                header: "Keywords",
-                render: (row) => (
-                    <div className="flex flex-wrap gap-2">
-                        {row?.matchedKeywords?.map((keyword, index) => (
-                            <span
-                                key={index}
-                                className="bg-red-100 text-red-600 px-2 py-1 rounded-lg text-xs"
-                            >
-                                {keyword}
-                            </span>
-                        ))}
-                    </div>
-                ),
-            },
-
-            {
-                header: "Message",
-                render: (row) => (
-                    <div className="max-w-[350px]">
-                        <p className="text-sm text-gray-700 line-clamp-3">{row.message}</p>
-                    </div>
-                ),
-            },
-
-            {
-                header: "Status",
-
-                render: (row) => (
-                    <span
-                        className={`px-3 py-1 rounded-xl text-xs font-medium
-            ${row.status === "FRAUD"
-                                ? "bg-red-100 text-red-600"
-                                : row.status === "FINE"
-                                    ? "bg-green-100 text-green-600"
-                                    : "bg-yellow-100 text-yellow-700"
-                            }
+        render: (row) => (
+          <span
+            className={`px-3 py-1 rounded-xl text-xs font-medium
+            ${
+              row.status === "FRAUD"
+                ? "bg-red-100 text-red-600"
+                : row.status === "FINE"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-yellow-100 text-yellow-700"
+            }
           `}
-                    >
-                        {row.status}
-                    </span>
-                ),
-            },
+          >
+            {row.status}
+          </span>
+        ),
+      },
 
-            {
-                header: "Date & Time",
+      {
+        header: "Date & Time",
 
-                render: (row) => (
-                    <div>
-                        <p className="text-sm">
-                            {new Date(row.createdAt).toLocaleDateString()}
-                        </p>
+        render: (row) => (
+          <div>
+            <p className="text-sm">
+              {new Date(row.createdAt).toLocaleDateString()}
+            </p>
 
-                        <p className="text-xs text-gray-500">
-                            {new Date(row.createdAt).toLocaleTimeString()}
-                        </p>
-                    </div>
-                ),
-            },
+            <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString()}
+            </p>
+          </div>
+        ),
+      },
 
-            {
-                header: "Actions",
+      {
+        header: "Actions",
 
-                render: (row) => (
-                    <div className="flex items-center justify-center gap-2">
-                        {/* FRAUD BUTTON */}
+        render: (row) => {
+          const isFraud = row.status === "FRAUD";
+          const isFine = row.status === "FINE";
+          const isResolved = isFraud || isFine;
 
-                        <ProtectedActionButton
-                            module="fraud_logs"
-                            action="update"
-                            executeAction={executeAction}
-                            mutationFn={() =>
-                                updateFraudStatus({
-                                    variables: {
-                                        id: row.id,
-                                        status: "FRAUD",
-                                    },
-                                })
-                            }
-                         onSuccess={fetchFraudLogs}
-                            className={`px-4 py-2 rounded-xl text-sm text-white
-  ${!canUpdate
-                                    ? "bg-gray-300 cursor-not-allowed"
-                                    : "bg-red-500 hover:bg-red-600"
-                                }`}
-                        >
-                            Fraud
-                        </ProtectedActionButton>
+          return (
+            <div className="flex items-center justify-center gap-2">
+              {/* Fraud */}
+              <ProtectedActionButton
+                disabled={isResolved && !isFraud}
+                module="fraud_logs"
+                action="update"
+                executeAction={executeAction}
+                mutationFn={() =>
+                  updateFraudStatus({
+                    variables: {
+                      id: row.id,
+                      status: "FRAUD",
+                    },
+                  })
+                }
+                onSuccess={fetchFraudLogs}
+                className={`px-4 py-2 rounded-xl text-sm text-white
+            ${
+              row.status === "FRAUD"
+                ? "bg-red-700 ring-2 ring-red-300"
+                : "bg-red-500 hover:bg-red-600"
+            }
+            ${
+              isResolved && row.status !== "FRAUD"
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }
+          `}
+              >
+                Fraud
+              </ProtectedActionButton>
 
-                        {/* FINE BUTTON */}
+              {/* Fine */}
+              <ProtectedActionButton
+                disabled={isResolved && !isFine}
+                module="fraud_logs"
+                action="update"
+                executeAction={executeAction}
+                mutationFn={() =>
+                  updateFraudStatus({
+                    variables: {
+                      id: row.id,
+                      status: "FINE",
+                    },
+                  })
+                }
+                onSuccess={fetchFraudLogs}
+                className={`px-4 py-2 rounded-xl text-sm text-white
+            ${
+              row.status === "FINE"
+                ? "bg-green-700 ring-2 ring-green-300"
+                : "bg-green-500 hover:bg-green-600"
+            }
+            ${
+              isResolved && row.status !== "FINE"
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }
+          `}
+              >
+                Fine
+              </ProtectedActionButton>
+            </div>
+          );
+        },
+      },
 
-                        <ProtectedActionButton
-                            module="fraud_logs"
-                            action="update"
-                            executeAction={executeAction}
-                            mutationFn={() =>
-                                updateFraudStatus({
-                                    variables: {
-                                        id: row.id,
-                                        status: "FINE",
-                                    },
-                                })
-                            }
-                         onSuccess={fetchFraudLogs}
-                            className={`px-4 py-2 rounded-xl text-sm text-white
-  ${!canUpdate
-                                    ? "bg-gray-300 cursor-not-allowed"
-                                    : "bg-green-500 hover:bg-green-600"
-                                }`}
-                        >
-                            Fine
-                        </ProtectedActionButton>
-                    </div>
-                ),
-            },
-        ],
-        [page, limit, canUpdate],
-    );
+      {
+        header: "Chat",
 
-    // ======================================================
-    // UI
-    // ======================================================
+        render: (row) => (
+          <button
+            onClick={() => {
+              setSelectedSession(row.sessionId);
+              setOpenModal(true);
+            }}
+            className="px-3 py-2 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700"
+          >
+            View Chat
+          </button>
+        ),
+      },
+    ],
+    [page, limit, canUpdate],
+  );
 
-    return (
-        <div className="p-6 bg-[#f5f5f7] min-h-screen">
-            {/* ======================================================
+  // ======================================================
+  // UI
+  // ======================================================
+
+  return (
+    <div className="p-6 bg-[#f5f5f7] min-h-screen">
+      {/* ======================================================
           CONFIRM MODAL
       ====================================================== */}
 
-            <ConfirmModal
-                open={!!confirmState}
-                onCancel={() => setConfirmState(null)}
-                onConfirm={handleConfirm}
-            />
+      <ConfirmModal
+        open={!!confirmState}
+        onCancel={() => setConfirmState(null)}
+        onConfirm={handleConfirm}
+      />
 
-            {/* ======================================================
+      {/* ======================================================
           CARD
       ====================================================== */}
 
-            <div className="bg-white rounded-3xl shadow-sm p-5">
-                {/* ======================================================
+      <div className="bg-white rounded-3xl shadow-sm p-5">
+        {/* ======================================================
             HEADER
         ====================================================== */}
 
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-                    <div>
-                        <h2 className="text-2xl font-semibold">Fraud Logs</h2>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl font-semibold">Fraud Logs</h2>
 
-                        <p className="text-sm text-gray-500 mt-1">
-                            Monitor suspicious chats & fraud keywords
-                        </p>
-                    </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Monitor suspicious chats & fraud keywords
+            </p>
+          </div>
 
-                    {/* FILTERS */}
+          {/* FILTERS */}
 
-                    <div className="flex flex-col md:flex-row items-center gap-3">
-                        {/* SEARCH */}
+          <div className="flex flex-col md:flex-row items-center gap-3">
+            {/* SEARCH */}
 
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
 
-                                setPage(1);
-                            }}
-                            className="border rounded-2xl border-gray-300 px-4 py-2.5 outline-none focus:border-violet-500 w-full md:w-72"
-                        />
+                setPage(1);
+              }}
+              className="border rounded-2xl border-gray-300 px-4 py-2.5 outline-none focus:border-violet-500 w-full md:w-72"
+            />
 
-                        {/* STATUS */}
+            {/* STATUS */}
 
-                        <select
-                            value={status}
-                            onChange={(e) => {
-                                setStatus(e.target.value);
+            <select
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value);
 
-                                setPage(1);
-                            }}
-                            className="border rounded-2xl border-gray-300 px-4 py-2.5 outline-none focus:border-violet-500"
-                        >
-                            <option value="">All Status</option>
+                setPage(1);
+              }}
+              className="border rounded-2xl border-gray-300 px-4 py-2.5 outline-none focus:border-violet-500"
+            >
+              <option value="">All Status</option>
 
-                            <option value="PENDING">Pending</option>
+              <option value="PENDING">Pending</option>
 
-                            <option value="FRAUD">Fraud</option>
+              <option value="FRAUD">Fraud</option>
 
-                            <option value="FINE">Fine</option>
-                        </select>
-                    </div>
-                </div>
+              <option value="FINE">Fine</option>
+            </select>
+          </div>
+        </div>
 
-                {/* ======================================================
+        {/* ======================================================
             TABLE
         ====================================================== */}
 
-                <div className="overflow-x-auto">
-                    <div className="min-w-full bg-white rounded-2xl overflow-hidden">
-                        <DataTable columns={columns} data={fraudLogs} loading={loading} />
-                    </div>
-                </div>
+        <div className="overflow-x-auto">
+          <div className="min-w-full bg-white rounded-2xl overflow-hidden">
+            <DataTable columns={columns} data={fraudLogs} loading={loading} />
+          </div>
+        </div>
 
-                {/* ======================================================
+        {/* ======================================================
             FOOTER
         ====================================================== */}
 
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6">
-                    <p className="text-sm text-gray-500">
-                        Total Fraud Logs: {totalCount}
-                    </p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6">
+          <p className="text-sm text-gray-500">
+            Total Fraud Logs: {totalCount}
+          </p>
 
-                    {/* PAGINATION */}
+          {/* PAGINATION */}
 
-                    <div className="flex items-center gap-2">
-                        <button
-                            disabled={page === 1}
-                            onClick={() => setPage((prev) => prev - 1)}
-                            className={`px-4 py-2 rounded-xl border
-              ${page === 1
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : "hover:bg-gray-100"
-                                }
+          <div className="flex items-center gap-2">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage((prev) => prev - 1)}
+              className={`px-4 py-2 rounded-xl border
+              ${
+                page === 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-100"
+              }
             `}
-                        >
-                            Prev
-                        </button>
+            >
+              Prev
+            </button>
 
-                        <span className="text-sm font-medium">
-                            {page} / {totalPages}
-                        </span>
+            <span className="text-sm font-medium">
+              {page} / {totalPages}
+            </span>
 
-                        <button
-                            disabled={page === totalPages}
-                            onClick={() => setPage((prev) => prev + 1)}
-                            className={`px-4 py-2 rounded-xl border
-              ${page === totalPages
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : "hover:bg-gray-100"
-                                }
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage((prev) => prev + 1)}
+              className={`px-4 py-2 rounded-xl border
+              ${
+                page === totalPages
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-100"
+              }
             `}
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
-            </div>
+            >
+              Next
+            </button>
+          </div>
         </div>
-    );
+      </div>
+      <SessionMessagesModal
+        open={openModal}
+        onClose={() => {
+          setOpenModal(false);
+          setSelectedSession(null);
+        }}
+        sessionId={selectedSession}
+      />
+    </div>
+  );
 }

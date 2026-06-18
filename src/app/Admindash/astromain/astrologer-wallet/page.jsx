@@ -179,19 +179,9 @@ export default function AstrologerWalletTransactionsPage() {
                 ?.displayName || "N/A"}
             </p>
 
-            <p className="text-xs text-gray-500">
-              {
-                row?.astrologerWallet?.astrologer
-                  ?.contactNo
-              }
-            </p>
+          
 
-            <p className="text-xs text-gray-400">
-              {
-                row?.astrologerWallet?.astrologer
-                  ?.email
-              }
-            </p>
+           
           </div>
         ),
       },

@@ -10,7 +10,12 @@ import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
 
-import { GET_COUPONS, CREATE_COUPON, DELETE_COUPON, UPDATE_COUPON_STATUS, } from "../../../../app/graphQL/coupon";
+import {
+  GET_COUPONS,
+  CREATE_COUPON,
+  DELETE_COUPON,
+  UPDATE_COUPON_STATUS,
+} from "../../../../app/graphQL/coupon";
 
 import { usePermissions } from "@/context/PermissionContext";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
@@ -20,12 +25,8 @@ import { useActionHandler } from "@/hooks/useActionHandler";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
 
 export default function CouponMain() {
-  const {
-  confirmState,
-  setConfirmState,
-  executeAction,
-  handleConfirm,
-} = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const [isCoupOpen, setCoupOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,13 +34,21 @@ export default function CouponMain() {
   const [coupon, setCoupon] = useState({
     code: "",
     description: "",
+
     applicable: "recharge",
+
     type: "cashback",
+
     status: "active",
+
     visibility: "visible",
+
+    couponCount: 0,
+
     percentage: 0,
     max_discount: 0,
     redeem_limit: 0,
+
     start_date: "",
     end_date: "",
   });
@@ -79,20 +88,25 @@ export default function CouponMain() {
           input: {
             code: coupon.code,
             description: coupon.description,
+
             applicable: coupon.applicable,
+
             type: coupon.type,
+
             status: coupon.status,
+
             visibility: coupon.visibility,
-            percentage: coupon.percentage
-              ? Number(coupon.percentage)
-              : null,
-            max_discount: coupon.max_discount
-              ? Number(coupon.max_discount)
-              : null,
-            redeem_limit: coupon.redeem_limit
-              ? Number(coupon.redeem_limit)
-              : null,
+
+            couponCount: Number(coupon.couponCount) || 0,
+
+            percentage: Number(coupon.percentage) || null,
+
+            max_discount: Number(coupon.max_discount) || null,
+
+            redeem_limit: Number(coupon.redeem_limit) || null,
+
             start_date: coupon.start_date,
+
             end_date: coupon.end_date,
           },
         },
@@ -151,12 +165,9 @@ export default function CouponMain() {
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
-
-
       {isCoupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-lg flex flex-col gap-3 shadow-lg w-[60%] p-6">
-
             <div className="flex justify-between bg-[#7a5ba3] text-white px-4 py-3 rounded-full">
               <h3>Add New Coupon</h3>
               <button onClick={() => setCoupOpen(false)}>
@@ -165,7 +176,6 @@ export default function CouponMain() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-
               <CustomInput
                 label="Coupon Code"
                 value={coupon.code}
@@ -218,6 +228,12 @@ export default function CouponMain() {
                 value={coupon.redeem_limit}
                 onChange={(e) => handleChange("redeem_limit", e.target.value)}
               />
+              <CustomInput
+                label="Coupon Count"
+                type="number"
+                value={coupon.couponCount}
+                onChange={(e) => handleChange("couponCount", e.target.value)}
+              />
 
               <CustomInput
                 label="Start Date"
@@ -246,13 +262,31 @@ export default function CouponMain() {
                 />
               </div>
 
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-600">
+                  Visibility
+                </label>
+
+                <CustomToggle
+                  checked={coupon.visibility === "visible"}
+                  onChange={(val) =>
+                    handleChange("visibility", val ? "visible" : "hidden")
+                  }
+                />
+
+                <span className="text-xs text-gray-500">
+                  {coupon.visibility}
+                </span>
+              </div>
             </div>
 
             <div className="flex justify-center mt-4">
               <CustomButton
                 variant="green"
                 onClick={handleSubmit}
-                className={!canCreate ? "opacity-50 cursor-not-allowed" : " px-2 py-1"}
+                className={
+                  !canCreate ? "opacity-50 cursor-not-allowed" : " px-2 py-1"
+                }
               >
                 Submit
               </CustomButton>
@@ -267,7 +301,6 @@ export default function CouponMain() {
       />
 
       <div className="bg-white shadow-md rounded-xl p-6">
-
         <div className="flex justify-between mb-4">
           <h3 className="text-lg font-semibold">Manage Coupons</h3>
 
@@ -277,7 +310,9 @@ export default function CouponMain() {
               if (!canCreate) return;
               setCoupOpen(true);
             }}
-            className={!canCreate ? "opacity-50  cursor-not-allowed" : "px-2 py-1"}
+            className={
+              !canCreate ? "opacity-50  cursor-not-allowed" : "px-2 py-1"
+            }
           >
             Add New Coupon
           </CustomButton>
@@ -293,18 +328,31 @@ export default function CouponMain() {
 
         {coupons
           .filter((c) =>
-            c.code.toLowerCase().includes(searchTerm.toLowerCase())
+            c.code.toLowerCase().includes(searchTerm.toLowerCase()),
           )
           .map((c, index) => (
             <div
               key={c.id}
-              className="grid grid-cols-8 border-b p-2 items-center text-sm"
+              className="grid grid-cols-10 border-b p-2 items-center text-sm"
             >
               <div className="text-center">{index + 1}</div>
               <div className="text-center">{c.code}</div>
               <div className="text-center">{c.description}</div>
               <div className="text-center">{c.type}</div>
               <div className="text-center">{c.percentage}</div>
+              <div className="text-center">{c.couponCount}</div>
+
+              <div className="text-center">
+                <span
+                  className={`px-2 py-1 rounded text-xs ${
+                    c.visibility === "visible"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {c.visibility}
+                </span>
+              </div>
               <div className="text-center">
                 {new Date(c.start_date).toLocaleDateString("en-IN")}
               </div>
@@ -315,10 +363,11 @@ export default function CouponMain() {
               <div className="flex gap-2 justify-center">
                 <button
                   disabled={!canUpdate}
-                  className={`px-2 py-1 rounded ${!canUpdate
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-yellow-400"
-                    }`}
+                  className={`px-2 py-1 rounded ${
+                    !canUpdate
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-yellow-400"
+                  }`}
                 >
                   <FaEdit />
                 </button>
@@ -326,7 +375,7 @@ export default function CouponMain() {
                 <ProtectedActionButton
                   module="coupon"
                   action="delete"
-                  executeAction={executeAction}  
+                  executeAction={executeAction}
                   mutationFn={deleteCoupon}
                   variables={{ id: c.id }}
                   onSuccess={refetch}
