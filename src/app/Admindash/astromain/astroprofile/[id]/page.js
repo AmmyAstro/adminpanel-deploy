@@ -2,7 +2,11 @@
 
 import AlertLoading from "@/app/common/AlertLoading";
 import Skenton from "@/app/common/Skenton";
-import { GET_ASTROLOGER_BY_ID, GET_ASTROLOGER_DASHBOARD_STATS } from "@/app/graphQL/astroHiring";
+import {
+  GET_ASTROLOGER_BY_ID,
+  GET_ASTROLOGER_DASHBOARD_STATS,
+  UPDATE_AVAILABILITY,
+} from "@/app/graphQL/astroHiring";
 import { formatDate } from "@/app/helper/helper";
 import { mainurl } from "@/app/redux/config";
 import {
@@ -14,7 +18,7 @@ import { RequestAstrologerDetail } from "@/app/redux/slices/astrologer/Astrologe
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
@@ -53,28 +57,70 @@ export default function AstroProfile() {
   );
 
   const {
-  data: statsData,
-  loading: statsLoading,
-  error: statsError,
-} = useQuery(
-  GET_ASTROLOGER_DASHBOARD_STATS,
-  {
+    data: statsData,
+    loading: statsLoading,
+    error: statsError,
+  } = useQuery(GET_ASTROLOGER_DASHBOARD_STATS, {
     variables: {
       astrologerId,
     },
     skip: !astrologerId,
-  }
-);
-const dashboardStats =
-  statsData?.getAstrologerDashboardStats;
+  });
+  const dashboardStats = statsData?.getAstrologerDashboardStats;
   useEffect(() => {
-  console.log(
-    "Dashboard Stats",
-    dashboardStats
-  );
-}, [dashboardStats]);
+    console.log("Dashboard Stats", dashboardStats);
+  }, [dashboardStats]);
+  const [availability, setAvailability] = useState({
+    call: false,
+    chat: false,
+    live: false,
+    online: false,
+  });
+const [updateAvailability, { loading: availabilityLoading }] =
+  useMutation(UPDATE_AVAILABILITY);
+useEffect(() => {
+  if (!astrologerprofile) return;
 
+  setAvailability({
+    call: astrologerprofile.isCallActive ?? false,
+    chat: astrologerprofile.isChatActive ?? false,
+    live: astrologerprofile.isLiveActive ?? false,
+    online: astrologerprofile.isOnline ?? false,
+  });
+}, [astrologerprofile]);
 
+ const handleAvailabilityChange = async (field, value) => {
+  try {
+    setAvailability((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    const variables = {
+         astrologerId, 
+      ...(field === "chat" && {
+        isChatActive: value,
+      }),
+
+      ...(field === "call" && {
+        isCallActive: value,
+      }),
+
+      ...(field === "live" && {
+        isLiveActive: value,
+      }),
+    };
+
+    await updateAvailability({
+      variables,
+    });
+
+    toast.success("Updated");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed");
+  }
+};
   if (error) {
     return (
       <div className="p-5 text-red-500">Failed to load astrologer profile</div>
@@ -105,55 +151,49 @@ const dashboardStats =
     { id: 3, name: "Video", rate: "3.10", num: "200" },
   ];
 
-const stats = [
-  {
-    id: 1,
-    label: "Wallet Balance",
-    amount:
-      dashboardStats?.walletBalance || 0,
-    prefix: "₹",
-  },
+  const stats = [
+    {
+      id: 1,
+      label: "Wallet Balance",
+      amount: dashboardStats?.walletBalance || 0,
+      prefix: "₹",
+    },
 
-  {
-    id: 2,
-    label: "Total Earnings",
-    amount:
-      dashboardStats?.totalEarned || 0,
-    prefix: "₹",
-  },
+    {
+      id: 2,
+      label: "Total Earnings",
+      amount: dashboardStats?.totalEarned || 0,
+      prefix: "₹",
+    },
 
-  {
-    id: 3,
-    label: "Total Calls",
-    amount:
-      dashboardStats?.totalCalls || 0,
-    prefix: "",
-  },
+    {
+      id: 3,
+      label: "Total Calls",
+      amount: dashboardStats?.totalCalls || 0,
+      prefix: "",
+    },
 
-  {
-    id: 4,
-    label: "Total Chats",
-    amount:
-      dashboardStats?.totalChats || 0,
-    prefix: "",
-  },
+    {
+      id: 4,
+      label: "Total Chats",
+      amount: dashboardStats?.totalChats || 0,
+      prefix: "",
+    },
 
-  {
-    id: 5,
-    label: "Followers",
-    amount:
-      dashboardStats?.totalFollowers || 0,
-    prefix: "",
-  },
+    {
+      id: 5,
+      label: "Followers",
+      amount: dashboardStats?.totalFollowers || 0,
+      prefix: "",
+    },
 
-  {
-    id: 6,
-    label: "Rating",
-    amount:
-      dashboardStats?.averageRating || 0,
-    prefix: "",
-  },
-];
+    {
+      id: 6,
+      label: "Rating",
+      amount: dashboardStats?.averageRating || 0,
+      prefix: "",
+    },
+  ];
   if (loading || statsLoading) {
     return <Skenton />;
   }
@@ -336,13 +376,11 @@ const stats = [
                   <label className="text-sm font-semibold text-gray-700">
                     ₹ {callPricing?.offerPrice || callPricing?.price || 0}
                   </label>
-                  {/* <CustomToggle
-                    id="chat"
+                  <CustomToggle
+                    id="call"
                     checked={availability.call}
-                    onChange={(val) =>
-                      setAvailability({ ...availability, chat: val })
-                    }
-                  /> */}
+                    onChange={(val) => handleAvailabilityChange("call", val)}
+                  />
                 </div>
               </div>
 
@@ -354,14 +392,24 @@ const stats = [
                   <label className="text-sm font-semibold text-gray-700">
                     ₹ {chatPricing?.offerPrice || chatPricing?.price || 0}
                   </label>
-                  {/* <CustomToggle
+                  <CustomToggle
                     id="chat"
                     checked={availability.chat}
-                    onChange={(val) =>
-                      setAvailability({ ...availability, chat: val })
-                    }
-                  /> */}
+                    onChange={(val) => handleAvailabilityChange("chat", val)}
+                  />
                 </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Live
+                </label>
+
+                <CustomToggle
+                  id="live"
+                  checked={availability.live}
+                  onChange={(val) => handleAvailabilityChange("live", val)}
+                />
               </div>
 
               <div className="grid grid-cols-2 items-center gap-3">
@@ -493,7 +541,7 @@ const stats = [
             </div>
           </div>
 
-         <AstrologerActivities astrologerId={astrologerId} />
+          <AstrologerActivities astrologerId={astrologerId} />
 
           {/* <div className="flex w-full ">
             <div className="p-4 rounded-2xl flex flex-col gap-3 shadow-xl   bg-white w-full">

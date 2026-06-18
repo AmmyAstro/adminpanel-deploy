@@ -7,31 +7,51 @@ const fileSchema = z.union([
   z.null(),
 ]).optional();
 
-const pricingItem = z.object({
-  type: z.enum(["CHAT", "CALL", "VIDEO", "AUDIO"]),
-  price: z.coerce.number().optional(),
-  offerPrice: z.coerce.number().nullable().optional(),
-  commissionPercent: z.coerce.number().optional(),
-  isActive: z.boolean(),
-}).superRefine((data, ctx) => {
-  if (data.isActive) {
-    if (data.price == null || data.price <= 0) {
-      ctx.addIssue({
-        path: ["price"],
-        message: "Price is required when active",
-        code: z.ZodIssueCode.custom,
-      });
+const pricingItem = z
+  .object({
+    type: z.enum([
+      "CHAT",
+      "CALL",
+      "VIDEO",
+      "AUDIO",
+      "GIFT_COMMISSION",
+      "OFFER",
+    ]),
+    price: z.coerce.number().optional(),
+    offerPrice: z.coerce.number().nullable().optional(),
+    commissionPercent: z.coerce.number().optional(),
+    isActive: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.isActive) return;
+
+    const isCommissionOnly =
+      data.type === "GIFT_COMMISSION" ||
+      data.type === "OFFER";
+
+    // CHAT/CALL/VIDEO/AUDIO
+    if (!isCommissionOnly) {
+      if (!data.price || data.price <= 0) {
+        ctx.addIssue({
+          path: ["price"],
+          message: "Price is required when active",
+          code: z.ZodIssueCode.custom,
+        });
+      }
     }
 
-    if (data.commissionPercent == null) {
+    // ALL TYPES
+    if (
+      data.commissionPercent == null ||
+      data.commissionPercent < 0
+    ) {
       ctx.addIssue({
         path: ["commissionPercent"],
-        message: "Commission is required when active",
+        message: "Commission is required",
         code: z.ZodIssueCode.custom,
       });
     }
-  }
-});
+  });
 
 export const addAstrologerSchema = z.object({
   astroname: z.string().min(2, "Name is required"),

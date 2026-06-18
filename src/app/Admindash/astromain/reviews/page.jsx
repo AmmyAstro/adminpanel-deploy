@@ -1,10 +1,14 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
+import Link from "next/link";
+import CustomToggle from "@/components/Custom/CustomToggle";
+import { TOGGLE_REVIEW_FLAG } from "@/app/graphQL/astroHiring";
+import { useRouter } from "next/navigation";
 
 const GET_USER_REVIEWS = gql`
   query GetUserReviews($searchInput: UserReviewSearchInput!) {
@@ -18,10 +22,16 @@ const GET_USER_REVIEWS = gql`
         reviewId
         sessionId
 
+        userId
         userName
         mobile
 
+        astrologerId
+
         astrologerName
+        displayName
+
+        isFlagged
 
         sessionType
 
@@ -101,6 +111,8 @@ export default function ReviewsPage() {
     endDate,
   ]);
 
+  const [toggleReviewFlag] = useMutation(TOGGLE_REVIEW_FLAG);
+  const router = useRouter();
   // SEARCH INPUT
   const searchInput = {
     page,
@@ -160,16 +172,28 @@ export default function ReviewsPage() {
         header: "User",
         render: (row) => (
           <div>
-            <p className="font-semibold">{row.userName}</p>
+            <Link
+              href={`""`}
+              className="font-semibold text-blue-600 hover:underline"
+            >
+              {row.userName}
+            </Link>
 
-            <p className="text-xs text-gray-500">{row.mobile}</p>
+            <p className="text-xs text-gray-500">{row.userId?.slice(0, 20)}</p>
           </div>
         ),
       },
 
       {
         header: "Astrologer",
-        accessor: "astrologerName",
+        render: (row) => (
+          <Link
+            href={`/Admindash/astromain/astroprofile/${row.astrologerId}`}
+            className="font-semibold text-purple-600 hover:underline"
+          >
+            {row.displayName}
+          </Link>
+        ),
       },
 
       {
@@ -204,6 +228,45 @@ export default function ReviewsPage() {
           <div className="max-w-[300px] break-words">
             {row.comment || "N/A"}
           </div>
+        ),
+      },
+      {
+        header: "Chat History",
+        render: (row) =>
+          row.sessionId ? (
+            <button
+              onClick={() =>
+                router.push(`/Admindash/chat-history/${row.sessionId}`)
+              }
+              className="px-3 py-1 bg-black text-white rounded-lg text-xs"
+            >
+              View Chat
+            </button>
+          ) : (
+            <span className="text-gray-400">N/A</span>
+          ),
+      },
+
+      {
+        header: "Flag",
+        render: (row) => (
+          <CustomToggle
+            checked={row.isFlagged}
+            onChange={async (val) => {
+              try {
+                await toggleReviewFlag({
+                  variables: {
+                    reviewId: row.reviewId,
+                    isFlagged: val,
+                  },
+                });
+
+                toast.success("Review updated");
+              } catch (err) {
+                toast.error("Update failed");
+              }
+            }}
+          />
         ),
       },
 

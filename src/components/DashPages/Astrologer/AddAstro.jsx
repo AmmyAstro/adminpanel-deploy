@@ -72,7 +72,7 @@ export default function AddAstro() {
   const astrologerId = params?.id;
 
   const isEditMode = !!astrologerId;
-
+  const [fileInputKey, setFileInputKey] = useState(0);
   const {
     data: astroData,
     loading: astroLoading,
@@ -84,14 +84,7 @@ export default function AddAstro() {
     skip: !isEditMode,
   });
   const appId = params?.appId || "";
-  console.log("LOADING:", astroLoading);
-  console.log("ERROR:", astroError);
-  console.log("DATA:", astroData);
-  console.log("xxxxxxxxxxxxxxxxxxxxtttttttttttttttttttxxxxxxxxxxx", appId);
 
-  console.log("PARAMSxxxx:", params);
-  console.log("ASTROLOGER IDxxxxxxxxxxxx:", astrologerId);
-  console.log("EDIT MODExxxxxxxxxxxxxx:", isEditMode);
   console.log("ASTRO DATAxxxxxxxxxxxxxxxxxxx:", astroData);
 
   const [existingDocs, setExistingDocs] = useState({});
@@ -103,9 +96,10 @@ export default function AddAstro() {
     },
   );
 
-  const [addAstrologer, { loading: addLoading, error }] = useMutation(ADD_ASTROLOGER);
-const [updateAstrologer, { loading: updateLoading }] =
-  useMutation(UPDATE_ASTROLOGER);
+  const [addAstrologer, { loading: addLoading, error }] =
+    useMutation(ADD_ASTROLOGER);
+  const [updateAstrologer, { loading: updateLoading }] =
+    useMutation(UPDATE_ASTROLOGER);
 
   const [dummyLoading, setDummyLoading] = useState(false);
 
@@ -160,6 +154,16 @@ const [updateAstrologer, { loading: updateLoading }] =
         type: "AUDIO",
         price: "",
         offerPrice: "",
+        commissionPercent: "",
+        isActive: false,
+      },
+      {
+        type: "GIFT_COMMISSION",
+        commissionPercent: "",
+        isActive: false,
+      },
+      {
+        type: "OFFER",
         commissionPercent: "",
         isActive: false,
       },
@@ -235,6 +239,16 @@ const [updateAstrologer, { loading: updateLoading }] =
         price: 25,
         offerPrice: 20,
         commissionPercent: 10,
+        isActive: true,
+      },
+      {
+        type: "GIFT_COMMISSION",
+        commissionPercent: 50,
+        isActive: true,
+      },
+      {
+        type: "OFFER",
+        commissionPercent: 30,
         isActive: true,
       },
     ],
@@ -329,6 +343,16 @@ const [updateAstrologer, { loading: updateLoading }] =
           type: "AUDIO",
           price: "",
           offerPrice: "",
+          commissionPercent: "",
+          isActive: true,
+        },
+        {
+          type: "GIFT_COMMISSION",
+          commissionPercent: "",
+          isActive: true,
+        },
+        {
+          type: "OFFER",
           commissionPercent: "",
           isActive: true,
         },
@@ -568,10 +592,7 @@ const [updateAstrologer, { loading: updateLoading }] =
             data: payload,
           },
         });
-          console.log(
-    "UPDATE RESPONSE:",
-    res?.data?.updateAstrologer
-  );
+        console.log("UPDATE RESPONSE:", res?.data?.updateAstrologer);
 
         toast.success("Astrologer updated successfully ✅");
       } else {
@@ -586,9 +607,15 @@ const [updateAstrologer, { loading: updateLoading }] =
         }
       }
 
-    if (!isEditMode) {
-  reset(emptyForm);
-}
+      if (!isEditMode) {
+        reset(emptyForm);
+        setExistingDocs({
+          aadhaar: null,
+          panCard: null,
+          passbook: null,
+        });
+        setFileInputKey((prev) => prev + 1);
+      }
 
       window.scrollTo({
         top: 0,
@@ -598,6 +625,17 @@ const [updateAstrologer, { loading: updateLoading }] =
       console.log(err);
       toast.error("Something went wrong ❌");
     }
+  };
+
+  const handleReset = () => {
+    reset(emptyForm);
+
+    setExistingDocs({
+      aadhaar: null,
+      panCard: null,
+      passbook: null,
+    });
+    setFileInputKey((prev) => prev + 1);
   };
 
   const selectFields = [
@@ -729,6 +767,7 @@ const [updateAstrologer, { loading: updateLoading }] =
                 render={({ field }) => (
                   <input
                     type="file"
+                   key={`profile-${fileInputKey}`}
                     accept="image/*"
                     className="w-full outline-none border-0 bg-transparent text-sm"
                     onChange={(e) => {
@@ -1044,7 +1083,16 @@ const [updateAstrologer, { loading: updateLoading }] =
             </h2>
 
             <div className="grid grid-cols-2 gap-5">
-              {["CHAT", "CALL", "VIDEO", "AUDIO"].map((type, index) => {
+              {[
+                "CHAT",
+                "CALL",
+                "VIDEO",
+                "AUDIO",
+                "GIFT_COMMISSION",
+                "OFFER",
+              ].map((type, index) => {
+                const isCommissionOnly =
+                  type === "GIFT_COMMISSION" || type === "OFFER";
                 const isActive = useWatch({
                   control,
                   name: `pricing.${index}.isActive`,
@@ -1075,8 +1123,11 @@ const [updateAstrologer, { loading: updateLoading }] =
                               field.onChange(val);
 
                               if (!val) {
-                                setValue(`pricing.${index}.price`, 0);
-                                setValue(`pricing.${index}.offerPrice`, 0);
+                                if (!isCommissionOnly) {
+                                  setValue(`pricing.${index}.price`, 0);
+                                  setValue(`pricing.${index}.offerPrice`, 0);
+                                }
+
                                 setValue(
                                   `pricing.${index}.commissionPercent`,
                                   0,
@@ -1091,28 +1142,34 @@ const [updateAstrologer, { loading: updateLoading }] =
                     {isActive && (
                       <>
                         <div className="flex gap-2">
-                          <input
-                            {...register(`pricing.${index}.price`, {
-                              valueAsNumber: true,
-                            })}
-                            placeholder="Price"
-                            className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
-                          />
+                          {!isCommissionOnly && (
+                            <>
+                              <input
+                                {...register(`pricing.${index}.price`, {
+                                  valueAsNumber: true,
+                                })}
+                                placeholder="Price"
+                                className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                              />
 
-                          <input
-                            {...register(`pricing.${index}.offerPrice`, {
-                              valueAsNumber: true,
-                            })}
-                            placeholder="Offer"
-                            className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
-                          />
+                              <input
+                                {...register(`pricing.${index}.offerPrice`, {
+                                  valueAsNumber: true,
+                                })}
+                                placeholder="Offer"
+                                className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                              />
+                            </>
+                          )}
 
                           <input
                             {...register(`pricing.${index}.commissionPercent`, {
                               valueAsNumber: true,
                             })}
                             placeholder="%"
-                            className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                            className={`border border-gray-200 rounded-xl p-1 text-sm ${
+                              isCommissionOnly ? "w-full" : "w-1/3"
+                            }`}
                           />
                         </div>
 
@@ -1363,6 +1420,7 @@ const [updateAstrologer, { loading: updateLoading }] =
                         render={({ field }) => (
                           <input
                             type="file"
+                            key={`${item.name}-${fileInputKey}`}
                             onChange={(e) =>
                               field.onChange(e.target.files?.[0])
                             }
@@ -1405,7 +1463,7 @@ const [updateAstrologer, { loading: updateLoading }] =
             type="submit"
             variant="green"
             className="px-4 py-1"
-           disabled={isSubmitting}
+            disabled={isSubmitting}
           >
             {isSubmitting
               ? "Saving..."
@@ -1418,7 +1476,7 @@ const [updateAstrologer, { loading: updateLoading }] =
             type="button"
             variant="gray"
             className="px-4 py-1"
-            onClick={() => reset(emptyForm)}
+            onClick={handleReset}
           >
             Reset
           </CustomButton>

@@ -40,7 +40,7 @@ const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
         astrologerWallet {
           astrologer {
             id
-            name
+            displayName
             contactNo
             email
           }
@@ -176,7 +176,7 @@ export default function AstrologerWalletTransactionsPage() {
           <div>
             <p className="font-semibold">
               {row?.astrologerWallet?.astrologer
-                ?.name || "N/A"}
+                ?.displayName || "N/A"}
             </p>
 
             <p className="text-xs text-gray-500">
@@ -198,7 +198,7 @@ export default function AstrologerWalletTransactionsPage() {
 
       {
         header: "Transaction ID",
-        accessor: "id",
+          render: (row) => ` ${row.id?.slice(0,15)}`,
       },
 
       {

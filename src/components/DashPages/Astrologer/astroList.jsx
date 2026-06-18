@@ -21,7 +21,7 @@ const GET_ASTRO_LIST = gql`
     getAstrologerListBySearch(searchInput: $searchInput) {
       data {
         id
-        name
+        displayName
         email
         contactNo
         experience
@@ -103,27 +103,17 @@ export default function AstroList() {
       accessor: "name",
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-medium">{row.name}</span>
-          <small className="text-gray-400">ID: {row.id}</small>
+          <span className="font-medium">{row.displayName}</span>
+        <small className="text-gray-400">
+  ID: {row.id?.slice(0, 15)}
+</small>
         </div>
       ),
     },
     { header: "Email", accessor: "email" },
     { header: "Phone", accessor: "contactNo" },
-    {
-      header: "Experience",
-      accessor: "experience",
-      render: (row) => `${row.experience || 0} yrs`,
-    },
-    {
-      header: "Tag",
-      accessor: "tags",
-      render: (row) => (
-        <span className="bg-purple-100 px-2 py-1 rounded text-xs">
-          {row.tags || "-"}
-        </span>
-      ),
-    },
+
+   
     {
       header: "Actions",
       render: (row) => (

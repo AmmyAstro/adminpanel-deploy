@@ -400,3 +400,39 @@ export const GET_ASTROLOGER_CALL_HISTORY = gql`
     }
   }
 `;
+
+export const UPDATE_AVAILABILITY = gql`
+  mutation UpdateAvailability(
+    $astrologerId: ID!
+    $isChatActive: Boolean
+    $isCallActive: Boolean
+    $isLiveActive: Boolean
+  ) {
+    updateAstrologerAvailability(
+      astrologerId: $astrologerId
+      isChatActive: $isChatActive
+      isCallActive: $isCallActive
+      isLiveActive: $isLiveActive
+    ) {
+      id
+      isChatActive
+      isCallActive
+      isLiveActive
+    }
+  }
+`;
+
+export const TOGGLE_REVIEW_FLAG = gql`
+  mutation ToggleReviewFlag(
+    $reviewId: ID!
+    $isFlagged: Boolean!
+  ) {
+    toggleReviewFlag(
+      reviewId: $reviewId
+      isFlagged: $isFlagged
+    ) {
+      success
+      message
+    }
+  }
+`;
