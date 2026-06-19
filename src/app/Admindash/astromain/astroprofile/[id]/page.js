@@ -8,13 +8,6 @@ import {
   UPDATE_AVAILABILITY,
 } from "@/app/graphQL/astroHiring";
 import { formatDate } from "@/app/helper/helper";
-import { mainurl } from "@/app/redux/config";
-import {
-  resetCode,
-  sendManagePriceRequest,
-} from "@/app/redux/slices/astrologer/ActiveAccountSlice";
-import { RequestAstrologerDetail } from "@/app/redux/slices/astrologer/AstrologerDetail";
-
 import CustomButton from "@/components/Custom/CustomButtom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomToggle from "@/components/Custom/CustomToggle";
@@ -75,52 +68,63 @@ export default function AstroProfile() {
     chat: false,
     live: false,
     online: false,
+    promotional: false,
   });
-const [updateAvailability, { loading: availabilityLoading }] =
-  useMutation(UPDATE_AVAILABILITY);
-useEffect(() => {
-  if (!astrologerprofile) return;
 
-  setAvailability({
-    call: astrologerprofile.isCallActive ?? false,
-    chat: astrologerprofile.isChatActive ?? false,
-    live: astrologerprofile.isLiveActive ?? false,
-    online: astrologerprofile.isOnline ?? false,
-  });
-}, [astrologerprofile]);
+  const [updateAvailability, { loading: availabilityLoading }] =
+    useMutation(UPDATE_AVAILABILITY);
+  useEffect(() => {
+    if (!astrologerprofile) return;
 
- const handleAvailabilityChange = async (field, value) => {
-  try {
-    setAvailability((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setAvailability({
+      call: astrologerprofile.isCallActive ?? false,
 
-    const variables = {
-         astrologerId, 
-      ...(field === "chat" && {
-        isChatActive: value,
-      }),
+      chat: astrologerprofile.isChatActive ?? false,
 
-      ...(field === "call" && {
-        isCallActive: value,
-      }),
+      live: astrologerprofile.isLiveActive ?? false,
 
-      ...(field === "live" && {
-        isLiveActive: value,
-      }),
-    };
+      online: astrologerprofile.isOnline ?? false,
 
-    await updateAvailability({
-      variables,
+      promotional: astrologerprofile.isPromotional ?? false,
     });
+  }, [astrologerprofile]);
 
-    toast.success("Updated");
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed");
-  }
-};
+  const handleAvailabilityChange = async (field, value) => {
+    try {
+      setAvailability((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+
+      const variables = {
+        astrologerId,
+        ...(field === "chat" && {
+          isChatActive: value,
+        }),
+
+        ...(field === "call" && {
+          isCallActive: value,
+        }),
+
+        ...(field === "live" && {
+          isLiveActive: value,
+        }),
+        ...(field === "promotional" && {
+          isPromotional: value,
+        }),
+      };
+
+      await updateAvailability({
+        variables,
+      });
+
+      toast.success("Updated");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed");
+    }
+  };
+
   if (error) {
     return (
       <div className="p-5 text-red-500">Failed to load astrologer profile</div>
@@ -411,44 +415,18 @@ useEffect(() => {
                   onChange={(val) => handleAvailabilityChange("live", val)}
                 />
               </div>
-
-              <div className="grid grid-cols-2 items-center gap-3">
+              <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">
-                  Promotional (Serve/Limit)
+                  Promotional
                 </label>
 
-                <div className="flex items-center justify-end gap-4">
-                  <div className="flex items-center gap-3">
-                    <CustomButton
-                      variant={"black"}
-                      onClick={() => alert("Edit clicked")}
-                      className="px-2 py-[2px] text-[10px] transition"
-                    >
-                      Edit
-                    </CustomButton>
-                    {/* <span className="text-red-400 text-xs">
-                      {astro_stats?.promotional || 0}/10
-                    </span> */}
-                  </div>
-                  {/* <button
-                    type="button"
-                    onClick={() =>
-                      setAvailability({
-                        ...availability,
-                        promo: !availability.promo,
-                      })
-                    }
-                    className={`relative inline-flex h-5 w-11 items-center rounded-full transition cursor-pointer ${
-                      availability.promo ? "bg-green-500" : "bg-gray-300"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                        availability.promo ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button> */}
-                </div>
+                <CustomToggle
+                  id="promotional"
+                  checked={availability.promotional}
+                  onChange={(val) =>
+                    handleAvailabilityChange("promotional", val)
+                  }
+                />
               </div>
             </div>
 
@@ -456,38 +434,6 @@ useEffect(() => {
 
             <div className="flex flex-col gap-2 py-3">
               <h6 className="text-sm font-semibold ">Astrologer Documents:</h6>
-
-              {/* <div className="space-y-3">
-                {docs.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex px-4 items-center gap-5 justify-between p-2 border border-gray-50  rounded-full shadow hover:bg-gray-50 transition"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <h6 className="font-medium text-sm">{doc.name} :</h6>
-                      <span
-                        className={`text-sm ${
-                          doc.status === "Uploded"
-                            ? "text-green-600 font-semibold"
-                            : "text-red-500 font-medium"
-                        }`}
-                      >
-                        {doc.file ? "Uploaded" : "Not Uploaded"}
-                      </span>
-                    </div>
-
-                    {doc.file && (
-                      <CustomButton
-                        variant={"black"}
-                        onClick={() => window.open(doc.file, "_blank")}
-                        className="px-2 py-[2px] text-[10px]"
-                      >
-                        View
-                      </CustomButton>
-                    )}
-                  </div>
-                ))}
-              </div> */}
             </div>
 
             <hr className="text-gray-300" />

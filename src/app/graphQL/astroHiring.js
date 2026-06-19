@@ -382,17 +382,20 @@ export const UPDATE_AVAILABILITY = gql`
     $isChatActive: Boolean
     $isCallActive: Boolean
     $isLiveActive: Boolean
+    $isPromotional: Boolean
   ) {
     updateAstrologerAvailability(
       astrologerId: $astrologerId
       isChatActive: $isChatActive
       isCallActive: $isCallActive
       isLiveActive: $isLiveActive
+      isPromotional: $isPromotional
     ) {
       id
       isChatActive
       isCallActive
       isLiveActive
+      isPromotional
     }
   }
 `;
@@ -529,6 +532,62 @@ export const GET_USER_PROFILE = gql`
 
         lastRechargeAmount
         lastRechargeDate
+      }
+    }
+  }
+`;
+
+export const CREATE_NOTICE = gql`
+  mutation CreateNotice(
+    $input: CreateNoticeInput!
+  ) {
+    createNotice(input: $input) {
+      id
+      title
+    }
+  }
+`;
+
+export const UPDATE_NOTICE = gql`
+  mutation UpdateNotice(
+    $id: ID!
+    $input: UpdateNoticeInput!
+  ) {
+    updateNotice(
+      id: $id
+      input: $input
+    ) {
+      id
+      title
+      isActive
+    }
+  }
+`;
+export const DELETE_NOTICE = gql`
+  mutation DeleteNotice($id: ID!) {
+    deleteNotice(id: $id)
+  }
+`;
+
+export const GET_NOTICES = gql`
+  query GetNotices {
+    getNotices {
+      id
+      title
+      description
+
+      targetType
+
+      isActive
+
+      createdAt
+
+      astrologers {
+        astrologer {
+          id
+          name
+          displayName
+        }
       }
     }
   }
