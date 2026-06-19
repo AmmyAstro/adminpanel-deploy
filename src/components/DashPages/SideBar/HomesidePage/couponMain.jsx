@@ -3,7 +3,7 @@
 import { MdDelete, MdCancel } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import CustomButton from "@/components/Custom/CustomButtom";
@@ -15,6 +15,7 @@ import {
   CREATE_COUPON,
   DELETE_COUPON,
   UPDATE_COUPON_STATUS,
+  UPDATE_COUPON,
 } from "../../../../app/graphQL/coupon";
 
 import { usePermissions } from "@/context/PermissionContext";
@@ -23,35 +24,29 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import { useActionHandler } from "@/hooks/useActionHandler";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
-
+import DataTable from "@/components/utils/DataTable";
+const INITIAL_COUPON = {
+  code: "",
+  description: "",
+  applicable: "recharge",
+  type: "CASHBACK",
+  status: "ACTIVE",
+  visibility: "VISIBLE",
+  couponCount: 0,
+  percentage: 0,
+  maxDiscount: 0,
+  redeemLimit: 0,
+  startDate: "",
+  endDate: "",
+};
 export default function CouponMain() {
   const { confirmState, setConfirmState, executeAction, handleConfirm } =
     useActionHandler();
-
+  const [editingCouponId, setEditingCouponId] = useState(null);
   const [isCoupOpen, setCoupOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [coupon, setCoupon] = useState({
-    code: "",
-    description: "",
-
-    applicable: "recharge",
-
-    type: "cashback",
-
-    status: "active",
-
-    visibility: "visible",
-
-    couponCount: 0,
-
-    percentage: 0,
-    max_discount: 0,
-    redeem_limit: 0,
-
-    start_date: "",
-    end_date: "",
-  });
+  const [coupon, setCoupon] = useState(INITIAL_COUPON);
 
   const { can, isSuperAdmin } = usePermissions();
   const canRead = isSuperAdmin || can("coupon", "read");
@@ -61,7 +56,7 @@ export default function CouponMain() {
   const { data, loading, refetch } = useQuery(GET_COUPONS, {
     skip: !canRead,
   });
-
+  const [updateCoupon] = useMutation(UPDATE_COUPON);
   const [createCoupon] = useMutation(CREATE_COUPON);
   const [deleteCoupon] = useMutation(DELETE_COUPON);
   const [updateStatus] = useMutation(UPDATE_COUPON_STATUS);
@@ -75,6 +70,24 @@ export default function CouponMain() {
       [key]: value,
     }));
   };
+  const buildPayload = () => ({
+    code: coupon.code.trim(),
+    description: coupon.description.trim(),
+    applicable: coupon.applicable,
+
+    type: coupon.type,
+    status: coupon.status,
+    visibility: coupon.visibility,
+
+    couponCount: Number(coupon.couponCount) || 0,
+    percentage: Number(coupon.percentage) || 0,
+
+    maxDiscount: Number(coupon.maxDiscount) || 0,
+    redeemLimit: Number(coupon.redeemLimit) || 0,
+
+    startDate: coupon.startDate,
+    endDate: coupon.endDate,
+  });
 
   const handleSubmit = async () => {
     if (!(isSuperAdmin || can("coupon", "create"))) {
@@ -83,38 +96,44 @@ export default function CouponMain() {
     }
 
     try {
-      await createCoupon({
-        variables: {
-          input: {
-            code: coupon.code,
-            description: coupon.description,
+      if (!coupon.code.trim()) {
+        return toast.error("Coupon code is required");
+      }
 
-            applicable: coupon.applicable,
+      if (!coupon.startDate || !coupon.endDate) {
+        return toast.error("Please select start and end dates");
+      }
 
-            type: coupon.type,
-
-            status: coupon.status,
-
-            visibility: coupon.visibility,
-
-            couponCount: Number(coupon.couponCount) || 0,
-
-            percentage: Number(coupon.percentage) || null,
-
-            max_discount: Number(coupon.max_discount) || null,
-
-            redeem_limit: Number(coupon.redeem_limit) || null,
-
-            start_date: coupon.start_date,
-
-            end_date: coupon.end_date,
+      if (new Date(coupon.startDate) > new Date(coupon.endDate)) {
+        return toast.error("End date must be after start date");
+      }
+      if (editingCouponId) {
+        await updateCoupon({
+          variables: {
+            id: editingCouponId,
+            input: buildPayload(),
           },
-        },
-      });
+          refetchQueries: [{ query: GET_COUPONS }],
+          awaitRefetchQueries: true,
+        });
 
-      toast.success("Coupon Added Successfully");
+        toast.success("Coupon Updated Successfully");
+      } else {
+        await createCoupon({
+          variables: {
+            input: buildPayload(),
+          },
+          refetchQueries: [{ query: GET_COUPONS }],
+          awaitRefetchQueries: true,
+        });
+
+        toast.success("Coupon Added Successfully");
+      }
+      setCoupon(INITIAL_COUPON);
+
+      setEditingCouponId(null);
+
       setCoupOpen(false);
-      refetch();
     } catch (err) {
       toast.error(err.message);
     }
@@ -147,7 +166,7 @@ export default function CouponMain() {
       await updateStatus({
         variables: {
           id,
-          status: value ? "active" : "inactive",
+          status: value ? "ACTIVE" : "INACTIVE",
         },
       });
 
@@ -156,6 +175,137 @@ export default function CouponMain() {
       toast.error(err.message);
     }
   };
+
+  const columns = useMemo(
+    () => [
+      {
+        header: "Code",
+        accessor: "code",
+      },
+
+      // {
+      //   header: "Description",
+      //   accessor: "description",
+      // },
+
+      {
+        header: "Type",
+        render: (row) => <span className="font-medium">{row.type}</span>,
+      },
+
+      {
+        header: "Discount %",
+        render: (row) => row.percentage ?? 0,
+      },
+
+      {
+        header: "Count",
+        render: (row) => row.couponCount ?? 0,
+      },
+
+      {
+        header: "Visibility",
+        render: (row) => (
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              row.visibility === "VISIBLE"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {row.visibility}
+          </span>
+        ),
+      },
+      {
+        header: "Start Date",
+        render: (row) =>
+          row.startDate
+            ? new Date(Number(row.startDate)).toLocaleDateString("en-IN")
+            : "-",
+      },
+
+      {
+        header: "End Date",
+        render: (row) =>
+          row.endDate
+            ? new Date(Number(row.endDate)).toLocaleDateString("en-IN")
+            : "-",
+      },
+
+      {
+        header: "Status",
+        render: (row) => (
+          <CustomToggle
+            checked={row.status}
+            onChange={(val) => handleStatusToggle(row.id, val)}
+          />
+        ),
+      },
+
+      {
+        header: "Actions",
+        render: (row) => (
+          <div className="flex gap-2 justify-center">
+            <button
+              disabled={!canUpdate}
+              onClick={() => {
+                setEditingCouponId(row.id);
+
+                setCoupon({
+                  code: row.code || "",
+                  description: row.description || "",
+                  applicable: row.applicable || "recharge",
+
+                  type: row.type || "CASHBACK",
+
+                  status: row.status ? "ACTIVE" : "INACTIVE",
+
+                  visibility: row.visibility || "VISIBLE",
+
+                  couponCount: row.couponCount || 0,
+                  percentage: row.percentage || 0,
+
+                  maxDiscount: row.maxDiscount || 0,
+                  redeemLimit: row.redeemLimit || 0,
+
+                  startDate: row.startDate
+                    ? new Date(Number(row.startDate))
+                        .toISOString()
+                        .split("T")[0]
+                    : "",
+
+                  endDate: row.endDate
+                    ? new Date(Number(row.endDate)).toISOString().split("T")[0]
+                    : "",
+                });
+
+                setCoupOpen(true);
+              }}
+            >
+              <FaEdit />
+            </button>
+
+            <ProtectedActionButton
+              module="coupon"
+              action="delete"
+              executeAction={executeAction}
+              mutationFn={deleteCoupon}
+              variables={{ id: row.id }}
+              onSuccess={refetch}
+              className="px-2 py-1 bg-red-400 text-white rounded"
+            >
+              <MdDelete />
+            </ProtectedActionButton>
+          </div>
+        ),
+      },
+    ],
+    [canUpdate, deleteCoupon, executeAction, refetch],
+  );
+  const filteredCoupons = coupons.filter((c) =>
+    (c.code || "").toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   if (!canRead) {
     return <p className="p-10 text-red-500">No Access to Coupons</p>;
@@ -169,7 +319,7 @@ export default function CouponMain() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-lg flex flex-col gap-3 shadow-lg w-[60%] p-6">
             <div className="flex justify-between bg-[#7a5ba3] text-white px-4 py-3 rounded-full">
-              <h3>Add New Coupon</h3>
+              <h3>{editingCouponId ? "Edit Coupon" : "Add New Coupon"}</h3>
               <button onClick={() => setCoupOpen(false)}>
                 <MdCancel className="text-2xl" />
               </button>
@@ -204,8 +354,8 @@ export default function CouponMain() {
                 value={coupon.type}
                 onChange={(e) => handleChange("type", e.target.value)}
               >
-                <option value="cashback">Cashback</option>
-                <option value="discount">Discount</option>
+                <option value="CASHBACK">Cashback</option>
+                <option value="DISCOUNT">Discount</option>
               </CustomDropdown>
 
               <CustomInput
@@ -214,19 +364,17 @@ export default function CouponMain() {
                 value={coupon.percentage}
                 onChange={(e) => handleChange("percentage", e.target.value)}
               />
-
               <CustomInput
                 label="Max Discount"
                 type="number"
-                value={coupon.max_discount}
-                onChange={(e) => handleChange("max_discount", e.target.value)}
+                value={coupon.maxDiscount}
+                onChange={(e) => handleChange("maxDiscount", e.target.value)}
               />
-
               <CustomInput
                 label="Redeem Limit"
                 type="number"
-                value={coupon.redeem_limit}
-                onChange={(e) => handleChange("redeem_limit", e.target.value)}
+                value={coupon.redeemLimit}
+                onChange={(e) => handleChange("redeemLimit", e.target.value)}
               />
               <CustomInput
                 label="Coupon Count"
@@ -238,15 +386,15 @@ export default function CouponMain() {
               <CustomInput
                 label="Start Date"
                 type="date"
-                value={coupon.start_date}
-                onChange={(e) => handleChange("start_date", e.target.value)}
+                value={coupon.startDate}
+                onChange={(e) => handleChange("startDate", e.target.value)}
               />
 
               <CustomInput
                 label="End Date"
                 type="date"
-                value={coupon.end_date}
-                onChange={(e) => handleChange("end_date", e.target.value)}
+                value={coupon.endDate}
+                onChange={(e) => handleChange("endDate", e.target.value)}
               />
 
               {/* STATUS TOGGLE */}
@@ -255,9 +403,9 @@ export default function CouponMain() {
                   Status
                 </label>
                 <CustomToggle
-                  checked={coupon.status === "active"}
+                  checked={coupon.status === "ACTIVE"}
                   onChange={(val) =>
-                    handleChange("status", val ? "active" : "inactive")
+                    handleChange("status", val ? "ACTIVE" : "INACTIVE")
                   }
                 />
               </div>
@@ -268,15 +416,11 @@ export default function CouponMain() {
                 </label>
 
                 <CustomToggle
-                  checked={coupon.visibility === "visible"}
+                  checked={coupon.visibility === "VISIBLE"}
                   onChange={(val) =>
-                    handleChange("visibility", val ? "visible" : "hidden")
+                    handleChange("visibility", val ? "VISIBLE" : "HIDDEN")
                   }
                 />
-
-                <span className="text-xs text-gray-500">
-                  {coupon.visibility}
-                </span>
               </div>
             </div>
 
@@ -288,7 +432,7 @@ export default function CouponMain() {
                   !canCreate ? "opacity-50 cursor-not-allowed" : " px-2 py-1"
                 }
               >
-                Submit
+                {editingCouponId ? "Update" : "Submit"}
               </CustomButton>
             </div>
           </div>
@@ -318,6 +462,20 @@ export default function CouponMain() {
           </CustomButton>
         </div>
 
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="bg-black text-white px-4 py-2 rounded-lg text-sm font-semibold">
+            Total Coupons : {coupons.length}
+          </div>
+
+          <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-semibold">
+            Active : {coupons.filter((c) => c.status).length}
+          </div>
+
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold">
+            Hidden : {coupons.filter((c) => c.visibility === "HIDDEN").length}
+          </div>
+        </div>
+
         <input
           type="text"
           placeholder="Search coupons..."
@@ -326,71 +484,11 @@ export default function CouponMain() {
           className="w-full border rounded-full p-2 mb-4"
         />
 
-        {coupons
-          .filter((c) =>
-            c.code.toLowerCase().includes(searchTerm.toLowerCase()),
-          )
-          .map((c, index) => (
-            <div
-              key={c.id}
-              className="grid grid-cols-10 border-b p-2 items-center text-sm"
-            >
-              <div className="text-center">{index + 1}</div>
-              <div className="text-center">{c.code}</div>
-              <div className="text-center">{c.description}</div>
-              <div className="text-center">{c.type}</div>
-              <div className="text-center">{c.percentage}</div>
-              <div className="text-center">{c.couponCount}</div>
-
-              <div className="text-center">
-                <span
-                  className={`px-2 py-1 rounded text-xs ${
-                    c.visibility === "visible"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {c.visibility}
-                </span>
-              </div>
-              <div className="text-center">
-                {new Date(c.start_date).toLocaleDateString("en-IN")}
-              </div>
-              <div className="text-center">
-                {new Date(c.end_date).toLocaleDateString("en-IN")}
-              </div>
-
-              <div className="flex gap-2 justify-center">
-                <button
-                  disabled={!canUpdate}
-                  className={`px-2 py-1 rounded ${
-                    !canUpdate
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-yellow-400"
-                  }`}
-                >
-                  <FaEdit />
-                </button>
-
-                <ProtectedActionButton
-                  module="coupon"
-                  action="delete"
-                  executeAction={executeAction}
-                  mutationFn={deleteCoupon}
-                  variables={{ id: c.id }}
-                  onSuccess={refetch}
-                  className="px-2 py-1 bg-red-400 text-white rounded"
-                >
-                  <MdDelete />
-                </ProtectedActionButton>
-
-                <CustomToggle
-                  checked={c.status === true}
-                  onChange={(val) => handleStatusToggle(c.id, val)}
-                />
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <div className="bg-white rounded-xl shadow border">
+            <DataTable columns={columns} data={filteredCoupons} />
+          </div>
+        </div>
       </div>
     </div>
   );

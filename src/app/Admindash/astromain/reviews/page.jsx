@@ -175,7 +175,7 @@ const [selectedSession, setSelectedSession] = useState(null);
         render: (row) => (
           <div>
             <Link
-              href={`""`}
+              href={`/Admindash/usermain/userprofile/${row?.userId}`}
               className="font-semibold text-blue-600 hover:underline"
             >
               {row.userName}

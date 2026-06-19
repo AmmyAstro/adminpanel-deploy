@@ -340,3 +340,20 @@ export const GET_MODULES_BY_SECTION = gql`
     }
   }
 `;
+
+
+export const GET_DASHBOARD_COUNTS = gql`
+  query GetDashboardCounts {
+    getDashboardCounts {
+      totalAstrologers
+      totalUsers
+      totalStaff
+
+      totalCalls
+      totalChats
+
+      totalRevenue
+      totalApplications
+    }
+  }
+`;

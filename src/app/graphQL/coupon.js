@@ -11,10 +11,10 @@ export const GET_COUPONS = gql`
       status
       visibility
       percentage
-      max_discount
-      redeem_limit
-      start_date
-      end_date
+      maxDiscount
+      redeemLimit
+      startDate
+      endDate
     }
   }
 `;
@@ -39,6 +39,35 @@ export const UPDATE_COUPON_STATUS = gql`
     updateCouponStatus(id: $id, status: $status) {
       id
       status
+    }
+  }
+`;
+
+export const UPDATE_COUPON = gql`
+  mutation UpdateCoupon(
+    $id: ID!
+    $input: UpdateCouponInput!
+  ) {
+    updateCoupon(
+      id: $id
+      input: $input
+    ) {
+      id
+      code
+      description
+      applicable
+
+      type
+      visibility
+      status
+
+      couponCount
+      percentage
+      maxDiscount
+      redeemLimit
+
+      startDate
+      endDate
     }
   }
 `;

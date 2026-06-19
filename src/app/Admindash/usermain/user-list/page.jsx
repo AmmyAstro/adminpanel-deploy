@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
+import Link from "next/link";
 
 const GET_USERS = gql`
   query GetUsers(
@@ -143,10 +144,17 @@ export default function UsersListPage() {
   // TABLE COLUMNS
   const columns = useMemo(
     () => [
-      {
-        header: "Name",
-        accessor: "name",
-      },
+    {
+  header: "Name",
+  render: (row) => (
+    <Link
+      href={`/Admindash/usermain/userprofile/${row.id}`}
+      className="font-semibold text-violet-600 hover:underline"
+    >
+      {row.name || "N/A"}
+    </Link>
+  ),
+},
 
       {
         header: "Mobile",

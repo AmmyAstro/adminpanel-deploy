@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
+import Link from "next/link";
 
 const GET_USER_WALLET_TRANSACTIONS = gql`
   query GetUserWalletTransactions(
@@ -144,13 +145,17 @@ export default function WalletTransactionsPage() {
         header: "User",
         render: (row) => (
           <div>
-            <p className="font-semibold">
-              {row?.userWallet?.user?.name || "N/A"}
-            </p>
+               <Link
+                  href={`/Admindash/usermain/userprofile/${row?.userWallet?.user?.id}`}
+                  className="font-semibold text-violet-600 hover:underline"
+                >
+                      {row?.userWallet?.user?.name || "N/A"}
+                </Link>
+          
 
-            <p className="text-xs text-gray-500">
+            {/* <p className="text-xs text-gray-500">
               {row?.userWallet?.user?.mobile || "N/A"}
-            </p>
+            </p> */}
           </div>
         ),
       },

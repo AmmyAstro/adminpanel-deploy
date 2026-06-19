@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
+import Link from "next/link";
 
 const GET_ASTROLOGER_EARNINGS = gql`
   query GetAstrologerEarnings(
@@ -155,9 +156,9 @@ export default function AstrologerEarningsPage() {
         header: "Astrologer",
         render: (row) => (
           <div>
-            <p className="font-semibold">
+            <Link href={`/Admindash/astromain/astroprofile/${row.astrologerId}`} className="font-semibold">
               {row.astrologerName}
-            </p>
+            </Link>
 
 
             <p className="text-xs text-gray-400">

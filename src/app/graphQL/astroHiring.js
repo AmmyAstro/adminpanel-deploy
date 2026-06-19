@@ -84,8 +84,7 @@ export const UPDATE_APPROVAL_STATUS = gql`
   }
 `;
 
-
-// docs uload 
+// docs uload
 export const UPLOAD_IMAGE = gql`
   mutation UploadImage($file: Upload!) {
     uploadImage(file: $file) {
@@ -138,8 +137,6 @@ export const REJECT_KYC = gql`
   }
 `;
 
-
-
 export const GET_OFFERS = gql`
   query GetOffers {
     getOffers {
@@ -160,11 +157,7 @@ export const CREATE_OFFER = gql`
     $description: String!
   ) {
     createOffer(
-      data: {
-        offerName: $offerName
-        price: $price
-        description: $description
-      }
+      data: { offerName: $offerName, price: $price, description: $description }
     ) {
       success
       message
@@ -265,14 +258,8 @@ export const GET_ASTROLOGER_BY_ID = gql`
   }
 `;
 export const UPDATE_ASTROLOGER = gql`
-  mutation UpdateAstrologer(
-    $astrologerId: ID!
-    $data: UpdateAstrologerInput!
-  ) {
-    updateAstrologer(
-      astrologerId: $astrologerId
-      data: $data
-    ) {
+  mutation UpdateAstrologer($astrologerId: ID!, $data: UpdateAstrologerInput!) {
+    updateAstrologer(astrologerId: $astrologerId, data: $data) {
       id
       name
       email
@@ -280,7 +267,7 @@ export const UPDATE_ASTROLOGER = gql`
   }
 `;
 
- export const GET_CATEGORIES = gql`
+export const GET_CATEGORIES = gql`
   query getCategories {
     getCategories {
       id
@@ -297,12 +284,8 @@ export const DELETE_CATEGORY = gql`
 `;
 
 export const GET_ASTROLOGER_DASHBOARD_STATS = gql`
-  query GetAstrologerDashboardStats(
-    $astrologerId: ID!
-  ) {
-    getAstrologerDashboardStats(
-      astrologerId: $astrologerId
-    ) {
+  query GetAstrologerDashboardStats($astrologerId: ID!) {
+    getAstrologerDashboardStats(astrologerId: $astrologerId) {
       totalChats
       totalCalls
       totalSessions
@@ -326,11 +309,7 @@ export const GET_ASTROLOGER_DASHBOARD_STATS = gql`
 `;
 
 export const GET_ASTROLOGER_CHAT_HISTORY = gql`
-  query GetAstrologerChatHistory(
-    $astrologerId: ID!
-    $page: Int
-    $limit: Int
-  ) {
+  query GetAstrologerChatHistory($astrologerId: ID!, $page: Int, $limit: Int) {
     getAstrologerChatHistory(
       astrologerId: $astrologerId
       page: $page
@@ -364,11 +343,7 @@ export const GET_ASTROLOGER_CHAT_HISTORY = gql`
 `;
 
 export const GET_ASTROLOGER_CALL_HISTORY = gql`
-  query GetAstrologerCallHistory(
-    $astrologerId: ID!
-    $page: Int
-    $limit: Int
-  ) {
+  query GetAstrologerCallHistory($astrologerId: ID!, $page: Int, $limit: Int) {
     getAstrologerCallHistory(
       astrologerId: $astrologerId
       page: $page
@@ -423,16 +398,138 @@ export const UPDATE_AVAILABILITY = gql`
 `;
 
 export const TOGGLE_REVIEW_FLAG = gql`
-  mutation ToggleReviewFlag(
-    $reviewId: ID!
-    $isFlagged: Boolean!
-  ) {
-    toggleReviewFlag(
-      reviewId: $reviewId
-      isFlagged: $isFlagged
-    ) {
+  mutation ToggleReviewFlag($reviewId: ID!, $isFlagged: Boolean!) {
+    toggleReviewFlag(reviewId: $reviewId, isFlagged: $isFlagged) {
       success
       message
+    }
+  }
+`;
+
+export const GET_USER_CALL_HISTORY = gql`
+  query GetUserCallHistory($searchInput: UserCallHistorySearchInput!) {
+    getUserCallHistory(searchInput: $searchInput) {
+      totalCount
+      currentPage
+      totalPages
+
+      totalCoinsDeducted
+      totalCoinsEarned
+      totalCommission
+
+      data {
+        sessionId
+
+        userId
+        userName
+        mobile
+
+        astrologerId
+        astrologerName
+
+        type
+        status
+
+        ratePerMin
+        durationSec
+
+        coinsDeducted
+        coinsEarned
+        commission
+
+        startedAt
+        endedAt
+        createdAt
+      }
+    }
+  }
+`;
+
+export const GET_USERS_CHAT_HISTORY = gql`
+  query GetUsersChatHistory($searchInput: UserChatHistorySearchInput!) {
+    getUsersChatHistory(searchInput: $searchInput) {
+      totalCount
+      currentPage
+      totalPages
+
+      totalCoinsDeducted
+      totalCoinsEarned
+      totalCommission
+
+      data {
+        userId
+        sessionId
+        userName
+        mobile
+        astrologerName
+
+        status
+        ratePerMin
+        coinsDeducted
+        coinsEarned
+        commission
+
+        durationSec
+        createdAt
+      }
+    }
+  }
+`;
+
+export const GET_ASTRO_LIST = gql`
+  query GetAstrologerList($searchInput: AstrologerSearchInput!) {
+    getAstrologerListBySearch(searchInput: $searchInput) {
+      data {
+        id
+        displayName
+        email
+        contactNo
+        experience
+        tags
+        vtags
+      }
+    }
+  }
+`;
+
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($userId: ID!) {
+    getUserProfile(userId: $userId) {
+      id
+      name
+
+      mobile
+      countryCode
+
+      gender
+
+      birthDate
+      birthTime
+
+      occupation
+
+      isActive
+
+      createdAt
+
+      stats {
+        walletBalance
+
+        totalRecharge
+        totalRechargeCount
+
+        totalCalls
+        totalChats
+
+        totalReviews
+
+        totalFollowing
+
+        totalBookings
+
+        lastRechargeAmount
+        lastRechargeDate
+      }
     }
   }
 `;

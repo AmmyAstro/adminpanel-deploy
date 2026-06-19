@@ -12,25 +12,13 @@ import { useActionHandler } from "@/hooks/useActionHandler";
 import { useMutation, useQuery } from "@apollo/client/react";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
+import { GET_ASTRO_LIST } from "@/app/graphQL/astroHiring";
+import Link from "next/link";
 
 
 
 
-const GET_ASTRO_LIST = gql`
-  query GetAstrologerList($searchInput: AstrologerSearchInput!) {
-    getAstrologerListBySearch(searchInput: $searchInput) {
-      data {
-        id
-        displayName
-        email
-        contactNo
-        experience
-        tags
-        vtags
-      }
-    }
-  }
-`;
+
 
 const DELETE_ASTRO = gql`
   mutation DeleteAstrologer($astrologerId: ID!) {
@@ -44,9 +32,7 @@ export default function AstroList() {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
-  /* =========================
-      PERMISSIONS
-  ========================= */
+ 
 
   const { can, isSuperAdmin } = usePermissions();
 
@@ -54,9 +40,7 @@ export default function AstroList() {
   const canUpdate = isSuperAdmin || can("astrologer", "update");
   const canDelete = isSuperAdmin || can("astrologer", "delete");
 
-  /* =========================
-      ACTION HANDLER
-  ========================= */
+ 
 
   const {
     confirmState,
@@ -65,9 +49,7 @@ export default function AstroList() {
     handleConfirm,
   } = useActionHandler();
 
-  /* =========================
-      API CALLS
-  ========================= */
+
 
   const { data, loading, refetch } = useQuery(GET_ASTRO_LIST, {
     variables: {
@@ -103,7 +85,7 @@ export default function AstroList() {
       accessor: "name",
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-medium">{row.displayName}</span>
+          <Link href={`/Admindash/astromain/astroprofile/${row.id}`} className="font-medium">{row.displayName}</Link>
         <small className="text-gray-400">
   ID: {row.id?.slice(0, 15)}
 </small>

@@ -6,36 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
 import SessionMessagesModal from "../SessionModal";
-
-const GET_USERS_CHAT_HISTORY = gql`
-  query GetUsersChatHistory($searchInput: UserChatHistorySearchInput!) {
-    getUsersChatHistory(searchInput: $searchInput) {
-      totalCount
-      currentPage
-      totalPages
-
-      totalCoinsDeducted
-      totalCoinsEarned
-      totalCommission
-
-      data {
-        sessionId
-        userName
-        mobile
-        astrologerName
-
-        status
-        ratePerMin
-        coinsDeducted
-        coinsEarned
-        commission
-
-        durationSec
-        createdAt
-      }
-    }
-  }
-`;
+import { GET_USERS_CHAT_HISTORY } from "@/app/graphQL/astroHiring";
+import Link from "next/link";
 
 export default function UserChatHistoryPage() {
   const [openModal, setOpenModal] = useState(false);
@@ -159,7 +131,12 @@ export default function UserChatHistoryPage() {
         header: "User",
         render: (row) => (
           <div>
-            <p className="font-semibold">{row.userName}</p>
+            <Link
+              href={`/Admindash/usermain/userprofile/${row.userId}`}
+              className="font-semibold text-violet-600 hover:underline"
+            >
+              {row.userName}
+            </Link>
 
             <p className="text-xs text-gray-500">{row.mobile}</p>
           </div>
@@ -190,8 +167,9 @@ export default function UserChatHistoryPage() {
 
           return (
             <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${statusStyles[row.status] || "bg-gray-100 text-gray-700"
-                }`}
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                statusStyles[row.status] || "bg-gray-100 text-gray-700"
+              }`}
             >
               {row.status}
             </span>
@@ -273,9 +251,9 @@ export default function UserChatHistoryPage() {
             </svg>
           </button>
         ),
-      }
+      },
     ],
-   [setSelectedSession, setOpenModal]
+    [setSelectedSession, setOpenModal],
   );
 
   if (error) {
@@ -397,12 +375,11 @@ export default function UserChatHistoryPage() {
         )}
       </div>
 
-
       <SessionMessagesModal
-  open={openModal}
-  onClose={() => setOpenModal(false)}
-  sessionId={selectedSession}
-/>
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        sessionId={selectedSession}
+      />
 
       {/* TABLE */}
       <div className="overflow-x-auto">
@@ -420,10 +397,11 @@ export default function UserChatHistoryPage() {
         <button
           disabled={page === 1}
           onClick={() => setPage((prev) => prev - 1)}
-          className={`px-4 py-2 rounded-lg ${page === 1
+          className={`px-4 py-2 rounded-lg ${
+            page === 1
               ? "bg-gray-200 cursor-not-allowed"
               : "bg-black text-white"
-            }`}
+          }`}
         >
           Previous
         </button>
@@ -435,10 +413,11 @@ export default function UserChatHistoryPage() {
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((prev) => prev + 1)}
-          className={`px-4 py-2 rounded-lg ${page >= totalPages
+          className={`px-4 py-2 rounded-lg ${
+            page >= totalPages
               ? "bg-gray-200 cursor-not-allowed"
               : "bg-black text-white"
-            }`}
+          }`}
         >
           Next
         </button>

@@ -5,49 +5,9 @@ import { useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
+import { GET_USER_CALL_HISTORY } from "@/app/graphQL/astroHiring";
 
-const GET_USER_CALL_HISTORY = gql`
-  query GetUserCallHistory(
-    $searchInput: UserCallHistorySearchInput!
-  ) {
-    getUserCallHistory(
-      searchInput: $searchInput
-    ) {
-      totalCount
-      currentPage
-      totalPages
 
-      totalCoinsDeducted
-      totalCoinsEarned
-      totalCommission
-
-      data {
-        sessionId
-
-        userId
-        userName
-        mobile
-
-        astrologerId
-        astrologerName
-
-        type
-        status
-
-        ratePerMin
-        durationSec
-
-        coinsDeducted
-        coinsEarned
-        commission
-
-        startedAt
-        endedAt
-        createdAt
-      }
-    }
-  }
-`;
 
 export default function UserCallHistoryPage() {
   // SEARCH STATES
@@ -220,9 +180,12 @@ export default function UserCallHistoryPage() {
         header: "User",
         render: (row) => (
           <div>
-            <p className="font-semibold">
+                <Link
+              href={`/Admindash/usermain/userprofile/${row.userId}`}
+              className="font-semibold text-violet-600 hover:underline"
+            >
               {row.userName}
-            </p>
+            </Link>
 
             <p className="text-xs text-gray-500">
               {row.mobile}

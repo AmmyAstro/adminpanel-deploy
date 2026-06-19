@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
+import Link from "next/link";
 
 const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
   query GetAstrologerWalletTransactions(
@@ -52,23 +53,17 @@ const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
 
 export default function AstrologerWalletTransactionsPage() {
   // SEARCH STATES
-  const [searchPhone, setSearchPhone] =
-    useState("");
+  const [searchPhone, setSearchPhone] = useState("");
 
-  const [searchType, setSearchType] =
-    useState("");
+  const [searchType, setSearchType] = useState("");
 
-  const [searchAmount, setSearchAmount] =
-    useState("");
+  const [searchAmount, setSearchAmount] = useState("");
 
-  const [searchFilterType, setSearchFilterType] =
-    useState("");
+  const [searchFilterType, setSearchFilterType] = useState("");
 
-  const [startDate, setStartDate] =
-    useState("");
+  const [startDate, setStartDate] = useState("");
 
-  const [endDate, setEndDate] =
-    useState("");
+  const [endDate, setEndDate] = useState("");
 
   // PAGINATION
   const [page, setPage] = useState(1);
@@ -117,8 +112,7 @@ export default function AstrologerWalletTransactionsPage() {
   };
 
   if (filters.contactNo) {
-    queryVariables.contactNo =
-      filters.contactNo;
+    queryVariables.contactNo = filters.contactNo;
   }
 
   if (filters.type) {
@@ -126,26 +120,17 @@ export default function AstrologerWalletTransactionsPage() {
   }
 
   if (filters.amount) {
-    queryVariables.amount = Number(
-      filters.amount
-    );
+    queryVariables.amount = Number(filters.amount);
   }
 
   if (filters.filterType) {
-    queryVariables.filterType =
-      filters.filterType;
+    queryVariables.filterType = filters.filterType;
   }
 
-  if (
-    filters.filterType === "CUSTOM" &&
-    filters.startDate &&
-    filters.endDate
-  ) {
-    queryVariables.startDate =
-      filters.startDate;
+  if (filters.filterType === "CUSTOM" && filters.startDate && filters.endDate) {
+    queryVariables.startDate = filters.startDate;
 
-    queryVariables.endDate =
-      filters.endDate;
+    queryVariables.endDate = filters.endDate;
   }
 
   // API CALL
@@ -154,16 +139,12 @@ export default function AstrologerWalletTransactionsPage() {
     {
       variables: queryVariables,
       fetchPolicy: "network-only",
-    }
+    },
   );
 
-  const transactions =
-    data?.getAstrologerWalletTransactions
-      ?.data || [];
+  const transactions = data?.getAstrologerWalletTransactions?.data || [];
 
-  const totalCount =
-    data?.getAstrologerWalletTransactions
-      ?.totalCount || 0;
+  const totalCount = data?.getAstrologerWalletTransactions?.totalCount || 0;
 
   const totalPages = Math.ceil(totalCount / limit);
 
@@ -174,21 +155,19 @@ export default function AstrologerWalletTransactionsPage() {
         header: "Astrologer",
         render: (row) => (
           <div>
-            <p className="font-semibold">
-              {row?.astrologerWallet?.astrologer
-                ?.displayName || "N/A"}
-            </p>
-
-          
-
-           
+            <Link
+              href={`/Admindash/astromain/astroprofile/${row?.astrologerWallet?.astrologer?.id}`}
+              className="font-semibold"
+            >
+              {row?.astrologerWallet?.astrologer?.displayName || "N/A"}
+            </Link>
           </div>
         ),
       },
 
       {
         header: "Transaction ID",
-          render: (row) => ` ${row.id?.slice(0,15)}`,
+        render: (row) => ` ${row.id?.slice(0, 15)}`,
       },
 
       {
@@ -219,28 +198,22 @@ export default function AstrologerWalletTransactionsPage() {
       {
         header: "Description",
         render: (row) => (
-          <div className="max-w-[250px] truncate">
-            {row.description}
-          </div>
+          <div className="max-w-[250px] truncate">{row.description}</div>
         ),
       },
 
       {
         header: "Created At",
-        render: (row) =>
-          new Date(
-            row.createdAt
-          ).toLocaleString(),
+        render: (row) => new Date(row.createdAt).toLocaleString(),
       },
     ],
-    []
+    [],
   );
 
   if (error) {
     return (
       <p className="p-10 text-red-500">
-        Error loading astrologer wallet
-        transactions
+        Error loading astrologer wallet transactions
       </p>
     );
   }
@@ -249,9 +222,7 @@ export default function AstrologerWalletTransactionsPage() {
     <div className="p-10 space-y-6">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold">
-          Astrologer Wallet Transactions
-        </h1>
+        <h1 className="text-2xl font-bold">Astrologer Wallet Transactions</h1>
 
         <div className="bg-black text-white px-4 py-2 rounded-lg w-fit">
           Total Records : {totalCount}
@@ -265,31 +236,21 @@ export default function AstrologerWalletTransactionsPage() {
           type="text"
           placeholder="Search by contact no"
           value={searchPhone}
-          onChange={(e) =>
-            setSearchPhone(e.target.value)
-          }
+          onChange={(e) => setSearchPhone(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         />
 
         {/* TYPE */}
         <select
           value={searchType}
-          onChange={(e) =>
-            setSearchType(e.target.value)
-          }
+          onChange={(e) => setSearchType(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         >
-          <option value="">
-            All Types
-          </option>
+          <option value="">All Types</option>
 
-          <option value="CREDIT">
-            CREDIT
-          </option>
+          <option value="CREDIT">CREDIT</option>
 
-          <option value="DEBIT">
-            DEBIT
-          </option>
+          <option value="DEBIT">DEBIT</option>
         </select>
 
         {/* AMOUNT */}
@@ -297,41 +258,25 @@ export default function AstrologerWalletTransactionsPage() {
           type="number"
           placeholder="Search by amount"
           value={searchAmount}
-          onChange={(e) =>
-            setSearchAmount(e.target.value)
-          }
+          onChange={(e) => setSearchAmount(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         />
 
         {/* DATE FILTER */}
         <select
           value={searchFilterType}
-          onChange={(e) =>
-            setSearchFilterType(
-              e.target.value
-            )
-          }
+          onChange={(e) => setSearchFilterType(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         >
-          <option value="">
-            All Time
-          </option>
+          <option value="">All Time</option>
 
-          <option value="WEEK">
-            Last Week
-          </option>
+          <option value="WEEK">Last Week</option>
 
-          <option value="MONTH">
-            Last Month
-          </option>
+          <option value="MONTH">Last Month</option>
 
-          <option value="YEAR">
-            Last Year
-          </option>
+          <option value="YEAR">Last Year</option>
 
-          <option value="CUSTOM">
-            Custom Date
-          </option>
+          <option value="CUSTOM">Custom Date</option>
         </select>
 
         {/* START DATE */}
@@ -339,11 +284,7 @@ export default function AstrologerWalletTransactionsPage() {
           <input
             type="date"
             value={startDate}
-            onChange={(e) =>
-              setStartDate(
-                e.target.value
-              )
-            }
+            onChange={(e) => setStartDate(e.target.value)}
             className="border rounded-lg px-4 py-2 outline-none"
           />
         )}
@@ -353,11 +294,7 @@ export default function AstrologerWalletTransactionsPage() {
           <input
             type="date"
             value={endDate}
-            onChange={(e) =>
-              setEndDate(
-                e.target.value
-              )
-            }
+            onChange={(e) => setEndDate(e.target.value)}
             className="border rounded-lg px-4 py-2 outline-none"
           />
         )}
@@ -372,14 +309,9 @@ export default function AstrologerWalletTransactionsPage() {
       <div className="overflow-x-auto">
         <div className="w-full bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
           {loading ? (
-            <div className="p-10 text-center">
-              Loading Transactions...
-            </div>
+            <div className="p-10 text-center">Loading Transactions...</div>
           ) : (
-            <DataTable
-              columns={columns}
-              data={transactions}
-            />
+            <DataTable columns={columns} data={transactions} />
           )}
         </div>
       </div>
@@ -388,9 +320,7 @@ export default function AstrologerWalletTransactionsPage() {
       <div className="flex items-center justify-between">
         <button
           disabled={page === 1}
-          onClick={() =>
-            setPage((prev) => prev - 1)
-          }
+          onClick={() => setPage((prev) => prev - 1)}
           className={`px-4 py-2 rounded-lg ${
             page === 1
               ? "bg-gray-200 cursor-not-allowed"
@@ -401,15 +331,12 @@ export default function AstrologerWalletTransactionsPage() {
         </button>
 
         <div className="font-medium">
-          Page {page} of{" "}
-          {totalPages || 1}
+          Page {page} of {totalPages || 1}
         </div>
 
         <button
           disabled={page >= totalPages}
-          onClick={() =>
-            setPage((prev) => prev + 1)
-          }
+          onClick={() => setPage((prev) => prev + 1)}
           className={`px-4 py-2 rounded-lg ${
             page >= totalPages
               ? "bg-gray-200 cursor-not-allowed"
