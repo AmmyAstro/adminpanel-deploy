@@ -17,10 +17,7 @@ import {
 
 const SAVE_AND_VERIFY_KYC = gql`
   mutation SaveKyc($astrologerId: String!, $input: KycDetailInput!) {
-    saveAndVerifyKyc(
-      astrologerId: $astrologerId
-      input: $input
-    ) {
+    saveAndVerifyKyc(astrologerId: $astrologerId, input: $input) {
       id
       status
     }
@@ -30,7 +27,6 @@ const SAVE_AND_VERIFY_KYC = gql`
 import { GET_INTERVIEWERS } from "@/app/graphQL/astroHiring";
 import toast from "react-hot-toast";
 import { gql } from "@apollo/client";
-
 
 export default function AstrologerHiring() {
   const { can } = usePermissions();
@@ -59,7 +55,7 @@ export default function AstrologerHiring() {
   const allData = data?.getApplications || [];
 
   const interviewerMap = Object.fromEntries(
-    interviewers.map((i) => [i.id, i.name])
+    interviewers.map((i) => [i.id, i.name]),
   );
 
   const StatusBadge = ({ status }) => {
@@ -71,7 +67,9 @@ export default function AstrologerHiring() {
       verified: "bg-green-600",
     };
     return (
-      <span className={`w-2 h-2 rounded-full ${map[status?.toLowerCase()] || "bg-gray-400"}`} />
+      <span
+        className={`w-2 h-2 rounded-full ${map[status?.toLowerCase()] || "bg-gray-400"}`}
+      />
     );
   };
 
@@ -89,11 +87,10 @@ export default function AstrologerHiring() {
       },
     });
     setOpenModal(false);
-    toast.success("Interview Scheduled !")
+    toast.success("Interview Scheduled !");
 
     refetch();
   };
-
 
   const handleUpload = async (key, file) => {
     if (!file) return;
@@ -101,8 +98,7 @@ export default function AstrologerHiring() {
     const res = await uploadImage({ variables: { file } });
 
     const url = res.data.uploadImage.url;
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",url , res);
-    
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", url, res);
 
     setSelected((prev) => ({
       ...prev,
@@ -112,11 +108,11 @@ export default function AstrologerHiring() {
       },
     }));
   };
- 
+
   const handleSave = async () => {
     await saveAndVerifyKyc({
       variables: {
-        astrologerId: selected.id,   
+        astrologerId: selected.id,
         input: {
           accountHolderName: selected.kyc?.accountHolderName,
           accountNumber: selected.kyc?.accountNumber,
@@ -135,7 +131,7 @@ export default function AstrologerHiring() {
       },
     });
     setOpenModal(false);
-    toast.success("Docs Verified Successfully !")
+    toast.success("Docs Verified Successfully !");
 
     refetch();
   };
@@ -143,10 +139,9 @@ export default function AstrologerHiring() {
   const handleReject = async () => {
     await rejectKyc({ variables: { astrologerId: selected.id } });
     setOpenModal(false);
-    toast.error("Docs Rejected !")
+    toast.error("Docs Rejected !");
     refetch();
   };
-
 
   const columns = [
     { header: "Name", accessor: "name" },
@@ -227,18 +222,17 @@ export default function AstrologerHiring() {
             window.location.href = `/Admindash/astromain/add-astrologer?appId=${row.id}`;
           }}
           className={`px-3 py-1 rounded text-xs ${row.approvalStatus === "APPROVED"
-            ? "bg-green-600 text-white"
-            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? "bg-green-600 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
         >
           ADD
         </button>
       ),
-    }
+    },
   ];
 
   const docFields = [
-  
     { label: "Aadhaar", key: "aadhaarImage" },
     { label: "Pancard", key: "panImage" },
     { label: "Bank Passbook", key: "passbookImage" },
@@ -251,17 +245,15 @@ export default function AstrologerHiring() {
       {openModal && selected && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
           <div className="bg-white w-[700px] rounded-xl p-5 space-y-4">
-
             <div className="flex justify-between">
               <h2>{selected.name}</h2>
               <button onClick={() => setOpenModal(false)}>✕</button>
             </div>
 
-     
             <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl">
-              <button onClick={() => setActiveTab("interview")}
-
-              >Interview</button>
+              <button onClick={() => setActiveTab("interview")}>
+                Interview
+              </button>
               <button
                 disabled={selected.interviewStatus !== "PASSED"}
                 onClick={() => setActiveTab("documents")}
@@ -270,14 +262,10 @@ export default function AstrologerHiring() {
               </button>
             </div>
 
-          
             {activeTab === "interview" && (
               <div className="space-y-3">
-
-              
                 {selected.interviewStatus === "PENDING" && (
                   <div className="grid grid-cols-2 gap-4">
-
                     <select
                       className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
                       onChange={(e) =>
@@ -292,21 +280,24 @@ export default function AstrologerHiring() {
                       ))}
                     </select>
 
-                    <input className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                    <input
+                      className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
                       type="date"
                       onChange={(e) =>
                         setForm({ ...form, date: e.target.value })
                       }
                     />
 
-                    <input className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                    <input
+                      className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
                       type="time"
                       onChange={(e) =>
                         setForm({ ...form, time: e.target.value })
                       }
                     />
 
-                    <select className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                    <select
+                      className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
                       onChange={(e) =>
                         setForm({ ...form, round: e.target.value })
                       }
@@ -324,48 +315,65 @@ export default function AstrologerHiring() {
                   </div>
                 )}
 
-               
-                {["SCHEDULED", "PASSED", "REJECTED"].includes(selected.interviewStatus) && (
-                  <div className="bg-gray-100 p-3 rounded space-y-2 text-sm">
+                {["SCHEDULED", "PASSED", "REJECTED"].includes(
+                  selected.interviewStatus,
+                ) && (
+                    <div className="bg-gray-100 p-3 rounded space-y-2 text-sm">
+                      <p>
+                        <b>Interviewer:</b>{" "}
+                        {interviewerMap[selected.interviewerId] || "-"}
+                      </p>
+                      <p>
+                        <b>Date:</b>{" "}
+                        {selected.interviewDate
+                          ? new Date(
+                            Number(selected.interviewDate),
+                          ).toLocaleDateString("en-IN")
+                          : "-"}
+                      </p>
+                      <p>
+                        <b>Time:</b> {selected.interviewTime || "-"}
+                      </p>
+                      <p>
+                        <b>Round:</b> {selected.round || "-"}
+                      </p>
+                      <p>
+                        <b>Status:</b> {selected.interviewStatus}
+                      </p>
 
-                    <p><b>Interviewer:</b> {interviewerMap[selected.interviewerId] || "-"}</p>
-                 <p>
-  <b>Date:</b>{" "}
-  {selected.interviewDate
-    ? new Date(Number(selected.interviewDate))
-        .toLocaleDateString("en-IN")
-    : "-"}
-</p>
-                    <p><b>Time:</b> {selected.interviewTime || "-"}</p>
-                    <p><b>Round:</b> {selected.round || "-"}</p>
-                    <p><b>Status:</b> {selected.interviewStatus}</p>
-
-                    <button
-                      onClick={() => {
-                        setSelected({ ...selected, interviewStatus: "PENDING" });
-                        setForm({
-                          interviewerId: selected.interviewerId || "",
-                          date: selected.interviewDate?.split("T")[0] || "",
-                          time: selected.interviewTime || "",
-                          round: selected.round || "1",
-                        });
-                      }}
-                      className="bg-orange-500 text-white px-3 py-1 rounded"
-                    >
-                      Reschedule
-                    </button>
-                  </div>
-                )}
+                      <button
+                        onClick={() => {
+                          setSelected({
+                            ...selected,
+                            interviewStatus: "PENDING",
+                          });
+                          setForm({
+                            interviewerId: selected.interviewerId || "",
+                            date: selected.interviewDate?.split("T")[0] || "",
+                            time: selected.interviewTime || "",
+                            round: selected.round || "1",
+                          });
+                        }}
+                        className="bg-orange-500 text-white px-3 py-1 rounded"
+                      >
+                        Reschedule
+                      </button>
+                    </div>
+                  )}
               </div>
             )}
 
-
             {activeTab === "documents" && (
               <div className="space-y-4">
-
-
                 <div className="grid grid-cols-2 gap-2">
-                  {["accountHolderName", "accountNumber", "bankName", "ifsc", "branchName", "panNumber"].map((field) => (
+                  {[
+                    "accountHolderName",
+                    "accountNumber",
+                    "bankName",
+                    "ifsc",
+                    "branchName",
+                    "panNumber",
+                  ].map((field) => (
                     <input
                       key={field}
                       placeholder={field}
@@ -381,31 +389,38 @@ export default function AstrologerHiring() {
                   ))}
                 </div>
 
-
-
                 {docFields.map(({ label, key }) => (
                   <div key={key} className="flex justify-between text-xs">
-
                     <span>{label}</span>
                     {selected.kyc?.[key] && (
-                      <a href={selected.kyc[key]} target="_blank">View</a>
+                      <a href={selected.kyc[key]} target="_blank">
+                        View
+                      </a>
                     )}
-                    <input type="file" className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
-                      onChange={(e) => handleUpload(key, e.target.files[0])} />
+                    <input
+                      type="file"
+                      className="border border-gray-200 rounded-xl px-2 py-1 text-sm"
+                      onChange={(e) => handleUpload(key, e.target.files[0])}
+                    />
                   </div>
                 ))}
 
                 <div className="flex items-center justify-center gap-3">
-                  <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded-lg">
+                  <button
+                    onClick={handleSave}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                  >
                     Save & Verify
                   </button>
-                  <button onClick={handleReject} className="bg-red-600 text-white px-4 py-2 rounded-lg">
+                  <button
+                    onClick={handleReject}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                  >
                     Reject
                   </button>
                 </div>
               </div>
             )}
-
           </div>
         </div>
       )}

@@ -93,7 +93,14 @@ export default function InterviewerPanel() {
 
             {/* Interview Info */}
             <div className="bg-gray-50 p-3 rounded">
-              <p>Date: {formatDate(item.interviewDate)}</p>
+                <p>
+                        <b>Date:</b>{" "}
+                        {item.interviewDate
+                          ? new Date(
+                            Number(item.interviewDate),
+                          ).toLocaleDateString("en-IN")
+                          : "-"}
+                      </p>
               <p>Time: {item.interviewTime}</p>
               <p>Round: {item.round}</p>
             </div>

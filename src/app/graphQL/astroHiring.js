@@ -224,6 +224,12 @@ export const GET_ASTROLOGER_BY_ID = gql`
       languages
       skills
       problems
+          isCallActive
+    isChatActive
+    isLiveActive
+    isBusy
+    isOnline
+    isPromotional
 
       pricing {
         type
