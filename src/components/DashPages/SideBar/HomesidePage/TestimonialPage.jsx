@@ -168,7 +168,7 @@ export default function TestimonialPage() {
                 mutationFn={deleteTestimonial}
                 variables={{ id: t.id }}
                 onSuccess={() => {
-                  toast.success("Deleted");
+                  // toast.success("Deleted");
                   refetch();
                 }}
                 className={`px-3 py-1 text-xs bg-red-500 text-white rounded ${getPermissionClass(

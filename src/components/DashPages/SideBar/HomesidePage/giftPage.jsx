@@ -68,7 +68,7 @@ export default function GiftManager() {
     setEditingGift(null);
   };
 
-  // 🔥 FILE VALIDATION + PREVIEW
+ 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
 
@@ -158,19 +158,23 @@ export default function GiftManager() {
   const giftColumns = [
     { header: "Name", accessor: "name" },
     { header: "Amount", accessor: "amount" },
-    {
-      header: "Image",
-      render: (row) => (
-        <img
-          src={
-            row.image
-              ? `http://localhost:4001${row.image}`
-              : "/placeholder.png"
-          }
-          className="h-10 w-10 object-cover mx-auto rounded"
-        />
-      ),
-    },
+{
+  header: "Image",
+  render: (row) => (
+    <img
+      src={
+        row.image
+          ? `https://dhwaniastro.com${row.image}`
+          : "/placeholder.png"
+      }
+      alt={row.name}
+      className="h-10 w-10 object-cover mx-auto rounded"
+      onError={(e) => {
+        console.log("Image failed:", e.target.src);
+      }}
+    />
+  ),
+},
     { header: "Status", accessor: "status" },
     {
       header: "Actions",

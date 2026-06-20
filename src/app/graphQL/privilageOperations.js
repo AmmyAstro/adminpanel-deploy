@@ -357,3 +357,22 @@ export const GET_DASHBOARD_COUNTS = gql`
     }
   }
 `;
+
+export const GET_APP_VERSIONS = gql`
+  query GetAppVersions {
+    getAppVersions {
+      id
+      platform
+      latestVersion
+      minimumVersion
+      forceUpdate
+      maintenanceMode
+      maintenanceMessage
+      playStoreUrl
+      appStoreUrl
+      releaseNotes
+      createdAt
+      updatedAt
+    }
+  }
+`;

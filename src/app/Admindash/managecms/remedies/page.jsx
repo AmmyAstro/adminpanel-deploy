@@ -12,6 +12,7 @@ import {
   GET_REMEDIES,
   UPDATE_REMEDY,
 } from "@/app/graphQL/managecms";
+import toast from "react-hot-toast";
 
 export default function RemedyAdminPage() {
   // =========================
@@ -83,7 +84,7 @@ export default function RemedyAdminPage() {
           },
         });
 
-        alert("Remedy updated");
+        toast.success("Remedy Updated")
       }
 
       // =====================
@@ -100,7 +101,7 @@ export default function RemedyAdminPage() {
           },
         });
 
-        alert("Remedy created");
+       toast.success("Remedy Created")
       }
 
       // =====================

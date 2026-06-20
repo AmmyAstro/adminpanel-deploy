@@ -58,7 +58,14 @@ export default function BannerManager() {
 
   useEffect(() => {
     if (editingBanner) {
-      setForm(editingBanner);
+      setForm({
+        heading: editingBanner.heading || "",
+        subheading: editingBanner.subheading || "",
+        slug: editingBanner.slug || "",
+        sortorder: editingBanner.sortorder || 0,
+        bannerlink: editingBanner.bannerlink || "",
+        language: editingBanner.language || "en",
+      });
     } else {
       resetForm();
     }
@@ -180,11 +187,27 @@ export default function BannerManager() {
     { header: "Language", accessor: "language" },
     { header: "Sort", accessor: "sortorder" },
 
-    // 🔥 STATUS TOGGLE
+    {
+  header: "Image",
+  render: (row) => (
+    <img
+      src={
+        row.imageUrl
+          ? `https://dhwaniastro.com${row.imageUrl}`
+          : "/no-image.png"
+      }
+      alt={row.heading}
+      onError={(e) => {
+        e.target.src = "/no-image.png";
+      }}
+      className="h-14 w-24 object-cover rounded-md border"
+    />
+  ),
+},
     {
       header: "Status",
       render: (row) => (
-        <label className="inline-flex items-center cursor-pointer">
+        <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
             checked={row.status}
@@ -219,10 +242,17 @@ export default function BannerManager() {
             className="sr-only peer"
           />
 
-          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 relative transition">
-            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-          </div>
-        </label>
+<div
+  className={`w-12 h-6 rounded-full relative transition ${
+    row.status ? "bg-green-500" : "bg-gray-300"
+  }`}
+>
+  <div
+    className={`absolute top-0.5 h-5 w-5 bg-white rounded-full transition ${
+      row.status ? "translate-x-6" : "translate-x-0.5"
+    }`}
+  />
+</div>        </label>
       ),
     },
 
@@ -357,10 +387,10 @@ export default function BannerManager() {
             {file && <img src={URL.createObjectURL(file)} className="h-20" />}
 
             {editingBanner?.imageUrl && !file && (
-              <img
-                src={`http://localhost:4000${editingBanner.imageUrl}`}
-                className="h-20"
-              />
+        <img
+  src={`https://dhwaniastro.com${editingBanner.imageUrl}`}
+  className="h-20 w-32 object-cover rounded"
+/>
             )}
 
             <select

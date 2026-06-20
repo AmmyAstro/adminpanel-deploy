@@ -329,7 +329,13 @@ export default function AstrologerHiring() {
                   <div className="bg-gray-100 p-3 rounded space-y-2 text-sm">
 
                     <p><b>Interviewer:</b> {interviewerMap[selected.interviewerId] || "-"}</p>
-                    <p><b>Date:</b> {selected.interviewDate?.split("T")[0] || "-"}</p>
+                 <p>
+  <b>Date:</b>{" "}
+  {selected.interviewDate
+    ? new Date(Number(selected.interviewDate))
+        .toLocaleDateString("en-IN")
+    : "-"}
+</p>
                     <p><b>Time:</b> {selected.interviewTime || "-"}</p>
                     <p><b>Round:</b> {selected.round || "-"}</p>
                     <p><b>Status:</b> {selected.interviewStatus}</p>

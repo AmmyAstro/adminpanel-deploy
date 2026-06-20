@@ -40,7 +40,7 @@ export const useActionHandler = () => {
       const result = res?.data?.[Object.keys(res.data)[0]];
 
       if (typeof result === "boolean") {
-        toast.success("Action successful");
+        // toast.success("Action successful");
       } else if (result) {
         toast.success(result?.message || "Action successful");
       } else {

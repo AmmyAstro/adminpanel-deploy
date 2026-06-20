@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
@@ -9,9 +9,7 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import { GET_ABOUT_PAGE, UPSERT_ABOUT_PAGE } from "@/app/graphQL/managecms";
 
 export default function AboutPageAdmin() {
-  // =========================
-  // FORM
-  // =========================
+  const [isEditing, setIsEditing] = useState(false);
 
   const { register, control, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
@@ -80,21 +78,18 @@ export default function AboutPageAdmin() {
     if (data?.getAboutPage) {
       reset({
         heroTitle: data.getAboutPage.heroTitle || "",
-
         heroDescription: data.getAboutPage.heroDescription || "",
-
         mentors: data.getAboutPage.mentors || [],
-
         founders: data.getAboutPage.founders || [],
-
         metaTitle: data.getAboutPage.metaTitle || "",
-
         metaDescription: data.getAboutPage.metaDescription || "",
-
         keywords: data.getAboutPage.keywords || [],
-
         status: data.getAboutPage.status || "DRAFT",
       });
+
+      setIsEditing(false);
+    } else {
+      setIsEditing(true); // new page create mode
     }
   }, [data, reset]);
 
@@ -115,7 +110,7 @@ export default function AboutPageAdmin() {
           if (mentor.image instanceof File) {
             const fd = new FormData();
 
-         fd.append("mentorImage", mentor.image);
+            fd.append("mentorImage", mentor.image);
 
             const uploadRes = await fetch(
               "https://dhwaniastro.com/adminAuth/api/upload-documents",
@@ -127,7 +122,7 @@ export default function AboutPageAdmin() {
 
             const uploaded = await uploadRes.json();
 
-          imageUrl = uploaded.mentorImage;
+            imageUrl = uploaded.mentorImage;
           }
 
           return {
@@ -148,7 +143,7 @@ export default function AboutPageAdmin() {
           if (founder.image instanceof File) {
             const fd = new FormData();
 
-     fd.append("founderImage", founder.image);
+            fd.append("founderImage", founder.image);
 
             const uploadRes = await fetch(
               "https://dhwaniastro.com/adminAuth/api/upload-documents",
@@ -160,7 +155,7 @@ export default function AboutPageAdmin() {
 
             const uploaded = await uploadRes.json();
 
-           imageUrl = uploaded.founderImage;
+            imageUrl = uploaded.founderImage;
           }
 
           return {
@@ -209,7 +204,19 @@ export default function AboutPageAdmin() {
   return (
     <div className="p-10 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto space-y-10">
-        <h1 className="text-4xl font-bold">About Page CMS</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold">About Page CMS</h1>
+
+          {data?.getAboutPage && !isEditing && (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            >
+              Edit About Page
+            </button>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
           {/* ================= HERO ================= */}
@@ -219,6 +226,7 @@ export default function AboutPageAdmin() {
 
             <input
               {...register("heroTitle")}
+              disabled={!isEditing}
               placeholder="Hero Title"
               className="border p-4 rounded-xl w-full"
             />
@@ -258,12 +266,14 @@ export default function AboutPageAdmin() {
                   <input
                     {...register(`mentors.${index}.name`)}
                     placeholder="Name"
+                    disabled={!isEditing}
                     className="border p-4 rounded-xl"
                   />
 
                   <input
                     {...register(`mentors.${index}.designation`)}
                     placeholder="Designation"
+                    disabled={!isEditing}
                     className="border p-4 rounded-xl"
                   />
                 </div>
@@ -292,6 +302,7 @@ export default function AboutPageAdmin() {
                 />
 
                 <TapEditor
+                  editable={isEditing}
                   value={watch(`mentors.${index}.description`)}
                   onChange={(value) =>
                     setValue(`mentors.${index}.description`, value)
@@ -338,12 +349,14 @@ export default function AboutPageAdmin() {
                   <input
                     {...register(`founders.${index}.name`)}
                     placeholder="Name"
+                    disabled={!isEditing}
                     className="border p-4 rounded-xl"
                   />
 
                   <input
                     {...register(`founders.${index}.designation`)}
                     placeholder="Designation"
+                    disabled={!isEditing}
                     className="border p-4 rounded-xl"
                   />
                 </div>
@@ -370,6 +383,7 @@ export default function AboutPageAdmin() {
                 />
 
                 <TapEditor
+                  editable={isEditing}
                   value={watch(`founders.${index}.description`)}
                   onChange={(value) =>
                     setValue(`founders.${index}.description`, value)
@@ -396,17 +410,20 @@ export default function AboutPageAdmin() {
             <input
               {...register("metaTitle")}
               placeholder="Meta Title"
+              disabled={!isEditing}
               className="border p-4 rounded-xl w-full"
             />
 
             <textarea
               {...register("metaDescription")}
               placeholder="Meta Description"
+              disabled={!isEditing}
               className="border p-4 rounded-xl w-full h-40"
             />
 
             <input
               {...register("keywords")}
+              disabled={!isEditing}
               placeholder="keyword1, keyword2"
               className="border p-4 rounded-xl w-full"
             />
@@ -423,13 +440,19 @@ export default function AboutPageAdmin() {
 
           {/* ================= SUBMIT ================= */}
 
-          <button
-            type="submit"
-            disabled={updateLoading}
-            className="bg-purple-600 text-white px-10 py-4 rounded-xl"
-          >
-            {updateLoading ? "Saving..." : "Save About Page"}
-          </button>
+          {isEditing && (
+            <button
+              type="submit"
+              disabled={updateLoading}
+              className="bg-purple-600 text-white px-10 py-4 rounded-xl"
+            >
+              {updateLoading
+                ? "Saving..."
+                : data?.getAboutPage
+                  ? "Update About Page"
+                  : "Create About Page"}
+            </button>
+          )}
         </form>
       </div>
     </div>

@@ -121,25 +121,35 @@ export const GET_BANNERS = gql`
 `;
 
 export const CREATE_BANNER = gql`
-  mutation ($input: BannerInput!) {
+  mutation CreateBanner($input: CreateBannerInput!) {
     createBanner(input: $input) {
       id
       heading
+      slug
+      status
     }
   }
 `;
 
 export const UPDATE_BANNER = gql`
-  mutation ($id: ID!, $input: BannerInput!) {
-    updateBanner(id: $id, input: $input) {
+  mutation UpdateBanner(
+    $id: ID!
+    $input: UpdateBannerInput!
+  ) {
+    updateBanner(
+      id: $id
+      input: $input
+    ) {
       id
       heading
+      slug
+      status
     }
   }
 `;
 
 export const DELETE_BANNER = gql`
-  mutation ($id: ID!) {
+  mutation DeleteBanner($id: ID!) {
     deleteBanner(id: $id)
   }
 `;
