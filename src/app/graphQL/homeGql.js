@@ -8,6 +8,7 @@ export const GET_GIFTS = gql`
       amount
       image
       status
+      createdAt
     }
   }
 `;

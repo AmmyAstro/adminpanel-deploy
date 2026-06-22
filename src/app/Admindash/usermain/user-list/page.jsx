@@ -147,12 +147,15 @@ export default function UsersListPage() {
     {
   header: "Name",
   render: (row) => (
-    <Link
+    <div>    <Link
       href={`/Admindash/usermain/userprofile/${row.id}`}
-      className="font-semibold text-violet-600 hover:underline"
+      className="font-semibold text-violet-600 flex flex-col  hover:underline"
     >
       {row.name || "N/A"}
+     
     </Link>
+    <p> {row.id?.slice(0,8)}</p></div>
+
   ),
 },
 
@@ -188,20 +191,31 @@ export default function UsersListPage() {
 
 
 
-      {
-        header: "Created At",
-        render: (row) =>
-          new Date(
-            row.createdAt
-          ).toLocaleString(),
-      },
+          {
+      header: "Created Date",
+      render: (row) => (
+        <div className="text-xs">
+          {new Date(row.createdAt).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "Asia/Kolkata",
+          })}
+               <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+        </div>
+      ),
+    },
 
       {
-        header: "Updated At",
+        header: "Actions",
         render: (row) =>
-          new Date(
-            row.updatedAt
-          ).toLocaleString(),
+        <Link href={`/Admindash/usermain/userprofile/${row.id}`} className=" rounded-full px-3 py-1 text-xs text-white hover:scale-104 bg-blue-400" >View</Link>
       },
     ],
     []

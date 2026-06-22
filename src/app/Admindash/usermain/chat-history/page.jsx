@@ -138,7 +138,7 @@ export default function UserChatHistoryPage() {
               {row.userName}
             </Link>
 
-            <p className="text-xs text-gray-500">{row.mobile}</p>
+            <p className="text-xs text-gray-500">{row.userId?.slice(0,8)}</p>
           </div>
         ),
       },
@@ -213,24 +213,46 @@ export default function UserChatHistoryPage() {
         ),
       },
 
-      {
-        header: "Duration",
-        render: (row) => <span>{Math.floor(row.durationSec / 60)} min</span>,
-      },
+     {
+  header: "Duration",
+  render: (row) => {
+    const sec = Number(row.durationSec || 0);
 
-      {
-        header: "Created At",
-        render: (row) => {
-          const date = new Date(row.createdAt);
+    if (sec < 60) {
+      return <span>{sec} sec</span>;
+    }
 
-          return (
-            <div className="flex flex-col">
-              <span>{date.toLocaleDateString()}</span>
-              <span>{date.toLocaleTimeString()}</span>
-            </div>
-          );
-        },
-      },
+    const minutes = Math.floor(sec / 60);
+    const seconds = sec % 60;
+
+    return (
+      <span>
+        {minutes}.{String(seconds).padStart(2, "0")} min
+      </span>
+    );
+  },
+},
+
+          {
+      header: "Created Date",
+      render: (row) => (
+        <div className="text-xs">
+          {new Date(row.createdAt).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "Asia/Kolkata",
+          })}
+               <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+        </div>
+      ),
+    },
       {
         header: "Action",
         render: (row) => (

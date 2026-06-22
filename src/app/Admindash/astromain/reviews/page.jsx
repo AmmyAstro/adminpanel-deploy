@@ -7,9 +7,10 @@ import { useEffect, useMemo, useState } from "react";
 import DataTable from "@/components/utils/DataTable";
 import Link from "next/link";
 import CustomToggle from "@/components/Custom/CustomToggle";
-import { TOGGLE_REVIEW_FLAG } from "@/app/graphQL/astroHiring";
+import { TOGGLE_REVIEW_FLAG, UPDATE_REVIEW_COMMENT } from "@/app/graphQL/astroHiring";
 import { useRouter } from "next/navigation";
 import SessionMessagesModal from "../../usermain/SessionModal";
+import toast from "react-hot-toast";
 
 const GET_USER_REVIEWS = gql`
   query GetUserReviews($searchInput: UserReviewSearchInput!) {
@@ -45,8 +46,11 @@ const GET_USER_REVIEWS = gql`
   }
 `;
 
+
 export default function ReviewsPage() {
-  // SEARCH STATES
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState(null);
+  const [editedComment, setEditedComment] = useState("");
   const [searchName, setSearchName] = useState("");
 
   const [searchMobile, setSearchMobile] = useState("");
@@ -62,8 +66,8 @@ export default function ReviewsPage() {
   const [startDate, setStartDate] = useState("");
 
   const [endDate, setEndDate] = useState("");
-const [openModal, setOpenModal] = useState(false);
-const [selectedSession, setSelectedSession] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
   // PAGINATION
   const [page, setPage] = useState(1);
 
@@ -113,6 +117,10 @@ const [selectedSession, setSelectedSession] = useState(null);
     endDate,
   ]);
 
+  const [updateReviewComment, { loading: updatingComment }] = useMutation(
+    UPDATE_REVIEW_COMMENT,
+  );
+
   const [toggleReviewFlag] = useMutation(TOGGLE_REVIEW_FLAG);
   const router = useRouter();
   // SEARCH INPUT
@@ -152,10 +160,11 @@ const [selectedSession, setSelectedSession] = useState(null);
   }
 
   // API CALL
-  const { data, loading, error } = useQuery(GET_USER_REVIEWS, {
+  const { data, loading, error, refetch } = useQuery(GET_USER_REVIEWS, {
     variables: {
       searchInput,
     },
+    fetchPolicy: "network-only",
     fetchPolicy: "network-only",
   });
 
@@ -171,6 +180,16 @@ const [selectedSession, setSelectedSession] = useState(null);
   const columns = useMemo(
     () => [
       {
+        header: "SessionID",
+        render: (row) => (
+          <div>
+            <div className="  hover:underline">
+              {row.sessionId?.slice(0, 8)}
+            </div>
+          </div>
+        ),
+      },
+      {
         header: "User",
         render: (row) => (
           <div>
@@ -181,7 +200,9 @@ const [selectedSession, setSelectedSession] = useState(null);
               {row.userName}
             </Link>
 
-            <p className="text-xs text-gray-500">{row.userId?.slice(0, 20)}</p>
+            <p className="text-[10px] flex text-gray-500">
+              UserID: <b>{row.userId?.slice(0, 8)}</b>
+            </p>
           </div>
         ),
       },
@@ -226,29 +247,24 @@ const [selectedSession, setSelectedSession] = useState(null);
 
       {
         header: "Comment",
+        width: "300px",
         render: (row) => (
-          <div className="max-w-[300px] break-words">
-            {row.comment || "N/A"}
+          <div className="group relative">
+            <p
+              title={row.comment}
+              className="truncate text-sm text-gray-700 cursor-pointer"
+            >
+              {row.comment}
+            </p>
+
+            <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-[9999]">
+              <div className="max-w-80 rounded-lg bg-black p-3 text-sm text-white shadow-xl break-words whitespace-normal">
+                {row.comment}
+              </div>
+            </div>
           </div>
         ),
       },
-  {
-  header: "Chat History",
-  render: (row) =>
-    row.sessionId ? (
-      <button
-        onClick={() => {
-          setSelectedSession(row.sessionId);
-          setOpenModal(true);
-        }}
-        className="px-3 py-1 bg-black text-white rounded-lg text-xs"
-      >
-        View Chat
-      </button>
-    ) : (
-      <span className="text-gray-400">N/A</span>
-    ),
-},
 
       {
         header: "Flag",
@@ -263,6 +279,7 @@ const [selectedSession, setSelectedSession] = useState(null);
                     isFlagged: val,
                   },
                 });
+                await refetch();
 
                 toast.success("Review updated");
               } catch (err) {
@@ -272,13 +289,61 @@ const [selectedSession, setSelectedSession] = useState(null);
           />
         ),
       },
+      {
+        header: "Action",
+        render: (row) =>
+          row.sessionId ? (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  setSelectedSession(row.sessionId);
+                  setOpenModal(true);
+                }}
+                className="px-3 py-1 bg-blue-500 text-white rounded-full hover:scale-104 cursor-pointer text-[10px]"
+              >
+                View
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedReviewId(row.reviewId);
+                  setEditedComment(row.comment || "");
+                  setEditModalOpen(true);
+                }}
+                className="px-3 py-1 bg-black/50 text-white rounded-full hover:scale-104 cursor-pointer text-[10px]"
+              >
+                Edit
+              </button>
+            </div>
+          ) : (
+            <span className="text-gray-400">N/A</span>
+          ),
+      },
 
       {
         header: "Created At",
-        render: (row) => new Date(row.createdAt).toLocaleString(),
+        render: (row) => (
+          <div className="text-xs">
+            <p>
+              {new Date(row.createdAt).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                timeZone: "Asia/Kolkata",
+              })}
+            </p>
+
+            <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div>
+        ),
       },
     ],
-  [toggleReviewFlag]
+    [toggleReviewFlag],
   );
 
   if (error) {
@@ -445,14 +510,68 @@ const [selectedSession, setSelectedSession] = useState(null);
         </button>
       </div>
       <SessionMessagesModal
-  open={openModal}
-  onClose={() => {
-    setOpenModal(false);
-    setSelectedSession(null);
-  }}
-  sessionId={selectedSession}
-/>
+        open={openModal}
+        onClose={() => {
+          setOpenModal(false);
+          setSelectedSession(null);
+        }}
+        sessionId={selectedSession}
+      />
+      {editModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+            <h2 className="text-lg font-semibold mb-4">Edit Review Comment</h2>
+
+            <textarea
+              rows={6}
+              value={editedComment}
+              onChange={(e) => setEditedComment(e.target.value)}
+              className="w-full border rounded-lg p-3 outline-none"
+              placeholder="Enter review comment..."
+            />
+
+            <div className="flex justify-end gap-3 mt-5">
+              <button
+                onClick={() => {
+                  setEditModalOpen(false);
+                  setSelectedReviewId(null);
+                  setEditedComment("");
+                }}
+                className="px-4 py-2 border rounded-lg"
+              >
+                Cancel
+              </button>
+
+              <button
+                disabled={updatingComment}
+                onClick={async () => {
+                  try {
+                    await updateReviewComment({
+                      variables: {
+                        reviewId: selectedReviewId,
+                        comment: editedComment,
+                      },
+                    });
+
+                    toast.success("Review updated");
+
+                    await refetch();
+
+                    setEditModalOpen(false);
+                    setSelectedReviewId(null);
+                    setEditedComment("");
+                  } catch (err) {
+                    toast.error("Failed to update review");
+                  }
+                }}
+                className="px-4 py-2 bg-violet-600 text-white rounded-lg"
+              >
+                {updatingComment ? "Updating..." : "Submit"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-    
   );
 }

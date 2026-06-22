@@ -208,23 +208,25 @@ export default function UserCallHistoryPage() {
         ),
       },
 
-      {
-        header: "Duration",
-        render: (row) => {
-          const mins = Math.floor(
-            row.durationSec / 60
-          );
+     {
+  header: "Duration",
+  render: (row) => {
+    const sec = Number(row.durationSec || 0);
 
-          const secs =
-            row.durationSec % 60;
+    if (sec < 60) {
+      return <span>{sec} sec</span>;
+    }
 
-          return (
-            <span>
-              {mins}m {secs}s
-            </span>
-          );
-        },
-      },
+    const minutes = Math.floor(sec / 60);
+    const seconds = sec % 60;
+
+    return (
+      <span>
+        {minutes}.{String(seconds).padStart(2, "0")} min
+      </span>
+    );
+  },
+},
 
       {
         header: "Coins Deducted",
@@ -288,12 +290,25 @@ export default function UserCallHistoryPage() {
       },
 
       {
-        header: "Created At",
-        render: (row) =>
-          new Date(
-            row.createdAt
-          ).toLocaleString(),
-      },
+      header: "Created Date",
+      render: (row) => (
+        <div className="text-xs">
+          {new Date(row.createdAt).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "Asia/Kolkata",
+          })}
+               <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+        </div>
+      ),
+    },
     ],
     []
   );

@@ -19,7 +19,8 @@ import { useMutation, useQuery } from "@apollo/client/react";
 
 export default function TestimonialPage() {
   const { can, isSuperAdmin } = usePermissions();
-
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState("");
   const { confirmState, setConfirmState, executeAction, handleConfirm } =
     useActionHandler();
 
@@ -55,6 +56,12 @@ export default function TestimonialPage() {
         image: editing.image,
         rating: editing.rating,
       });
+
+      setPreview(
+        editing.image?.startsWith("http")
+          ? editing.image
+          : `https://dhwaniastro.com${editing.image}`,
+      );
     } else {
       setForm({
         name: "",
@@ -67,10 +74,30 @@ export default function TestimonialPage() {
   }, [editing]);
 
   const handleSubmit = async () => {
+    let imageUrl = form.image;
+    if (file) {
+      const formData = new FormData();
+
+      formData.append("image", file);
+
+      const res = await fetch(
+        "https://dhwaniastro.com/adminAuth/api/upload-testimonials",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const uploadData = await res.json();
+
+      if (!uploadData.url) {
+        throw new Error("Image upload failed");
+      }
+
+      imageUrl = uploadData.url;
+    }
     try {
-      const allowed =
-        isSuperAdmin ||
-        (editing ? canUpdate : canCreate);
+      const allowed = isSuperAdmin || (editing ? canUpdate : canCreate);
 
       if (!allowed) return;
 
@@ -78,13 +105,21 @@ export default function TestimonialPage() {
         await updateTestimonial({
           variables: {
             id: editing.id,
-            input: form,
+            input: {
+              ...form,
+              image: imageUrl,
+            },
           },
         });
         toast.success("Updated");
       } else {
         await createTestimonial({
-          variables: { input: form },
+          variables: {
+            input: {
+              ...form,
+              image: imageUrl,
+            },
+          },
         });
         toast.success("Created");
       }
@@ -114,7 +149,7 @@ export default function TestimonialPage() {
             setOpen(true);
           }}
           className={`px-4 py-2 rounded bg-blue-600 text-white ${getPermissionClass(
-            canCreate
+            canCreate,
           )}`}
         >
           + Create Testimonial
@@ -132,7 +167,14 @@ export default function TestimonialPage() {
       <div className="grid grid-cols-3 gap-4">
         {data?.testimonials?.map((t) => (
           <div key={t.id} className="border p-4 rounded shadow">
-            <img src={t.image} className="h-32 w-full object-cover" />
+            <img
+              src={
+                t.image?.startsWith("http")
+                  ? t.image
+                  : `https://dhwaniastro.com${t.image}`
+              }
+              className="h-32 w-full object-cover"
+            />
 
             <h2 className="font-bold">{t.name}</h2>
             <p className="text-sm text-gray-500">{t.address}</p>
@@ -154,7 +196,7 @@ export default function TestimonialPage() {
                   setOpen(true);
                 }}
                 className={`px-3 py-1 text-xs rounded bg-blue-500 text-white ${getPermissionClass(
-                  canUpdate
+                  canUpdate,
                 )}`}
               >
                 Edit
@@ -172,7 +214,7 @@ export default function TestimonialPage() {
                   refetch();
                 }}
                 className={`px-3 py-1 text-xs bg-red-500 text-white rounded ${getPermissionClass(
-                  canDelete
+                  canDelete,
                 )}`}
               >
                 Delete
@@ -194,38 +236,39 @@ export default function TestimonialPage() {
               placeholder="Name"
               className="w-full border p-2 mb-2"
               value={form.name}
-              onChange={(e) =>
-                setForm({ ...form, name: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
 
             <input
               placeholder="Address"
               className="w-full border p-2 mb-2"
               value={form.address}
-              onChange={(e) =>
-                setForm({ ...form, address: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
 
             <textarea
               placeholder="Review"
               className="w-full border p-2 mb-2"
               value={form.content}
-              onChange={(e) =>
-                setForm({ ...form, content: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
             />
-
+            {preview && (
+              <img
+                src={preview}
+                alt="preview"
+                className="w-24 h-24 object-cover rounded mb-3"
+              />
+            )}
             <input
               type="file"
               className="mb-2"
               onChange={(e) => {
-                const file = e.target.files[0];
-                setForm({
-                  ...form,
-                  image: URL.createObjectURL(file),
-                });
+                const selectedFile = e.target.files?.[0];
+
+                if (!selectedFile) return;
+
+                setFile(selectedFile);
+                setPreview(URL.createObjectURL(selectedFile));
               }}
             />
 
@@ -249,7 +292,7 @@ export default function TestimonialPage() {
               <button
                 onClick={handleSubmit}
                 className={`px-4 py-2 rounded bg-green-600 text-white ${getPermissionClass(
-                  editing ? canUpdate : canCreate
+                  editing ? canUpdate : canCreate,
                 )}`}
               >
                 {editing ? "Update" : "Save"}

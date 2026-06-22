@@ -17,6 +17,7 @@ import { usePermissions } from "@/context/PermissionContext";
 
 import { useActionHandler } from "@/hooks/useActionHandler";
 import SessionMessagesModal from "../../usermain/SessionModal";
+import Link from "next/link";
 
 // ======================================================
 // QUERIES & MUTATIONS
@@ -113,29 +114,55 @@ export default function FraudLogsPage() {
         header: "Order ID",
         render: (row) => (
           <div>
-            <p className="font-medium">{row.orderId?.slice(0, 12)}</p>
+            <p className="font-medium">{row.orderId?.slice(0, 8)}</p>
           </div>
         ),
       },
 
       {
         header: "Sender",
-        render: (row) => (
-          <div>
-            <p className="font-medium">{row.senderName}</p>
-            <p className="font-medium">{row.senderId?.slice(0, 12)}</p>
-          </div>
-        ),
+        render: (row) => {
+          const profilePath =
+            row.senderName?.toLowerCase() === "astrologer"
+              ? `/Admindash/astromain/astroprofile/${row.senderId}`
+              : `/Admindash/usermain/userprofile/${row.senderId}`;
+
+          return (
+            <div>
+              <Link
+                href={profilePath}
+                className="font-semibold text-violet-600 hover:underline"
+              >
+                {row.senderName}
+              </Link>
+
+              <p className="font-medium">{row.senderId?.slice(0, 8)}</p>
+            </div>
+          );
+        },
       },
 
       {
         header: "Receiver",
-        render: (row) => (
-          <div>
-            <p className="font-medium">{row.receiverName}</p>
-            <p className="font-medium">{row.receiverId?.slice(0, 12)}</p>
-          </div>
-        ),
+        render: (row) => {
+          const profilePath =
+            row.receiverName?.toLowerCase() === "astrologer"
+              ? `/Admindash/astromain/astroprofile/${row.receiverId}`
+              : `/Admindash/usermain/userprofile/${row.receiverId}`;
+
+          return (
+            <div>
+              <Link
+                href={profilePath}
+                className="font-semibold text-violet-600 hover:underline"
+              >
+                {row.receiverName}
+              </Link>
+
+              <p className="font-medium">{row.receiverId?.slice(0, 8)}</p>
+            </div>
+          );
+        },
       },
 
       {
@@ -154,14 +181,26 @@ export default function FraudLogsPage() {
         ),
       },
 
-      {
-        header: "Message",
-        render: (row) => (
-          <div className="max-w-[350px]">
-            <p className="text-sm text-gray-700 line-clamp-3">{row.message}</p>
-          </div>
-        ),
-      },
+{
+  header: "Message",
+  width: "300px",
+  render: (row) => (
+    <div className="group relative">
+      <p
+        title={row.message}
+        className="truncate text-sm text-gray-700 cursor-pointer"
+      >
+        {row.message}
+      </p>
+
+      <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-[9999]">
+        <div className="max-w-80 rounded-lg bg-black p-3 text-sm text-white shadow-xl break-words whitespace-normal">
+          {row.message}
+        </div>
+      </div>
+    </div>
+  ),
+},
 
       {
         header: "Status",
@@ -224,15 +263,15 @@ export default function FraudLogsPage() {
                   })
                 }
                 onSuccess={fetchFraudLogs}
-                className={`px-4 py-2 rounded-xl text-sm text-white
+                className={`px-4 py-1 rounded-xl text-xs text-white  
             ${
               row.status === "FRAUD"
-                ? "bg-red-700 ring-2 ring-red-300"
-                : "bg-red-500 hover:bg-red-600"
+                ? "bg-red-700 ring-2 ring-red-300 cursor-not-allowed"
+                : "bg-red-500 hover:bg-red-600 cursor-pointer"
             }
             ${
               isResolved && row.status !== "FRAUD"
-                ? "opacity-50 cursor-not-allowed"
+                ? "opacity-50 cursor-not-allowed hidden"
                 : ""
             }
           `}
@@ -255,15 +294,15 @@ export default function FraudLogsPage() {
                   })
                 }
                 onSuccess={fetchFraudLogs}
-                className={`px-4 py-2 rounded-xl text-sm text-white
+                className={`px-4 py-1 rounded-xl text-xs text-white 
             ${
               row.status === "FINE"
-                ? "bg-green-700 ring-2 ring-green-300"
-                : "bg-green-500 hover:bg-green-600"
+                ? "bg-green-700 ring-2 ring-green-300 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600 cursor-pointer"
             }
             ${
               isResolved && row.status !== "FINE"
-                ? "opacity-50 cursor-not-allowed"
+                ? "opacity-50 cursor-not-allowed hidden"
                 : ""
             }
           `}
@@ -284,9 +323,9 @@ export default function FraudLogsPage() {
               setSelectedSession(row.sessionId);
               setOpenModal(true);
             }}
-            className="px-3 py-2 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700"
+            className="px-3 py-1 rounded-full bg-violet-600 text-white text-xs hover:bg-violet-700 hover:scale-103 cursor-pointer"
           >
-            View Chat
+            Chat
           </button>
         ),
       },

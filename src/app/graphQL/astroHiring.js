@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-// 🔥 GET ALL APPLICATIONS (single source of truth)
+
 export const GET_APPLICATIONS = gql`
   query {
     getApplications {
@@ -28,7 +28,7 @@ export const GET_APPLICATIONS = gql`
   }
 `;
 
-// 🔥 INTERVIEWERS
+
 export const GET_INTERVIEWERS = gql`
   query {
     getInterviewers {
@@ -39,7 +39,7 @@ export const GET_INTERVIEWERS = gql`
   }
 `;
 
-// 🔥 SCHEDULE INTERVIEW
+
 export const SCHEDULE_INTERVIEW = gql`
   mutation (
     $astrologerId: ID!
@@ -64,7 +64,7 @@ export const SCHEDULE_INTERVIEW = gql`
   }
 `;
 
-// 🔥 DOCUMENT STATUS
+
 export const UPDATE_DOCUMENT_STATUS = gql`
   mutation ($astrologerId: ID!, $status: DocumentStatus!) {
     updateDocumentStatus(astrologerId: $astrologerId, status: $status) {
@@ -74,7 +74,7 @@ export const UPDATE_DOCUMENT_STATUS = gql`
   }
 `;
 
-// 🔥 APPROVAL STATUS
+
 export const UPDATE_APPROVAL_STATUS = gql`
   mutation ($astrologerId: ID!, $status: ApprovalStatus!) {
     updateApprovalStatus(astrologerId: $astrologerId, status: $status) {
@@ -84,7 +84,7 @@ export const UPDATE_APPROVAL_STATUS = gql`
   }
 `;
 
-// docs uload
+
 export const UPLOAD_IMAGE = gql`
   mutation UploadImage($file: Upload!) {
     uploadImage(file: $file) {
@@ -224,12 +224,12 @@ export const GET_ASTROLOGER_BY_ID = gql`
       languages
       skills
       problems
-          isCallActive
-    isChatActive
-    isLiveActive
-    isBusy
-    isOnline
-    isPromotional
+      isCallActive
+      isChatActive
+      isLiveActive
+      isBusy
+      isOnline
+      isPromotional
 
       pricing {
         type
@@ -544,9 +544,7 @@ export const GET_USER_PROFILE = gql`
 `;
 
 export const CREATE_NOTICE = gql`
-  mutation CreateNotice(
-    $input: CreateNoticeInput!
-  ) {
+  mutation CreateNotice($input: CreateNoticeInput!) {
     createNotice(input: $input) {
       id
       title
@@ -555,14 +553,8 @@ export const CREATE_NOTICE = gql`
 `;
 
 export const UPDATE_NOTICE = gql`
-  mutation UpdateNotice(
-    $id: ID!
-    $input: UpdateNoticeInput!
-  ) {
-    updateNotice(
-      id: $id
-      input: $input
-    ) {
+  mutation UpdateNotice($id: ID!, $input: UpdateNoticeInput!) {
+    updateNotice(id: $id, input: $input) {
       id
       title
       isActive
@@ -581,20 +573,43 @@ export const GET_NOTICES = gql`
       id
       title
       description
-
       targetType
-
       isActive
-
       createdAt
 
       astrologers {
-        astrologer {
-          id
-          name
-          displayName
-        }
+        id
+        name
+        displayName
       }
+    }
+  }
+`;
+export const UPDATE_REVIEW_COMMENT = gql`
+  mutation UpdateReviewComment(
+    $reviewId: ID!
+    $comment: String!
+  ) {
+    updateReviewComment(
+      reviewId: $reviewId
+      comment: $comment
+    ) {
+      reviewId
+      comment
+    }
+  }
+`;
+export const UPDATE_GIFT_STATUS = gql`
+  mutation UpdateGiftStatus(
+    $id: ID!
+    $status: String!
+  ) {
+    updateGiftStatus(
+      id: $id
+      status: $status
+    ) {
+      id
+      status
     }
   }
 `;

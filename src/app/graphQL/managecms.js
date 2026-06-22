@@ -253,6 +253,7 @@ export const GET_BLOG_CATEGORIES = gql`
       id
       name
       slug
+      createdAt
     }
   }
 `;

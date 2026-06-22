@@ -15,24 +15,15 @@ import ConfirmModal from "@/components/Custom/ConfirmModal";
 import { GET_ASTRO_LIST } from "@/app/graphQL/astroHiring";
 import Link from "next/link";
 
-
-
-
-
-
 const DELETE_ASTRO = gql`
   mutation DeleteAstrologer($astrologerId: ID!) {
     deleteAstrologer(astrologerId: $astrologerId)
   }
 `;
 
-
-
 export default function AstroList() {
   const router = useRouter();
   const [query, setQuery] = useState("");
-
- 
 
   const { can, isSuperAdmin } = usePermissions();
 
@@ -40,16 +31,8 @@ export default function AstroList() {
   const canUpdate = isSuperAdmin || can("astrologer", "update");
   const canDelete = isSuperAdmin || can("astrologer", "delete");
 
- 
-
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
-
-
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const { data, loading, refetch } = useQuery(GET_ASTRO_LIST, {
     variables: {
@@ -64,8 +47,6 @@ export default function AstroList() {
   const [deleteAstrologer] = useMutation(DELETE_ASTRO);
 
   const astrologers = data?.getAstrologerListBySearch?.data || [];
-
-
 
   const viewProfile = (id) => {
     router.push(`/Admindash/astromain/astroprofile/${id}`);
@@ -85,22 +66,23 @@ export default function AstroList() {
       accessor: "name",
       render: (row) => (
         <div className="flex flex-col">
-          <Link href={`/Admindash/astromain/astroprofile/${row.id}`} className="font-medium">{row.displayName}</Link>
-        <small className="text-gray-400">
-  ID: {row.id?.slice(0, 15)}
-</small>
+          <Link
+            href={`/Admindash/astromain/astroprofile/${row.id}`}
+            className="font-medium"
+          >
+            {row.displayName}
+          </Link>
+          <small className="text-gray-400">ID: {row.id?.slice(0, 15)}</small>
         </div>
       ),
     },
     { header: "Email", accessor: "email" },
     { header: "Phone", accessor: "contactNo" },
 
-   
     {
       header: "Actions",
       render: (row) => (
         <div className="flex justify-center gap-2">
-
           {/* VIEW */}
           <button
             disabled={!canView}
@@ -139,13 +121,12 @@ export default function AstroList() {
             action="delete"
             executeAction={executeAction}
             mutationFn={deleteAstrologer}
-              variables={{ astrologerId: row.id }}
+            variables={{ astrologerId: row.id }}
             onSuccess={refetch}
             className="px-2 py-1 text-xs bg-red-500 text-white rounded"
           >
             Delete
           </ProtectedActionButton>
-
         </div>
       ),
     },
@@ -171,12 +152,9 @@ export default function AstroList() {
 
   return (
     <div className="min-h-screen">
-
       {/* HEADER */}
       <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex justify-between">
-        <h2 className="text-xl font-bold text-purple-900">
-          Astrologer List
-        </h2>
+        <h2 className="text-xl font-bold text-purple-900">Astrologer List</h2>
 
         <div className="flex gap-2">
           <CustomInput
@@ -184,9 +162,7 @@ export default function AstroList() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <CustomButton onClick={handleSearch}>
-            Search
-          </CustomButton>
+          <CustomButton onClick={handleSearch}>Search</CustomButton>
         </div>
       </div>
 

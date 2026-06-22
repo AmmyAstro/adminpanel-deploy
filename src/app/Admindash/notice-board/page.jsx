@@ -14,93 +14,89 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function CreateNotice() {
-const [formData, setFormData] = useState({
-  id: null,
-  title: "",
-  description: "",
-  targetType: "ALL",
-  astrologers: [],
-  isActive: true,
-});
-  const { data: astroData } = useQuery(GET_ASTRO_LIST);
+  const [formData, setFormData] = useState({
+    id: null,
+    title: "",
+    description: "",
+    targetType: "ALL",
+    astrologers: [],
+    isActive: true,
+  });
+  const { data: astroData } = useQuery(GET_ASTRO_LIST, {
+    variables: {
+      searchInput: {},
+    },
+  });
 
-  const astrologers = astroData?.getAstrologers || [];
+  const astrologers = astroData?.getAstrologerListBySearch?.data || [];
 
   const [createNotice] = useMutation(CREATE_NOTICE);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const isEditMode = !!formData.id;
+    const isEditMode = !!formData.id;
 
-  try {
-    if (isEditMode) {
-      await updateNotice({
-        variables: {
-          id: formData.id,
+    try {
+      if (isEditMode) {
+        await updateNotice({
+          variables: {
+            id: formData.id,
 
-          input: {
-            title: formData.title,
-            description: formData.description,
-            targetType: formData.targetType,
+            input: {
+              title: formData.title,
+              description: formData.description,
+              targetType: formData.targetType,
 
-            astrologers:
-              formData.targetType === "SELECTED"
-                ? formData.astrologers
-                : [],
+              astrologers:
+                formData.targetType === "SELECTED" ? formData.astrologers : [],
 
-            isActive: formData.isActive,
+              isActive: formData.isActive,
+            },
           },
-        },
 
-        refetchQueries: [GET_NOTICES],
-      });
+          refetchQueries: [GET_NOTICES],
+        });
 
-      toast.success("Notice Updated");
-    } else {
-      await createNotice({
-        variables: {
-          input: {
-            title: formData.title,
-            description: formData.description,
+        toast.success("Notice Updated");
+      } else {
+        await createNotice({
+          variables: {
+            input: {
+              title: formData.title,
+              description: formData.description,
 
-            targetType: formData.targetType,
+              targetType: formData.targetType,
 
-            astrologers:
-              formData.targetType === "SELECTED"
-                ? formData.astrologers
-                : [],
+              astrologers:
+                formData.targetType === "SELECTED" ? formData.astrologers : [],
 
-            isActive: formData.isActive,
+              isActive: formData.isActive,
 
-            startDate:
-              formData.startDate || null,
+              startDate: formData.startDate || null,
 
-            endDate:
-              formData.endDate || null,
+              endDate: formData.endDate || null,
+            },
           },
-        },
 
-        refetchQueries: [GET_NOTICES],
+          refetchQueries: [GET_NOTICES],
+        });
+
+        toast.success("Notice Created");
+      }
+
+      // reset form
+      setFormData({
+        title: "",
+        description: "",
+        targetType: "ALL",
+        astrologers: [],
+        isActive: true,
       });
-
-      toast.success("Notice Created");
+    } catch (err) {
+      toast.error(err?.message || "Something went wrong");
     }
-
-    // reset form
-    setFormData({
-      title: "",
-      description: "",
-      targetType: "ALL",
-      astrologers: [],
-      isActive: true,
-    });
-  } catch (err) {
-    toast.error(
-      err?.message || "Something went wrong"
-    );
-  }
-};
+  };
   const [deleteNotice] = useMutation(DELETE_NOTICE);
 
   const handleDelete = async (id) => {
@@ -140,7 +136,7 @@ const handleSubmit = async (e) => {
 
   const { data: noticeData, loading: noticeLoading } = useQuery(GET_NOTICES);
   const notices = noticeData?.getNotices || [];
-
+      
   return (
     <div className="bg-white p-6 rounded-xl shadow">
       <h2 className="text-xl font-semibold mb-5">Create Notice</h2>
@@ -207,30 +203,44 @@ const handleSubmit = async (e) => {
 
         {formData.targetType === "SELECTED" && (
           <div>
-            <label className="block mb-2">Select Astrologers</label>
+            <label className="block mb-2 font-medium">Select Astrologers</label>
 
-            <select
-              multiple
-              className="border rounded-lg w-full p-3 h-48"
-              value={formData.astrologers}
-              onChange={(e) => {
-                const values = Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value,
-                );
-
-                setFormData({
-                  ...formData,
-                  astrologers: values,
-                });
-              }}
-            >
+            <div className="border rounded-lg max-h-64 overflow-y-auto p-3 space-y-3">
               {astrologers.map((astro) => (
-                <option key={astro.id} value={astro.id}>
-                  {astro.displayName || astro.name}
-                </option>
+                <label
+                  key={astro.id}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.astrologers.includes(astro.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({
+                          ...formData,
+                          astrologers: [...formData.astrologers, astro.id],
+                        });
+                      } else {
+                        setFormData({
+                          ...formData,
+                          astrologers: formData.astrologers.filter(
+                            (id) => id !== astro.id,
+                          ),
+                        });
+                      }
+                    }}
+                  />
+
+                  <span>{astro.displayName || astro.name}</span>
+                </label>
               ))}
-            </select>
+            </div>
+
+            {formData.astrologers.length > 0 && (
+              <p className="mt-2 text-sm text-gray-500">
+                Selected: {formData.astrologers.length}
+              </p>
+            )}
           </div>
         )}
 
@@ -253,14 +263,12 @@ const handleSubmit = async (e) => {
           />
         </div>
 
-  <CustomButton
-  type="submit"
-  className="bg-green-600 text-white px-6 py-3 rounded-lg"
->
-  {formData.id
-    ? "Update Notice"
-    : "Create Notice"}
-</CustomButton>
+        <CustomButton
+          type="submit"
+          className="bg-green-600 text-white px-6 py-3 rounded-lg"
+        >
+          {formData.id ? "Update Notice" : "Create Notice"}
+        </CustomButton>
       </form>
 
       <div className="mt-10">
@@ -277,6 +285,21 @@ const handleSubmit = async (e) => {
                   <h3 className="font-bold text-lg">{notice.title}</h3>
 
                   <p className="text-gray-600 mt-2">{notice.description}</p>
+   
+
+<p className="text-sm text-gray-600">
+  {new Date(Number(notice.createdAt)).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  })}
+</p>
+                           
+
                 </div>
 
                 <div className="flex gap-2">
@@ -292,8 +315,7 @@ const handleSubmit = async (e) => {
 
                         targetType: notice.targetType,
 
-                        astrologers:
-                          notice.astrologers?.map((a) => a.astrologer.id) || [],
+                        astrologers: notice.astrologers?.map((a) => a.id) || [],
 
                         isActive: notice.isActive,
                       });
@@ -324,10 +346,10 @@ const handleSubmit = async (e) => {
                     <div className="mt-2 flex flex-wrap gap-2">
                       {notice.astrologers?.map((item) => (
                         <span
-                          key={item.astrologer.id}
+                          key={item.id}
                           className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full"
                         >
-                          {item.astrologer.displayName || item.astrologer.name}
+                          {item.displayName || item.name}
                         </span>
                       ))}
                     </div>

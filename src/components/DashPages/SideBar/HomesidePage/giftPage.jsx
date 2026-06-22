@@ -16,19 +16,18 @@ import {
   GET_GIFTS,
   UPDATE_GIFT,
 } from "@/app/graphQL/homeGql";
+import { UPDATE_GIFT_STATUS } from "@/app/graphQL/astroHiring";
+import CustomToggle from "@/components/Custom/CustomToggle";
 
 export default function GiftManager() {
   const { can, isSuperAdmin } = usePermissions();
 
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const { data, loading, error, refetch } = useQuery(GET_GIFTS);
   const gifts = data?.getGifts?.data || data?.getGifts || [];
+  const [updateGiftStatus] = useMutation(UPDATE_GIFT_STATUS);
 
   const [createGift] = useMutation(CREATE_GIFT);
   const [updateGift] = useMutation(UPDATE_GIFT);
@@ -68,7 +67,6 @@ export default function GiftManager() {
     setEditingGift(null);
   };
 
- 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
 
@@ -100,10 +98,13 @@ export default function GiftManager() {
         const formData = new FormData();
         formData.append("image", file);
 
-        const res = await fetch("https://dhwaniastro.com/adminAuth/api/upload-gifts", {
-          method: "POST",
-          body: formData,
-        });
+        const res = await fetch(
+          "https://dhwaniastro.com/adminAuth/api/upload-gifts",
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
 
         if (!res.ok) throw new Error("Upload failed");
 
@@ -158,36 +159,77 @@ export default function GiftManager() {
   const giftColumns = [
     { header: "Name", accessor: "name" },
     { header: "Amount", accessor: "amount" },
-{
-  header: "Image",
-  render: (row) => (
-    <img
-      src={
-        row.image
-          ? `https://dhwaniastro.com${row.image}`
-          : "/placeholder.png"
-      }
-      alt={row.name}
-      className="h-10 w-10 object-cover mx-auto rounded"
-      onError={(e) => {
-        console.log("Image failed:", e.target.src);
-      }}
-    />
-  ),
-},
-    { header: "Status", accessor: "status" },
+    {
+      header: "Image",
+      render: (row) => (
+        <img
+          src={
+            row.image
+              ? `https://dhwaniastro.com${row.image}`
+              : "/placeholder.png"
+          }
+          alt={row.name}
+          className="h-10 w-10 object-cover mx-auto rounded"
+          onError={(e) => {
+            console.log("Image failed:", e.target.src);
+          }}
+        />
+      ),
+    },
+    {
+      header: "Status",
+      render: (row) => (
+        <CustomToggle
+          checked={row.status === "active"}
+          onChange={async (val) => {
+            try {
+              await updateGiftStatus({
+                variables: {
+                  id: row.id,
+                  status: val ? "active" : "inactive",
+                },
+              });
+
+              toast.success("Status updated");
+              refetch();
+            } catch (error) {
+              toast.error("Failed to update status");
+            }
+          }}
+        />
+      ),
+    },
+    {
+      header: "Created Date",
+      render: (row) => (
+        <div className="text-xs">
+          {new Date(row.createdAt).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "Asia/Kolkata",
+          })}
+               <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+        </div>
+      ),
+    },
     {
       header: "Actions",
       render: (row) => (
         <div className="flex justify-center gap-3">
-
           {canUpdate && (
             <button
               onClick={() => {
                 setEditingGift(row);
                 setOpenModal(true);
               }}
-              className="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+              className="px-3 py-1 text-xs bg-blue-500 text-white rounded-full"
             >
               Edit
             </button>
@@ -200,11 +242,10 @@ export default function GiftManager() {
             mutationFn={deleteGift}
             variables={{ id: row.id }}
             onSuccess={refetch}
-            className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+            className="px-3 py-1 text-xs bg-red-500 text-white rounded-full"
           >
             Delete
           </ProtectedActionButton>
-
         </div>
       ),
     },
@@ -215,7 +256,6 @@ export default function GiftManager() {
 
   return (
     <div className="p-10 space-y-5">
-
       {/* CREATE BUTTON */}
       <button
         disabled={!canCreate}
@@ -246,7 +286,6 @@ export default function GiftManager() {
       {openModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
-
             <h2 className="text-lg font-semibold">
               {editingGift ? "Edit Gift" : "Create Gift"}
             </h2>
@@ -306,11 +345,10 @@ export default function GiftManager() {
                 {submitting
                   ? "Processing..."
                   : editingGift
-                  ? "Update"
-                  : "Create"}
+                    ? "Update"
+                    : "Create"}
               </button>
             </div>
-
           </div>
         </div>
       )}

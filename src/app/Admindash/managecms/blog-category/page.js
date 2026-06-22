@@ -1,37 +1,31 @@
 "use client";
 
-import { CREATE_BLOG_CATEGORY, DELETE_BLOG_CATEGORY, GET_BLOG_CATEGORIES, UPDATE_BLOG_CATEGORY } from "@/app/graphQL/managecms";
+import {
+  CREATE_BLOG_CATEGORY,
+  DELETE_BLOG_CATEGORY,
+  GET_BLOG_CATEGORIES,
+  UPDATE_BLOG_CATEGORY,
+} from "@/app/graphQL/managecms";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
 
-
-
-
-
 export default function Page() {
-  const [showForm, setShowForm] =
-    useState(false);
+  const [showForm, setShowForm] = useState(false);
 
-  const [editing, setEditing] =
-    useState(null);
+  const [editing, setEditing] = useState(null);
 
-  const [formData, setFormData] =
-    useState({
-      name: "",
-      slug: "",
-    });
+  const [formData, setFormData] = useState({
+    name: "",
+    slug: "",
+  });
 
-  const { data, loading, refetch } =
-    useQuery(GET_BLOG_CATEGORIES);
+  const { data, loading, refetch } = useQuery(GET_BLOG_CATEGORIES);
 
-  const [createCategory] =
-    useMutation(CREATE_BLOG_CATEGORY);
+  const [createCategory] = useMutation(CREATE_BLOG_CATEGORY);
 
-  const [updateCategory] =
-    useMutation(UPDATE_BLOG_CATEGORY);
+  const [updateCategory] = useMutation(UPDATE_BLOG_CATEGORY);
 
-  const [deleteCategory] =
-    useMutation(DELETE_BLOG_CATEGORY);
+  const [deleteCategory] = useMutation(DELETE_BLOG_CATEGORY);
 
   const handleSubmit = async () => {
     try {
@@ -77,12 +71,7 @@ export default function Page() {
   };
 
   const handleDelete = async (id) => {
-    if (
-      !confirm(
-        "Delete this category?"
-      )
-    )
-      return;
+    if (!confirm("Delete this category?")) return;
 
     await deleteCategory({
       variables: {
@@ -95,31 +84,22 @@ export default function Page() {
 
   return (
     <div className="p-6">
-
       <div className="flex justify-between mb-6">
-
-        <h1 className="text-2xl font-bold">
-          Blog Categories
-        </h1>
+        <h1 className="text-2xl font-bold">Blog Categories</h1>
 
         <button
-          onClick={() =>
-            setShowForm(true)
-          }
+          onClick={() => setShowForm(true)}
           className="bg-indigo-600 text-white px-4 py-2 rounded"
         >
           Create Blog Category
         </button>
-
       </div>
 
       {/* FORM */}
 
       {showForm && (
         <div className="border rounded-lg p-5 mb-8 bg-white">
-
           <div className="grid grid-cols-2 gap-4">
-
             <input
               type="text"
               placeholder="Category Name"
@@ -127,8 +107,7 @@ export default function Page() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  name:
-                    e.target.value,
+                  name: e.target.value,
                 })
               }
               className="border p-3 rounded"
@@ -141,26 +120,19 @@ export default function Page() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  slug:
-                    e.target.value,
+                  slug: e.target.value,
                 })
               }
               className="border p-3 rounded"
             />
-
           </div>
 
           <div className="flex gap-3 mt-5">
-
             <button
-              onClick={
-                handleSubmit
-              }
+              onClick={handleSubmit}
               className="bg-green-600 text-white px-4 py-2 rounded"
             >
-              {editing
-                ? "Update"
-                : "Submit"}
+              {editing ? "Update" : "Submit"}
             </button>
 
             <button
@@ -178,7 +150,6 @@ export default function Page() {
             >
               Cancel
             </button>
-
           </div>
         </div>
       )}
@@ -186,77 +157,72 @@ export default function Page() {
       {/* LIST */}
 
       <div className="bg-white rounded-lg border">
-
         <table className="w-full">
-
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left">
-                Name
-              </th>
+              <th className="p-4 text-left">Name</th>
 
-              <th className="p-4 text-left">
-                Slug
-              </th>
-
-              <th className="p-4 text-left">
-                Actions
-              </th>
+              <th className="p-4 text-left">Slug</th>
+              <th className="p-4 text-left">Created At</th>
+              <th className="p-4 text-left">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-
             {!loading &&
-              data?.blogCategories?.map(
-                (item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b"
-                  >
-                    <td className="p-4">
-                      {item.name}
-                    </td>
+              data?.blogCategories?.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="p-4">{item.name}</td>
 
-                    <td className="p-4">
-                      {item.slug}
-                    </td>
+                  <td className="p-4">{item.slug}</td>
+                  <td className="p-4">
+                    <div className="text-xs">
+                      <p>
+                        {new Date(Number(item.createdAt)).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                            timeZone: "Asia/Kolkata",
+                          },
+                        )}
+                      </p>
 
-                    <td className="p-4 flex gap-2">
+                      <p className="text-gray-500">
+                        {new Date(Number(item.createdAt)).toLocaleTimeString(
+                          "en-IN",
+                          {
+                            timeZone: "Asia/Kolkata",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          },
+                        )}
+                      </p>
+                    </div>
+                  </td>
 
-                      <button
-                        onClick={() =>
-                          handleEdit(
-                            item
-                          )
-                        }
-                        className="bg-blue-500 text-white px-3 py-1 rounded"
-                      >
-                        Edit
-                      </button>
+                  <td className="p-4 flex gap-2">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                    >
+                      Edit
+                    </button>
 
-                      <button
-                        onClick={() =>
-                          handleDelete(
-                            item.id
-                          )
-                        }
-                        className="bg-red-500 text-white px-3 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-
-                    </td>
-                  </tr>
-                )
-              )}
-
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
-
         </table>
-
       </div>
-
     </div>
   );
 }

@@ -4,31 +4,22 @@ import BlogSidebar from "./BlogSidebar";
 import { GET_BLOG_CATEGORIES } from "@/app/graphQL/managecms";
 import Link from "next/link";
 
-export default function BlogLayout({
-  children,
-}) {
-      const { data: categoryData } = useQuery(GET_BLOG_CATEGORIES);
+export default function BlogLayout({ children }) {
+  const { data: categoryData } = useQuery(GET_BLOG_CATEGORIES);
   return (
     <div className="container mx-auto py-10">
-        
-        <Link
-          href="/Admindash/managecms/blogs/create"
-          className="bg-indigo-600 text-white px-6 py-3 rounded-lg"
-        >
-          Add New Blog
-        </Link>
+      <Link
+        href="/Admindash/managecms/blogs/create"
+        className="bg-indigo-600 text-white px-6 py-3 rounded-lg"
+      >
+        Add New Blog
+      </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
+        <div className="lg:col-span-3">{children}</div>
 
-        <div className="lg:col-span-3">
-          {children}
-        </div>
-
-           <BlogSidebar categories={categoryData?.blogCategories || []} />
-
+        <BlogSidebar categories={categoryData?.blogCategories || []} />
       </div>
-
     </div>
   );
 }
