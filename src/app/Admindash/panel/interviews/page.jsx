@@ -13,6 +13,8 @@ const GET_MY_INTERVIEWS = gql`
       name
       skills
       experience
+      phoneNumber
+      email
       interviewDate
       interviewTime
       round
@@ -45,16 +47,15 @@ export default function InterviewerPanel() {
 
   const [remarks, setRemarks] = useState({});
 
-  const formatDate = (date) =>
-    new Date(date).toLocaleDateString("en-IN");
+  const formatDate = (date) => new Date(date).toLocaleDateString("en-IN");
 
   const handleUpdate = async (id, status) => {
     await updateResult({
       variables: {
         astrologerId: id,
         status,
-        remarks: remarks[id] || ""
-      }
+        remarks: remarks[id] || "",
+      },
     });
 
     refetch();
@@ -62,45 +63,40 @@ export default function InterviewerPanel() {
 
   return (
     <div className="p-6 space-y-5">
+      <h1 className="text-xl font-semibold">Assigned Interviews</h1>
 
-      <h1 className="text-xl font-semibold">
-        Assigned Interviews
-      </h1>
-
-      {data?.getMyInterviews?.length === 0 && (
-        <p>No interviews assigned</p>
-      )}
+      {data?.getMyInterviews?.length === 0 && <p>No interviews assigned</p>}
 
       <div className="grid md:grid-cols-2 gap-4">
-
         {data?.getMyInterviews?.map((item) => (
           <div
             key={item.id}
             className="border rounded-xl p-4 shadow-sm space-y-2"
           >
             {/* Candidate */}
-            <h2 className="font-semibold text-lg">
-              {item.name}
-            </h2>
+            <h2 className="font-semibold text-lg">{item.name}</h2>
 
-            <p className="text-sm">
-              Skills: {item.skills?.join(", ")}
+            <p className="text-sm">Skills: {item.skills?.join(", ")}</p>
+
+            <p className="text-sm">Experience: {item.experience} yrs</p>
+            <p>
+              <b>Email:</b> {item.email || "-"}
             </p>
 
-            <p className="text-sm">
-              Experience: {item.experience} yrs
+            <p>
+              <b>Phone:</b> {item.phoneNumber || "-"}
             </p>
 
             {/* Interview Info */}
             <div className="bg-gray-50 p-3 rounded">
-                <p>
-                        <b>Date:</b>{" "}
-                        {item.interviewDate
-                          ? new Date(
-                            Number(item.interviewDate),
-                          ).toLocaleDateString("en-IN")
-                          : "-"}
-                      </p>
+              <p>
+                <b>Date:</b>{" "}
+                {item.interviewDate
+                  ? new Date(Number(item.interviewDate)).toLocaleDateString(
+                      "en-IN",
+                    )
+                  : "-"}
+              </p>
               <p>Time: {item.interviewTime}</p>
               <p>Round: {item.round}</p>
             </div>
@@ -112,7 +108,7 @@ export default function InterviewerPanel() {
               onChange={(e) =>
                 setRemarks({
                   ...remarks,
-                  [item.id]: e.target.value
+                  [item.id]: e.target.value,
                 })
               }
             />

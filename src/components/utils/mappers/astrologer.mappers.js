@@ -1,5 +1,6 @@
 export const mapAstrologerPayload = (formData) => {
   return {
+      applicationId: formData.applicationId, 
     astroname: formData.astroname,
     displayName: formData.displayName,
    status: formData.status ?? true,  

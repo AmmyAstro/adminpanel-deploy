@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-
 export const GET_APPLICATIONS = gql`
   query {
     getApplications {
@@ -13,7 +12,7 @@ export const GET_APPLICATIONS = gql`
       languages
       problems
       experience
-
+      dob
       applicationStatus
       interviewStatus
       documentStatus
@@ -21,13 +20,28 @@ export const GET_APPLICATIONS = gql`
       interviewerId
       interviewDate
       interviewTime
-      round
+      interviewRemarks
 
+      round
+      astrologerId
       createdAt
+      kycDetail {
+        accountHolderName
+        accountNumber
+        bankName
+        ifsc
+        branchName
+        panNumber
+        documentRemarks
+        aadhaarImage
+        panImage
+        passbookImage
+
+        status
+      }
     }
   }
 `;
-
 
 export const GET_INTERVIEWERS = gql`
   query {
@@ -39,10 +53,11 @@ export const GET_INTERVIEWERS = gql`
   }
 `;
 
-
 export const SCHEDULE_INTERVIEW = gql`
   mutation (
     $astrologerId: ID!
+    $astrologerNumber: String!
+    $astrologerMail: String!
     $interviewerId: String!
     $interviewDate: String!
     $interviewTime: String!
@@ -50,6 +65,8 @@ export const SCHEDULE_INTERVIEW = gql`
   ) {
     scheduleInterview(
       astrologerId: $astrologerId
+      astrologerNumber: $astrologerNumber
+      astrologerMail: $astrologerMail
       interviewerId: $interviewerId
       interviewDate: $interviewDate
       interviewTime: $interviewTime
@@ -64,7 +81,6 @@ export const SCHEDULE_INTERVIEW = gql`
   }
 `;
 
-
 export const UPDATE_DOCUMENT_STATUS = gql`
   mutation ($astrologerId: ID!, $status: DocumentStatus!) {
     updateDocumentStatus(astrologerId: $astrologerId, status: $status) {
@@ -74,16 +90,15 @@ export const UPDATE_DOCUMENT_STATUS = gql`
   }
 `;
 
-
 export const UPDATE_APPROVAL_STATUS = gql`
   mutation ($astrologerId: ID!, $status: ApprovalStatus!) {
     updateApprovalStatus(astrologerId: $astrologerId, status: $status) {
       id
       approvalStatus
+      applicationStatus
     }
   }
 `;
-
 
 export const UPLOAD_IMAGE = gql`
   mutation UploadImage($file: Upload!) {
@@ -94,46 +109,11 @@ export const UPLOAD_IMAGE = gql`
   }
 `;
 
-export const SAVE_AND_VERIFY_KYC = gql`
-  mutation SaveAndVerifyKyc(
-    $astrologerId: ID!
-    $accountHolderName: String
-    $accountNumber: String
-    $bankName: String
-    $ifsc: String
-    $branchName: String
-    $panNumber: String
-    $profileImage: String
-    $aadhaarImage: String
-    $panImage: String
-    $passbookImage: String
-    $status: DocumentStatus!
-  ) {
-    saveAndVerifyKyc(
-      astrologerId: $astrologerId
-      accountHolderName: $accountHolderName
-      accountNumber: $accountNumber
-      bankName: $bankName
-      ifsc: $ifsc
-      branchName: $branchName
-      panNumber: $panNumber
-      profileImage: $profileImage
-      aadhaarImage: $aadhaarImage
-      panImage: $panImage
-      passbookImage: $passbookImage
-      status: $status
-    ) {
-      id
-    }
-  }
-`;
+
 
 export const REJECT_KYC = gql`
-  mutation RejectKyc($astrologerId: ID!) {
-    rejectKyc(astrologerId: $astrologerId) {
-      id
-      status
-    }
+  mutation RejectKyc($astrologerId: String!, $remarks: String) {
+    rejectKyc(astrologerId: $astrologerId, remarks: $remarks)
   }
 `;
 
@@ -247,7 +227,6 @@ export const GET_ASTROLOGER_BY_ID = gql`
         branchName
         panNumber
 
-        profileImage
         aadhaarImage
         panImage
         passbookImage
@@ -586,28 +565,16 @@ export const GET_NOTICES = gql`
   }
 `;
 export const UPDATE_REVIEW_COMMENT = gql`
-  mutation UpdateReviewComment(
-    $reviewId: ID!
-    $comment: String!
-  ) {
-    updateReviewComment(
-      reviewId: $reviewId
-      comment: $comment
-    ) {
+  mutation UpdateReviewComment($reviewId: ID!, $comment: String!) {
+    updateReviewComment(reviewId: $reviewId, comment: $comment) {
       reviewId
       comment
     }
   }
 `;
 export const UPDATE_GIFT_STATUS = gql`
-  mutation UpdateGiftStatus(
-    $id: ID!
-    $status: String!
-  ) {
-    updateGiftStatus(
-      id: $id
-      status: $status
-    ) {
+  mutation UpdateGiftStatus($id: ID!, $status: String!) {
+    updateGiftStatus(id: $id, status: $status) {
       id
       status
     }

@@ -131,10 +131,7 @@ export default function AstroProfile() {
     );
   }
   const docs = [
-    {
-      name: "Profile Image",
-      file: astrologerprofile?.kycDetail?.profileImage,
-    },
+ 
     {
       name: "Aadhaar",
       file: astrologerprofile?.kycDetail?.aadhaarImage,

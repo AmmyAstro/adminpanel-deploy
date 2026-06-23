@@ -40,7 +40,7 @@ const GET_APPLICATION_BY_ID = gql`
       name
       email
       phoneNumber
-      dateOfBirth
+      dob
       gender
       experience
       languages
@@ -56,7 +56,7 @@ const GET_APPLICATION_BY_ID = gql`
         ifsc
         branchName
         panNumber
-        profileImage
+        
         aadhaarImage
         panImage
         passbookImage
@@ -66,8 +66,10 @@ const GET_APPLICATION_BY_ID = gql`
 `;
 
 export default function AddAstro() {
-  // const params = useSearchParams();
-  const params = useParams();
+const params = useParams(); // edit mode ke liye rehne do
+
+const searchParams = useSearchParams();
+const appId = searchParams.get("appId");
 
   const astrologerId = params?.id;
 
@@ -83,7 +85,7 @@ export default function AddAstro() {
     },
     skip: !isEditMode,
   });
-  const appId = params?.appId || "";
+
 
   console.log("ASTRO DATAxxxxxxxxxxxxxxxxxxx:", astroData);
 
@@ -384,7 +386,9 @@ export default function AddAstro() {
       displayName: app.name,
       email: app.email,
       phoneNumber: app.phoneNumber,
-      dateOfBirth: app.dateOfBirth || "",
+      dateOfBirth: app.dob
+    ? app.dob.split("T")[0]
+    : "",
       gender: app.gender,
       experience: app.experience,
       address: app.address,
@@ -554,24 +558,27 @@ export default function AddAstro() {
       const uploadedFiles = await uploadRes.json();
 
       // Sanitize: replace {} or non-string values with null
-      const safeFiles = {
-        profilePic:
-          typeof uploadedFiles?.profilePic === "string"
-            ? uploadedFiles.profilePic
-            : null,
-        aadhaar:
-          typeof uploadedFiles?.aadhaar === "string"
-            ? uploadedFiles.aadhaar
-            : null,
-        panCard:
-          typeof uploadedFiles?.panCard === "string"
-            ? uploadedFiles.panCard
-            : null,
-        passbook:
-          typeof uploadedFiles?.passbook === "string"
-            ? uploadedFiles.passbook
-            : null,
-      };
+    const safeFiles = {
+  profilePic:
+    typeof uploadedFiles?.profilePic === "string"
+      ? uploadedFiles.profilePic
+      : null,
+
+  aadhaar:
+    typeof uploadedFiles?.aadhaar === "string"
+      ? uploadedFiles.aadhaar
+      : appData?.getApplicationById?.kycDetail?.aadhaarImage || null,
+
+  panCard:
+    typeof uploadedFiles?.panCard === "string"
+      ? uploadedFiles.panCard
+      : appData?.getApplicationById?.kycDetail?.panImage || null,
+
+  passbook:
+    typeof uploadedFiles?.passbook === "string"
+      ? uploadedFiles.passbook
+      : appData?.getApplicationById?.kycDetail?.passbookImage || null,
+};
 
       const payload = mapAstrologerPayload({
         ...formData,
