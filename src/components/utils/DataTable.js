@@ -32,7 +32,7 @@ const gridColumns = updatedColumns
             }}
             >
               {updatedColumns.map((col, i) => (
-                <td key={i} className="px-5 py-2 text-sm text-center">
+                <td key={i} className="px-1 py-2 text-sm text-center">
                   {/* 🔥 SR NO logic */}
                   {col.accessor === "srNo"
                     ? rowIndex + 1

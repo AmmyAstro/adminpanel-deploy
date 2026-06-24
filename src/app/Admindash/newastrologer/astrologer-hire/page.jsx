@@ -169,7 +169,6 @@ export default function AstrologerHiring() {
           branchName: selected.kyc?.branchName,
           panNumber: selected.kyc?.panNumber,
 
-        
           aadhaarImage: selected.kyc?.aadhaarImage,
           panImage: selected.kyc?.panImage,
           passbookImage: selected.kyc?.passbookImage,
@@ -198,7 +197,12 @@ export default function AstrologerHiring() {
       header: "Name",
       render: (row) => (
         <div>
-          <Link className="text-xs font-semibold text-purple-500" href={`/Admindash/astromain/astroprofile/${row.receiverId}`}>{row.name}</Link>
+          <Link
+            className="text-xs font-semibold text-purple-500"
+            href={`/Admindash/astromain/astroprofile/${row.receiverId}`}
+          >
+            {row.name}
+          </Link>
           <p className="text-xs text-gray-500">{row.phoneNumber}</p>
         </div>
       ),
@@ -289,16 +293,17 @@ export default function AstrologerHiring() {
         }
 
         return (
-          <select className={`border rounded px-2 py-1 ${
-  row.approvalStatus === "REJECTED" ||
-  row.approvalStatus === "APPROVED"
-    ? "cursor-not-allowed bg-gray-200 text-gray-500"
-    : ""
-}`}
+          <select
+            className={`border rounded px-2 py-1 ${
+              row.approvalStatus === "REJECTED" ||
+              row.approvalStatus === "APPROVED"
+                ? "cursor-not-allowed bg-gray-200 text-gray-500"
+                : ""
+            }`}
             value={row.approvalStatus}
             disabled={
               row.approvalStatus === "REJECTED" ||
-              row.approvalStatus === "APPROVED"            
+              row.approvalStatus === "APPROVED"
             }
             onChange={(e) =>
               updateApprovalStatus({
@@ -321,7 +326,7 @@ export default function AstrologerHiring() {
       header: "Profile",
       render: (row) => {
         const isAdded = !!row.astrologerId;
-
+console.log("ROW ID=========================================== =", row.id);
         return (
           <button
             disabled={isAdded || row.approvalStatus !== "APPROVED"}
@@ -330,6 +335,7 @@ export default function AstrologerHiring() {
                 window.location.href = `/Admindash/astromain/add-astrologer?appId=${row.id}`;
               }
             }}
+            
             className={`px-3 py-1 rounded text-xs ${
               isAdded
                 ? "bg-blue-600 text-white"
@@ -595,7 +601,8 @@ export default function AstrologerHiring() {
                       <b>PAN:</b> {selected.kycDetail?.panNumber || "-"}
                     </p>
                     <p>
-                      <b>Remarks:</b> {selected.kycDetail?.documentRemarks || "-"}
+                      <b>Remarks:</b>{" "}
+                      {selected.kycDetail?.documentRemarks || "-"}
                     </p>
 
                     <div className="flex gap-3">

@@ -27,7 +27,7 @@ export default function AstroProfile() {
   const dispatch = useDispatch();
   const params = useParams();
   const astrologerId = params?.id;
-
+  const [previewImage, setPreviewImage] = useState(null);
   const { data, loading, error } = useQuery(GET_ASTROLOGER_BY_ID, {
     variables: {
       id: astrologerId,
@@ -131,7 +131,6 @@ export default function AstroProfile() {
     );
   }
   const docs = [
- 
     {
       name: "Aadhaar",
       file: astrologerprofile?.kycDetail?.aadhaarImage,
@@ -429,9 +428,81 @@ export default function AstroProfile() {
 
             <hr className="text-gray-300" />
 
-            <div className="flex flex-col gap-2 py-3">
-              <h6 className="text-sm font-semibold ">Astrologer Documents:</h6>
+            <div className="flex flex-col gap-3 py-3">
+              <h6 className="text-sm font-semibold">Astrologer Documents:</h6>
+
+              <div className="flex flex-wrap gap-4">
+                {[
+                  {
+                    label: "Aadhaar",
+                    image: astrologerprofile?.kycDetail?.aadhaarImage,
+                  },
+                  {
+                    label: "PAN Card",
+                    image: astrologerprofile?.kycDetail?.panImage,
+                  },
+                  {
+                    label: "Passbook",
+                    image: astrologerprofile?.kycDetail?.passbookImage,
+                  },
+                ].map((doc) =>
+                  doc.image ? (
+                    <div
+                      key={doc.label}
+                      className="group relative overflow-hidden rounded-lg border"
+                    >
+                      <Image
+                        height={100}
+                        width={100}
+                        src={`https://dhwaniastro.com${doc.image}`}
+                        alt={doc.label}
+                        className="h-24 w-24 object-cover rounded-md"
+                      />
+
+                      {/* Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        <button
+                          onClick={() =>
+                            setPreviewImage(
+                              `https://dhwaniastro.com${doc.image}`,
+                            )
+                          }
+                          className="rounded bg-white px-3 py-1 text-xs font-medium text-black"
+                        >
+                          View
+                        </button>
+                      </div>
+
+                      <p className="py-1 text-center text-xs">{doc.label}</p>
+                    </div>
+                  ) : null,
+                )}
+              </div>
             </div>
+
+            {previewImage && (
+              <div
+                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
+                onClick={() => setPreviewImage(null)}
+              >
+                <div className="relative max-h-[90vh] max-w-[90vw]">
+                  <button
+                    onClick={() => setPreviewImage(null)}
+                    className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black"
+                  >
+                    ✕
+                  </button>
+
+                  <Image
+                    height={100}
+                    width={100}
+                    src={previewImage}
+                    alt="Preview"
+                    className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+                  />
+                </div>
+              </div>
+            )}
 
             <hr className="text-gray-300" />
 

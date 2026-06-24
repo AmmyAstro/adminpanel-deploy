@@ -6,49 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
 import Link from "next/link";
+import { GET_USER_WALLET_TRANSACTIONS } from "@/app/graphQL/astroHiring";
 
-const GET_USER_WALLET_TRANSACTIONS = gql`
-  query GetUserWalletTransactions(
-    $mobile: String
-    $type: String
-    $amount: Float
-    $page: Int
-    $limit: Int
-    $filterType: String
-    $startDate: String
-    $endDate: String
-  ) {
-    getUserWalletTransactions(
-      mobile: $mobile
-      type: $type
-      amount: $amount
-      page: $page
-      limit: $limit
-      filterType: $filterType
-      startDate: $startDate
-      endDate: $endDate
-    ) {
-      totalCount
 
-      data {
-        id
-        type
-        coins
-        amount
-        description
-        createdAt
-
-        userWallet {
-          user {
-            id
-            name
-            mobile
-          }
-        }
-      }
-    }
-  }
-`;
 
 export default function WalletTransactionsPage() {
   // SEARCH STATES

@@ -128,6 +128,14 @@ export default function UserChatHistoryPage() {
   const columns = useMemo(
     () => [
       {
+        header: "SessionID",
+        render: (row) => (
+          <span className="font-extralight text-blue-600">
+            {row.sessionId?.slice(0, 8)}
+          </span>
+        ),
+      },
+      {
         header: "User",
         render: (row) => (
           <div>
@@ -138,43 +146,28 @@ export default function UserChatHistoryPage() {
               {row.userName}
             </Link>
 
-            <p className="text-xs text-gray-500">{row.userId?.slice(0,8)}</p>
+            <p className="text-xs text-gray-500">{row.userId?.slice(0, 8)}</p>
+            <p className="text-[10px] font-bold text-purple-600">{row.source}</p>
           </div>
         ),
       },
 
       {
         header: "Astrologer",
-        accessor: "astrologerName",
-      },
-
-      {
-        header: "Status",
-        render: (row) => {
-          const statusStyles = {
-            REQUESTED: "bg-yellow-100 text-yellow-700",
-
-            ACCEPTED: "bg-blue-100 text-blue-700",
-
-            ONGOING: "bg-purple-100 text-purple-700",
-
-            COMPLETED: "bg-green-100 text-green-700",
-
-            CANCELLED: "bg-red-100 text-red-700",
-
-            FAILED: "bg-gray-200 text-gray-700",
-          };
-
-          return (
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                statusStyles[row.status] || "bg-gray-100 text-gray-700"
-              }`}
+        render: (row) => (
+          <div>
+            <Link
+              href={`/Admindash/astromain/astroprofile/${row.astrologerId}`}
+              className="font-semibold text-violet-600 hover:underline"
             >
-              {row.status}
-            </span>
-          );
-        },
+              {row.astrologerName}
+            </Link>
+
+            <p className="text-xs text-gray-500">
+              {row.astrologerId?.slice(0, 8)}
+            </p>
+          </div>
+        ),
       },
 
       {
@@ -212,47 +205,75 @@ export default function UserChatHistoryPage() {
           </span>
         ),
       },
+      {
+        header: "Status",
+        render: (row) => {
+          const statusStyles = {
+            REQUESTED: "bg-yellow-100 text-yellow-700",
 
-     {
-  header: "Duration",
-  render: (row) => {
-    const sec = Number(row.durationSec || 0);
+            ACCEPTED: "bg-blue-100 text-blue-700",
 
-    if (sec < 60) {
-      return <span>{sec} sec</span>;
-    }
+            ONGOING: "bg-purple-100 text-purple-700",
 
-    const minutes = Math.floor(sec / 60);
-    const seconds = sec % 60;
+            COMPLETED: "bg-green-100 text-green-700",
 
-    return (
-      <span>
-        {minutes}.{String(seconds).padStart(2, "0")} min
-      </span>
-    );
-  },
-},
+            CANCELLED: "bg-red-100 text-red-700",
 
-          {
-      header: "Created Date",
-      render: (row) => (
-        <div className="text-xs">
-          {new Date(row.createdAt).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            timeZone: "Asia/Kolkata",
-          })}
-               <p className="text-xs text-gray-500">
+            FAILED: "bg-gray-200 text-gray-700",
+          };
+
+          return (
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                statusStyles[row.status] || "bg-gray-100 text-gray-700"
+              }`}
+            >
+              {row.status?.charAt(0)}
+            </span>
+          );
+        },
+      },
+
+      {
+        header: "Duration",
+        render: (row) => {
+          const sec = Number(row.durationSec || 0);
+
+          if (sec < 60) {
+            return <span>{sec} sec</span>;
+          }
+
+          const minutes = Math.floor(sec / 60);
+          const seconds = sec % 60;
+
+          return (
+            <span>
+              {minutes}.{String(seconds).padStart(2, "0")} min
+            </span>
+          );
+        },
+      },
+
+      {
+        header: "Created Date",
+        render: (row) => (
+          <div className="text-xs">
+            {new Date(row.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "Asia/Kolkata",
+            })}
+            <p className="text-xs text-gray-500">
               {new Date(row.createdAt).toLocaleTimeString("en-IN", {
                 timeZone: "Asia/Kolkata",
                 hour: "2-digit",
                 minute: "2-digit",
               })}
             </p>
-        </div>
-      ),
-    },
+          </div>
+        ),
+      },
       {
         header: "Action",
         render: (row) => (
@@ -261,7 +282,7 @@ export default function UserChatHistoryPage() {
               setSelectedSession(row.sessionId);
               setOpenModal(true);
             }}
-            className="flex items-center justify-center text-blue-600 hover:text-blue-800"
+            className="flex items-center justify-center place-self-center align-center text-blue-600 hover:text-blue-800"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

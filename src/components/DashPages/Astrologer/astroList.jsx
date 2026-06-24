@@ -68,7 +68,7 @@ export default function AstroList() {
         <div className="flex flex-col">
           <Link
             href={`/Admindash/astromain/astroprofile/${row.id}`}
-            className="font-medium"
+            className="font-bold text-purple-500"
           >
             {row.displayName}
           </Link>

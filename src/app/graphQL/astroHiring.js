@@ -109,8 +109,6 @@ export const UPLOAD_IMAGE = gql`
   }
 `;
 
-
-
 export const REJECT_KYC = gql`
   mutation RejectKyc($astrologerId: String!, $remarks: String) {
     rejectKyc(astrologerId: $astrologerId, remarks: $remarks)
@@ -411,7 +409,7 @@ export const GET_USER_CALL_HISTORY = gql`
         userId
         userName
         mobile
-
+        source
         astrologerId
         astrologerName
 
@@ -432,6 +430,42 @@ export const GET_USER_CALL_HISTORY = gql`
     }
   }
 `;
+export const GET_USER_WALLET_TRANSACTIONS = gql`
+ query GetUserWalletTransactions(
+  $userId: ID
+  $mobile: String
+  $type: String
+  $amount: Float
+  $page: Int
+  $limit: Int
+  $filterType: String
+  $startDate: String
+  $endDate: String
+) {
+  getUserWalletTransactions(
+    userId: $userId
+    mobile: $mobile
+    type: $type
+    amount: $amount
+    page: $page
+    limit: $limit
+    filterType: $filterType
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    totalCount
+
+    data {
+      id
+      type
+      coins
+      amount
+      description
+      createdAt
+    }
+  }
+}
+`;
 
 export const GET_USERS_CHAT_HISTORY = gql`
   query GetUsersChatHistory($searchInput: UserChatHistorySearchInput!) {
@@ -450,7 +484,8 @@ export const GET_USERS_CHAT_HISTORY = gql`
         userName
         mobile
         astrologerName
-
+        astrologerId
+        source
         status
         ratePerMin
         coinsDeducted
@@ -518,6 +553,14 @@ export const GET_USER_PROFILE = gql`
         lastRechargeAmount
         lastRechargeDate
       }
+    }
+  }
+`;
+export const UPDATE_USER_STATUS = gql`
+  mutation UpdateUserStatus($userId: ID!, $isActive: Boolean!) {
+    updateUserStatus(userId: $userId, isActive: $isActive) {
+      id
+      isActive
     }
   }
 `;

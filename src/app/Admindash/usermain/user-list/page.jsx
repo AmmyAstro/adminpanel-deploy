@@ -154,15 +154,15 @@ export default function UsersListPage() {
       {row.name || "N/A"}
      
     </Link>
-    <p> {row.id?.slice(0,8)}</p></div>
+    <p className="text-xs font-semibold"> {row.id?.slice(0,8)}</p></div>
 
   ),
 },
 
-      {
-        header: "Mobile",
-        accessor: "mobile",
-      },
+      // {
+      //   header: "Mobile",
+      //   accessor: "mobile",
+      // },
 
       {
         header: "Gender",

@@ -10,7 +10,11 @@ import { useActionHandler } from "@/hooks/useActionHandler";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { gql } from "@apollo/client";
-import { DELETE_CATEGORY, GET_CATEGORIES } from "@/app/graphQL/astroHiring";
+import {
+  DELETE_CATEGORY,
+  GET_ASTRO_LIST,
+  GET_CATEGORIES,
+} from "@/app/graphQL/astroHiring";
 
 /* ------------------ GRAPHQL ------------------ */
 
@@ -29,6 +33,13 @@ const GET_SERVICES = gql`
         id
         name
         slug
+      }
+      astrologerMappings {
+        price
+
+        astrologer {
+          displayName
+        }
       }
     }
   }
@@ -62,6 +73,24 @@ const UPDATE_SERVICE = gql`
 const DELETE_SERVICE = gql`
   mutation ($id: ID!) {
     deleteService(id: $id)
+  }
+`;
+const GET_SERVICE_ASTROLOGERS = gql`
+  query ($serviceId: ID!) {
+    getServiceAstrologers(serviceId: $serviceId) {
+      id
+      price
+
+      astrologer {
+        id
+        displayName
+      }
+    }
+  }
+`;
+const SAVE_SERVICE_ASTROLOGERS = gql`
+  mutation ($serviceId: ID!, $astrologers: [ServiceAstrologerInput!]!) {
+    saveServiceAstrologers(serviceId: $serviceId, astrologers: $astrologers)
   }
 `;
 
@@ -105,6 +134,43 @@ export default function DhwaniServicesAdmin() {
   const [newCategoryInput, setNewCategoryInput] = useState("");
   const [preview, setPreview] = useState("");
   const [modalType, setModalType] = useState("service");
+
+  const [mappingOpen, setMappingOpen] = useState(false);
+
+  const [selectedService, setSelectedService] = useState(null);
+
+  const [mappedAstrologers, setMappedAstrologers] = useState([]);
+  const { data: astroData } = useQuery(GET_ASTRO_LIST, {
+    variables: {
+      searchInput: {
+        page: 1,
+        limit: 50,
+      },
+    },
+  });
+  const [saveMappings] = useMutation(SAVE_SERVICE_ASTROLOGERS);
+
+  const openMappingModal = async (service) => {
+    setSelectedService(service);
+
+    const res = await client.query({
+      query: GET_SERVICE_ASTROLOGERS,
+      variables: {
+        serviceId: service.id,
+      },
+      fetchPolicy: "network-only",
+    });
+
+    setMappedAstrologers(
+      res.data.getServiceAstrologers.map((a) => ({
+        astrologerId: a.astrologer.id,
+        displayName: a.astrologer.displayName,
+        price: a.price,
+      })),
+    );
+
+    setMappingOpen(true);
+  };
   /* ------------------ EDIT PREFILL ------------------ */
 
   useEffect(() => {
@@ -130,7 +196,7 @@ export default function DhwaniServicesAdmin() {
       name: "",
       slug: "",
       type: "DIRECT_SERVICE",
-      price: "",
+  
       description: "",
       longText: "",
       categoryId: "",
@@ -144,6 +210,34 @@ export default function DhwaniServicesAdmin() {
   };
 
   /* ------------------ IMAGE ------------------ */
+
+  const handleSaveMappings = async () => {
+    const invalid = mappedAstrologers.find((a) => !a.price);
+
+    if (invalid) {
+      toast.error("Please enter price for all selected astrologers");
+      return;
+    }
+
+    await saveMappings({
+      variables: {
+        serviceId: selectedService.id,
+
+        astrologers: mappedAstrologers.map((a) => ({
+          astrologerId: a.astrologerId,
+          price: Number(a.price),
+        })),
+      },
+    });
+
+    toast.success("Mapping Saved");
+
+    setMappingOpen(false);
+  };
+
+   const handleCancelMappings =() =>{
+     setMappingOpen(false);
+   }
 
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -198,7 +292,6 @@ export default function DhwaniServicesAdmin() {
           name: form.name,
           slug: form.slug,
           image: imageUrl,
-          price: Number(form.price),
           description: form.description,
           longText: form.longText,
           categoryId: form.categoryId || null,
@@ -376,13 +469,21 @@ export default function DhwaniServicesAdmin() {
                     />
                   )}
                   <h3>{item.name}</h3>
-                  <p>₹{item.price || "-"}</p>
+              
                 </div>
 
                 <div className="p-2">
                   <p>{item.description}</p>
 
                   <p>Category: {item.category?.name || "None"}</p>
+                  <div className="mt-2 text-xs">
+                    {item.astrologerMappings?.map((m) => (
+                      <p key={m.astrologer.displayName}>
+                        {m.astrologer.displayName}
+                        {" - "}₹{m.price}
+                      </p>
+                    ))}
+                  </div>
 
                   <div className="flex gap-2 mt-2">
                     <button
@@ -392,7 +493,7 @@ export default function DhwaniServicesAdmin() {
                         setEditing(item);
                         setOpen(true);
                       }}
-                      className="bg-blue-500 text-white px-2 py-1 text-xs"
+                      className="bg-blue-500 rounded-full text-white px-2 py-1 text-xs"
                     >
                       Edit
                     </button>
@@ -404,11 +505,17 @@ export default function DhwaniServicesAdmin() {
                       mutationFn={deleteService}
                       variables={{ id: item.id }}
                       onSuccess={refetch}
-                      className="bg-red-500 text-white px-2 py-1 text-xs"
+                      className="bg-red-500 text-white rounded-full px-2 py-1 text-xs"
                     >
                       Delete
                     </ProtectedActionButton>
                   </div>
+                  <button
+                    onClick={() => openMappingModal(item)}
+                    className="bg-green-600 text-white px-2 mt-2 py-1 text-xs rounded"
+                  >
+                    Map Astrologers
+                  </button>
                 </div>
               </div>
             ))}
@@ -526,17 +633,6 @@ export default function DhwaniServicesAdmin() {
                   ))}
                 </select>
 
-                <input
-                  placeholder="Price"
-                  className="border p-2 w-full mb-3"
-                  value={form.price}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      price: e.target.value,
-                    })
-                  }
-                />
 
                 <input
                   placeholder="Short Description"
@@ -587,6 +683,90 @@ export default function DhwaniServicesAdmin() {
                 </button>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {mappingOpen && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+          <div className="bg-white w-[700px] rounded-lg p-5">
+            <h2 className="text-xl font-semibold mb-4">Map Astrologers</h2>
+
+            <p className="mb-4 font-medium">{selectedService?.name}</p>
+
+            <div className="max-h-[450px] grid grid-cols-2 gap-5 overflow-y-auto">
+              {astroData?.getAstrologerListBySearch?.data?.map((astro) => {
+                const selected = mappedAstrologers.find(
+                  (a) => a.astrologerId === astro.id,
+                );
+
+                return (
+                  <div
+                    key={astro.id}
+                    className="flex items-center rounded bg-gray-100 px-3 py-1  gap-4  "
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!selected}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setMappedAstrologers((prev) => [
+                            ...prev,
+                            {
+                              astrologerId: astro.id,
+                              displayName: astro.displayName,
+                              price: "",
+                            },
+                          ]);
+                        } else {
+                          setMappedAstrologers((prev) =>
+                            prev.filter((x) => x.astrologerId !== astro.id),
+                          );
+                        }
+                      }}
+                    />
+
+                    <span className="w-52">{astro.displayName}</span>
+
+                    {selected && (
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={selected.price}
+                        onChange={(e) =>
+                          setMappedAstrologers((prev) =>
+                            prev.map((x) =>
+                              x.astrologerId === astro.id
+                                ? {
+                                    ...x,
+                                    price: e.target.value,
+                                  }
+                                : x,
+                            ),
+                          )
+                        }
+                        className="border border-gray-200 bg-white rounded-xl p-2 w-20"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+           <div className="flex  gap-5 items-center justify-center">
+             <button
+              onClick={handleSaveMappings}
+              className="bg-green-600 text-white px-4 py-1 rounded-xl mt-4"
+            >
+              Save Mapping
+            </button>
+                <button
+              onClick={handleCancelMappings}
+              className="bg-green-600 text-white px-4 py-1 rounded-xl mt-4"
+            >
+              Cancel
+            </button>
+           </div>
           </div>
         </div>
       )}

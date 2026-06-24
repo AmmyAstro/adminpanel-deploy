@@ -14,7 +14,7 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { mapAstrologerPayload } from "@/components/utils/mappers/astrologer.mappers";
 import toast from "react-hot-toast";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   GET_ASTROLOGER_BY_ID,
   UPDATE_ASTROLOGER,
@@ -56,7 +56,7 @@ const GET_APPLICATION_BY_ID = gql`
         ifsc
         branchName
         panNumber
-        
+
         aadhaarImage
         panImage
         passbookImage
@@ -66,13 +66,13 @@ const GET_APPLICATION_BY_ID = gql`
 `;
 
 export default function AddAstro() {
-const params = useParams(); // edit mode ke liye rehne do
+  const params = useParams(); // edit mode ke liye rehne do
 
-const searchParams = useSearchParams();
-const appId = searchParams.get("appId");
-
+  const searchParams = useSearchParams();
+  const appId = searchParams.get("appId");
+  console.log("URL APP ID============== =", appId);
   const astrologerId = params?.id;
-
+const router = useRouter();
   const isEditMode = !!astrologerId;
   const [fileInputKey, setFileInputKey] = useState(0);
   const {
@@ -85,7 +85,6 @@ const appId = searchParams.get("appId");
     },
     skip: !isEditMode,
   });
-
 
   console.log("ASTRO DATAxxxxxxxxxxxxxxxxxxx:", astroData);
 
@@ -380,15 +379,17 @@ const appId = searchParams.get("appId");
     if (!appData?.getApplicationById) return;
 
     const app = appData.getApplicationById;
+    console.log(
+      "APP DATA ===============================",
+      appData?.getApplicationById?.id,
+    );
 
     reset({
       astroname: app.name,
       displayName: app.name,
       email: app.email,
       phoneNumber: app.phoneNumber,
-      dateOfBirth: app.dob
-    ? app.dob.split("T")[0]
-    : "",
+      dateOfBirth: app.dob ? app.dob.split("T")[0] : "",
       gender: app.gender,
       experience: app.experience,
       address: app.address,
@@ -558,27 +559,27 @@ const appId = searchParams.get("appId");
       const uploadedFiles = await uploadRes.json();
 
       // Sanitize: replace {} or non-string values with null
-    const safeFiles = {
-  profilePic:
-    typeof uploadedFiles?.profilePic === "string"
-      ? uploadedFiles.profilePic
-      : null,
+      const safeFiles = {
+        profilePic:
+          typeof uploadedFiles?.profilePic === "string"
+            ? uploadedFiles.profilePic
+            : null,
 
-  aadhaar:
-    typeof uploadedFiles?.aadhaar === "string"
-      ? uploadedFiles.aadhaar
-      : appData?.getApplicationById?.kycDetail?.aadhaarImage || null,
+        aadhaar:
+          typeof uploadedFiles?.aadhaar === "string"
+            ? uploadedFiles.aadhaar
+            : appData?.getApplicationById?.kycDetail?.aadhaarImage || null,
 
-  panCard:
-    typeof uploadedFiles?.panCard === "string"
-      ? uploadedFiles.panCard
-      : appData?.getApplicationById?.kycDetail?.panImage || null,
+        panCard:
+          typeof uploadedFiles?.panCard === "string"
+            ? uploadedFiles.panCard
+            : appData?.getApplicationById?.kycDetail?.panImage || null,
 
-  passbook:
-    typeof uploadedFiles?.passbook === "string"
-      ? uploadedFiles.passbook
-      : appData?.getApplicationById?.kycDetail?.passbookImage || null,
-};
+        passbook:
+          typeof uploadedFiles?.passbook === "string"
+            ? uploadedFiles.passbook
+            : appData?.getApplicationById?.kycDetail?.passbookImage || null,
+      };
 
       const payload = mapAstrologerPayload({
         ...formData,
@@ -602,6 +603,8 @@ const appId = searchParams.get("appId");
         console.log("UPDATE RESPONSE:", res?.data?.updateAstrologer);
 
         toast.success("Astrologer updated successfully ✅");
+                 router.replace("/Admindash/astromain/astrologer-list");
+
       } else {
         res = await addAstrologer({
           variables: {
@@ -611,6 +614,7 @@ const appId = searchParams.get("appId");
 
         if (res?.data?.addAstrologer?.success) {
           toast.success(res.data.addAstrologer.message);
+           router.replace("/Admindash/astromain/astrologer-list");
         }
       }
 
@@ -774,7 +778,7 @@ const appId = searchParams.get("appId");
                 render={({ field }) => (
                   <input
                     type="file"
-                   key={`profile-${fileInputKey}`}
+                    key={`profile-${fileInputKey}`}
                     accept="image/*"
                     className="w-full outline-none border-0 bg-transparent text-sm"
                     onChange={(e) => {
