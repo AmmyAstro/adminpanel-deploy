@@ -190,7 +190,8 @@ export const GET_ASTROLOGER_BY_ID = gql`
 
       email
       contactNo
-
+ createdAt
+      updatedAt
       gender
       experience
 
@@ -431,7 +432,7 @@ export const GET_USER_CALL_HISTORY = gql`
   }
 `;
 export const GET_USER_WALLET_TRANSACTIONS = gql`
- query GetUserWalletTransactions(
+query GetUserWalletTransactions(
   $userId: ID
   $mobile: String
   $type: String
@@ -441,6 +442,7 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
   $filterType: String
   $startDate: String
   $endDate: String
+  $onlyRecharge: Boolean
 ) {
   getUserWalletTransactions(
     userId: $userId
@@ -452,6 +454,7 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
     filterType: $filterType
     startDate: $startDate
     endDate: $endDate
+    onlyRecharge: $onlyRecharge
   ) {
     totalCount
 
@@ -462,6 +465,13 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
       amount
       description
       createdAt
+
+      rechargePack {
+        id
+        name
+        talktime
+        validityDays
+      }
     }
   }
 }
@@ -510,6 +520,7 @@ export const GET_ASTRO_LIST = gql`
         experience
         tags
         vtags
+         createdAt
       }
     }
   }
@@ -623,3 +634,32 @@ export const UPDATE_GIFT_STATUS = gql`
     }
   }
 `;
+export const GET_USER_REVIEWS = gql`
+  query GetUserReviews($searchInput: UserReviewSearchInput!) {
+    getUserReviews(searchInput: $searchInput) {
+      totalCount
+      currentPage
+      totalPages
+      averageRating
+
+      data {
+        reviewId
+        sessionId  
+
+        userId
+        userName
+        mobile
+        astrologerId
+        astrologerName
+        displayName
+        isFlagged
+        sessionType
+        sessionStatus
+        rating
+        comment
+        createdAt
+      }
+    }
+  }
+`;
+

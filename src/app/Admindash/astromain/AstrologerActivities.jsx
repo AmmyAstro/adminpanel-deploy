@@ -11,6 +11,8 @@ import {
   GET_ASTROLOGER_CHAT_HISTORY,
   GET_ASTROLOGER_DASHBOARD_STATS,
 } from "@/app/graphQL/astroHiring";
+import DataTable from "@/components/utils/DataTable";
+import dayjs from "dayjs";
 
 const GET_ASTROLOGER_EARNINGS = gql`
   query GetAstrologerEarnings($searchInput: AstrologerEarningSearchInput!) {
@@ -48,7 +50,7 @@ export default function AstrologerActivities({ astrologerId }) {
 
 const stats =
   statsData?.getAstrologerDashboardStats;
-  const { data: chatData } = useQuery(GET_ASTROLOGER_CHAT_HISTORY, {
+  const { data: chatData, loading: chatLoading  } = useQuery(GET_ASTROLOGER_CHAT_HISTORY, {
     variables: {
       astrologerId,
       page: 1,
@@ -57,7 +59,7 @@ const stats =
 
     skip: !astrologerId || activeTab !== "chat",
   });
-  const { data: callData } = useQuery(GET_ASTROLOGER_CALL_HISTORY, {
+  const { data: callData, loading: callLoading  } = useQuery(GET_ASTROLOGER_CALL_HISTORY, {
     variables: {
       astrologerId,
       page: 1,
@@ -71,7 +73,67 @@ const stats =
 
   const calls = callData?.getAstrologerCallHistory?.data || [];
 
-//   const earnings = data?.getAstrologerEarnings?.data || [];
+const historyColumns = [
+  {
+    header: "Session ID",
+    render: (row) => row.sessionId?.slice(0, 8),
+  },
+  {
+    header: "User",
+    render: (row) => (
+      <div>
+        <p className="font-semibold text-violet-600">{row.userName}</p>
+        <p className="text-xs text-gray-500">
+          {row.userId?.slice(0, 8)}
+        </p>
+      </div>
+    ),
+  },
+  {
+    header: "Rate / Min",
+    render: (row) => `₹${row.ratePerMin || 0}`,
+  },
+  {
+    header: "Coins Earned",
+    render: (row) => row.coinsEarned ?? "-",
+  },
+  {
+    header: "Commission",
+    render: (row) => row.commission ?? "-",
+  },
+  {
+    header: "Duration",
+    render: (row) => {
+      const sec = Number(row.durationSec || 0);
+
+      if (sec < 60) return `${sec} sec`;
+
+      const min = Math.floor(sec / 60);
+      const rem = sec % 60;
+
+      return `${min}.${String(rem).padStart(2, "0")} min`;
+    },
+  },
+  {
+    header: "Status",
+    render: (row) => (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          row.status === "COMPLETED"
+            ? "bg-green-100 text-green-700"
+            : "bg-yellow-100 text-yellow-700"
+        }`}
+      >
+        {row.status}
+      </span>
+    ),
+  },
+  {
+    header: "Date",
+    render: (row) =>
+      dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+  },
+];
 
   return (
     <div className="p-4 rounded-2xl flex flex-col gap-3 shadow-xl bg-white w-full">
@@ -105,7 +167,7 @@ const stats =
               : "bg-gray-100"
           }`}
         >
-          Earnings
+          Insights
         </button>
 
         <button
@@ -173,67 +235,29 @@ const stats =
 
       {/* Chat */}
 
-      {activeTab === "chat" && (
-        <table className="w-full text-sm">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Duration</th>
-              <th>Rate</th>
-              <th>Earned</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {chats.map((chat) => (
-              <tr key={chat.sessionId}>
-                <td>{chat.userName}</td>
-
-                <td>{Math.floor(chat.durationSec / 60)} min</td>
-
-                <td>₹ {chat.ratePerMin}</td>
-
-                <td>₹ {chat.coinsEarned}</td>
-
-                <td>{chat.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+ {activeTab === "chat" && (
+  chatLoading ? (
+    <p>Loading chat history...</p>
+  ) : (
+    <DataTable
+      columns={historyColumns}
+      data={chats}
+    />
+  )
+)}
 
       {/* Call */}
 
-      {activeTab === "call" && (
-        <table className="w-full text-sm">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Duration</th>
-              <th>Rate</th>
-              <th>Earned</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {calls.map((call) => (
-              <tr key={call.sessionId}>
-                <td>{call.userName}</td>
-
-                <td>{Math.floor(call.durationSec / 60)} min</td>
-
-                <td>₹ {call.ratePerMin}</td>
-
-                <td>₹ {call.coinsEarned}</td>
-
-                <td>{call.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+  {activeTab === "call" && (
+  callLoading ? (
+    <p>Loading call history...</p>
+  ) : (
+    <DataTable
+      columns={historyColumns}
+      data={calls}
+    />
+  )
+)}
     </div>
   );
 }

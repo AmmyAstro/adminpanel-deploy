@@ -7,44 +7,11 @@ import { useEffect, useMemo, useState } from "react";
 import DataTable from "@/components/utils/DataTable";
 import Link from "next/link";
 import CustomToggle from "@/components/Custom/CustomToggle";
-import { TOGGLE_REVIEW_FLAG, UPDATE_REVIEW_COMMENT } from "@/app/graphQL/astroHiring";
+import { GET_USER_REVIEWS, TOGGLE_REVIEW_FLAG, UPDATE_REVIEW_COMMENT } from "@/app/graphQL/astroHiring";
 import { useRouter } from "next/navigation";
 import SessionMessagesModal from "../../usermain/SessionModal";
 import toast from "react-hot-toast";
 
-const GET_USER_REVIEWS = gql`
-  query GetUserReviews($searchInput: UserReviewSearchInput!) {
-    getUserReviews(searchInput: $searchInput) {
-      totalCount
-      currentPage
-      totalPages
-      averageRating
-
-      data {
-        reviewId
-        sessionId
-
-        userId
-        userName
-        mobile
-
-        astrologerId
-
-        astrologerName
-        displayName
-
-        isFlagged
-
-        sessionType
-
-        rating
-        comment
-
-        createdAt
-      }
-    }
-  }
-`;
 
 
 export default function ReviewsPage() {

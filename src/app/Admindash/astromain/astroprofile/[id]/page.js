@@ -20,6 +20,7 @@ import { FaStar } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import AstrologerActivities from "../../AstrologerActivities";
+import dayjs from "dayjs";
 
 export default function AstroProfile() {
   const [activeTab, setActiveTab] = useState("call");
@@ -338,18 +339,22 @@ export default function AstroProfile() {
 
                 <div className="text-sm">{astrologerprofile?.skills}</div>
               </div>
-              <div className="mt-4">
-                <h6 className="font-semibold mb-2">About</h6>
+           <div className="mt-4">
+  <h6 className="font-semibold mb-2">About</h6>
 
-                <p className="text-sm text-gray-600">
-                  {astrologerprofile?.about}
-                </p>
-              </div>
+  <div
+    className="prose prose-sm max-w-none text-gray-600"
+    dangerouslySetInnerHTML={{
+      __html: astrologerprofile?.about || "",
+    }}
+  />
+</div>
               <div className="flex justify-between items-center">
                 <div className="font-semibold text-sm  ">Joined From:</div>
-                <div className="text-sm">
-                  {formatDate(astrologerprofile?.created_at)}
-                </div>
+               <p>
+
+  {dayjs(astrologerprofile.createdAt).format("DD MMM YYYY hh:mm A")}
+</p>
               </div>
             </div>
             <hr className="text-gray-300" />
@@ -460,18 +465,14 @@ export default function AstroProfile() {
                       />
 
                       {/* Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                        <button
-                          onClick={() =>
-                            setPreviewImage(
-                              `https://dhwaniastro.com${doc.image}`,
-                            )
-                          }
-                          className="rounded bg-white px-3 py-1 text-xs font-medium text-black"
-                        >
-                          View
-                        </button>
-                      </div>
+             <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center bg-black/60 py-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+  <button
+    onClick={() => setPreviewImage(`https://dhwaniastro.com${doc.image}`)}
+    className="rounded bg-white px-3 py-1 text-xs font-medium text-black"
+  >
+    View
+  </button>
+</div>
 
                       <p className="py-1 text-center text-xs">{doc.label}</p>
                     </div>
@@ -538,7 +539,7 @@ export default function AstroProfile() {
         </div>
 
         <div className="col-span-5 bg-white rounded-lg p-4 flex flex-col gap-5">
-          <div className="flex items-center gap-3 w-full">
+          {/* <div className="flex items-center gap-3 w-full">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
               {stats.map((item) => (
                 <div
@@ -553,7 +554,7 @@ export default function AstroProfile() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <AstrologerActivities astrologerId={astrologerId} />
 

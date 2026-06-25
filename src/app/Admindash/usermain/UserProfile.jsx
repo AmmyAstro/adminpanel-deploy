@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   GET_USER_CALL_HISTORY,
   GET_USER_PROFILE,
+  GET_USER_REVIEWS,
   GET_USER_WALLET_TRANSACTIONS,
   GET_USERS_CHAT_HISTORY,
   UPDATE_USER_STATUS,
@@ -15,6 +16,7 @@ import dayjs from "dayjs";
 import { FaUser } from "react-icons/fa6";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import DataTable from "@/components/utils/DataTable";
+import Link from "next/link";
 
 export default function UserProfile({ userId }) {
   console.log("USER ID =", userId);
@@ -37,8 +39,7 @@ export default function UserProfile({ userId }) {
           limit: 50,
         },
       },
-      skip: tab !== "Chats",
-      fetchPolicy: "network-only",
+      fetchPolicy: "cache-first",
     },
   );
   const { data: callData, loading: callLoading } = useQuery(
@@ -51,8 +52,7 @@ export default function UserProfile({ userId }) {
           limit: 50,
         },
       },
-      skip: tab !== "Calls",
-      fetchPolicy: "network-only",
+       fetchPolicy: "cache-first",
     },
   );
   const { data: walletData, loading: walletLoading } = useQuery(
@@ -63,15 +63,25 @@ export default function UserProfile({ userId }) {
         page: 1,
         limit: 50,
       },
-      skip: tab !== "Wallet",
-      fetchPolicy: "network-only",
+      fetchPolicy: "cache-first",
     },
   );
-  const userWallet = walletData?.getUserWalletTransactions?.data || [];
-const rechargeHistory = userWallet.filter(
-  (item) => item.rechargePackId
+  const { data: rechargeData, loading: rechargeLoading } = useQuery(
+  GET_USER_WALLET_TRANSACTIONS,
+  {
+    variables: {
+      userId,
+      page: 1,
+      limit: 50,
+      onlyRecharge: true,
+    },
+    fetchPolicy: "cache-first",
+  }
 );
-  const calls = callData?.getUserCallHistory?.data || [];
+  const userWallet = walletData?.getUserWalletTransactions?.data || [];
+const rechargeHistory =
+  rechargeData?.getUserWalletTransactions?.data || [];
+    const calls = callData?.getUserCallHistory?.data || [];
 
   const [updateUserStatus] = useMutation(UPDATE_USER_STATUS, {
     refetchQueries: [
@@ -82,6 +92,22 @@ const rechargeHistory = userWallet.filter(
     ],
   });
   const chats = chatData?.getUsersChatHistory?.data || [];
+
+  const { data: reviewData, loading: reviewLoading } = useQuery(
+  GET_USER_REVIEWS,
+  {
+    variables: {
+      searchInput: {
+        userId,
+        page: 1,
+        limit: 50,
+      },
+    },
+    fetchPolicy: "cache-first",
+  }
+);
+
+const reviews = reviewData?.getUserReviews?.data || [];
 
   const user = data?.getUserProfile;
   if (loading) {
@@ -125,7 +151,7 @@ const rechargeHistory = userWallet.filter(
       header: "Astrologer",
       render: (row) => (
         <div>
-          <p className="font-semibold text-violet-600">{row.astrologerName}</p>
+          <Link href={`/Admindash/astromain/astroprofile/${row.astrologerId}`} className="font-semibold text-violet-600">{row.astrologerName}</Link>
           <p className="text-xs text-gray-500">
             {row.astrologerId?.slice(0, 8)}
           </p>
@@ -213,32 +239,86 @@ const rechargeHistory = userWallet.filter(
       render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
     },
   ];
+
   const rechargeColumns = [
-    {
-      header: "Pack",
-      render: (row) => row.rechargePack?.name,
-    },
-    {
-      header: "Price",
-      render: (row) => `₹${row.amount}`,
-    },
-    {
-      header: "Coins",
-      render: (row) => row.coins,
-    },
-    {
-      header: "Talktime",
-      render: (row) => row.rechargePack?.talktime,
-    },
-    {
-      header: "Validity",
-      render: (row) => `${row.rechargePack?.validityDays} Days`,
-    },
-    {
-      header: "Date",
-      render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
-    },
-  ];
+  {
+    header: "Pack",
+    render: (row) => row.rechargePack?.name || "-",
+  },
+  {
+    header: "Amount",
+    render: (row) => `₹${row.amount ?? 0}`,
+  },
+  {
+    header: "Coins",
+    render: (row) => row.coins,
+  },
+  {
+    header: "Talktime",
+    render: (row) => row.rechargePack?.talktime ?? "-",
+  },
+  {
+    header: "Validity",
+    render: (row) =>
+      row.rechargePack?.validityDays
+        ? `${row.rechargePack.validityDays} Days`
+        : "-",
+  },
+  {
+    header: "Date",
+    render: (row) =>
+      dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+  },
+];
+const reviewColumns = [
+  {
+    header: "Review ID",
+    render: (row) => row.reviewId.slice(0, 8),
+  },
+  {
+    header: "Session ID",
+    render: (row) => row.sessionId?.slice(0, 8) || "-",
+  },
+  {
+    header: "Order ID",
+    render: (row) => row.orderId || "-",
+  },
+  {
+    header: "Astrologer",
+    render: (row) => row.displayName || row.astrologerName,
+  },
+  {
+    header: "Rating",
+    render: (row) => `⭐ ${row.rating}`,
+  },
+  {
+    header: "Comment",
+    render: (row) => (
+      <div className="max-w-[250px] truncate">
+        {row.comment || "-"}
+      </div>
+    ),
+  },
+  {
+    header: "Date",
+    render: (row) =>
+      dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+  },
+  {
+    header: "Action",
+    render: (row) => (
+      <button
+        onClick={() => {
+          // Open chat/session details
+          console.log(row.sessionId);
+        }}
+        className="px-3 py-1 rounded bg-violet-600 text-white"
+      >
+        View Chat
+      </button>
+    ),
+  },
+];
 
   return (
     <div className="p-6 space-y-6">
@@ -425,7 +505,7 @@ const rechargeHistory = userWallet.filter(
           ))}
         </div>
 
-        <div className="mt-6"> 
+        <div className="mt-6">
           {tab === "Wallet" && (
             <>
               {walletLoading ? (
@@ -435,18 +515,18 @@ const rechargeHistory = userWallet.filter(
               )}
             </>
           )}
-             {tab === "Recharge" && (
-            <>
-              {walletLoading ? (
-                <p>Loading wallet history...</p>
-              ) : (
-                <DataTable
-  columns={rechargeColumns}
-  data={rechargeHistory}
-/>
-              )}
-            </>
-          )}
+       {tab === "Recharge" && (
+  <>
+    {rechargeLoading ? (
+      <p>Loading recharge history...</p>
+    ) : (
+      <DataTable
+        columns={rechargeColumns}
+        data={rechargeHistory}
+      />
+    )}
+  </>
+)}
 
           {tab === "Chats" && (
             <>
@@ -467,8 +547,17 @@ const rechargeHistory = userWallet.filter(
               )}
             </>
           )}
+          {tab === "Reviews" && (
+  <>
+    {reviewLoading ? (
+      <p>Loading reviews...</p>
+    ) : (
+      <DataTable columns={reviewColumns} data={reviews} />
+    )}
+  </>
+)}
 
-          {tab === "Follow" && <div>Followed Astrologers</div>}
+       
         </div>
       </div>
     </div>

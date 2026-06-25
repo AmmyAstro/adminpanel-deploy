@@ -14,6 +14,7 @@ import ProtectedActionButton from "@/components/Custom/ActionButton";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
 import { GET_ASTRO_LIST } from "@/app/graphQL/astroHiring";
 import Link from "next/link";
+import dayjs from "dayjs";
 
 const DELETE_ASTRO = gql`
   mutation DeleteAstrologer($astrologerId: ID!) {
@@ -78,6 +79,11 @@ export default function AstroList() {
     },
     { header: "Email", accessor: "email" },
     { header: "Phone", accessor: "contactNo" },
+    {
+  header: "Joined On",
+  render: (row) =>
+    dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+},
 
     {
       header: "Actions",
