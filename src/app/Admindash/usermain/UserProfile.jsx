@@ -21,16 +21,17 @@ import SessionMessagesModal from "./SessionModal";
 import CustomButton from "@/components/Custom/CustomButtom";
 import { MdCancel } from "react-icons/md";
 import CustomInput from "@/components/Custom/CustomInput";
+import toast from "react-hot-toast";
 
 export default function UserProfile({ userId }) {
   console.log("USER ID =", userId);
   const [openModal, setOpenModal] = useState(false);
   const [openPopup, setOpenPopUp] = useState(false);
-const [price, setPrice] = useState("");
-const [remarks, setRemarks] = useState("");
-const openWallet = () => {
-  setOpenPopUp(true);
-};
+  const [price, setPrice] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const openWallet = () => {
+    setOpenPopUp(true);
+  };
   const [selectedSession, setSelectedSession] = useState(null);
   const { data, loading, error } = useQuery(GET_USER_PROFILE, {
     variables: {
@@ -39,58 +40,58 @@ const openWallet = () => {
     fetchPolicy: "network-only",
   });
   const [tab, setTab] = useState("Wallet");
-const [manageUserWallet, { loading: manageWalletLoading }] = useMutation(
-  MANAGE_USER_WALLET,
-  {
-    refetchQueries: [
-      {
-        query: GET_USER_PROFILE,
+  const [manageUserWallet, { loading: manageWalletLoading }] = useMutation(
+    MANAGE_USER_WALLET,
+    {
+      refetchQueries: [
+        {
+          query: GET_USER_PROFILE,
+          variables: {
+            userId,
+          },
+        },
+        {
+          query: GET_USER_WALLET_TRANSACTIONS,
+          variables: {
+            userId,
+            page: 1,
+            limit: 50,
+          },
+        },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
+  const Manageprice = async (action) => {
+    const amt = Number(price);
+
+    if (!amt || amt <= 0) {
+      return toast.error("Please enter valid amount");
+    }
+
+    try {
+      await manageUserWallet({
         variables: {
           userId,
+          amount: amt,
+          remarks,
+          type: action === "add" ? "CREDIT" : "DEBIT",
         },
-      },
-      {
-        query: GET_USER_WALLET_TRANSACTIONS,
-        variables: {
-          userId,
-          page: 1,
-          limit: 50,
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
-  }
-);
-const Manageprice = async (action) => {
-  const amt = Number(price);
+      });
 
-  if (!amt || amt <= 0) {
-    return toast.error("Please enter valid amount");
-  }
+      toast.success(
+        action === "add"
+          ? "Wallet credited successfully"
+          : "Wallet debited successfully",
+      );
 
-  try {
-    await manageUserWallet({
-      variables: {
-        userId,
-        amount: amt,
-        remarks,
-        type: action === "add" ? "CREDIT" : "DEBIT",
-      },
-    });
-
-    toast.success(
-      action === "add"
-        ? "Wallet credited successfully"
-        : "Wallet debited successfully"
-    );
-
-    setPrice("");
-    setRemarks("");
-    setOpenPopUp(false);
-  } catch (err) {
-    toast.error(err.message);
-  }
-};
+      setPrice("");
+      setRemarks("");
+      setOpenPopUp(false);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
   const { data: chatData, loading: chatLoading } = useQuery(
     GET_USERS_CHAT_HISTORY,
     {
@@ -458,21 +459,21 @@ const Manageprice = async (action) => {
               </div>
 
               <div className="flex justify-center gap-3">
-               <CustomButton
-  variant="green"
-  loading={manageWalletLoading}
-  onClick={() => Manageprice("add")}
->
-  Add Gems
-</CustomButton>
+                <CustomButton
+                  variant="green"
+                  loading={manageWalletLoading}
+                  onClick={() => Manageprice("add")}
+                >
+                  Add Gems
+                </CustomButton>
 
-<CustomButton
-  variant="red"
-  loading={manageWalletLoading}
-  onClick={() => Manageprice("deduct")}
->
-  Deduct Gems
-</CustomButton>
+                <CustomButton
+                  variant="red"
+                  loading={manageWalletLoading}
+                  onClick={() => Manageprice("deduct")}
+                >
+                  Deduct Gems
+                </CustomButton>
               </div>
             </div>
           </div>

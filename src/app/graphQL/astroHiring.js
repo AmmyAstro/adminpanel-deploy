@@ -288,6 +288,52 @@ export const GET_ASTROLOGER_DASHBOARD_STATS = gql`
       totalReviews
 
       averageRating
+
+      statusSummary {
+        requested
+        accepted
+        ongoing
+        completed
+        cancelled
+        failed
+      }
+    }
+  }
+`;
+export const GET_SESSION_ANALYTICS = gql`
+  query GetSessionAnalytics(
+    $status: SessionStatus
+    $filter: DashboardFilter
+  ) {
+    getSessionAnalytics(
+      status: $status
+      filter: $filter
+    ) {
+      totalSessions
+      totalChats
+      totalCalls
+
+      statusSummary {
+        requested
+        accepted
+        ongoing
+        completed
+        cancelled
+        failed
+      }
+
+      recentSessions {
+        sessionId
+        userName
+        status
+        ratePerMin
+        durationSec
+        coinsEarned
+        coinsDeducted
+        startedAt
+        endedAt
+        createdAt
+      }
     }
   }
 `;

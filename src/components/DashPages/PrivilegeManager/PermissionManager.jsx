@@ -20,12 +20,8 @@ import ConfirmModal from "@/components/Custom/ConfirmModal";
 export default function PermissionManager() {
   const { can, isSuperAdmin } = usePermissions();
 
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const { data, refetch } = useQuery(GET_PERMISSIONS, {
     variables: { page: 1, limit: 100 },
@@ -65,10 +61,74 @@ export default function PermissionManager() {
   }, [permissions]);
 
   // 🔥 FILTER
+  const ACTION_ORDER = {
+    read: 1,
+    create: 2,
+    update: 3,
+    delete: 4,
+  };
+
   const filteredPermissions = useMemo(() => {
-    if (activeTab === "ALL") return permissions;
-    return permissions.filter((p) => p.type === activeTab);
+    const list =
+      activeTab === "ALL"
+        ? [...permissions]
+        : permissions.filter((p) => p.type === activeTab);
+
+    return list.sort((a, b) => {
+      const moduleA = a.modules?.[0]?.name || "";
+      const moduleB = b.modules?.[0]?.name || "";
+
+      if (moduleA !== moduleB) {
+        return moduleA.localeCompare(moduleB);
+      }
+
+      const actionA = a.name.split(".")[1] || "";
+      const actionB = b.name.split(".")[1] || "";
+
+      return (ACTION_ORDER[actionA] || 99) - (ACTION_ORDER[actionB] || 99);
+    });
   }, [permissions, activeTab]);
+
+  const groupedPermissions = useMemo(() => {
+  return filteredPermissions.reduce((acc, permission) => {
+    const module = permission.modules?.[0];
+
+    if (!module) return acc;
+
+    if (!acc[module.id]) {
+      acc[module.id] = {
+        id: module.id,
+        name: module.name,
+        description:
+          module.description || `Manage ${module.name.toLowerCase()}`,
+        permissions: [],
+      };
+    }
+
+    acc[module.id].permissions.push(permission);
+
+    return acc;
+  }, {});
+}, [filteredPermissions]);
+  const formatPermissionName = (permission) => {
+    if (!permission.includes(".")) return permission;
+
+    const [module, action] = permission.split(".");
+
+    const actionMap = {
+      read: "View",
+      create: "Create",
+      update: "Update",
+      delete: "Delete",
+    };
+
+    const moduleName = module
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+    return `${actionMap[action] || action} ${moduleName}`;
+  };
 
   const resetForm = () => {
     setName("");
@@ -115,10 +175,13 @@ export default function PermissionManager() {
     }
   };
 
+  const getAction = (name) => {
+    return name.split(".")[1] || "-";
+  };
   const permissionColumns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: "Permission",
+      render: (row) => formatPermissionName(row.name),
     },
     {
       header: "Type",
@@ -140,52 +203,30 @@ export default function PermissionManager() {
     },
     {
       header: "Modules",
-      render: (row) =>
-        row.modules?.map((m) => m.name).join(", ") || "-",
-    },
-    {
-      header: "Actions",
       render: (row) => (
-        <div className="flex justify-center gap-2">
-          {/* EDIT */}
-          {row.type === "CUSTOM" && (
-            <button
-              disabled={!canUpdate}
-              onClick={() => {
-                if (!canUpdate) return;
-                setEditing(row);
-                setName(row.name);
-                setSelectedModules(
-                  row.modules?.map((m) => m.id) || []
-                );
-                setOpen(true);
-              }}
-              className={`px-3 py-1 text-xs rounded ${
-                !canUpdate
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-blue-500 text-white"
-              }`}
+        <div className="flex flex-wrap gap-2">
+          {row.modules?.map((m) => (
+            <span
+              key={m.id}
+              className="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs"
             >
-              Edit
-            </button>
-          )}
-
-          {/* DELETE */}
-          {row.type === "CUSTOM" && (
-            <ProtectedActionButton
-              module="permissions"
-              action="delete"
-              executeAction={executeAction}
-              mutationFn={deletePermission}
-              variables={{ permissionId: row.id }}
-              onSuccess={refetch}
-              className="px-3 py-1 text-xs bg-red-500 text-white rounded"
-            >
-              Delete
-            </ProtectedActionButton>
-          )}
+              {m.name}
+            </span>
+          ))}
         </div>
       ),
+    },
+    {
+      header: "Action",
+      render: (row) => {
+        const action = getAction(row.name);
+
+        return (
+          <span className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs capitalize">
+            {action === "read" ? "View" : action}
+          </span>
+        );
+      },
     },
   ];
 
@@ -198,9 +239,7 @@ export default function PermissionManager() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded ${
-              activeTab === tab
-                ? "bg-black text-white"
-                : "bg-gray-200"
+              activeTab === tab ? "bg-black text-white" : "bg-gray-200"
             }`}
           >
             {tab} ({counts[tab]})
@@ -233,12 +272,146 @@ export default function PermissionManager() {
       />
 
       {/* TABLE */}
-      <div className="w-full bg-white shadow-md rounded-xl border overflow-hidden">
-        <DataTable
-          columns={permissionColumns}
-          data={filteredPermissions}
-        />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  {Object.values(groupedPermissions).map((module) => (
+
+    <div
+      key={module.id}
+      className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
+    >
+
+      {/* Header */}
+
+      <div className="flex items-start justify-between p-5 border-b">
+
+        <div>
+
+          <h2 className="text-lg font-bold text-gray-800">
+            {module.name}
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            {module.description}
+          </p>
+
+        </div>
+
+        <span className="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-semibold">
+          {module.permissions.length}
+        </span>
+
       </div>
+
+      {/* Permission List */}
+
+      <div className="">
+
+        {module.permissions.map((permission) => {
+
+          const action = getAction(permission.name);
+
+          return (
+
+            <div
+              key={permission.id}
+              className="flex items-center justify-between px-5 py-4 border-b last:border-b-0 hover:bg-gray-50"
+            >
+
+              <div>
+
+                <h4 className="font-medium text-gray-800">
+                  {formatPermissionName(permission.name)}
+                </h4>
+
+              </div>
+
+              <div className="flex items-center gap-3">
+
+                {/* Action */}
+
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium
+                  ${
+                    action === "read"
+                      ? "bg-blue-100 text-blue-700"
+                      : action === "create"
+                      ? "bg-green-100 text-green-700"
+                      : action === "update"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {action === "read"
+                    ? "View"
+                    : action.charAt(0).toUpperCase() +
+                      action.slice(1)}
+                </span>
+
+                {/* Type */}
+
+                <span
+                  className={`px-2 py-1 rounded text-xs ${
+                    permission.type === "SYSTEM"
+                      ? "bg-violet-100 text-violet-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {permission.type === "SYSTEM"
+                    ? "System Default"
+                    : "Custom"}
+                </span>
+
+                {/* Edit/Delete */}
+
+                {permission.type === "CUSTOM" && (
+                  <div className="flex gap-2">
+
+                    <button
+                      onClick={() => {
+                        setEditing(permission);
+                        setName(permission.name);
+                        setSelectedModules(
+                          permission.modules.map((m) => m.id)
+                        );
+                        setOpen(true);
+                      }}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Edit
+                    </button>
+
+                    <ProtectedActionButton
+                      module="permissions"
+                      action="delete"
+                      executeAction={executeAction}
+                      mutationFn={deletePermission}
+                      variables={{
+                        permissionId: permission.id,
+                      }}
+                      onSuccess={refetch}
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Delete
+                    </ProtectedActionButton>
+
+                  </div>
+                )}
+
+              </div>
+
+            </div>
+
+          );
+        })}
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
 
       {/* MODAL */}
       {open && (
@@ -256,7 +429,7 @@ export default function PermissionManager() {
               value={selectedModules}
               onChange={(e) => {
                 const values = [...e.target.selectedOptions].map(
-                  (o) => o.value
+                  (o) => o.value,
                 );
                 setSelectedModules(values);
               }}

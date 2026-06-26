@@ -157,7 +157,7 @@ export default function AstrologerWalletTransactionsPage() {
           <div>
             <Link
               href={`/Admindash/astromain/astroprofile/${row?.astrologerWallet?.astrologer?.id}`}
-              className="font-semibold"
+              className="font-semibold text-purple-500"
             >
               {row?.astrologerWallet?.astrologer?.displayName || "N/A"}
             </Link>
@@ -167,7 +167,7 @@ export default function AstrologerWalletTransactionsPage() {
 
       {
         header: "Transaction ID",
-        render: (row) => ` ${row.id?.slice(0, 15)}`,
+        render: (row) => ` ${row.id?.slice(0, 8)}`,
       },
 
       {
@@ -186,14 +186,14 @@ export default function AstrologerWalletTransactionsPage() {
       },
 
       {
-        header: "Coins",
+        header: "Amount",
         accessor: "coins",
       },
 
-      {
-        header: "Amount",
-        render: (row) => `₹ ${row.amount}`,
-      },
+      // {
+      //   header: "Amount",
+      //   render: (row) => `₹ ${row.amount}`,
+      // },
 
       {
         header: "Description",

@@ -17,26 +17,7 @@ import dayjs from "dayjs";
 import SessionMessagesModal from "../usermain/SessionModal";
 import Link from "next/link";
 
-const GET_ASTROLOGER_EARNINGS = gql`
-  query GetAstrologerEarnings($searchInput: AstrologerEarningSearchInput!) {
-    getAstrologerEarnings(searchInput: $searchInput) {
-      totalCount
 
-      data {
-        astrologerId
-        astrologerName
-        email
-        contactNo
-
-        balanceCoins
-        totalEarned
-        totalWithdrawn
-
-        createdAt
-      }
-    }
-  }
-`;
 
 export default function AstrologerActivities({ astrologerId }) {
   const [activeTab, setActiveTab] = useState("earnings");
@@ -118,20 +99,36 @@ const historyColumns = [
       return `${min}.${String(rem).padStart(2, "0")} min`;
     },
   },
-  {
-    header: "Status",
-    render: (row) => (
+{
+  header: "Status",
+  render: (row) => {
+    const status = row.status || "";
+
+    const statusStyles = {
+      REQUESTED: "bg-orange-100 text-orange-700",
+      ACCEPTED: "bg-blue-100 text-blue-700",
+      ONGOING: "bg-purple-100 text-purple-700",
+      COMPLETED: "bg-green-100 text-green-700",
+      CANCELLED: "bg-red-100 text-red-700",
+      FAILED: "bg-gray-200 text-gray-700",
+    };
+
+    const formattedStatus = status
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+    return (
       <span
-        className={`px-2 py-1 rounded-full text-xs font-medium ${
-          row.status === "COMPLETED"
-            ? "bg-green-100 text-green-700"
-            : "bg-yellow-100 text-yellow-700"
+        className={`px-3 py-1 rounded-full text-xs font-medium ${
+          statusStyles[status] || "bg-gray-100 text-gray-700"
         }`}
       >
-        {row.status?.charAt(0)}
+        {formattedStatus}
       </span>
-    ),
+    );
   },
+},
   {
     header: "Date",
     render: (row) =>

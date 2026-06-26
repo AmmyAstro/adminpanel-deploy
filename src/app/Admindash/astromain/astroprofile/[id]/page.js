@@ -26,6 +26,7 @@ import { useSelector, useDispatch } from "react-redux";
 import AstrologerActivities from "../../AstrologerActivities";
 import dayjs from "dayjs";
 import Link from "next/link";
+import SessionMessagesModal from "@/app/Admindash/usermain/SessionModal";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("call");
@@ -42,6 +43,8 @@ export default function Page() {
     },
     skip: !astrologerId,
   });
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
 
   const openWallet = () => {
     setOpenPopUp(true);
@@ -131,20 +134,19 @@ export default function Page() {
       toast.error(err.message);
     }
   };
-  const {
-  data: giftData,
-  loading: giftLoading,
-} = useQuery(GET_ASTROLOGER_GIFT_HISTORY, {
-  variables: {
-    astrologerId,
-    page: 1,
-    limit: 50,
-  },
-  skip: !astrologerId,
-});
+  const { data: giftData, loading: giftLoading } = useQuery(
+    GET_ASTROLOGER_GIFT_HISTORY,
+    {
+      variables: {
+        astrologerId,
+        page: 1,
+        limit: 50,
+      },
+      skip: !astrologerId,
+    },
+  );
 
-const gifts = giftData?.getSendGiftHistory?.data || [];
-
+  const gifts = giftData?.getSendGiftHistory?.data || [];
 
   const [updateAvailability, { loading: availabilityLoading }] =
     useMutation(UPDATE_AVAILABILITY);
@@ -341,10 +343,11 @@ const gifts = giftData?.getSendGiftHistory?.data || [];
               <div className="">
                 <Image
                   src={`https://dhwaniastro.com${astrologerprofile?.profilePic}`}
-                  alt={astrologerprofile?.name}
+                  alt="Profile"
                   width={150}
                   height={150}
-                  className="rounded-full"
+                  unoptimized
+                  className="rounded-full object-cover"
                 />
               </div>
 
@@ -523,6 +526,7 @@ const gifts = giftData?.getSendGiftHistory?.data || [];
                         width={100}
                         src={`https://dhwaniastro.com${doc.image}`}
                         alt={doc.label}
+                        unoptimized
                         className="h-24 w-24 object-cover rounded-md"
                       />
 
@@ -610,7 +614,7 @@ const gifts = giftData?.getSendGiftHistory?.data || [];
           <div
             className=" rounded-xl border shadow mt-6 p-5 flex flex-col"
             style={{ maxHeight: "500px" }}
-           >
+          >
             <h2 className="text-lg font-semibold mb-5 flex-shrink-0">
               User Reviews ({reviews.length})
             </h2>
@@ -628,22 +632,30 @@ const gifts = giftData?.getSendGiftHistory?.data || [];
                   >
                     <div className="flex justify-between">
                       <div>
-                   <div className="flex items-center gap-5">
-                         <Link
-                          href={`/Admindash/usermain/userprofile/${review.userId}`}
-                          className="font-semibold text-violet-600 hover:underline"
-                        >
-                          {review.userName}
-                        </Link>     <button
-                        onClick={() => {
-                          setSelectedSession(review.sessionId);
-                          setOpenModal(true);
-                        }}
-                        className="bg-blue-500 text-white px-3 py-1 rounded-full text-[9px]"
-                      >
-                        View Chat
-                      </button>
-                   </div>
+                        <div className="flex items-center gap-5">
+                          <Link
+                            href={`/Admindash/usermain/userprofile/${review.userId}`}
+                            className="font-semibold text-violet-600 hover:underline"
+                          >
+                            {review.userName}
+                          </Link>{" "}
+                          <button
+                            onClick={() => {
+                              setSelectedSession(review.sessionId);
+                              setOpenModal(true);
+                            }}
+                            className="text-white rounded-full text-xs"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              height={20}
+                              width={20}
+                              viewBox="0 0 640 640"
+                            >
+                              <path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z" />
+                            </svg>
+                          </button>
+                        </div>
 
                         <p className="text-xs text-gray-500">
                           {dayjs(Number(review.createdAt)).format(
@@ -661,8 +673,6 @@ const gifts = giftData?.getSendGiftHistory?.data || [];
                     <p className="mt-1 text-gray-700">
                       {review.comment || "No comment"}
                     </p>
-
-                   
                   </div>
                 ))}
               </div>
@@ -670,86 +680,77 @@ const gifts = giftData?.getSendGiftHistory?.data || [];
           </div>
 
           <div className="bg-white rounded-xl border shadow mt-6 p-5">
-  <h2 className="text-lg font-semibold mb-5">
-    Gift History ({gifts.length})
-  </h2>
+            <h2 className="text-lg font-semibold mb-5">
+              Gift History ({gifts.length})
+            </h2>
 
-  {giftLoading ? (
-    <p>Loading...</p>
-  ) : gifts.length === 0 ? (
-    <p className="text-gray-500">
-      No gifts found.
-    </p>
-  ) : (
-    <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
-      {gifts.map((gift) => (
-        <div
-          key={gift.id}
-          className="border rounded-lg p-4 shadow-sm"
-        >
-          <div className="flex justify-between">
+            {giftLoading ? (
+              <p>Loading...</p>
+            ) : gifts.length === 0 ? (
+              <p className="text-gray-500">No gifts found.</p>
+            ) : (
+              <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
+                {gifts.map((gift) => (
+                  <div
+                    key={gift.id}
+                    className="border rounded-lg p-4 shadow-sm"
+                  >
+                    <div className="flex justify-between">
+                      {/* Left */}
+                      <div className="flex gap-4">
+                        <img
+                          src={`https://dhwaniastro.com${gift.gift?.image}`}
+                          alt={gift.giftName}
+                          className="w-14 h-14 rounded-lg object-cover border"
+                        />
 
-            {/* Left */}
-            <div className="flex gap-4">
+                        <div>
+                          <h3 className="font-semibold">{gift.giftName}</h3>
 
-              <img
-                src={`https://dhwaniastro.com${gift.gift?.image}`}
-                alt={gift.giftName}
-                className="w-14 h-14 rounded-lg object-cover border"
-              />
+                          <Link
+                            href={`/Admindash/usermain/userprofile/${gift.user.id}`}
+                            className="text-violet-600 hover:underline text-sm"
+                          >
+                            {gift.user.name}
+                          </Link>
 
-              <div>
-                <h3 className="font-semibold">
-                  {gift.giftName}
-                </h3>
+                          <p className="text-xs text-gray-500">
+                            {dayjs(gift.createdAt).format(
+                              "DD MMM YYYY hh:mm A",
+                            )}
+                          </p>
+                        </div>
+                      </div>
 
-                <Link
-                  href={`/Admindash/usermain/userprofile/${gift.user.id}`}
-                  className="text-violet-600 hover:underline text-sm"
-                >
-                  {gift.user.name}
-                </Link>
+                      {/* Right */}
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">
+                          ₹{gift.giftPrice}
+                        </p>
 
-                <p className="text-xs text-gray-500">
-                  {dayjs(gift.createdAt).format(
-                    "DD MMM YYYY hh:mm A"
-                  )}
-                </p>
+                        <p className="text-xs text-gray-500">Gift Price</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end mt-4">
+                      <Link
+                        href={`/Admindash/usermain/userprofile/${gift.user.id}`}
+                        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1 rounded-full"
+                      >
+                        View User
+                      </Link>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-            </div>
-
-            {/* Right */}
-            <div className="text-right">
-
-              <p className="font-bold text-green-600">
-                ₹{gift.giftPrice}
-              </p>
-
-              <p className="text-xs text-gray-500">
-                Gift Price
-              </p>
-
-            </div>
-
+            )}
           </div>
 
-          <div className="flex justify-end mt-4">
-
-            <Link
-              href={`/Admindash/usermain/userprofile/${gift.user.id}`}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1 rounded-full"
-            >
-              View User
-            </Link>
-
-          </div>
-
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+          <SessionMessagesModal
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            sessionId={selectedSession}
+          />
         </div>
       </div>
     </div>

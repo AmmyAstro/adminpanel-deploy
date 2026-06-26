@@ -25,6 +25,7 @@ export default function BlogCard({ blog, onEdit, onDelete }) {
         alt={blog.title}
         width={800}
         height={400}
+        unoptimized
         className="w-full h-[200px] object-cover"
       />
 

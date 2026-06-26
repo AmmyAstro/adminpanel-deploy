@@ -15,24 +15,21 @@ import { useActionHandler } from "@/hooks/useActionHandler";
 import ConfirmModal from "@/components/Custom/ConfirmModal";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { usePermissions } from "@/context/PermissionContext";
+import toast from "react-hot-toast";
 
 export default function ModuleManager() {
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const { data, loading, error, refetch } = useQuery(GET_MODULES, {
-    variables: { page: 1, limit: 10 },
+    variables: { page: 1, limit: 50 },
   });
 
   const { can, isSuperAdmin } = usePermissions();
 
   const modules = data?.getModulesPaginated?.data || [];
 
-  // 🔥 Extract sections dynamically
+
   const sectionsFromDB = useMemo(() => {
     const allSections = modules.map((m) => m.section).filter(Boolean);
     return [...new Set(allSections)];
@@ -78,9 +75,7 @@ export default function ModuleManager() {
     try {
       const canSubmit =
         isSuperAdmin ||
-        (editingModule
-          ? can("modules", "update")
-          : can("modules", "create"));
+        (editingModule ? can("modules", "update") : can("modules", "create"));
 
       if (!canSubmit) return;
 
@@ -90,9 +85,7 @@ export default function ModuleManager() {
       }
 
       if (useCustomSection) {
-        const exists = sectionsFromDB.includes(
-          customSection.toLowerCase()
-        );
+        const exists = sectionsFromDB.includes(customSection.toLowerCase());
         if (exists) {
           alert("Section already exists");
           return;
@@ -123,6 +116,7 @@ export default function ModuleManager() {
             section: finalSection,
           },
         });
+        toast.success("Updated Successfully");
       } else {
         await createModule({
           variables: {
@@ -132,11 +126,17 @@ export default function ModuleManager() {
             section: finalSection,
           },
         });
+        toast.success("Created Successfully");
       }
 
       await refetch();
       setOpenModal(false);
       setEditingModule(null);
+      setName("");
+      setSlug("");
+      setDescription("");
+      setSection("");
+      setCustomSection("");
     } catch (err) {
       console.error("Module save error:", err);
     }
