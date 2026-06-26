@@ -362,6 +362,7 @@ export const GET_APP_VERSIONS = gql`
   query GetAppVersions {
     getAppVersions {
       id
+      appType
       platform
       latestVersion
       minimumVersion

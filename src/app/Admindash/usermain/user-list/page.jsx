@@ -1,19 +1,20 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
 import Link from "next/link";
+import {
+  GET_USER_PROFILE,
+  UPDATE_USER_STATUS,
+} from "@/app/graphQL/astroHiring";
+import CustomToggle from "@/components/Custom/CustomToggle";
 
 const GET_USERS = gql`
-  query GetUsers(
-    $searchInput: UserSearchInput!
-  ) {
-    getUsersListBySearch(
-      searchInput: $searchInput
-    ) {
+  query GetUsers($searchInput: UserSearchInput!) {
+    getUsersListBySearch(searchInput: $searchInput) {
       totalCount
       currentPage
       totalPages
@@ -23,9 +24,8 @@ const GET_USERS = gql`
         name
         mobile
         gender
-
+        isActive
         userCoins
-        
 
         createdAt
         updatedAt
@@ -36,20 +36,15 @@ const GET_USERS = gql`
 
 export default function UsersListPage() {
   // SEARCH STATES
-  const [searchName, setSearchName] =
-    useState("");
+  const [searchName, setSearchName] = useState("");
 
-  const [searchMobile, setSearchMobile] =
-    useState("");
+  const [searchMobile, setSearchMobile] = useState("");
 
-  const [searchFilterType, setSearchFilterType] =
-    useState("");
+  const [searchFilterType, setSearchFilterType] = useState("");
 
-  const [startDate, setStartDate] =
-    useState("");
+  const [startDate, setStartDate] = useState("");
 
-  const [endDate, setEndDate] =
-    useState("");
+  const [endDate, setEndDate] = useState("");
 
   // PAGINATION
   const [page, setPage] = useState(1);
@@ -80,19 +75,14 @@ export default function UsersListPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [
-    searchName,
-    searchMobile,
-    searchFilterType,
-    startDate,
-    endDate,
-  ]);
+  }, [searchName, searchMobile, searchFilterType, startDate, endDate]);
 
   // SEARCH INPUT
   const searchInput = {
     page,
     limit,
   };
+  const [updateUserStatus] = useMutation(UPDATE_USER_STATUS);
 
   if (filters.query) {
     searchInput.query = filters.query;
@@ -103,61 +93,47 @@ export default function UsersListPage() {
   }
 
   if (filters.filterType) {
-    searchInput.filterType =
-      filters.filterType;
+    searchInput.filterType = filters.filterType;
   }
 
-  if (
-    filters.filterType === "CUSTOM" &&
-    filters.startDate &&
-    filters.endDate
-  ) {
-    searchInput.startDate =
-      filters.startDate;
+  if (filters.filterType === "CUSTOM" && filters.startDate && filters.endDate) {
+    searchInput.startDate = filters.startDate;
 
-    searchInput.endDate =
-      filters.endDate;
+    searchInput.endDate = filters.endDate;
   }
 
   // API CALL
-  const { data, loading, error } = useQuery(
-    GET_USERS,
-    {
-      variables: {
-        searchInput,
-      },
-      fetchPolicy: "network-only",
-    }
-  );
+  const { data, loading, error , refetch } = useQuery(GET_USERS, {
+    variables: {
+      searchInput,
+    },
+    fetchPolicy: "network-only",
+  });
 
-  const users =
-    data?.getUsersListBySearch?.data || [];
+  const users = data?.getUsersListBySearch?.data || [];
 
-  const totalCount =
-    data?.getUsersListBySearch
-      ?.totalCount || 0;
+  const totalCount = data?.getUsersListBySearch?.totalCount || 0;
 
-  const totalPages =
-    data?.getUsersListBySearch
-      ?.totalPages || 1;
+  const totalPages = data?.getUsersListBySearch?.totalPages || 1;
 
   // TABLE COLUMNS
   const columns = useMemo(
     () => [
-    {
-  header: "Name",
-  render: (row) => (
-    <div>    <Link
-      href={`/Admindash/usermain/userprofile/${row.id}`}
-      className="font-semibold text-violet-600 flex flex-col  hover:underline"
-    >
-      {row.name || "N/A"}
-     
-    </Link>
-    <p className="text-xs font-semibold"> {row.id?.slice(0,8)}</p></div>
-
-  ),
-},
+      {
+        header: "Name",
+        render: (row) => (
+          <div>
+            {" "}
+            <Link
+              href={`/Admindash/usermain/userprofile/${row.id}`}
+              className="font-semibold text-violet-600 flex flex-col  hover:underline"
+            >
+              {row.name || "N/A"}
+            </Link>
+            <p className="text-xs font-semibold"> {row.id?.slice(0, 8)}</p>
+          </div>
+        ),
+      },
 
       // {
       //   header: "Mobile",
@@ -172,8 +148,8 @@ export default function UsersListPage() {
               row.gender === "MALE"
                 ? "bg-blue-100 text-blue-700"
                 : row.gender === "FEMALE"
-                ? "bg-pink-100 text-pink-700"
-                : "bg-gray-100 text-gray-700"
+                  ? "bg-pink-100 text-pink-700"
+                  : "bg-gray-100 text-gray-700"
             }`}
           >
             {row.gender || "N/A"}
@@ -181,61 +157,93 @@ export default function UsersListPage() {
         ),
       },
       {
-  header: "Wallet Coins",
-  render: (row) => (
-    <span className="font-semibold text-green-600">
-      {row.userCoins || 0}
-    </span>
-  ),
-},
+        header: "Wallet Coins",
+        render: (row) => (
+          <span className="font-semibold text-green-600">
+            {row.userCoins || 0}
+          </span>
+        ),
+      },
 
-
-
-          {
-      header: "Created Date",
-      render: (row) => (
-        <div className="text-xs">
-          {new Date(row.createdAt).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            timeZone: "Asia/Kolkata",
-          })}
-               <p className="text-xs text-gray-500">
+      {
+        header: "Created Date",
+        render: (row) => (
+          <div className="text-xs">
+            {new Date(row.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "Asia/Kolkata",
+            })}
+            <p className="text-xs text-gray-500">
               {new Date(row.createdAt).toLocaleTimeString("en-IN", {
                 timeZone: "Asia/Kolkata",
                 hour: "2-digit",
                 minute: "2-digit",
               })}
             </p>
-        </div>
-      ),
-    },
+          </div>
+        ),
+      },
 
       {
         header: "Actions",
-        render: (row) =>
-        <Link href={`/Admindash/usermain/userprofile/${row.id}`} className=" rounded-full px-3 py-1 text-xs text-white hover:scale-104 bg-blue-400" >View</Link>
+        render: (row) => (
+          <Link
+            href={`/Admindash/usermain/userprofile/${row.id}`}
+            className=" rounded-full px-3 py-1 text-xs text-white hover:scale-104 bg-blue-400"
+          >
+            View
+          </Link>
+        ),
+      },
+      {
+        header: "Status",
+        render: (row) => (
+          <div className="flex items-center gap-3">
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${
+                row.isActive
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {row.isActive ? "Active" : "Inactive"}
+            </span>
+
+            <CustomToggle
+              checked={row.isActive}
+              onChange={async (value) => {
+                try {
+                  await updateUserStatus({
+                    variables: {
+                      userId: row.id,
+                      isActive: value,
+                    },
+                  });
+
+                  await refetch();
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+            />
+          </div>
+        ),
       },
     ],
-    []
+    [],
   );
 
   if (error) {
-    return (
-      <p className="p-10 text-red-500">
-        Error loading users list
-      </p>
-    );
+    return <p className="p-10 text-red-500">Error loading users list</p>;
   }
 
   return (
     <div className="p-10 space-y-6">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold">
-          Users List
-        </h1>
+        <h1 className="text-2xl font-bold">Users List</h1>
 
         <div className="bg-black text-white px-4 py-2 rounded-lg w-fit">
           Total Records : {totalCount}
@@ -249,9 +257,7 @@ export default function UsersListPage() {
           type="text"
           placeholder="Search by name"
           value={searchName}
-          onChange={(e) =>
-            setSearchName(e.target.value)
-          }
+          onChange={(e) => setSearchName(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         />
 
@@ -260,41 +266,25 @@ export default function UsersListPage() {
           type="text"
           placeholder="Search by mobile"
           value={searchMobile}
-          onChange={(e) =>
-            setSearchMobile(e.target.value)
-          }
+          onChange={(e) => setSearchMobile(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         />
 
         {/* DATE FILTER */}
         <select
           value={searchFilterType}
-          onChange={(e) =>
-            setSearchFilterType(
-              e.target.value
-            )
-          }
+          onChange={(e) => setSearchFilterType(e.target.value)}
           className="border rounded-lg px-4 py-2 outline-none"
         >
-          <option value="">
-            All Time
-          </option>
+          <option value="">All Time</option>
 
-          <option value="WEEK">
-            Last Week
-          </option>
+          <option value="WEEK">Last Week</option>
 
-          <option value="MONTH">
-            Last Month
-          </option>
+          <option value="MONTH">Last Month</option>
 
-          <option value="YEAR">
-            Last Year
-          </option>
+          <option value="YEAR">Last Year</option>
 
-          <option value="CUSTOM">
-            Custom Date
-          </option>
+          <option value="CUSTOM">Custom Date</option>
         </select>
 
         {/* START DATE */}
@@ -302,11 +292,7 @@ export default function UsersListPage() {
           <input
             type="date"
             value={startDate}
-            onChange={(e) =>
-              setStartDate(
-                e.target.value
-              )
-            }
+            onChange={(e) => setStartDate(e.target.value)}
             className="border rounded-lg px-4 py-2 outline-none"
           />
         )}
@@ -316,11 +302,7 @@ export default function UsersListPage() {
           <input
             type="date"
             value={endDate}
-            onChange={(e) =>
-              setEndDate(
-                e.target.value
-              )
-            }
+            onChange={(e) => setEndDate(e.target.value)}
             className="border rounded-lg px-4 py-2 outline-none"
           />
         )}
@@ -335,14 +317,9 @@ export default function UsersListPage() {
       <div className="overflow-x-auto">
         <div className="w-full bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
           {loading ? (
-            <div className="p-10 text-center">
-              Loading Users...
-            </div>
+            <div className="p-10 text-center">Loading Users...</div>
           ) : (
-            <DataTable
-              columns={columns}
-              data={users}
-            />
+            <DataTable columns={columns} data={users} />
           )}
         </div>
       </div>
@@ -351,9 +328,7 @@ export default function UsersListPage() {
       <div className="flex items-center justify-between">
         <button
           disabled={page === 1}
-          onClick={() =>
-            setPage((prev) => prev - 1)
-          }
+          onClick={() => setPage((prev) => prev - 1)}
           className={`px-4 py-2 rounded-lg ${
             page === 1
               ? "bg-gray-200 cursor-not-allowed"
@@ -364,15 +339,12 @@ export default function UsersListPage() {
         </button>
 
         <div className="font-medium">
-          Page {page} of{" "}
-          {totalPages || 1}
+          Page {page} of {totalPages || 1}
         </div>
 
         <button
           disabled={page >= totalPages}
-          onClick={() =>
-            setPage((prev) => prev + 1)
-          }
+          onClick={() => setPage((prev) => prev + 1)}
           className={`px-4 py-2 rounded-lg ${
             page >= totalPages
               ? "bg-gray-200 cursor-not-allowed"

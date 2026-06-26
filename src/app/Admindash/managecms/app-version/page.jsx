@@ -49,7 +49,7 @@ export default function AppVersionPanel() {
   const versions = data?.getAppVersions || [];
   const [formData, setFormData] = useState({
     platform: "ANDROID",
-
+ appType: "USER",
     latestVersion: "",
     minimumVersion: "",
 
@@ -80,6 +80,7 @@ export default function AppVersionPanel() {
       await refetch();
 
       setFormData({
+          appType: "USER",
         platform: "ANDROID",
         latestVersion: "",
         minimumVersion: "",
@@ -105,6 +106,19 @@ export default function AppVersionPanel() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid gap-5">
+          <select
+  value={formData.appType}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      appType: e.target.value,
+    })
+  }
+  className="p-3 border rounded-xl"
+>
+  <option value="USER">User</option>
+  <option value="ASTROLOGER">Astrologer</option>
+</select>
           <select
             value={formData.platform}
             onChange={(e) =>
@@ -227,6 +241,10 @@ export default function AppVersionPanel() {
         ) : (
           <DataTable
             columns={[
+              {
+  header: "App Type",
+  accessor: "appType",
+},
               {
                 header: "Platform",
                 accessor: "platform",

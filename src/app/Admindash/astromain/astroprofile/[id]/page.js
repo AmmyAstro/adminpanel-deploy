@@ -5,6 +5,10 @@ import Skenton from "@/app/common/Skenton";
 import {
   GET_ASTROLOGER_BY_ID,
   GET_ASTROLOGER_DASHBOARD_STATS,
+  GET_ASTROLOGER_FOLLOWERS,
+  GET_ASTROLOGER_GIFT_HISTORY,
+  GET_ASTROLOGER_REVIEWS,
+  MANAGE_ASTROLOGER_WALLET,
   UPDATE_AVAILABILITY,
 } from "@/app/graphQL/astroHiring";
 import { formatDate } from "@/app/helper/helper";
@@ -21,20 +25,27 @@ import { MdCancel } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import AstrologerActivities from "../../AstrologerActivities";
 import dayjs from "dayjs";
+import Link from "next/link";
 
-export default function AstroProfile() {
+export default function Page() {
   const [activeTab, setActiveTab] = useState("call");
   const [openPopup, setOpenPopUp] = useState(false);
   const dispatch = useDispatch();
   const params = useParams();
   const astrologerId = params?.id;
   const [previewImage, setPreviewImage] = useState(null);
+  const [price, setPrice] = useState("");
+  const [remarks, setRemarks] = useState("");
   const { data, loading, error } = useQuery(GET_ASTROLOGER_BY_ID, {
     variables: {
       id: astrologerId,
     },
     skip: !astrologerId,
   });
+
+  const openWallet = () => {
+    setOpenPopUp(true);
+  };
 
   const astrologerprofile = useMemo(() => {
     return data?.getAstrologerById;
@@ -49,6 +60,17 @@ export default function AstroProfile() {
   const chatPricing = astrologerprofile?.pricing?.find(
     (item) => item.type === "CHAT",
   );
+  const {
+    data: reviewData,
+    loading: reviewLoading,
+    refetch: refetchReviews,
+  } = useQuery(GET_ASTROLOGER_REVIEWS, {
+    variables: {
+      astrologerId,
+    },
+    skip: !astrologerId,
+  });
+  const reviews = reviewData?.getAstrologerReviews || [];
 
   const {
     data: statsData,
@@ -71,6 +93,58 @@ export default function AstroProfile() {
     online: false,
     promotional: false,
   });
+
+  const [manageWallet, { loading: walletLoading }] = useMutation(
+    MANAGE_ASTROLOGER_WALLET,
+    {
+      refetchQueries: [
+        {
+          query: GET_ASTROLOGER_DASHBOARD_STATS,
+          variables: { astrologerId },
+        },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
+
+  const Manageprice = async (action) => {
+    if (!price || Number(price) <= 0) {
+      return toast.error("Enter valid amount");
+    }
+
+    try {
+      const { data } = await manageWallet({
+        variables: {
+          astrologerId,
+          amount: Number(price),
+          remarks,
+          type: action === "add" ? "CREDIT" : "DEBIT",
+        },
+      });
+
+      toast.success(data.manageAstrologerWallet.message);
+
+      setOpenPopUp(false);
+      setPrice("");
+      setRemarks("");
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+  const {
+  data: giftData,
+  loading: giftLoading,
+} = useQuery(GET_ASTROLOGER_GIFT_HISTORY, {
+  variables: {
+    astrologerId,
+    page: 1,
+    limit: 50,
+  },
+  skip: !astrologerId,
+});
+
+const gifts = giftData?.getSendGiftHistory?.data || [];
+
 
   const [updateAvailability, { loading: availabilityLoading }] =
     useMutation(UPDATE_AVAILABILITY);
@@ -131,20 +205,6 @@ export default function AstroProfile() {
       <div className="p-5 text-red-500">Failed to load astrologer profile</div>
     );
   }
-  const docs = [
-    {
-      name: "Aadhaar",
-      file: astrologerprofile?.kycDetail?.aadhaarImage,
-    },
-    {
-      name: "PAN Card",
-      file: astrologerprofile?.kycDetail?.panImage,
-    },
-    {
-      name: "Passbook",
-      file: astrologerprofile?.kycDetail?.passbookImage,
-    },
-  ];
 
   const review = [
     { id: 1, name: "Call", rate: "4.21", num: "106" },
@@ -207,7 +267,7 @@ export default function AstroProfile() {
         <CustomButton
           variant={"gray"}
           className="px-3 py-1"
-          //   onClick={openWallet}
+          onClick={openWallet}
         >
           Manage Wallet
         </CustomButton>
@@ -245,15 +305,15 @@ export default function AstroProfile() {
 
             <div className="flex justify-center gap-3">
               <CustomButton
-                variant={"green"}
-                className="  text-white   py-2 px-5 text-sm font-semibold"
+                variant="green"
+                loading={walletLoading}
                 onClick={() => Manageprice("add")}
               >
                 Add Gems
               </CustomButton>
               <CustomButton
-                variant={"red"}
-                className="  text-whitepx-4 py-2 px-5 text-sm font-semibold"
+                variant="red"
+                loading={walletLoading}
                 onClick={() => Manageprice("deduct")}
               >
                 Deduct Gems
@@ -267,12 +327,13 @@ export default function AstroProfile() {
         <div className="col-span-3 bg-white rounded-lg p-4 flex flex-col gap-2">
           <div className="flex justify-between items-center bg-purple-200 p-2 rounded-full shadow px-4">
             <h5 className="text-sm font-bold">Astrologers Details</h5>
-            <CustomButton
+            <Link
+              href={`/Admindash/astromain/edit-astrologer/${astrologerprofile?.id}`}
               variant={"black"}
-              className="text-sm px-3 py-1 text-black"
+              className="text-xs bg-black rounded-full px-3 py-1 text-white"
             >
               Edit
-            </CustomButton>
+            </Link>
           </div>
 
           <div className="flex w-full flex-col py-2 px-4">
@@ -339,22 +400,23 @@ export default function AstroProfile() {
 
                 <div className="text-sm">{astrologerprofile?.skills}</div>
               </div>
-           <div className="mt-4">
-  <h6 className="font-semibold mb-2">About</h6>
+              <div className="mt-4">
+                <h6 className="font-semibold mb-2">About</h6>
 
-  <div
-    className="prose prose-sm max-w-none text-gray-600"
-    dangerouslySetInnerHTML={{
-      __html: astrologerprofile?.about || "",
-    }}
-  />
-</div>
+                <div
+                  className="prose prose-sm max-w-none text-gray-600"
+                  dangerouslySetInnerHTML={{
+                    __html: astrologerprofile?.about || "",
+                  }}
+                />
+              </div>
               <div className="flex justify-between items-center">
                 <div className="font-semibold text-sm  ">Joined From:</div>
-               <p>
-
-  {dayjs(astrologerprofile.createdAt).format("DD MMM YYYY hh:mm A")}
-</p>
+                <p>
+                  {dayjs(astrologerprofile.createdAt).format(
+                    "DD MMM YYYY hh:mm A",
+                  )}
+                </p>
               </div>
             </div>
             <hr className="text-gray-300" />
@@ -363,13 +425,13 @@ export default function AstroProfile() {
               <div className="flex items-center justify-between">
                 <h6 className="text-sm font-semibold">Online Availability:</h6>
                 <div className="flex items-center gap-3">
-                  <CustomButton
+                  {/* <CustomButton
                     variant={"black"}
                     onClick={() => alert("Edit clicked")}
                     className="px-2 py-[2px] text-[10px] transition"
                   >
                     Edit
-                  </CustomButton>
+                  </CustomButton> */}
                 </div>
               </div>
 
@@ -465,14 +527,18 @@ export default function AstroProfile() {
                       />
 
                       {/* Overlay */}
-             <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center bg-black/60 py-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-  <button
-    onClick={() => setPreviewImage(`https://dhwaniastro.com${doc.image}`)}
-    className="rounded bg-white px-3 py-1 text-xs font-medium text-black"
-  >
-    View
-  </button>
-</div>
+                      <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center bg-black/60 py-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        <button
+                          onClick={() =>
+                            setPreviewImage(
+                              `https://dhwaniastro.com${doc.image}`,
+                            )
+                          }
+                          className="rounded-full bg-gray-800 text-white  px-3 py-0 text-xs"
+                        >
+                          View
+                        </button>
+                      </div>
 
                       <p className="py-1 text-center text-xs">{doc.label}</p>
                     </div>
@@ -539,92 +605,151 @@ export default function AstroProfile() {
         </div>
 
         <div className="col-span-5 bg-white rounded-lg p-4 flex flex-col gap-5">
-          {/* <div className="flex items-center gap-3 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-              {stats.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col items-center justify-center bg-purple-200  shadow-2xl rounded-xl p-2 hover:shadow-lg transition"
-                >
-                  <p className="text-xl font-bold text-gray-800">
-                    {item.prefix}
-                    <span className="rupee">{item.amount}</span>
-                  </p>
-                  <span className="text-gray-500 text-xs">{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
           <AstrologerActivities astrologerId={astrologerId} />
 
-          {/* <div className="flex w-full ">
-            <div className="p-4 rounded-2xl flex flex-col gap-3 shadow-xl   bg-white w-full">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <h2 className="font-semibold text-sm text-center ">
-                  Manage Availability
-                </h2>
+          <div
+            className=" rounded-xl border shadow mt-6 p-5 flex flex-col"
+            style={{ maxHeight: "500px" }}
+           >
+            <h2 className="text-lg font-semibold mb-5 flex-shrink-0">
+              User Reviews ({reviews.length})
+            </h2>
+
+            {reviewLoading ? (
+              <p>Loading...</p>
+            ) : reviews.length === 0 ? (
+              <p className="text-gray-500">No reviews found.</p>
+            ) : (
+              <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                {reviews.map((review) => (
+                  <div
+                    key={review.reviewId}
+                    className="border rounded-lg p-2 shadow-sm"
+                  >
+                    <div className="flex justify-between">
+                      <div>
+                   <div className="flex items-center gap-5">
+                         <Link
+                          href={`/Admindash/usermain/userprofile/${review.userId}`}
+                          className="font-semibold text-violet-600 hover:underline"
+                        >
+                          {review.userName}
+                        </Link>     <button
+                        onClick={() => {
+                          setSelectedSession(review.sessionId);
+                          setOpenModal(true);
+                        }}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-full text-[9px]"
+                      >
+                        View Chat
+                      </button>
+                   </div>
+
+                        <p className="text-xs text-gray-500">
+                          {dayjs(Number(review.createdAt)).format(
+                            "DD MMM YYYY hh:mm A",
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <FaStar className="text-yellow-500" />
+                        <span className="font-semibold">{review.rating}</span>
+                      </div>
+                    </div>
+
+                    <p className="mt-1 text-gray-700">
+                      {review.comment || "No comment"}
+                    </p>
+
+                   
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl border shadow mt-6 p-5">
+  <h2 className="text-lg font-semibold mb-5">
+    Gift History ({gifts.length})
+  </h2>
+
+  {giftLoading ? (
+    <p>Loading...</p>
+  ) : gifts.length === 0 ? (
+    <p className="text-gray-500">
+      No gifts found.
+    </p>
+  ) : (
+    <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
+      {gifts.map((gift) => (
+        <div
+          key={gift.id}
+          className="border rounded-lg p-4 shadow-sm"
+        >
+          <div className="flex justify-between">
+
+            {/* Left */}
+            <div className="flex gap-4">
+
+              <img
+                src={`https://dhwaniastro.com${gift.gift?.image}`}
+                alt={gift.giftName}
+                className="w-14 h-14 rounded-lg object-cover border"
+              />
+
+              <div>
+                <h3 className="font-semibold">
+                  {gift.giftName}
+                </h3>
+
+                <Link
+                  href={`/Admindash/usermain/userprofile/${gift.user.id}`}
+                  className="text-violet-600 hover:underline text-sm"
+                >
+                  {gift.user.name}
+                </Link>
+
+                <p className="text-xs text-gray-500">
+                  {dayjs(gift.createdAt).format(
+                    "DD MMM YYYY hh:mm A"
+                  )}
+                </p>
               </div>
 
-              <div className="flex items-center gap-6 ">
-                <div className="flex flex-col gap-1 items-start justify-start">
-                  <span className="text-xs font-semibold">LA</span>
-                  <CustomToggle
-                    id="call"
-                    onChange={(val) =>
-                      setAvailability({ ...availability, call: val })
-                    }
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold">LA</span>
-                  <CustomToggle
-                    id="call"
-                    onChange={(val) =>
-                      setAvailability({ ...availability, call: val })
-                    }
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold">LA</span>
-                  <CustomToggle
-                    id="call"
-                    onChange={(val) =>
-                      setAvailability({ ...availability, call: val })
-                    }
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold">LA</span>
-                  <CustomToggle
-                    id="call"
-                    onChange={(val) =>
-                      setAvailability({ ...availability, call: val })
-                    }
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold">LA</span>
-                  <CustomToggle
-                    id="call"
-                    onChange={(val) =>
-                      setAvailability({ ...availability, call: val })
-                    }
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold">LA</span>
-                  <CustomToggle
-                    id="call"
-                    onChange={(val) =>
-                      setAvailability({ ...availability, call: val })
-                    }
-                  />
-                </div>
-              </div>
             </div>
-          </div> */}
+
+            {/* Right */}
+            <div className="text-right">
+
+              <p className="font-bold text-green-600">
+                ₹{gift.giftPrice}
+              </p>
+
+              <p className="text-xs text-gray-500">
+                Gift Price
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="flex justify-end mt-4">
+
+            <Link
+              href={`/Admindash/usermain/userprofile/${gift.user.id}`}
+              className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1 rounded-full"
+            >
+              View User
+            </Link>
+
+          </div>
+
+        </div>
+      ))}
+    </div>
+  )}
+</div>
         </div>
       </div>
     </div>

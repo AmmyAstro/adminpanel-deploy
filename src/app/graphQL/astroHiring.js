@@ -190,7 +190,7 @@ export const GET_ASTROLOGER_BY_ID = gql`
 
       email
       contactNo
- createdAt
+      createdAt
       updatedAt
       gender
       experience
@@ -432,49 +432,49 @@ export const GET_USER_CALL_HISTORY = gql`
   }
 `;
 export const GET_USER_WALLET_TRANSACTIONS = gql`
-query GetUserWalletTransactions(
-  $userId: ID
-  $mobile: String
-  $type: String
-  $amount: Float
-  $page: Int
-  $limit: Int
-  $filterType: String
-  $startDate: String
-  $endDate: String
-  $onlyRecharge: Boolean
-) {
-  getUserWalletTransactions(
-    userId: $userId
-    mobile: $mobile
-    type: $type
-    amount: $amount
-    page: $page
-    limit: $limit
-    filterType: $filterType
-    startDate: $startDate
-    endDate: $endDate
-    onlyRecharge: $onlyRecharge
+  query GetUserWalletTransactions(
+    $userId: ID
+    $mobile: String
+    $type: String
+    $amount: Float
+    $page: Int
+    $limit: Int
+    $filterType: String
+    $startDate: String
+    $endDate: String
+    $onlyRecharge: Boolean
   ) {
-    totalCount
+    getUserWalletTransactions(
+      userId: $userId
+      mobile: $mobile
+      type: $type
+      amount: $amount
+      page: $page
+      limit: $limit
+      filterType: $filterType
+      startDate: $startDate
+      endDate: $endDate
+      onlyRecharge: $onlyRecharge
+    ) {
+      totalCount
 
-    data {
-      id
-      type
-      coins
-      amount
-      description
-      createdAt
-
-      rechargePack {
+      data {
         id
-        name
-        talktime
-        validityDays
+        type
+        coins
+        amount
+        description
+        createdAt
+
+        rechargePack {
+          id
+          name
+          talktime
+          validityDays
+        }
       }
     }
   }
-}
 `;
 
 export const GET_USERS_CHAT_HISTORY = gql`
@@ -520,7 +520,7 @@ export const GET_ASTRO_LIST = gql`
         experience
         tags
         vtags
-         createdAt
+        createdAt
       }
     }
   }
@@ -539,7 +539,7 @@ export const GET_USER_PROFILE = gql`
 
       birthDate
       birthTime
-
+      source
       occupation
 
       isActive
@@ -644,7 +644,7 @@ export const GET_USER_REVIEWS = gql`
 
       data {
         reviewId
-        sessionId  
+        sessionId
 
         userId
         userName
@@ -663,3 +663,122 @@ export const GET_USER_REVIEWS = gql`
   }
 `;
 
+export const MANAGE_ASTROLOGER_WALLET = gql`
+  mutation ManageAstrologerWallet(
+    $astrologerId: ID!
+    $amount: Float!
+    $remarks: String
+    $type: TransactionType!
+  ) {
+    manageAstrologerWallet(
+      astrologerId: $astrologerId
+      amount: $amount
+      remarks: $remarks
+      type: $type
+    ) {
+      success
+      message
+      walletBalance
+    }
+  }
+`;
+export const MANAGE_USER_WALLET = gql`
+  mutation ManageUserWallet(
+    $userId: ID!
+    $amount: Float!
+    $remarks: String
+    $type: TransactionType!
+  ) {
+    manageUserWallet(
+      userId: $userId
+      amount: $amount
+      remarks: $remarks
+      type: $type
+    ) {
+      success
+      message
+      walletBalance
+    }
+  }
+`;
+export const GET_ASTROLOGER_REVIEWS = gql`
+  query GetAstrologerReviews($astrologerId: ID!) {
+    getAstrologerReviews(astrologerId: $astrologerId) {
+      reviewId
+      sessionId
+      userId
+      userName
+      rating
+      comment
+      sessionType
+      createdAt
+    }
+  }
+`;
+export const GET_ASTROLOGER_GIFT_HISTORY = gql`
+  query GetAstrologerGiftHistory(
+    $astrologerId: String!
+    $page: Int
+    $limit: Int
+  ) {
+    getSendGiftHistory(
+      astrologerId: $astrologerId
+      page: $page
+      limit: $limit
+    ) {
+      totalCount
+
+      data {
+        id
+        giftName
+        giftPrice
+        createdAt
+
+        user {
+          id
+          name
+          mobile
+        }
+
+        gift {
+          id
+          name
+          image
+          amount
+        }
+      }
+    }
+  }
+`;
+export const GET_ASTROLOGER_FOLLOWERS = gql`
+  query GetAstrologerFollowers(
+    $astrologerId: ID!
+    $page: Int
+    $limit: Int
+    $search: String
+  ) {
+    getAstrologerFollowers(
+      astrologerId: $astrologerId
+      page: $page
+      limit: $limit
+      search: $search
+    ) {
+      totalCount
+      currentPage
+      totalPages
+
+      data {
+        id
+        createdAt
+
+        user {
+          id
+          name
+          mobile
+          gender
+        
+        }
+      }
+    }
+  }
+`;
