@@ -15,15 +15,11 @@ import {
 import toast from "react-hot-toast";
 
 export default function RemedyAdminPage() {
-  // =========================
-  // EDIT STATE
-  // =========================
+
 
   const [editId, setEditId] = useState(null);
 
-  // =========================
-  // FORM
-  // =========================
+
 
   const { register, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
@@ -35,39 +31,26 @@ export default function RemedyAdminPage() {
     },
   });
 
-  // =========================
-  // GET REMEDIES
-  // =========================
+
 
   const { data, loading, refetch } = useQuery(GET_REMEDIES);
 
-  // =========================
-  // CREATE
-  // =========================
+  
 
   const [createRemedy, { loading: createLoading }] = useMutation(CREATE_REMEDY);
 
-  // =========================
-  // UPDATE
-  // =========================
 
   const [updateRemedy, { loading: updateLoading }] = useMutation(UPDATE_REMEDY);
 
-  // =========================
-  // DELETE
-  // =========================
+
 
   const [deleteRemedy] = useMutation(DELETE_REMEDY);
 
-  // =========================
-  // SUBMIT
-  // =========================
+
 
   const onSubmit = async (values) => {
     try {
-      // =====================
-      // UPDATE
-      // =====================
+
 
       if (editId) {
         await updateRemedy({
@@ -87,9 +70,7 @@ export default function RemedyAdminPage() {
         toast.success("Remedy Updated")
       }
 
-      // =====================
-      // CREATE
-      // =====================
+      
       else {
         await createRemedy({
           variables: {
@@ -104,9 +85,7 @@ export default function RemedyAdminPage() {
        toast.success("Remedy Created")
       }
 
-      // =====================
-      // RESET
-      // =====================
+
 
       reset({
         title: "",
@@ -124,9 +103,7 @@ export default function RemedyAdminPage() {
     }
   };
 
-  // =========================
-  // EDIT
-  // =========================
+
 
   const handleEdit = (item) => {
     setEditId(item.id);
@@ -145,9 +122,6 @@ export default function RemedyAdminPage() {
     });
   };
 
-  // =========================
-  // DELETE
-  // =========================
 
   const handleDelete = async (id) => {
     const confirmDelete = confirm("Delete this remedy?");

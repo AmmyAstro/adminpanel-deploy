@@ -353,7 +353,7 @@ export const GET_ASTROLOGER_CHAT_HISTORY = gql`
 
       data {
         sessionId
-
+ by
         userName
 
         ratePerMin
@@ -387,7 +387,7 @@ export const GET_ASTROLOGER_CALL_HISTORY = gql`
 
       data {
         sessionId
-
+ by
         userName
 
         ratePerMin
@@ -452,7 +452,7 @@ export const GET_USER_CALL_HISTORY = gql`
 
       data {
         sessionId
-
+ by
         userId
         userName
         mobile
@@ -547,7 +547,7 @@ export const GET_USERS_CHAT_HISTORY = gql`
         coinsDeducted
         coinsEarned
         commission
-
+ by
         durationSec
         createdAt
       }
@@ -825,6 +825,25 @@ export const GET_ASTROLOGER_FOLLOWERS = gql`
         
         }
       }
+    }
+  }
+`;
+export const GET_SESSION_REMEDIES = gql`
+  query GetSessionRemedies($sessionId: String!) {
+    getSessionRemedies(sessionId: $sessionId) {
+      id
+      remedyText
+      createdAt
+    }
+  }
+`;
+
+export const GET_CALL_RECORDING = gql`
+  query GetCallRecording($sessionId: ID!) {
+    getCallRecording(sessionId: $sessionId) {
+      id
+      fileUrl
+      fileName
     }
   }
 `;

@@ -24,10 +24,9 @@ import { FaStar } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import AstrologerActivities from "../../AstrologerActivities";
-import dayjs from "dayjs";
 import Link from "next/link";
 import SessionMessagesModal from "@/app/Admindash/usermain/SessionModal";
-
+import dayjs from "dayjs";
 export default function Page() {
   const [activeTab, setActiveTab] = useState("call");
   const [openPopup, setOpenPopUp] = useState(false);
@@ -261,7 +260,7 @@ export default function Page() {
     return <Skenton />;
   }
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen  flex flex-col gap-2">
       <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
         <h2 className="text-xl font-bold text-purple-900">
           Astrologer Profile
@@ -325,8 +324,8 @@ export default function Page() {
         </div>
       )}
 
-      <div className="grid grid-cols-8 gap-4">
-        <div className="col-span-3 bg-white rounded-lg p-4 flex flex-col gap-2">
+      <div className="grid w-full grid-cols-8 gap-4">
+        <div className="col-span-3 min-w-0  bg-white rounded-lg p-4 flex flex-col gap-2">
           <div className="flex justify-between items-center bg-purple-200 p-2 rounded-full shadow px-4">
             <h5 className="text-sm font-bold">Astrologers Details</h5>
             <Link
@@ -355,7 +354,7 @@ export default function Page() {
                 <span className="font-bold text-gray-800">
                   {astrologerprofile?.displayName || astrologerprofile?.name}
                 </span>
-                <small className="font-semibold text-gray-600">
+                <small className="font-semibold text-gray-600  break-words">
                   Astrologer ID : {astrologerprofile?.id}
                 </small>
               </div>
@@ -376,7 +375,7 @@ export default function Page() {
               </div>{" "}
               <div className="flex justify-between items-center">
                 <div className="font-semibold text-sm">Address:</div>
-                <div className="text-sm">
+                <div className="text-sm break-words">
                   {address?.street},{address?.city},{address?.state},
                   {address?.country}
                 </div>
@@ -608,7 +607,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="col-span-5 bg-white rounded-lg p-4 flex flex-col gap-5">
+        <div className="col-span-5 min-w-0  bg-white rounded-lg p-4 flex flex-col gap-5">
           <AstrologerActivities astrologerId={astrologerId} />
 
           <div
