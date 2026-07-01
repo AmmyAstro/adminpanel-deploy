@@ -17,15 +17,18 @@ export default function Page() {
 
   
   const { data: deptData, loading: deptLoading } = useQuery(GET_DEPARTMENTS, {
-    variables: { page: 1, limit: 50 },
+    variables: { page: 1, limit: 50 },  fetchPolicy: "cache-first",
+
   });
 
   const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES, {
-    variables: { page: 1, limit: 50 },
+    variables: { page: 1, limit: 50 },  fetchPolicy: "cache-first",
+
   });
 
   const { data: staffData, loading: staffLoading } = useQuery(GET_STAFF, {
-    variables: { page: 1, limit: 50 },
+    variables: { page: 1, limit: 50 },  fetchPolicy: "cache-first",
+
   });
 
 const departments = deptData?.getDepartments?.data || [];

@@ -33,6 +33,8 @@ const INITIAL_COUPON = {
   status: "ACTIVE",
   visibility: "VISIBLE",
   couponCount: 0,
+    minOrderAmount: 0,
+
   percentage: 0,
   maxDiscount: 0,
   redeemLimit: 0,
@@ -81,6 +83,7 @@ export default function CouponMain() {
 
     couponCount: Number(coupon.couponCount) || 0,
     percentage: Number(coupon.percentage) || 0,
+  minOrderAmount: Number(coupon.minOrderAmount) || 0,
 
     maxDiscount: Number(coupon.maxDiscount) || 0,
     redeemLimit: Number(coupon.redeemLimit) || 0,
@@ -260,7 +263,7 @@ export default function CouponMain() {
                   type: row.type || "CASHBACK",
 
                   status: row.status ? "ACTIVE" : "INACTIVE",
-
+minOrderAmount: row.minOrderAmount || 0,
                   visibility: row.visibility || "VISIBLE",
 
                   couponCount: row.couponCount || 0,
@@ -370,6 +373,14 @@ export default function CouponMain() {
                 value={coupon.maxDiscount}
                 onChange={(e) => handleChange("maxDiscount", e.target.value)}
               />
+              <CustomInput
+  label="Min Order Amount"
+  type="number"
+  value={coupon.minOrderAmount}
+  onChange={(e) =>
+    handleChange("minOrderAmount", e.target.value)
+  }
+/>
               <CustomInput
                 label="Redeem Limit"
                 type="number"

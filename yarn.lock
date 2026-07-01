@@ -1049,6 +1049,11 @@
   resolved "https://registry.npmjs.org/@tiptap/extension-code/-/extension-code-3.26.1.tgz"
   integrity sha512-t9/VR5k3rGPyhcGau9YvVgaAQ+nP9R9WzS996bQQ7GIrMOTSXb0FWwoQFBiYl83V6VA16Tlj/oScC7SFlA8lvA==
 
+"@tiptap/extension-color@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-color/-/extension-color-3.26.1.tgz"
+  integrity sha512-f8yy+CBRDqMeaIaQ0UHDbGUqjfGka5O16ja47shatXm49lqLcL06js9tGoiZFVzp9/lcKOLSXjuzxNf0OZ9SbA==
+
 "@tiptap/extension-document@^3.26.1":
   version "3.26.1"
   resolved "https://registry.npmjs.org/@tiptap/extension-document/-/extension-document-3.26.1.tgz"
@@ -1079,10 +1084,20 @@
   resolved "https://registry.npmjs.org/@tiptap/extension-heading/-/extension-heading-3.26.1.tgz"
   integrity sha512-eRlv9XxzUL8FobKAiF1WjP35CT2QpbcxxeyYFF7BmGEONvKI7r5g7JGwyGli4Cvclh70h8w6JuoXSmGUVEU65A==
 
+"@tiptap/extension-highlight@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-highlight/-/extension-highlight-3.26.1.tgz"
+  integrity sha512-qgx4Eetqkogh3OyomZO0yIMQGHhjatCDAtELkC7NQxnmPsp2c9i6ck/hh7mP5We5ccBwUoYRuNGC9lkflCx75g==
+
 "@tiptap/extension-horizontal-rule@^3.26.1":
   version "3.26.1"
   resolved "https://registry.npmjs.org/@tiptap/extension-horizontal-rule/-/extension-horizontal-rule-3.26.1.tgz"
   integrity sha512-l9lPZYeSmY90y/2GkQcKaICFD5Atr8sx2SzJGkQzpNC9tRxZXyAHnfJE3OjBkspuGzjWIN0DimxBj4ibz58sKw==
+
+"@tiptap/extension-image@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-image/-/extension-image-3.26.1.tgz"
+  integrity sha512-IjoT+kRK4a1sTImvUz257yfk5l9kMxXxfxCfix5AUKdiWyn8SGUjJZapLICcZVY05UDqXmwsBvBK9lHkKX5ERg==
 
 "@tiptap/extension-italic@^3.26.1":
   version "3.26.1"
@@ -1131,6 +1146,36 @@
   resolved "https://registry.npmjs.org/@tiptap/extension-strike/-/extension-strike-3.26.1.tgz"
   integrity sha512-7hmQ2mBsA+75GRrJIKYxb+10H23mblEQSGGsv9Ptl7JLaGmj+8sv2HGQGSUT9QBiBVprxaYTqyWFXQC9akfLWg==
 
+"@tiptap/extension-table-cell@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-table-cell/-/extension-table-cell-3.26.1.tgz"
+  integrity sha512-eCGgHrzIUPHZpz/z3F4O8yk+SM/HBcLVvAWTHl8P+4/GC2+6oVFH+9ixBDIMKiJugSOnuOY8uLm30+Ld/MtyTw==
+
+"@tiptap/extension-table-header@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-table-header/-/extension-table-header-3.26.1.tgz"
+  integrity sha512-idVDYdhVpTL4hnzuf/MbE74HHjqqqIRCVwzfbTy/d5JnTnJ1LXpJZKz2oFWNOk5NaAq0kPhkwkz5lSBUgd2DbQ==
+
+"@tiptap/extension-table-row@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-table-row/-/extension-table-row-3.26.1.tgz"
+  integrity sha512-zAr7bQcUHoBpeysvbzxW8JchMduUn0wGwA2UeEgoE1K+gep74wRHs9LE8NRd70hARbZLzgUMRXcpT+W1pdoMMw==
+
+"@tiptap/extension-table@^3.26.1", "@tiptap/extension-table@3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-table/-/extension-table-3.26.1.tgz"
+  integrity sha512-epxUhc5ecxsH39lzNejc2WxFPXAXWGs9g2ofKDrIaoSlZlfFHf89/sEGSz048a46E5Sb+fYCtzUvRUUx+aG4xw==
+
+"@tiptap/extension-text-align@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-text-align/-/extension-text-align-3.26.1.tgz"
+  integrity sha512-Ptbu1FyASFqIrbw/p9D6zLt8G7seDh4X408qU9FIrun7PE79o+amB5LWI/SzHFuVk3OMI+g7jE/mMDhNUYsqVA==
+
+"@tiptap/extension-text-style@^3.26.1", "@tiptap/extension-text-style@3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-text-style/-/extension-text-style-3.26.1.tgz"
+  integrity sha512-V8t7qOyLH7IBR2HjjJVZ9rUHTnuFToJx07L9PN9PpgQLhz9q8Jah4gAwmjLBXDRG2YaXImGK0RwKKCU/yHhwOg==
+
 "@tiptap/extension-text@^3.26.1":
   version "3.26.1"
   resolved "https://registry.npmjs.org/@tiptap/extension-text/-/extension-text-3.26.1.tgz"
@@ -1140,6 +1185,11 @@
   version "3.26.1"
   resolved "https://registry.npmjs.org/@tiptap/extension-underline/-/extension-underline-3.26.1.tgz"
   integrity sha512-HUHtQ+DRWDM0opW7Nk3YQwrLzw876hMU7cr1X/ZTG+8Bp+AKHihlwU+bqrPgG5St0mqASyUEhHQ/vK5PlnUYOQ==
+
+"@tiptap/extension-youtube@^3.26.1":
+  version "3.26.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-youtube/-/extension-youtube-3.26.1.tgz"
+  integrity sha512-f33sIDdCDpdZ81V3kaGy2vZ63H09H/Ur+oZ/MKlDcWZW7zuB8Y2XgnIi8C+T6MDLvRWbtqPEItknxOjsFaAVzw==
 
 "@tiptap/extensions@^3.26.1", "@tiptap/extensions@3.26.1":
   version "3.26.1"

@@ -16,7 +16,7 @@ const gridColumns = updatedColumns
             }}
           >
             {updatedColumns.map((col, i) => (
-              <th key={i} className="px-5 py-3 text-sm font-semibold">
+              <th key={i} className="px-2 py-2 text-xs font-semibold">
                 {col.header}
               </th>
             ))}
@@ -27,12 +27,12 @@ const gridColumns = updatedColumns
           {data.map((row, rowIndex) => (
             <tr
               key={row.id || rowIndex}
-              className={`hover:bg-gray-50 border-b grid `}   style={{
+              className={`hover:bg-gray-50 border-b border-gray-200 grid `}   style={{
               gridTemplateColumns: gridColumns,
             }}
             >
               {updatedColumns.map((col, i) => (
-                <td key={i} className="px-1 py-2 text-sm text-center">
+                <td key={i} className="px-1 py-2 text-xs text-center">
                   {/* 🔥 SR NO logic */}
                   {col.accessor === "srNo"
                     ? rowIndex + 1

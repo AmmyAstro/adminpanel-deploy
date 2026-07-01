@@ -43,7 +43,7 @@ const [selectedSession, setSelectedSession] = useState(null);
     variables: {
       userId,
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-first",
   });
   const [tab, setTab] = useState("Wallet");
   const [manageUserWallet, { loading: manageWalletLoading }] = useMutation(
@@ -132,7 +132,7 @@ const [selectedSession, setSelectedSession] = useState(null);
         variables: {
           sessionId,
         },
-        fetchPolicy: "network-only",
+        fetchPolicy: "cache-and-network",
       });
 
       const recording = data?.getCallRecording;
@@ -229,7 +229,7 @@ const [selectedSession, setSelectedSession] = useState(null);
           return (
             <div className="flex flex-col">
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                className={`px-1 py- rounded-full text-xs font-medium ${
                   statusStyles[status] || "bg-gray-100 text-gray-700"
                 }`}
               >
@@ -237,7 +237,7 @@ const [selectedSession, setSelectedSession] = useState(null);
               </span>
 
               {(status === "CANCELLED" || status === "REJECTED") && row.by && (
-                <span className="text-[10px] mt-1 text-red-500 font-medium">
+                <span className="text-[10px]  text-red-500 font-medium">
                   {row.by}
                 </span>
               )}
@@ -303,7 +303,7 @@ const [selectedSession, setSelectedSession] = useState(null);
         page: 1,
         limit: 50,
       },
-      fetchPolicy: "cache-first",
+      fetchPolicy: "cache-and-network",
     },
   );
   const { data: rechargeData, loading: rechargeLoading } = useQuery(
@@ -315,7 +315,7 @@ const [selectedSession, setSelectedSession] = useState(null);
         limit: 50,
         onlyRecharge: true,
       },
-      fetchPolicy: "cache-first",
+      fetchPolicy: "cache-and-network",
     },
   );
   const userWallet = walletData?.getUserWalletTransactions?.data || [];
@@ -332,7 +332,7 @@ const [selectedSession, setSelectedSession] = useState(null);
           limit: 50,
         },
       },
-      fetchPolicy: "cache-first",
+      fetchPolicy: "cache-and-network",
     },
   );
 
@@ -382,7 +382,7 @@ const [selectedSession, setSelectedSession] = useState(null);
       header: "Type",
       render: (row) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${row.type === "CREDIT"
+          className={`px-3 py- rounded-full text-xs  ${row.type === "CREDIT"
               ? "bg-green-100 text-green-700"
               : "bg-red-100 text-red-700"
             }`}
@@ -453,13 +453,20 @@ const [selectedSession, setSelectedSession] = useState(null);
       header: "Session ID",
       render: (row) => row.sessionId?.slice(0, 8) || "-",
     },
-    {
-      header: "Order ID",
-      render: (row) => row.orderId || "-",
-    },
+
     {
       header: "Astrologer",
-      render: (row) => row.displayName || row.astrologerName,
+          render: (row) => (
+          <div>
+            <Link
+              href={`/Admindash/astromain/astroprofile/${row.astrologerId}`}
+              className="font-semibold text-violet-600"
+            >
+              {row.displayName}
+            </Link>
+        
+          </div>
+        ),
     },
     {
       header: "Rating",
@@ -478,27 +485,36 @@ const [selectedSession, setSelectedSession] = useState(null);
     {
       header: "Action",
       render: (row) => (
-        <button
-          onClick={() => {
-            // Open chat/session details
-            console.log(row.sessionId);
-          }}
-          className="px-3 py-1 rounded bg-violet-600 text-white"
-        >
-          View Chat
-        </button>
+    <div className="flex items-center justify-center gap-2">
+
+        
+     
+            <button
+              title="View Chat"
+              onClick={() => {
+                setSelectedSession(row.sessionId);
+                setOpenModal(true);
+              }}
+              className="flex cursor-pointer hover:scale-104 items-center justify-center text-blue-600 hover:text-blue-800"
+            >
+           <svg xmlns="http://www.w3.org/2000/svg" height={20} width={20} viewBox="0 0 640 640" > <path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z" /> </svg>
+            </button>
+      
+      
+       
+        </div>
       ),
     },
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-6">
       {/* Header */}
 
-      <div className=" rounded-2xl flex items-center justify-between border border-gray-300 bg-purple-300 shadow-sm p-6">
+      <div className=" rounded-2xl flex items-center justify-between border border-gray-300 bg-purple-300 shadow-sm p-4">
         <div className="flex items-center gap-5">
-          <div className="h-20 w-20 rounded-full bg-violet-100 flex items-center justify-center">
-            <FaUser size={30} className="text-violet-600" />
+          <div className="h-16 w-16 rounded-full bg-violet-100 flex items-center justify-center">
+            <FaUser size={26} className="text-violet-600" />
           </div>
 
           <div>
@@ -506,9 +522,9 @@ const [selectedSession, setSelectedSession] = useState(null);
 
             <p className="text-gray-800">#{user?.id}</p>
 
-            <p className="text-sm text-gray-700">
+            {/* <p className="text-sm text-gray-700">
               {user?.countryCode} {user?.mobile}
-            </p>
+            </p> */}
           </div>
         </div>
         <CustomButton
@@ -604,7 +620,7 @@ const [selectedSession, setSelectedSession] = useState(null);
       {/* Details */}
 
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-300 p-6">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
           <h2 className="font-semibold text-lg mb-4">Personal Information</h2>
 
           <div className="grid grid-cols-3 gap-5">
@@ -630,10 +646,10 @@ const [selectedSession, setSelectedSession] = useState(null);
 
             <Info label="Birth Time" value={user?.birthTime} />
           </div>
-          <div className="bg-purple-200 rounded-2xl border-gray-300 mt-5 p-6">
-            <h2 className="font-semibold text-lg mb-4">Account Summary</h2>
+          <div className="bg-purple-200 rounded-2xl border-gray-300 mt-5 py-3 px-5">
+            <h2 className="font-semibold text-lg mb-2">Account Summary</h2>
 
-            <div className="space-y-4 grid grid-cols-3 gap-5">
+            <div className="space-y-1 grid grid-cols-3 gap-1">
               <Info
                 label="Joined"
                 value={
@@ -667,13 +683,13 @@ const [selectedSession, setSelectedSession] = useState(null);
 
       {/* Tabs */}
 
-      <div className="bg-white rounded-2xl border p-4">
+      <div className="bg-white rounded-2xl border border-gray-200 p-4">
         <div className="flex gap-3 flex-wrap">
           {statCards.map((item) => (
             <button
               key={item.title}
               onClick={() => setTab(item.title)}
-              className={`px-4 py-2 rounded-xl ${tab === item.title ? "bg-violet-600 text-white" : "bg-gray-100"
+              className={`px-4 text-sm py-1 rounded-full ${tab === item.title ? "bg-violet-600 text-white" : "bg-gray-200"
                 }`}
             >
               {item.title}
@@ -747,14 +763,14 @@ const [selectedSession, setSelectedSession] = useState(null);
 
 function StatCard({ title, value, icon, color }) {
   return (
-    <div className={`rounded-2xl border p-5 shadow-sm ${color}`}>
+    <div className={`rounded-2xl border p-3 shadow-sm ${color}`}>
       <div className="flex items-center justify-between">
         <p className="text-gray-500">{title}</p>
 
         {icon}
       </div>
 
-      <h2 className="text-3xl font-bold mt-3">{value}</h2>
+      <h2 className="text-2xl font-bold mt-2">{value}</h2>
     </div>
   );
 }
@@ -762,9 +778,9 @@ function StatCard({ title, value, icon, color }) {
 function Info({ label, value }) {
   return (
     <div>
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm font-semibold text-gray-800">{label}</p>
 
-      <p className="font-semibold mt-1">{value || "N/A"}</p>
+      <p className=" text-sm mt-1">{value || "N/A"}</p>
     </div>
   );
 }

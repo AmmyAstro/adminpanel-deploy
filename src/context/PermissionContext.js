@@ -38,7 +38,6 @@ export const PermissionProvider = ({ children }) => {
 
   const can = (module, action) => {
     if (isSuperAdmin) return true;
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     
 
     return permissions.some(

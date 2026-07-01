@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   Loader2,
 } from "lucide-react";
+import Image from "next/image";
 
 const GET_ADMIN_SESSION_MESSAGES = gql`
   query AdminGetSessionMessages($sessionId: String!) {
@@ -40,7 +41,7 @@ export default function SessionMessagesModal({
 
       skip: !sessionId || !open,
 
-      fetchPolicy: "network-only",
+      fetchPolicy: "cache-first",
     });
 
  const messages =
@@ -122,11 +123,14 @@ export default function SessionMessagesModal({
                     {/* IMAGE */}
                     {msg.image && (
                       <div className="mt-3">
-                        <img
-                          src={msg.image}
-                          alt="chat"
-                          className="w-52 rounded-xl border"
-                        />
+               <Image
+               unoptimized
+               width={100}
+               height={100}
+  src={msg.image.replace("/v2/uploads/", "/uploads/")}
+
+  alt="chat"
+/>
 
                         <div className="flex items-center gap-1 text-xs opacity-70 mt-2">
                           <ImageIcon className="w-3 h-3" />

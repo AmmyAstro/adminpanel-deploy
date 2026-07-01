@@ -1431,6 +1431,8 @@ const router = useRouter();
                         render={({ field }) => (
                           <input
                             type="file"
+                                                className="w-full outline-none border rounded-full px-2 py-2 border-gray-300 bg-transparent text-sm"
+
                             key={`${item.name}-${fileInputKey}`}
                             onChange={(e) =>
                               field.onChange(e.target.files?.[0])

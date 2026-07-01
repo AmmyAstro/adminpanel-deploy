@@ -154,3 +154,194 @@ tr{
     /* display: flex; */
     justify-content: space-around;
 }
+
+/* ===== TipTap ===== */
+
+.tiptap {
+  min-height: 150px;
+  padding: 18px;
+  outline: none;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.tiptap:focus {
+  outline: none;
+}
+
+/* Headings */
+
+.tiptap h1{
+    font-size:40px;
+    font-weight:700;
+    margin:20px 0;
+}
+
+.tiptap h2{
+    font-size:32px;
+    font-weight:700;
+    margin:18px 0;
+}
+
+.tiptap h3{
+    font-size:28px;
+    font-weight:600;
+    margin:16px 0;
+}
+
+.tiptap h4{
+    font-size:24px;
+    font-weight:600;
+}
+
+.tiptap h5{
+    font-size:20px;
+    font-weight:600;
+}
+
+.tiptap h6{
+    font-size:18px;
+    font-weight:600;
+}
+
+/* paragraph */
+
+.tiptap p{
+    margin:10px 0;
+}
+
+/* Lists */
+
+.tiptap ul{
+
+    list-style:disc;
+
+    padding-left:30px;
+
+    margin:15px 0;
+
+}
+
+.tiptap ol{
+
+    list-style:decimal;
+
+    padding-left:30px;
+
+    margin:15px 0;
+
+}
+
+/* blockquote */
+
+.tiptap blockquote{
+
+    border-left:4px solid #7c3aed;
+
+    padding-left:15px;
+
+    color:#555;
+
+    margin:15px 0;
+
+    font-style:italic;
+
+}
+
+/* code */
+
+.tiptap code{
+
+    background:#eee;
+
+    padding:2px 6px;
+
+    border-radius:4px;
+
+}
+
+/* pre */
+
+.tiptap pre{
+
+    background:#111827;
+
+    color:white;
+
+    padding:16px;
+
+    border-radius:8px;
+
+    overflow:auto;
+
+}
+
+/* image */
+
+.tiptap img{
+
+    max-width:100%;
+
+    border-radius:12px;
+
+    margin:20px auto;
+
+    display:block;
+
+}
+
+/* hr */
+
+.tiptap hr{
+
+    border:none;
+
+    border-top:2px solid #ddd;
+
+    margin:25px 0;
+
+}
+
+/* link */
+
+.tiptap a{
+
+    color:#2563eb;
+
+    text-decoration:underline;
+
+}
+
+/* table */
+
+.tiptap table{
+
+    border-collapse:collapse;
+
+    width:100%;
+
+}
+
+.tiptap td,
+.tiptap th{
+
+    border:1px solid #ddd;
+
+    padding:10px;
+
+}
+
+.tiptap th{
+
+    background:#f4f4f4;
+
+}
+.tiptap ul,
+.prose ul {
+  list-style: disc !important;
+}
+
+.tiptap ol,
+.prose ol {
+  list-style: decimal !important;
+}

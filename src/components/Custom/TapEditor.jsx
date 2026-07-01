@@ -1,164 +1,442 @@
 "use client";
+
+import { useEffect, useRef } from "react";
+
 import { useEditor, EditorContent, useEditorState } from "@tiptap/react";
-// import { FloatingMenu, BubbleMenu } from '@tiptap/react/menus'
+
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEffect } from "react";
+
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import TextAlign from "@tiptap/extension-text-align";
+import Highlight from "@tiptap/extension-highlight";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+
+import { useMutation } from "@apollo/client/react";
+
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  List,
+  ListOrdered,
+  Undo2,
+  Redo2,
+  Link2,
+  ImageIcon,
+  Quote,
+  Minus,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Highlighter,
+} from "lucide-react";
+import { UPLOAD_IMAGE } from "@/app/graphQL/astroHiring";
 
 export default function TapEditor({
-    value = "",
-    onChange,
-    placeholder = "Write something...",
+  value = "",
+  onChange,
+  placeholder = "Write something...",
 }) {
-    const editor = useEditor({
-        extensions: [
-            StarterKit,
-            Placeholder.configure({
-                placeholder: "Write something...",
-            }),
+  const fileRef = useRef(null);
+
+  const [uploadImage] = useMutation(UPLOAD_IMAGE);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+
+      Underline,
+
+     Link.configure({
+  openOnClick: true,
+  autolink: true,
+  defaultProtocol: "https",
+  HTMLAttributes: {
+    target: "_blank",
+    rel: "noopener noreferrer",
+    class: "text-blue-600 underline",
+  },
+}),
+
+      Image.configure({
+        inline: false,
+      }),
+
+      TextStyle,
+
+      Color.configure(),
+      Highlight.configure(),
+
+      TextAlign.configure({
+        types: [
+          "heading",
+          "paragraph",
+          "bulletList",
+          "orderedList",
+          "listItem",
         ],
-        editorProps: {
-            attributes: {
-                class: "focus:outline-none w-full min-h-[100px] text-sm"
+      }),
 
-            },
+      Placeholder.configure({
+        placeholder,
+        emptyEditorClass: "is-editor-empty",
+      }),
+    ],
+
+    editorProps: {
+      attributes: {
+        class:
+          "tiptap prose prose-sm lg:prose max-w-none min-h-[150px] px-2 py-4 focus:outline-none",
+      },
+    },
+
+    immediatelyRender: false,
+
+    content: value,
+
+    onUpdate({ editor }) {
+      onChange?.(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const current = editor.getHTML();
+
+    if (current !== (value || "")) {
+      editor.commands.setContent(value || "", false);
+    }
+  }, [value, editor]);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+      const res = await uploadImage({
+        variables: {
+          file,
         },
-        content: value,
-        immediatelyRender: false,
-        onUpdate: ({ editor }) => {
-            const html = editor.getHTML();
-            onChange?.(html);
-        },
-    });
+      });
 
+      const url = res.data.uploadImage.url;
 
-    useEffect(() => {
-        if (editor && value !== editor.getHTML()) {
-            editor.commands.setContent(value || "");
-        }
-    }, [value, editor]);
-    return (
-        <div className="flex flex-col gap-1 w-full">
-            {editor && <Toolbar editor={editor} />}
-            <EditorContent
-                editor={editor}
-                className="edit-place focus:border-0 focus:ring-0 border border-gray-200 rounded-md p-2 "
-            />
-        </div>
-    );
+      editor?.chain().focus().setImage({ src: url }).run();
+    } catch (err) {
+      console.error(err);
+    }
+    e.target.value = "";
+  };
+
+const insertLink = () => {
+  const url = window.prompt("Enter URL");
+
+  if (url === null) return;
+
+  if (url.trim() === "") {
+    editor.chain().focus().unsetLink().run();
+    return;
+  }
+
+ let finalUrl = url.trim();
+
+if (
+  !finalUrl.startsWith("http://") &&
+  !finalUrl.startsWith("https://")
+) {
+  finalUrl = `https://${finalUrl}`;
 }
 
-const Toolbar = ({ editor }) => {
-    const editorState = useEditorState({
-        editor,
-        selector: (ctx) => {
-            return {
-                isBold: ctx.editor.isActive("bold") ?? false,
-                isItalic: ctx.editor.isActive("italic") ?? false,
-                isStrike: ctx.editor.isActive("strike") ?? false,
-                isUnderline: ctx.editor.isActive("underline") ?? false,
-                isParagraph: ctx.editor.isActive('paragraph') ?? false,
-                // isHeading1: ctx.editor.isActive('heading', { level: 1 }) ?? false,
-                isHeading2: ctx.editor.isActive('heading', { level: 2 }) ?? false,
-                isHeading3: ctx.editor.isActive('heading', { level: 3 }) ?? false,
-                isHeading4: ctx.editor.isActive('heading', { level: 4 }) ?? false,
-                isHeading5: ctx.editor.isActive('heading', { level: 5 }) ?? false,
-                isHeading6: ctx.editor.isActive('heading', { level: 6 }) ?? false,
-                // isBulletList: ctx.editor.isActive('bulletList') ?? false,
-                // isOrderedList: ctx.editor.isActive('orderedList') ?? false,
-                // isBlockquote: ctx.editor.isActive('blockquote') ?? false,
+editor?.chain().focus().extendMarkRange("link")?.setLink({href: finalUrl,target: "_blank",rel: "noopener noreferrer",}).run();
+};
 
-            };
-        },
-    });
+  return (
+    <div className="w-full">
+      <input
+        type="file"
+        accept="image/*"
+        hidden
+        ref={fileRef}
+        onChange={handleImageUpload}
+      />
 
-    const getCurrentHeading = () => {
-        for (let level = 1; level <= 6; level++) {
-            if (editor.isActive('heading', { level })) {
-                return `h${level}`;
-            }
-        }
-        return 'paragraph';
-    };
+      {editor && (
+        <Toolbar editor={editor} fileRef={fileRef} insertLink={insertLink} />
+      )}
 
-    const handleChange = (e) => {
-        const value = e.target.value;
+      <EditorContent
+        editor={editor}
+        className="border rounded-b-xl bg-white tiptap"
+      />
+    </div>
+  );
+}
+const Toolbar = ({ editor, fileRef, insertLink }) => {
+  const editorState = useEditorState({
+    editor,
+    selector: (ctx) => ({
+      bold: ctx.editor.isActive("bold"),
+      italic: ctx.editor.isActive("italic"),
+      underline: ctx.editor.isActive("underline"),
+      strike: ctx.editor.isActive("strike"),
+      bullet: ctx.editor.isActive("bulletList"),
+      ordered: ctx.editor.isActive("orderedList"),
+      quote: ctx.editor.isActive("blockquote"),
+      highlight: ctx.editor.isActive("highlight"),
+    }),
+  });
 
-        if (value === 'paragraph') {
-            editor.chain().focus().setParagraph().run();
-        } else {
-            const level = Number(value.replace('h', ''));
-            editor.chain().focus().toggleHeading({ level }).run();
-        }
-    };
+  const stop = (e) => e.preventDefault();
 
-    return (
-        <div className="flex gap-2 items-center bg-gray-300 border border-gray-200 rounded-md shadow-2xl px-4 py-0.5 w-full">
-            <button
-                type="button"
-                onClick={() => editor.chain().focus().toggleBold().run()}
-                className={`px-2 py-1 rounded-md text-xs font-bold transition  ${editorState.isBold
-                    ? "bg-gray-500 text-white"
-                    : "bg-transparent text-black hover:bg-gray-100"
-                    }`}
-            >
-                B
-            </button>
-            <button
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-                className={`px-2 py-1 rounded-md text-xs italic transition ${editorState.isItalic ? "bg-gray-500 text-white" : "hover:bg-gray-100"
-                    }`}
-            >
-                I
-            </button>
+  const getHeading = () => {
+    for (let i = 1; i <= 6; i++) {
+      if (editor.isActive("heading", { level: i })) return `h${i}`;
+    }
+    return "paragraph";
+  };
 
-            <button
-                onClick={() => editor.chain().focus().toggleStrike().run()}
-                className={`px-2 py-1 rounded-md text-xs line-through transition ${editorState.isStrike ? "bg-gray-500 text-white" : "hover:bg-gray-100"
-                    } `}
-            >
-                Strike
-            </button>
-            <button
-                onClick={() => editor.chain().focus().toggleUnderline().run()}
-                className={`px-2 py-1 rounded-md text-xs underline transition ${editorState.isUnderline ? "bg-gray-500 text-white" : "hover:bg-gray-100"
-                    } `}
-            >
-                U
-            </button>
-            <select
-                value={getCurrentHeading()}
-                onChange={handleChange}
-                className="px-2 py-1 text-xs border rounded-md bg-white"
-            >
-                <option value="paragraph">Select font size</option>
-                <option value="h1">Heading 1</option>
-                <option value="h2">Heading 2</option>
-                <option value="h3">Heading 3</option>
-                <option value="h4">Heading 4</option>
-                <option value="h5">Heading 5</option>
-                <option value="h6">Heading 6</option>
-            </select>
+  const changeHeading = (e) => {
+    const value = e.target.value;
 
-            {/* <button
-                onClick={() => editor.chain().focus().toggleBulletList().run()}
-                className={`px-2 py-1 rounded-md text-xs underline transition ${editorState.isBulletList ? "bg-gray-500 text-white" : "hover:bg-gray-100"
-                    } `}>
-                Bullet list
-            </button>
-            <button
-                onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                className={`px-2 py-1 rounded-md text-xs underline transition ${editorState.isOrderedList ? "bg-gray-500 text-white" : "hover:bg-gray-100"
-                    } `}>
-                Ordered list
-            </button>
+    if (value === "paragraph") {
+      editor.chain().focus().setParagraph().run();
+      return;
+    }
 
-            <button
-                onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                className={`px-2 py-1 rounded-md text-xs underline transition ${editorState.isBlockquote ? "bg-gray-500 text-white" : "hover:bg-gray-100"
-                    } `}>
-                Blockquote
-            </button> */}
-        </div>
-    );
+    editor
+      .chain()
+      .focus()
+      .toggleHeading({ level: Number(value.replace("h", "")) })
+      .run();
+  };
+
+  const btn = (active) =>
+    `h-6 w-9 rounded-md flex items-center justify-center transition
+    ${active ? "bg-purple-600 text-white" : "hover:bg-gray-200 text-gray-700"}`;
+
+  return (
+    <div className="flex flex-wrap gap-2 border rounded-t-xl bg-gray-100 p-2">
+      {/* Undo */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().undo().run()}
+        className={btn(false)}
+      >
+        <Undo2 size={16} />
+      </button>
+
+      {/* Redo */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().redo().run()}
+        className={btn(false)}
+      >
+        <Redo2 size={16} />
+      </button>
+
+      <div className="w-px bg-gray-300 mx-1" />
+
+      {/* Bold */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={btn(editorState.bold)}
+      >
+        <Bold size={16} />
+      </button>
+
+      {/* Italic */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={btn(editorState.italic)}
+      >
+        <Italic size={16} />
+      </button>
+
+      {/* Underline */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={btn(editorState.underline)}
+      >
+        <UnderlineIcon size={16} />
+      </button>
+
+      {/* Strike */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        className={btn(editorState.strike)}
+      >
+        <Strikethrough size={16} />
+      </button>
+
+      <div className="w-px bg-gray-300 mx-1" />
+
+      {/* Heading */}
+      <select
+        value={getHeading()}
+        onChange={changeHeading}
+        className="border rounded px-2 h-9 bg-white"
+      >
+        <option value="paragraph">Paragraph</option>
+        <option value="h1">Heading 1</option>
+        <option value="h2">Heading 2</option>
+        <option value="h3">Heading 3</option>
+        <option value="h4">Heading 4</option>
+        <option value="h5">Heading 5</option>
+        <option value="h6">Heading 6</option>
+      </select>
+
+      <div className="w-px bg-gray-300 mx-1" />
+
+      {/* Bullet */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={btn(editorState.bullet)}
+      >
+        <List size={16} />
+      </button>
+
+      {/* Ordered */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={btn(editorState.ordered)}
+      >
+        <ListOrdered size={16} />
+      </button>
+
+      {/* Quote */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        className={btn(editorState.quote)}
+      >
+        <Quote size={16} />
+      </button>
+
+      {/* Divider */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        className={btn(false)}
+      >
+        <Minus size={16} />
+      </button>
+
+      <div className="w-px bg-gray-300 mx-1" />
+
+      {/* Link */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={insertLink}
+        className={btn(false)}
+      >
+        <Link2 size={16} />
+      </button>
+
+      {/* Image */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => fileRef.current.click()}
+        className={btn(false)}
+      >
+        <ImageIcon size={16} />
+      </button>
+
+      <div className="w-px bg-gray-300 mx-1" />
+
+      {/* Highlight */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor?.chain().focus().toggleHighlight().run()}
+        className={btn(editorState.highlight)}
+      >
+        <Highlighter size={16} />
+      </button>
+
+      {/* Color */}
+      <input
+        type="color"
+        onMouseDown={stop}
+        onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+        className="w-9 h-9 cursor-pointer border rounded"
+      />
+
+      <div className="w-px bg-gray-300 mx-1" />
+
+      {/* Align Left */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor?.chain().focus().setTextAlign("left").run()}
+        className={btn(false)}
+      >
+        <AlignLeft size={16} />
+      </button>
+
+      {/* Center */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        className={btn(false)}
+      >
+        <AlignCenter size={16} />
+      </button>
+
+      {/* Right */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor?.chain().focus().setTextAlign("right").run()}
+        className={btn(false)}
+      >
+        <AlignRight size={16} />
+      </button>
+
+      {/* Justify */}
+      <button
+        type="button"
+        onMouseDown={stop}
+        onClick={() => editor?.chain().focus().setTextAlign("justify").run()}
+        className={btn(false)}
+      >
+        <AlignJustify size={16} />
+      </button>
+    </div>
+  );
 };

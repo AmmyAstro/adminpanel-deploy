@@ -26,6 +26,10 @@ export default function Header() {
 
     router.push("/");
   };
+const user = JSON.parse(localStorage.getItem("user"));
+
+console.log("User Name:", user?.name);
+  
 
   return (
     <header className="fixed top-0 z-100 w-full left-0 flex h-14 items-center justify-between px-6 py-1 bg-[#2f1254] shadow-md">
@@ -79,7 +83,7 @@ export default function Header() {
           >
             <div className="text-right text-white">
               <h4 className="text-sm font-semibold">USER</h4>
-              <span className="text-xs ">Admin</span>
+              <span className="text-xs ">{user?.name}</span>
             </div>
             <Image
               src="/admin-img/man.png"

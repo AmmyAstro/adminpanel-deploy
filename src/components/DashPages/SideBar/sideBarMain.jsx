@@ -20,6 +20,8 @@ export default function SideBarMain() {
   const { data, loading } = useQuery(GET_MODULES_BY_SECTION, {
     variables: { section },
     skip: !section,
+      fetchPolicy: "cache-and-network",
+
   });
 
   const modules = data?.getModulesBySection || [];
