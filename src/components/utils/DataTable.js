@@ -8,9 +8,9 @@ const gridColumns = updatedColumns
   return (
     <div className="w-full bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
       <table className="w-full border-separate  border-spacing-0">
-        <thead className="bg-purple-300 border-b">
+        <thead className="bg-purple-400 border-b">
           <tr
-            className="border-b grid"
+            className="border-b  grid"
             style={{
               gridTemplateColumns: gridColumns,
             }}
@@ -38,7 +38,7 @@ const gridColumns = updatedColumns
                     ? rowIndex + 1
                     : col.render
                       ? col.render(row)
-                      : row[col.accessor] || "-"}
+                     : row[col.accessor] ?? "-"}
                 </td>
               ))}
             </tr>

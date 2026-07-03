@@ -14,6 +14,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function CreateNotice() {
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     id: null,
     title: "",
@@ -27,14 +28,52 @@ export default function CreateNotice() {
       searchInput: {},
     },
   });
+  const validateForm = () => {
+    const err = {};
 
+    if (!formData.title.trim()) {
+      err.title = "Notice title is required";
+    } else if (formData.title.trim().length > 100) {
+      err.title = "Maximum 100 characters allowed";
+    }
+
+    if (!formData.description.trim()) {
+      err.description = "Description is required";
+    } else if (formData.description.trim().length > 1000) {
+      err.description = "Maximum 1000 characters allowed";
+    }
+
+    if (
+      formData.targetType === "SELECTED" &&
+      formData.astrologers.length === 0
+    ) {
+      err.astrologers = "Please select at least one astrologer";
+    }
+
+    setErrors(err);
+
+    return Object.keys(err).length === 0;
+  };
+
+  const handleChange = (key, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [key]: "",
+    }));
+  };
   const astrologers = astroData?.getAstrologerListBySearch?.data || [];
 
   const [createNotice] = useMutation(CREATE_NOTICE);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
+  if (!validateForm()) return;
     const isEditMode = !!formData.id;
 
     try {
@@ -59,6 +98,7 @@ export default function CreateNotice() {
         });
 
         toast.success("Notice Updated");
+        setErrors({});
       } else {
         await createNotice({
           variables: {
@@ -81,18 +121,19 @@ export default function CreateNotice() {
 
           refetchQueries: [GET_NOTICES],
         });
-
+setErrors({});
         toast.success("Notice Created");
       }
 
       // reset form
-      setFormData({
-        title: "",
-        description: "",
-        targetType: "ALL",
-        astrologers: [],
-        isActive: true,
-      });
+   setFormData({
+    id: null,
+    title: "",
+    description: "",
+    targetType: "ALL",
+    astrologers: [],
+    isActive: true,
+});
     } catch (err) {
       toast.error(err?.message || "Something went wrong");
     }
@@ -136,7 +177,7 @@ export default function CreateNotice() {
 
   const { data: noticeData, loading: noticeLoading } = useQuery(GET_NOTICES);
   const notices = noticeData?.getNotices || [];
-      
+
   return (
     <div className="bg-white p-6 rounded-xl shadow">
       <h2 className="text-xl font-semibold mb-5">Create Notice</h2>
@@ -151,13 +192,12 @@ export default function CreateNotice() {
             type="text"
             className="border rounded-lg w-full p-3"
             value={formData.title}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                title: e.target.value,
-              })
-            }
+            maxLength={100}
+            onChange={(e) => handleChange("title", e.target.value)}
           />
+          {errors.title && (
+            <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+          )}
         </div>
 
         {/* Description */}
@@ -169,13 +209,20 @@ export default function CreateNotice() {
             rows={6}
             className="border rounded-lg w-full p-3"
             value={formData.description}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                description: e.target.value,
-              })
-            }
+            maxLength={1000}
+            onChange={(e) => handleChange("description", e.target.value)}
           />
+        <div className="flex justify-between mt-1">
+    {errors.description && (
+        <p className="text-xs text-red-500">
+            {errors.description}
+        </p>
+    )}
+
+    <p className="text-xs text-gray-400 ml-auto">
+        {formData.description.length}/1000
+    </p>
+</div>
         </div>
 
         {/* Audience */}
@@ -186,17 +233,15 @@ export default function CreateNotice() {
           <select
             className="border rounded-lg w-full p-3"
             value={formData.targetType}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                targetType: e.target.value,
-              })
-            }
+            onChange={(e) => handleChange("targetType", e.target.value)}
           >
             <option value="ALL">All Astrologers</option>
 
             <option value="SELECTED">Selected Astrologers</option>
           </select>
+          {errors.astrologers && (
+            <p className="text-xs text-red-500 mt-2">{errors.astrologers}</p>
+          )}
         </div>
 
         {/* Multi Select */}
@@ -255,10 +300,7 @@ export default function CreateNotice() {
             id="activeNotice"
             checked={formData.isActive}
             onChange={(val) =>
-              setFormData({
-                ...formData,
-                isActive: val,
-              })
+             handleChange("isActive", val)
             }
           />
         </div>
@@ -285,21 +327,21 @@ export default function CreateNotice() {
                   <h3 className="font-bold text-lg">{notice.title}</h3>
 
                   <p className="text-gray-600 mt-2">{notice.description}</p>
-   
 
-<p className="text-sm text-gray-600">
-  {new Date(Number(notice.createdAt)).toLocaleString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "Asia/Kolkata",
-  })}
-</p>
-                           
-
+                  <p className="text-sm text-gray-600">
+                    {new Date(Number(notice.createdAt)).toLocaleString(
+                      "en-IN",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                        timeZone: "Asia/Kolkata",
+                      },
+                    )}
+                  </p>
                 </div>
 
                 <div className="flex gap-2">

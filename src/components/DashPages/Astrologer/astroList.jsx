@@ -15,7 +15,12 @@ import ConfirmModal from "@/components/Custom/ConfirmModal";
 import { GET_ASTRO_LIST } from "@/app/graphQL/astroHiring";
 import Link from "next/link";
 import dayjs from "dayjs";
-
+import Pagination from "@/app/Admindash/Pagination";
+import { exportExcel } from "@/components/utils/export/exportExcel";
+import { exportPDF } from "@/components/utils/export/exportPDF";
+import { printTable } from "@/components/utils/export/exportPrint";
+import ExportMenu from "@/components/Custom/ExportMenu";
+import { exportCSV } from "@/components/utils/export/exportCsv";
 const DELETE_ASTRO = gql`
   mutation DeleteAstrologer($astrologerId: ID!) {
     deleteAstrologer(astrologerId: $astrologerId)
@@ -25,7 +30,9 @@ const DELETE_ASTRO = gql`
 export default function AstroList() {
   const router = useRouter();
   const [query, setQuery] = useState("");
-
+  const [page, setPage] = useState(1);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const LIMIT = 50;
   const { can, isSuperAdmin } = usePermissions();
 
   const canView = isSuperAdmin || can("astrologer", "read");
@@ -34,16 +41,31 @@ export default function AstroList() {
 
   const { confirmState, setConfirmState, executeAction, handleConfirm } =
     useActionHandler();
-
+  const toggleSelection = (id) => {
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+  const toggleSelectAll = () => {
+    if (selectedRows.length === astrologers.length) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(astrologers.map((a) => a.id));
+    }
+  };
   const { data, loading, refetch } = useQuery(GET_ASTRO_LIST, {
     variables: {
       searchInput: {
-        query: "",
-        limit: 10,
-        page: 1,
+        query,
+        limit: LIMIT,
+        page,
       },
     },
+    fetchPolicy: "cache-and-network",
   });
+  const totalPages = data?.getAstrologerListBySearch?.totalPages || 1;
+
+  const currentPage = data?.getAstrologerListBySearch?.currentPage || page;
 
   const [deleteAstrologer] = useMutation(DELETE_ASTRO);
 
@@ -57,11 +79,28 @@ export default function AstroList() {
     router.push(`/Admindash/astromain/edit-astrologer/${id}`);
   };
 
-  /* =========================
-      TABLE COLUMNS
-  ========================= */
-
   const columns = [
+    {
+      header: (
+        <input
+          type="checkbox"
+          checked={
+            selectedRows.length === astrologers.length && astrologers.length > 0
+          }
+          onChange={toggleSelectAll}
+        />
+      ),
+
+      render: (row) => (
+        <input
+          type="checkbox"
+          checked={selectedRows.includes(row.id)}
+          onChange={() => toggleSelection(row.id)}
+        />
+      ),
+
+      width: "60px",
+    },
     {
       header: "Name",
       accessor: "name",
@@ -80,10 +119,9 @@ export default function AstroList() {
     { header: "Email", accessor: "email" },
     { header: "Phone", accessor: "contactNo" },
     {
-  header: "Joined On",
-  render: (row) =>
-    dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
-},
+      header: "Joined On",
+      render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+    },
 
     {
       header: "Actions",
@@ -143,33 +181,70 @@ export default function AstroList() {
   ========================= */
 
   const handleSearch = () => {
+    setPage(1);
+
     refetch({
       searchInput: {
         query,
-        limit: 10,
+        limit: LIMIT,
         page: 1,
       },
     });
   };
 
-  /* =========================
-      UI
-  ========================= */
+  const currentExportData = astrologers.map((x) => ({
+    Name: x.displayName,
+    Email: x.email,
+    Phone: x.contactNo,
+    Joined: dayjs(x.createdAt).format("DD MMM YYYY hh:mm A"),
+  }));
+  const selectedExportData = astrologers
+    .filter((x) => selectedRows.includes(x.id))
+    .map((x) => ({
+      Name: x.displayName,
+      Email: x.email,
+      Phone: x.contactNo,
+      Joined: dayjs(x.createdAt).format("DD MMM YYYY hh:mm A"),
+    }));
+  const handleExportAll = async () => {
+    const { data } = await client.query({
+      query: EXPORT_ASTROLOGERS,
 
+      variables: {
+        query,
+      },
+
+      fetchPolicy: "network-only",
+    });
+
+    exportExcel(data.exportAstrologers);
+  };
+  const exportData = selectedRows.length
+    ? selectedExportData
+    : currentExportData;
   return (
     <div className="min-h-screen">
       {/* HEADER */}
       <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex justify-between">
         <h2 className="text-xl font-bold text-purple-900">Astrologer List</h2>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
           <CustomInput
-            placeholder="Search..."
+            placeholder="Search by name, email or mobile..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            className="w-[100%]"
           />
-          <CustomButton onClick={handleSearch}>Search</CustomButton>
+          {/* <CustomButton onClick={handleSearch}>Search</CustomButton> */}
         </div>
+        <ExportMenu
+          onExcel={() => exportExcel(exportData)}
+          onCSV={() => exportCSV(exportData)}
+          onPDF={() => exportPDF(exportData)}
+          onPrint={() => printTable()}
+          onExportCurrent={() => exportExcel(currentExportData)}
+          onExportAll={handleExportAll}
+        />
       </div>
 
       {/* CONFIRM MODAL */}
@@ -179,11 +254,19 @@ export default function AstroList() {
         onConfirm={handleConfirm}
       />
 
-      {/* TABLE */}
       {loading ? (
         <p className="p-4">Loading...</p>
       ) : (
-        <DataTable columns={columns} data={astrologers} />
+        <>
+          <DataTable columns={columns} data={astrologers} />
+
+          <Pagination
+            page={currentPage}
+            totalPages={totalPages}
+            onPrevious={() => setPage((p) => Math.max(1, p - 1))}
+            onNext={() => setPage((p) => p + 1)}
+          />
+        </>
       )}
     </div>
   );

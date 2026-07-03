@@ -22,11 +22,12 @@ import { usePermissions } from "@/context/PermissionContext";
 import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useActionHandler } from "@/hooks/useActionHandler";
+import DataTable from "@/components/utils/DataTable";
 
 export default function PackageMain() {
   const [open, setOpen] = useState(false);
   const [editPack, setEditPack] = useState(null);
-
+  const [errors, setErrors] = useState({});
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -37,17 +38,14 @@ export default function PackageMain() {
     isActive: true,
   });
 
-  // 🔥 Permissions
   const { can, isSuperAdmin } = usePermissions();
   const canRead = isSuperAdmin || can("walletpackages", "read");
   const canCreate = isSuperAdmin || can("walletpackages", "create");
   const canUpdate = isSuperAdmin || can("walletpackages", "update");
 
-  // 🔥 Action handler (for delete confirm)
   const { confirmState, setConfirmState, executeAction, handleConfirm } =
     useActionHandler();
 
-  // 🔥 Query
   const { data, loading, refetch } = useQuery(GET_RECHARGE_PACKS, {
     skip: !canRead,
   });
@@ -58,15 +56,22 @@ export default function PackageMain() {
 
   const packs = data?.getRechargePacks || [];
 
-  // 🔥 No access
   if (!canRead) {
     return <p className="p-10 text-red-500">No Access</p>;
   }
 
-  // 🔥 Handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
   const resetForm = () => {
@@ -79,10 +84,11 @@ export default function PackageMain() {
       validityDays: "",
       isActive: true,
     });
-
+    setErrors({});
     setEditPack(null);
   };
   const handleSubmit = async () => {
+    if (!validateForm()) return;
     const canSubmit =
       isSuperAdmin ||
       (editPack
@@ -127,6 +133,45 @@ export default function PackageMain() {
       toast.error(err.message);
     }
   };
+  const validateForm = () => {
+    const err = {};
+
+    if (!form.name.trim()) {
+      err.name = "Package name is required";
+    }
+
+    if (!form.description.trim()) {
+      err.description = "Description is required";
+    }
+
+    if (!form.price) {
+      err.price = "Price is required";
+    } else if (Number(form.price) <= 0) {
+      err.price = "Price must be greater than 0";
+    }
+
+    if (!form.coins) {
+      err.coins = "Coins are required";
+    } else if (Number(form.coins) <= 0) {
+      err.coins = "Coins must be greater than 0";
+    }
+
+    if (!form.talktime) {
+      err.talktime = "Talktime is required";
+    } else if (Number(form.talktime) <= 0) {
+      err.talktime = "Talktime must be greater than 0";
+    }
+
+    if (!form.validityDays) {
+      err.validityDays = "Validity is required";
+    } else if (Number(form.validityDays) <= 0) {
+      err.validityDays = "Validity must be greater than 0";
+    }
+
+    setErrors(err);
+
+    return Object.keys(err).length === 0;
+  };
 
   const handleToggle = async (pkg) => {
     if (!(isSuperAdmin || can("walletpackages", "update"))) {
@@ -153,6 +198,86 @@ export default function PackageMain() {
       toast.error(err.message);
     }
   };
+  const columns = [
+    {
+      header: "Name",
+      accessor: "name",
+    },
+    {
+      header: "Price",
+      render: (row) => `₹${row.price}`,
+    },
+    {
+      header: "Talktime",
+      accessor: "talktime",
+    },
+    {
+      header: "Coins",
+      accessor: "coins",
+    },
+    {
+      header: "Validity",
+      render: (row) => `${row.validityDays} Days`,
+    },
+    {
+      header: "Status",
+      render: (row) => (
+        <CustomToggle
+          checked={row.isActive}
+          onChange={() => handleToggle(row)}
+        />
+      ),
+    },
+    {
+      header: "Created At",
+      render: (row) =>
+        row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "-",
+    },
+    {
+      header: "Action",
+      width: "140px",
+      render: (row) => (
+        <div className="flex justify-center gap-2">
+          <button
+            disabled={!canUpdate}
+            onClick={() => {
+              setEditPack(row);
+              setForm({
+                ...row,
+                price: String(row.price),
+                coins: String(row.coins),
+                talktime: String(row.talktime),
+                validityDays: String(row.validityDays),
+              });
+              setOpen(true);
+            }}
+            className={`p-2 rounded-full cursor-pointer ${
+              !canUpdate
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200"
+            }`}
+          >
+            <TbEdit />
+          </button>
+
+          <ProtectedActionButton
+            module="walletpackages"
+            action="delete"
+            executeAction={executeAction}
+            mutationFn={deletePack}
+            variables={{ id: row.id }}
+            onSuccess={() => {
+              toast.success("Deleted");
+              refetch();
+            }}
+            className="p-2 cursor-pointer bg-red-500 text-white rounded-full"
+          >
+            <MdDelete />
+          </ProtectedActionButton>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="ml-0 bg-[#928f8f34] p-6 rounded-lg">
@@ -185,169 +310,187 @@ export default function PackageMain() {
 
         {/* MODAL */}
         {open && (
-          <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-            <div className="bg-white rounded-xl p-6 w-[500px] space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold">
-                  {editPack ? "Edit Package" : "Create Package"}
-                </h2>
-                <MdCancel
-                  className="text-2xl cursor-pointer"
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.18)] animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between px-7 py-2 bg-violet-400">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">
+                    {editPack ? "Edit Wallet Package" : "Create Wallet Package"}
+                  </h2>
+
+                  <p className="text-sm text-violet-100 mt-1">
+                    Configure recharge package details for users.
+                  </p>
+                </div>
+
+                <button
                   onClick={() => setOpen(false)}
-                />
+                  className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition flex items-center justify-center"
+                >
+                  <MdCancel className="text-2xl text-white" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <CustomInput
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Package Name"
-                />
-
-                <CustomInput
-                  name="price"
-                  type="number"
-                  value={form.price}
-                  onChange={handleChange}
-                  placeholder="Price"
-                />
-
-                <CustomInput
-                  name="talktime"
-                  type="number"
-                  value={form.talktime}
-                  onChange={handleChange}
-                  placeholder="Talktime"
-                />
-
-                <CustomInput
-                  name="coins"
-                  type="number"
-                  value={form.coins}
-                  onChange={handleChange}
-                  placeholder="Coins"
-                />
-
-                <CustomInput
-                  name="validityDays"
-                  type="number"
-                  value={form.validityDays}
-                  onChange={handleChange}
-                  placeholder="Validity Days"
-                />
-
-                <CustomInput
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="Description"
-                />
+              <div className="p-7 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Package Name
+                    </label>
+                    <CustomInput
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      placeholder="Package Name"
+                    />
+                    {errors.name && (
+                      <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Price
+                    </label>
+                    <CustomInput
+                      name="price"
+                      type="number"
+                      value={form.price}
+                      onChange={handleChange}
+                      placeholder="Price"
+                    />
+                    {errors.price && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.price}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {" "}
+                    <label className="text-sm font-semibold text-gray-700">
+                      Talktime
+                    </label>
+                    <CustomInput
+                      name="talktime"
+                      type="number"
+                      value={form.talktime}
+                      onChange={handleChange}
+                      placeholder="Talktime"
+                    />
+                    {errors.talktime && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.talktime}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {" "}
+                    <label className="text-sm font-semibold text-gray-700">
+                      Coins
+                    </label>
+                    <CustomInput
+                      name="coins"
+                      type="number"
+                      value={form.coins}
+                      onChange={handleChange}
+                      placeholder="Coins"
+                    />
+                    {errors.coins && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.coins}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {" "}
+                    <label className="text-sm font-semibold text-gray-700">
+                      Validity Days
+                    </label>
+                    <CustomInput
+                      name="validityDays"
+                      type="number"
+                      value={form.validityDays}
+                      onChange={handleChange}
+                      placeholder="Validity Days"
+                    />
+                    {errors.validityDays && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.validityDays}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {" "}
+                    <label className="text-sm font-semibold text-gray-700">
+                      Description
+                    </label>
+                    <CustomInput
+                      name="description"
+                      value={form.description}
+                      onChange={handleChange}
+                      placeholder="Description"
+                    />
+                    {errors.description && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-sm">Active</span>
+              <div className="flex items-center justify-between rounded-2xl border border-violet-100 bg-violet-50 px-5 py-4">
+                <div>
+                  <p className="font-semibold text-gray-800">Package Status</p>
+
+                  <p className="text-sm text-gray-500">
+                    Enable or disable this wallet package.
+                  </p>
+                </div>
+
                 <CustomToggle
                   checked={form.isActive}
                   onChange={(val) =>
-                    setForm((prev) => ({ ...prev, isActive: val }))
+                    setForm((prev) => ({
+                      ...prev,
+                      isActive: val,
+                    }))
                   }
                 />
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-center gap-3 border-t border-gray-100 py-5">
                 <CustomButton
-                  className="px-2 py-1"
+                  variant="gray"
+                  className="px-5 py-2 rounded-full"
+                  onClick={() => {
+                    resetForm();
+                    setOpen(false);
+                  }}
+                >
+                  Cancel
+                </CustomButton>
+
+                <CustomButton
                   variant="green"
+                  className="px-6 py-2 rounded-full shadow-lg shadow-violet-300/40"
                   onClick={handleSubmit}
                 >
-                  {editPack ? "Update" : "Create"}
+                  {editPack ? "Update Package" : "Create Package"}
                 </CustomButton>
               </div>
             </div>
           </div>
         )}
 
-        {/* LOADING */}
         <AlertLoading show={loading} title="Loading..." />
 
-        {/* TABLE */}
-        <div className="mt-10">
-          <div className="grid grid-cols-9 bg-purple-300 p-2 font-semibold text-center">
-            <div>S.No</div>
-            <div>Name</div>
-            <div>Price</div>
-            <div>Talktime</div>
-            <div>Coins</div>
-            <div>Validity</div>
-            <div>Status</div>
-            <div>Created</div>
-            <div>Action</div>
-          </div>
-
-          {packs.map((pkg, index) => (
-            <div
-              key={pkg.id}
-              className="grid grid-cols-9 text-center border-b p-3 items-center"
-            >
-              <div>{index + 1}</div>
-              <div>{pkg.name}</div>
-              <div>₹{pkg.price}</div>
-              <div>{pkg.talktime}</div>
-              <div>{pkg.coins}</div>
-              <div>{pkg.validityDays} Days</div>
-
-              <div className="flex justify-center">
-                <CustomToggle
-                  checked={pkg.isActive}
-                  onChange={() => handleToggle(pkg)}
-                />
-              </div>
-
-              <div>
-                {pkg.createdAt
-                  ? new Date(pkg.createdAt).toLocaleDateString()
-                  : "-"}
-              </div>
-
-              <div className="flex gap-2 justify-center">
-                {/* EDIT */}
-                <button
-                  disabled={!canUpdate}
-                  onClick={() => {
-                    if (!canUpdate) return;
-                    setEditPack(pkg);
-                    setForm(pkg);
-                    setOpen(true);
-                  }}
-                  className={`p-2 rounded ${
-                    !canUpdate
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  <TbEdit />
-                </button>
-
-                {/* DELETE */}
-                <ProtectedActionButton
-                  module="walletpackages"
-                  action="delete"
-                  executeAction={executeAction}
-                  mutationFn={deletePack}
-                  variables={{ id: pkg.id }}
-                  onSuccess={() => {
-                    toast.success("Deleted");
-                    refetch();
-                  }}
-                  className="p-2 bg-red-500 text-white rounded"
-                >
-                  <MdDelete />
-                </ProtectedActionButton>
-              </div>
-            </div>
-          ))}
-        </div>
+        <DataTable
+          columns={columns}
+          data={packs}
+          pagination
+          highlightOnHover
+          responsive
+        />
       </div>
     </div>
   );

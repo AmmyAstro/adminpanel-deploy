@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PiChatTeardropTextFill } from "react-icons/pi";
 import { IoNotifications } from "react-icons/io5";
 import { useDispatch } from "react-redux";
@@ -15,20 +15,29 @@ export default function Header() {
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const [isNotifMenuOpen, setNotifMenuOpen] = useState(false);
   const [isPricingOpen, setPricing] = useState(false);
-
+const [user, setUser] = useState(null);
   const router = useRouter();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     cookieHelper.remove();
+  localStorage.removeItem("user");
 
     dispatch(logout());
 
     router.push("/");
   };
-const user = JSON.parse(localStorage.getItem("user"));
+useEffect(() => {
+  const storedUser = localStorage.getItem("user");
 
-console.log("User Name:", user?.name);
+  if (storedUser) {
+    try {
+      setUser(JSON.parse(storedUser));
+    } catch (error) {
+      console.error("Invalid user data in localStorage", error);
+    }
+  }
+}, []);
   
 
   return (

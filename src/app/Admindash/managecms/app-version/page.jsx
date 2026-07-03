@@ -27,7 +27,7 @@ export default function AppVersionPanel() {
     refetch,
   } = useQuery(GET_APP_VERSIONS);
   const [deleteVersion] = useMutation(DELETE_APP_VERSION);
-
+  const [errors, setErrors] = useState({});
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this version?",
@@ -49,7 +49,7 @@ export default function AppVersionPanel() {
   const versions = data?.getAppVersions || [];
   const [formData, setFormData] = useState({
     platform: "ANDROID",
- appType: "USER",
+    appType: "USER",
     latestVersion: "",
     minimumVersion: "",
 
@@ -66,10 +66,95 @@ export default function AppVersionPanel() {
   });
 
   const [saveVersion, { loading }] = useMutation(ADD_UPDATE_VERSION);
+  const VERSION_REGEX = /^\d+\.\d+\.\d+$/;
 
+  const compareVersions = (v1, v2) => {
+    const a = v1.split(".").map(Number);
+    const b = v2.split(".").map(Number);
+
+    for (let i = 0; i < 3; i++) {
+      if ((a[i] || 0) > (b[i] || 0)) return 1;
+      if ((a[i] || 0) < (b[i] || 0)) return -1;
+    }
+
+    return 0;
+  };
+  const validateForm = () => {
+    const err = {};
+
+    // Latest Version
+    if (!formData.latestVersion.trim()) {
+      err.latestVersion = "Latest version is required";
+    } else if (!VERSION_REGEX.test(formData.latestVersion.trim())) {
+      err.latestVersion = "Use format like 1.0.0";
+    } else if (formData.latestVersion.length > 15) {
+      err.latestVersion = "Maximum 15 characters allowed";
+    }
+
+    // Minimum Version
+    if (!formData.minimumVersion.trim()) {
+      err.minimumVersion = "Minimum version is required";
+    } else if (!VERSION_REGEX.test(formData.minimumVersion.trim())) {
+      err.minimumVersion = "Use format like 1.0.0";
+    } else if (formData.minimumVersion.length > 15) {
+      err.minimumVersion = "Maximum 15 characters allowed";
+    }
+
+    // Release Notes
+    if (!formData.releaseNotes.trim()) {
+      err.releaseNotes = "Release notes are required";
+    } else if (formData.releaseNotes.length > 500) {
+      err.releaseNotes = "Release notes cannot exceed 500 characters";
+    }
+
+    // Play Store URL
+    if (formData.platform === "ANDROID" && !formData.playStoreUrl.trim()) {
+      err.playStoreUrl = "Play Store URL is required";
+    } else if (
+      formData.playStoreUrl &&
+      !/^https?:\/\/.+/.test(formData.playStoreUrl)
+    ) {
+      err.playStoreUrl = "Enter a valid URL";
+    }
+
+    // App Store URL
+    if (formData.platform === "IOS" && !formData.appStoreUrl.trim()) {
+      err.appStoreUrl = "App Store URL is required";
+    } else if (
+      formData.appStoreUrl &&
+      !/^https?:\/\/.+/.test(formData.appStoreUrl)
+    ) {
+      err.appStoreUrl = "Enter a valid URL";
+    }
+
+    // Maintenance Message
+    if (formData.maintenanceMode && !formData.maintenanceMessage.trim()) {
+      err.maintenanceMessage = "Maintenance message is required";
+    }
+
+    if (formData.maintenanceMessage.length > 300) {
+      err.maintenanceMessage = "Maximum 300 characters allowed";
+    }
+    if (
+      formData.latestVersion &&
+      formData.minimumVersion &&
+      VERSION_REGEX.test(formData.latestVersion) &&
+      VERSION_REGEX.test(formData.minimumVersion)
+    ) {
+      if (
+        compareVersions(formData.latestVersion, formData.minimumVersion) < 0
+      ) {
+        err.latestVersion =
+          "Latest version must be greater than or equal to minimum version";
+      }
+    }
+    setErrors(err);
+
+    return Object.keys(err).length === 0;
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!validateForm()) return;
     try {
       await saveVersion({
         variables: {
@@ -80,7 +165,7 @@ export default function AppVersionPanel() {
       await refetch();
 
       setFormData({
-          appType: "USER",
+        appType: "USER",
         platform: "ANDROID",
         latestVersion: "",
         minimumVersion: "",
@@ -91,11 +176,22 @@ export default function AppVersionPanel() {
         appStoreUrl: "",
         releaseNotes: "",
       });
-
+setErrors({});
       alert("Version Updated");
     } catch (error) {
       console.error(error);
     }
+  };
+  const handleChange = (key, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [key]: "",
+    }));
   };
 
   return (
@@ -106,84 +202,135 @@ export default function AppVersionPanel() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid gap-5">
-          <select
-  value={formData.appType}
-  onChange={(e) =>
-    setFormData({
-      ...formData,
-      appType: e.target.value,
-    })
-  }
-  className="p-3 border rounded-xl"
->
-  <option value="USER">User</option>
-  <option value="ASTROLOGER">Astrologer</option>
-</select>
-          <select
-            value={formData.platform}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                platform: e.target.value,
-              })
-            }
-            className="p-3 border rounded-xl"
-          >
-            <option value="ANDROID">Android</option>
+        <div className="space-y-1">
+  <select
+    value={formData.appType}
+    onChange={(e) => handleChange("appType", e.target.value)}
+    className="p-3 border rounded-xl w-full"
+  >
+    <option value="USER">User</option>
+    <option value="ASTROLOGER">Astrologer</option>
+  </select>
 
-            <option value="IOS">iOS</option>
-          </select>
+  {errors.appType && (
+    <p className="text-xs text-red-500">{errors.appType}</p>
+  )}
+</div>
+<div className="space-y-1">
+  <select
+    value={formData.platform}
+    onChange={(e) => handleChange("platform", e.target.value)}
+    className="p-3 border rounded-xl w-full"
+  >
+    <option value="ANDROID">Android</option>
+    <option value="IOS">iOS</option>
+  </select>
 
-          <input
-            type="text"
-            placeholder="Latest Version"
-            value={formData.latestVersion}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                latestVersion: e.target.value,
-              })
-            }
-            className="p-3 border rounded-xl"
-          />
+  {errors.platform && (
+    <p className="text-xs text-red-500">{errors.platform}</p>
+  )}
+</div>
 
-          <input
-            type="text"
-            placeholder="Minimum Version"
-            value={formData.minimumVersion}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                minimumVersion: e.target.value,
-              })
-            }
-            className="p-3 border rounded-xl"
-          />
+        <div className="space-y-1">
+  <input
+    type="text"
+    placeholder="Latest Version (1.0.0)"
+    value={formData.latestVersion}
+    maxLength={15}
+    onChange={(e) =>
+      handleChange(
+        "latestVersion",
+        e.target.value.replace(/\s/g, "")
+      )
+    }
+    className="p-3 border rounded-xl w-full"
+  />
 
-          <textarea
-            placeholder="Release Notes"
-            value={formData.releaseNotes}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                releaseNotes: e.target.value,
-              })
-            }
-            className="p-3 border rounded-xl"
-          />
+  {errors.latestVersion && (
+    <p className="text-xs text-red-500">
+      {errors.latestVersion}
+    </p>
+  )}
+</div>
 
-          <input
-            type="text"
-            placeholder="Play Store URL"
-            value={formData.playStoreUrl}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                playStoreUrl: e.target.value,
-              })
-            }
-            className="p-3 border rounded-xl"
-          />
+    <div className="space-y-1">
+  <input
+    type="text"
+    placeholder="Minimum Version (1.0.0)"
+    value={formData.minimumVersion}
+    maxLength={15}
+    onChange={(e) =>
+      handleChange(
+        "minimumVersion",
+        e.target.value.replace(/\s/g, "")
+      )
+    }
+    className="p-3 border rounded-xl w-full"
+  />
+
+  {errors.minimumVersion && (
+    <p className="text-xs text-red-500">
+      {errors.minimumVersion}
+    </p>
+  )}
+</div>
+
+     <div className="space-y-1">
+  <textarea
+    placeholder="Release Notes"
+    maxLength={500}
+    value={formData.releaseNotes}
+    onChange={(e) =>
+      handleChange("releaseNotes", e.target.value)
+    }
+    className="p-3 border rounded-xl w-full"
+  />
+
+  {errors.releaseNotes && (
+    <p className="text-xs text-red-500">
+      {errors.releaseNotes}
+    </p>
+  )}
+</div>
+
+    <div className="space-y-1">
+  <input
+    type="url"
+    placeholder="Play Store URL"
+    maxLength={300}
+    value={formData.playStoreUrl}
+    onChange={(e) =>
+      handleChange("playStoreUrl", e.target.value)
+    }
+    className="p-3 border rounded-xl w-full"
+  />
+
+  {errors.playStoreUrl && (
+    <p className="text-xs text-red-500">
+      {errors.playStoreUrl}
+    </p>
+  )}
+</div>
+{formData.platform === "IOS" && (
+  <div className="space-y-1">
+    <input
+      type="url"
+      placeholder="App Store URL"
+      maxLength={300}
+      value={formData.appStoreUrl}
+      onChange={(e) =>
+        handleChange("appStoreUrl", e.target.value)
+      }
+      className="p-3 border rounded-xl w-full"
+    />
+
+    {errors.appStoreUrl && (
+      <p className="text-xs text-red-500">
+        {errors.appStoreUrl}
+      </p>
+    )}
+  </div>
+)}
 
           <div className="flex items-center gap-3">
             <input
@@ -201,16 +348,26 @@ export default function AppVersionPanel() {
           </div>
 
           <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={formData.maintenanceMode}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  maintenanceMode: e.target.checked,
-                })
-              }
-            />
+          <div className="space-y-1">
+  <textarea
+    placeholder="Maintenance Message"
+    maxLength={300}
+    value={formData.maintenanceMessage}
+    onChange={(e) =>
+      handleChange(
+        "maintenanceMessage",
+        e.target.value
+      )
+    }
+    className="p-3 border rounded-xl w-full"
+  />
+
+  {errors.maintenanceMessage && (
+    <p className="text-xs text-red-500">
+      {errors.maintenanceMessage}
+    </p>
+  )}
+</div>
 
             <p className="text-black">Maintenance Mode</p>
           </div>
@@ -242,9 +399,9 @@ export default function AppVersionPanel() {
           <DataTable
             columns={[
               {
-  header: "App Type",
-  accessor: "appType",
-},
+                header: "App Type",
+                accessor: "appType",
+              },
               {
                 header: "Platform",
                 accessor: "platform",
