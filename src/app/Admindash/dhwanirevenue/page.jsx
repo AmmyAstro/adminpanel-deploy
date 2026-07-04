@@ -19,9 +19,12 @@ import {
   Legend,
 } from "recharts";
 import { GET_DASHBOARD_COUNTS } from "@/app/graphQL/privilageOperations";
-import { GET_APPLICATIONS,  GET_SESSION_ANALYTICS,  GET_USER_CALL_HISTORY, GET_USERS_CHAT_HISTORY } from "@/app/graphQL/astroHiring";
-
-
+import {
+  GET_APPLICATIONS,
+  GET_SESSION_ANALYTICS,
+  GET_USER_CALL_HISTORY,
+  GET_USERS_CHAT_HISTORY,
+} from "@/app/graphQL/astroHiring";
 
 const COLORS = ["#facc15", "#22c55e", "#ef4444", "#8b5cf6"];
 
@@ -29,7 +32,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState("");
   const [filter, setFilter] = useState("MONTH");
   const [durationFilter, setDurationFilter] = useState("MONTH");
-const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -39,21 +42,18 @@ const [statusFilter, setStatusFilter] = useState("ALL");
     }
   }, []);
 
-const { data, loading, refetch } = useQuery(
-  GET_SESSION_ANALYTICS,
-  {
+  const { data, loading, refetch } = useQuery(GET_SESSION_ANALYTICS, {
     variables: {
       status: statusFilter === "ALL" ? null : statusFilter,
       filter: durationFilter,
     },
-  }
-);
+  });
 
-const analytics = data?.getSessionAnalytics;
+  const analytics = data?.getSessionAnalytics;
 
-const summary = analytics?.statusSummary;
+  const summary = analytics?.statusSummary;
 
-const sessions = analytics?.recentSessions || [];
+  const sessions = analytics?.recentSessions || [];
 
   const { data: countData } = useQuery(GET_DASHBOARD_COUNTS);
 
@@ -181,77 +181,67 @@ const sessions = analytics?.recentSessions || [];
       title: "Applications",
       value: stats.totalApplications || 0,
     },
-  {
+    {
       title: "Revenue",
-      value: `₹${
-        stats.totalRevenue || 0
-      }`,
+      value: `₹${stats.totalRevenue || 0}`,
     },
   ];
-  const STATUS_TABS = [
-  "ALL",
-  "REQUESTED",
-  "ACCEPTED",
-  "ONGOING",
-  "COMPLETED",
-  "FAILED",
-  "CANCELLED",
-];
-// const summary = sessionData?.getSessionAnalytics?.statusSummary;
-const statusCards = [
-  {
-    title: "Requested",
-    value: summary?.requested || 0,
-  },
-  {
-    title: "Accepted",
-    value: summary?.accepted || 0,
-  },
-  {
-    title: "Ongoing",
-    value: summary?.ongoing || 0,
-  },
-  {
-    title: "Completed",
-    value: summary?.completed || 0,
-  },
-  {
-    title: "Cancelled",
-    value: summary?.cancelled || 0,
-  },
-  {
-    title: "Failed",
-    value: summary?.failed || 0,
-  },
-];
-const sessionChartData = [
-  {
-    name: "Requested",
-    value: summary?.requested || 0,
-  },
-  {
-    name: "Accepted",
-    value: summary?.accepted || 0,
-  },
-  {
-    name: "Ongoing",
-    value: summary?.ongoing || 0,
-  },
-  {
-    name: "Completed",
-    value: summary?.completed || 0,
-  },
-  {
-    name: "Cancelled",
-    value: summary?.cancelled || 0,
-  },
-  {
-    name: "Failed",
-    value: summary?.failed || 0,
-  },
-];
+  const STATUS_TABS = ["ALL"];
+
+  const statusCards = [
+    {
+      title: "Requested",
+      value: summary?.requested || 0,
+    },
+    {
+      title: "Accepted",
+      value: summary?.accepted || 0,
+    },
+    {
+      title: "Ongoing",
+      value: summary?.ongoing || 0,
+    },
+    {
+      title: "Completed",
+      value: summary?.completed || 0,
+    },
+    {
+      title: "Cancelled",
+      value: summary?.cancelled || 0,
+    },
+    {
+      title: "Failed",
+      value: summary?.failed || 0,
+    },
+  ];
+  const sessionChartData = [
+    {
+      name: "Requested",
+      value: summary?.requested || 0,
+    },
+    {
+      name: "Accepted",
+      value: summary?.accepted || 0,
+    },
+    {
+      name: "Ongoing",
+      value: summary?.ongoing || 0,
+    },
+    {
+      name: "Completed",
+      value: summary?.completed || 0,
+    },
+    {
+      name: "Cancelled",
+      value: summary?.cancelled || 0,
+    },
+    {
+      name: "Failed",
+      value: summary?.failed || 0,
+    },
+  ];
   return (
-    <div className="p-6 bg-gray-300 shadow-3xl rounded-2xl min-h-screen text-white">
+    <div className="p-6 bg-gray-200 shadow-3xl rounded-2xl min-h-screen text-white">
       <div className="bg-purple-700 rounded-xl p-6 mb-6">
         <h1 className="text-2xl font-bold">
           Welcome,
@@ -260,9 +250,9 @@ const sessionChartData = [
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-5 mb-8">
         {cards.map((item) => (
-          <div key={item.title} className="bg-purple-300 rounded-xl p-5 shadow">
+          <div key={item.title} className="bg-violet-300 rounded-xl p-5 shadow">
             <p className="text-gray-900 text-xl font-semibold">{item.title}</p>
 
             <h2 className="text-3xl font-bold mt-2 text-[#2c0a4d]">
@@ -288,7 +278,7 @@ const sessionChartData = [
 
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
         <div className=" p-5 rounded-xl">
-          <h2 className="font-semibold text-lg mb-4">Calls Analytics</h2>
+          <h2 className="font-semibold text-black text-lg mb-4">Calls Analytics</h2>
 
           <ResponsiveContainer width="100%" height={320}>
             <BarChart data={callChartData}>
@@ -302,7 +292,7 @@ const sessionChartData = [
         </div>
 
         <div className=" p-5 rounded-xl">
-          <h2 className="font-semibold text-lg mb-4">Chats Analytics</h2>
+          <h2 className="font-semibold text-black text-lg mb-4">Chats Analytics</h2>
 
           <ResponsiveContainer width="100%" height={320}>
             <BarChart data={chatChartData}>
@@ -316,76 +306,54 @@ const sessionChartData = [
         </div>
       </div>
 
-
-      <div className="flex flex-wrap gap-3 mt-6 mb-6">
-  {STATUS_TABS.map((item) => (
-    <button
-      key={item}
-      onClick={() => setStatusFilter(item)}
-      className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-        statusFilter === item
-          ? "bg-purple-700 text-white"
-          : "bg-white text-gray-700 border"
-      }`}
-    >
-      {item}
-    </button>
-  ))}
-</div>
-<div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-
-{statusCards.map(card=>(
-
-<div
-className="bg-white rounded-xl p-4 shadow text-center"
-key={card.title}
->
-
-<p className="text-gray-500 text-sm">
-{card.title}
-</p>
-
-<h2 className="text-3xl font-bold mt-2 text-purple-700">
-{card.value}
-</h2>
-
-</div>
-
-))}
-
-</div>
-<ResponsiveContainer width="100%" height={320}>
-  <BarChart data={sessionChartData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="name" />
-    <YAxis />
-    <Tooltip />
-    <Bar dataKey="value" />
-  </BarChart>
-</ResponsiveContainer>
-<ResponsiveContainer width="100%" height={320}>
-  <PieChart>
-    <Pie
-      data={sessionChartData}
-      dataKey="value"
-      nameKey="name"
-      outerRadius={110}
-      label
-    >
-      {sessionChartData.map((_, i) => (
-        <Cell
-          key={i}
-          fill={COLORS[i % COLORS.length]}
-        />
-      ))}
-    </Pie>
-
-    <Tooltip />
-    <Legend />
-  </PieChart>
-</ResponsiveContainer>
-
       <div className="bg-[#2c0a4d] p-5 rounded-xl">
+        <h2 className="font-semibold text-lg mb-4">All Session Status</h2>
+
+    
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+          {statusCards.map((card) => (
+            <div
+              className="bg-white rounded-3xl p-4 shadow text-center"
+              key={card.title}
+            >
+              <p className="text-gray-500 text-sm">{card.title}</p>
+
+              <h2 className="text-3xl font-bold mt-2 text-purple-700">
+                {card.value}
+              </h2>
+            </div>
+          ))}
+        </div>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={sessionChartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" />
+          </BarChart>
+        </ResponsiveContainer>
+        <ResponsiveContainer width="100%" height={320}>
+          <PieChart>
+            <Pie
+              data={sessionChartData}
+              dataKey="value"
+              nameKey="name"
+              outerRadius={110}
+              label
+            >
+              {sessionChartData.map((_, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="bg-violet-900 p-5 mt-10 rounded-xl">
         <h2 className="font-semibold text-lg mb-4">Application Status</h2>
 
         <ResponsiveContainer width="100%" height={350}>

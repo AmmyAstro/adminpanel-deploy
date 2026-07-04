@@ -324,6 +324,7 @@ export const GET_SESSION_ANALYTICS = gql`
 
       recentSessions {
         sessionId
+          type 
         userName
         status
         ratePerMin
@@ -846,4 +847,10 @@ export const GET_CALL_RECORDING = gql`
       fileName
     }
   }
+`;
+
+export const END_SESSION_BY_ADMIN = gql`
+mutation EndSessionByAdmin($sessionId: ID!) {
+  endSessionByAdmin(sessionId: $sessionId)
+}
 `;
