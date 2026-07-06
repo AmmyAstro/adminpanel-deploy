@@ -72,7 +72,7 @@ export default function AstroList() {
   const astrologers = data?.getAstrologerListBySearch?.data || [];
 
   const viewProfile = (id) => {
-    router.push(`/Admindash/asrologer/astroprofile/${id}`);
+    router.push(`/Admindash/astrologer/astroprofile/${id}`);
   };
 
   const handleEdit = (id) => {
