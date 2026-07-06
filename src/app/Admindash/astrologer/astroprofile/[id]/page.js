@@ -329,7 +329,7 @@ export default function Page() {
           <div className="flex justify-between items-center bg-purple-200 p-2 rounded-full shadow px-4">
             <h5 className="text-sm font-bold">Astrologers Details</h5>
             <Link
-              href={`/Admindash/asrologer/edit-astrologer/${astrologerprofile?.id}`}
+              href={`/Admindash/astrologer/edit-astrologer/${astrologerprofile?.id}`}
               variant={"black"}
               className="text-xs bg-black rounded-full px-3 py-1 text-white"
             >

@@ -603,7 +603,7 @@ const router = useRouter();
         console.log("UPDATE RESPONSE:", res?.data?.updateAstrologer);
 
         toast.success("Astrologer updated successfully ✅");
-                 router.replace("/Admindash/asrologer/astrologer-list");
+                 router.replace("/Admindash/astrologer/astrologer-list");
 
       } else {
         res = await addAstrologer({
@@ -614,7 +614,7 @@ const router = useRouter();
 
         if (res?.data?.addAstrologer?.success) {
           toast.success(res.data.addAstrologer.message);
-           router.replace("/Admindash/asrologer/astrologer-list");
+           router.replace("/Admindash/astrologer/astrologer-list");
         }
       }
 

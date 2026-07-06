@@ -76,7 +76,7 @@ export default function AstroList() {
   };
 
   const handleEdit = (id) => {
-    router.push(`/Admindash/asrologer/edit-astrologer/${id}`);
+    router.push(`/Admindash/astrologer/edit-astrologer/${id}`);
   };
 
   const columns = [
@@ -107,7 +107,7 @@ export default function AstroList() {
       render: (row) => (
         <div className="flex flex-col">
           <Link
-            href={`/Admindash/asrologer/astroprofile/${row.id}`}
+            href={`/Admindash/astrologer/astroprofile/${row.id}`}
             className="font-bold text-purple-500"
           >
             {row.displayName}

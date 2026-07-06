@@ -161,7 +161,7 @@ export default function UserProfile({ userId }) {
         render: (row) => (
           <div>
             <Link
-              href={`/Admindash/asrologer/astroprofile/${row.astrologerId}`}
+              href={`/Admindash/astrologer/astroprofile/${row.astrologerId}`}
               className="font-semibold text-violet-600"
             >
               {row.astrologerName}
@@ -432,7 +432,7 @@ export default function UserProfile({ userId }) {
       render: (row) => (
         <div>
           <Link
-            href={`/Admindash/asrologer/astroprofile/${row.astrologerId}`}
+            href={`/Admindash/astrologer/astroprofile/${row.astrologerId}`}
             className="font-semibold text-violet-600"
           >
             {row.displayName}

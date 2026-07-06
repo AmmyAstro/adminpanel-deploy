@@ -11,6 +11,7 @@ import {
   GET_ASTROLOGER_CHAT_HISTORY,
   GET_ASTROLOGER_DASHBOARD_STATS,
   GET_ASTROLOGER_FOLLOWERS,
+  GET_ASTROLOGER_WALLET_TRANSACTIONS,
   GET_CALL_RECORDING,
 } from "@/app/graphQL/astroHiring";
 import DataTable from "@/components/utils/DataTable";
@@ -56,7 +57,19 @@ export default function AstrologerActivities({ astrologerId }) {
       skip: !astrologerId || activeTab !== "call",
     },
   );
-
+const { data: walletData, loading: walletLoading } = useQuery(
+  GET_ASTROLOGER_WALLET_TRANSACTIONS,
+  {
+    variables: {
+      astrologerId,
+      page: 1,
+      limit: 20,
+    },
+    skip: !astrologerId || activeTab !== "wallet",
+  },
+);
+const wallet =
+  walletData?.getAstrologerWalletTransactions?.data || [];
   const chats = chatData?.getAstrologerChatHistory?.data || [];
 
   const calls = callData?.getAstrologerCallHistory?.data || [];
@@ -110,12 +123,16 @@ export default function AstrologerActivities({ astrologerId }) {
         render: (row) => `₹${row.ratePerMin || 0}`,
       },
       {
-        header: "Coins Earned",
-        render: (row) => row.coinsEarned ?? "-",
+        header: "Astrologer Commission",
+        render: (row) => `₹ ${row.astrologerCommission ?? 0}`,
       },
       {
-        header: "Commission",
-        render: (row) => row.commission ?? "-",
+        header: "Dhwani Commission",
+        render: (row) => `₹ ${row.dhwaniCommission ?? 0}`,
+      },
+      {
+        header: "Amount deducted",
+        render: (row) => `₹ ${row.coinsDeducted ?? 0}`,
       },
       {
         header: "Duration",
@@ -160,9 +177,7 @@ export default function AstrologerActivities({ astrologerId }) {
               </span>
 
               {(status === "CANCELLED" || status === "REJECTED") && row.by && (
-                <span className="text-[10px] mt-1 text-red-500 ">
-                  {row.by}
-                </span>
+                <span className="text-[10px] mt-1 text-red-500 ">{row.by}</span>
               )}
             </div>
           );
@@ -290,6 +305,50 @@ export default function AstrologerActivities({ astrologerId }) {
     ],
     [],
   );
+  const walletColumns = useMemo(
+  () => [
+    {
+      header: "Transaction ID",
+      render: (row) => row.id.slice(0, 8),
+    },
+    {
+      header: "Type",
+      render: (row) => (
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            row.type === "CREDIT"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          {row.type}
+        </span>
+      ),
+    },
+    {
+      header: "Amount",
+      render: (row) => row.coins,
+    },
+    {
+      header: "Wallet Balance",
+      render: (row) => `₹ ${row.updatedBalance ?? 0}`,
+    },
+    {
+      header: "Description",
+      render: (row) => row.description || "-",
+    },
+    {
+      header: "Session",
+      render: (row) => row.session?.id?.slice(0, 8) || "-",
+    },
+    {
+      header: "Created At",
+      render: (row) =>
+        dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+    },
+  ],
+  [],
+);
 
   return (
     <div className="p-4 rounded-2xl flex w-full flex-col gap-3 shadow-xl bg-white w-full">
@@ -352,6 +411,16 @@ export default function AstrologerActivities({ astrologerId }) {
           }`}
         >
           Followers
+        </button>
+        <button
+          onClick={() => setActiveTab("wallet")}
+          className={`px-4 py-2 rounded-full text-sm ${
+            activeTab === "followers"
+              ? "bg-purple-500 text-white"
+              : "bg-gray-100"
+          }`}
+        >
+          Wallet
         </button>
       </div>
 
@@ -423,6 +492,12 @@ export default function AstrologerActivities({ astrologerId }) {
           <p>Loading followers...</p>
         ) : (
           <DataTable columns={followerColumns} data={followers} />
+        ))}
+            {activeTab === "wallet" &&
+        (walletLoading ? (
+          <p>Loading Astrologer Wallet...</p>
+        ) : (
+          <DataTable columns={walletColumns} data={wallet} />
         ))}
 
       <SessionMessagesModal

@@ -178,12 +178,16 @@ export default function DashboardPage() {
       value: stats.totalChats || 0,
     },
     {
-      title: "Applications",
+      title: "New Astrologers",
       value: stats.totalApplications || 0,
     },
     {
       title: "Revenue",
       value: `₹${stats.totalRevenue || 0}`,
+    },
+       {
+      title: "Total Recharges",
+      value: `₹${stats.totalRechargeAmount || 0}`,
     },
   ];
   const STATUS_TABS = ["ALL"];
@@ -250,7 +254,7 @@ export default function DashboardPage() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-5 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-8 gap-5 mb-8">
         {cards.map((item) => (
           <div key={item.title} className="bg-violet-300 rounded-xl p-5 shadow">
             <p className="text-gray-900 text-xl font-semibold">{item.title}</p>

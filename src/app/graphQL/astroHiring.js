@@ -301,14 +301,8 @@ export const GET_ASTROLOGER_DASHBOARD_STATS = gql`
   }
 `;
 export const GET_SESSION_ANALYTICS = gql`
-  query GetSessionAnalytics(
-    $status: SessionStatus
-    $filter: DashboardFilter
-  ) {
-    getSessionAnalytics(
-      status: $status
-      filter: $filter
-    ) {
+  query GetSessionAnalytics($status: SessionStatus, $filter: DashboardFilter) {
+    getSessionAnalytics(status: $status, filter: $filter) {
       totalSessions
       totalChats
       totalCalls
@@ -324,7 +318,7 @@ export const GET_SESSION_ANALYTICS = gql`
 
       recentSessions {
         sessionId
-          type 
+        type
         userName
         status
         ratePerMin
@@ -354,14 +348,15 @@ export const GET_ASTROLOGER_CHAT_HISTORY = gql`
 
       data {
         sessionId
- by
+        by
         userName
 
         ratePerMin
 
         durationSec
 
-        coinsEarned
+        astrologerCommission
+        dhwaniCommission
 
         coinsDeducted
 
@@ -388,14 +383,15 @@ export const GET_ASTROLOGER_CALL_HISTORY = gql`
 
       data {
         sessionId
- by
+        by
         userName
 
         ratePerMin
 
         durationSec
 
-        coinsEarned
+        astrologerCommission
+        dhwaniCommission
 
         coinsDeducted
 
@@ -453,7 +449,7 @@ export const GET_USER_CALL_HISTORY = gql`
 
       data {
         sessionId
- by
+        by
         userId
         userName
         mobile
@@ -512,7 +508,7 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
         amount
         description
         createdAt
-
+        updatedBalance
         rechargePack {
           id
           name
@@ -548,9 +544,55 @@ export const GET_USERS_CHAT_HISTORY = gql`
         coinsDeducted
         coinsEarned
         commission
- by
+        by
         durationSec
+        hasRemedy
         createdAt
+      }
+    }
+  }
+`;
+export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
+  query GetAstrologerWalletTransactions(
+    $page: Int
+    $limit: Int
+    $type: String
+    $contactNo: String
+    $amount: Float
+    $filterType: String
+    $startDate: String
+     $astrologerId: ID
+    $endDate: String
+  ) {
+    getAstrologerWalletTransactions(
+      page: $page
+      limit: $limit
+      type: $type
+      contactNo: $contactNo
+       astrologerId: $astrologerId
+      amount: $amount
+      filterType: $filterType
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      totalCount
+
+      data {
+        id
+        type
+        coins
+        amount
+        description
+        createdAt
+updatedBalance
+        astrologerWallet {
+          astrologer {
+            id
+            displayName
+            contactNo
+            email
+          }
+        }
       }
     }
   }
@@ -823,7 +865,6 @@ export const GET_ASTROLOGER_FOLLOWERS = gql`
           name
           mobile
           gender
-        
         }
       }
     }
@@ -850,7 +891,7 @@ export const GET_CALL_RECORDING = gql`
 `;
 
 export const END_SESSION_BY_ADMIN = gql`
-mutation EndSessionByAdmin($sessionId: ID!) {
-  endSessionByAdmin(sessionId: $sessionId)
-}
+  mutation EndSessionByAdmin($sessionId: ID!) {
+    endSessionByAdmin(sessionId: $sessionId)
+  }
 `;

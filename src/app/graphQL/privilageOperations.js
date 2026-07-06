@@ -351,7 +351,7 @@ export const GET_DASHBOARD_COUNTS = gql`
 
       totalCalls
       totalChats
-
+totalRechargeAmount
       totalRevenue
       totalApplications
     }

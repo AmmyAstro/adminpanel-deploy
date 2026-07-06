@@ -178,7 +178,7 @@ export default function ReviewsPage() {
         header: "Astrologer",
         render: (row) => (
           <Link
-            href={`/Admindash/asrologer/astroprofile/${row.astrologerId}`}
+            href={`/Admindash/astrologer/astroprofile/${row.astrologerId}`}
             className="font-semibold text-purple-600 hover:underline"
           >
             {row.displayName}

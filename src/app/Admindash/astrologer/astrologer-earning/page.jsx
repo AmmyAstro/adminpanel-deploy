@@ -156,13 +156,13 @@ export default function AstrologerEarningsPage() {
         header: "Astrologer",
         render: (row) => (
           <div>
-            <Link href={`/Admindash/astro/astroprofile/${row.astrologerId}`} className="font-semibold">
+            <Link href={`/Admindash/astrologer/astroprofile/${row.astrologerId}`} className="font-semibold text-purple-500">
               {row.astrologerName}
             </Link>
 
 
             <p className="text-xs text-gray-400">
-              {row.astrologerId?.slice(0,15)}
+              {row.astrologerId?.slice(0,8)}
             </p>
           </div>
         ),
@@ -175,14 +175,7 @@ export default function AstrologerEarningsPage() {
           </span>
         ),
       },
-      {
-        header: "Balance Coins",
-        render: (row) => (
-          <span className="font-semibold text-blue-600">
-            {row.balanceCoins || 0}
-          </span>
-        ),
-      },
+  
 
       {
         header: "Total Earned",
@@ -203,7 +196,14 @@ export default function AstrologerEarningsPage() {
       },
 
     
-
+    {
+        header: "Wallet Balance",
+        render: (row) => (
+          <span className="font-semibold text-blue-600">
+            {row.balanceCoins || 0}
+          </span>
+        ),
+      },
       {
         header: "Created At",
         render: (row) =>

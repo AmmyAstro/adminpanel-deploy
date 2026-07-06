@@ -6,50 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
 import Link from "next/link";
+import { GET_ASTROLOGER_WALLET_TRANSACTIONS } from "@/app/graphQL/astroHiring";
 
-const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
-  query GetAstrologerWalletTransactions(
-    $page: Int
-    $limit: Int
-    $type: String
-    $contactNo: String
-    $amount: Float
-    $filterType: String
-    $startDate: String
-    $endDate: String
-  ) {
-    getAstrologerWalletTransactions(
-      page: $page
-      limit: $limit
-      type: $type
-      contactNo: $contactNo
-      amount: $amount
-      filterType: $filterType
-      startDate: $startDate
-      endDate: $endDate
-    ) {
-      totalCount
-
-      data {
-        id
-        type
-        coins
-        amount
-        description
-        createdAt
-
-        astrologerWallet {
-          astrologer {
-            id
-            displayName
-            contactNo
-            email
-          }
-        }
-      }
-    }
-  }
-`;
 
 export default function AstrologerWalletTransactionsPage() {
   // SEARCH STATES
@@ -109,6 +67,7 @@ export default function AstrologerWalletTransactionsPage() {
   const queryVariables = {
     page,
     limit,
+   
   };
 
   if (filters.contactNo) {
@@ -161,6 +120,7 @@ export default function AstrologerWalletTransactionsPage() {
             >
               {row?.astrologerWallet?.astrologer?.displayName || "N/A"}
             </Link>
+            <p>{row?.astrologerWallet?.astrologer?.id.slice(0,8)}</p>
           </div>
         ),
       },
@@ -190,10 +150,14 @@ export default function AstrologerWalletTransactionsPage() {
         accessor: "coins",
       },
 
-      // {
-      //   header: "Amount",
-      //   render: (row) => `₹ ${row.amount}`,
-      // },
+{
+  header: "Wallet Balance",
+  render: (row) => (
+    <span className="font-semibold text-blue-600">
+      ₹ {row.updatedBalance ?? 0}
+    </span>
+  ),
+},
 
       {
         header: "Description",

@@ -39,7 +39,7 @@ export default function ModuleManager() {
   const [openSections, setOpenSections] = useState({});
 
   const sectionConfig = {
-    asrologer: {
+    astrologer: {
       title: "Astrologer",
       color: "from-blue-500 to-cyan-500",
       icon: <MdPeople size={22} />,
