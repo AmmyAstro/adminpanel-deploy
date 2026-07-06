@@ -20,12 +20,8 @@ import ConfirmModal from "@/components/Custom/ConfirmModal";
 export default function DepartmentManager() {
   const { can, isSuperAdmin } = usePermissions();
 
-  const {
-    confirmState,
-    setConfirmState,
-    executeAction,
-    handleConfirm,
-  } = useActionHandler();
+  const { confirmState, setConfirmState, executeAction, handleConfirm } =
+    useActionHandler();
 
   const { data, loading, error, refetch } = useQuery(GET_DEPARTMENTS, {
     variables: { page: 1, limit: 10 },
@@ -43,7 +39,6 @@ export default function DepartmentManager() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  // 🔥 Permissions
   const canCreate = isSuperAdmin || can("departments", "create");
   const canEdit = isSuperAdmin || can("departments", "update");
 
@@ -57,9 +52,7 @@ export default function DepartmentManager() {
     try {
       const canSubmit =
         isSuperAdmin ||
-        (editing
-          ? can("departments", "update")
-          : can("departments", "create"));
+        (editing ? can("departments", "update") : can("departments", "create"));
 
       if (!canSubmit) {
         console.log("No permission");
@@ -89,7 +82,8 @@ export default function DepartmentManager() {
   };
 
   if (loading) return <p className="p-10">Loading...</p>;
-  if (error) return <p className="p-10 text-red-500">Error loading departments</p>;
+  if (error)
+    return <p className="p-10 text-red-500">Error loading departments</p>;
 
   const departmentColumns = [
     {
@@ -104,7 +98,6 @@ export default function DepartmentManager() {
       header: "Actions",
       render: (row) => (
         <div className="flex justify-center gap-2">
-          {/* EDIT */}
           <button
             disabled={!canEdit}
             onClick={() => {
@@ -114,7 +107,7 @@ export default function DepartmentManager() {
               setDescription(row.description);
               setOpen(true);
             }}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`px-3 py-1 text-xs rounded-full ${
               !canEdit
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-500 text-white"
@@ -123,7 +116,6 @@ export default function DepartmentManager() {
             Edit
           </button>
 
-          {/* DELETE */}
           <ProtectedActionButton
             module="departments"
             action="delete"
@@ -131,7 +123,7 @@ export default function DepartmentManager() {
             mutationFn={deleteDepartment}
             variables={{ departmentId: row.id }}
             onSuccess={refetch}
-            className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+            className="px-3 py-1 text-xs bg-red-500 text-white rounded-full"
           >
             Delete
           </ProtectedActionButton>
@@ -142,7 +134,6 @@ export default function DepartmentManager() {
 
   return (
     <div className="p-10 space-y-5">
-      {/* CREATE */}
       <button
         disabled={!canCreate}
         onClick={() => {
@@ -150,7 +141,7 @@ export default function DepartmentManager() {
           resetForm();
           setOpen(true);
         }}
-        className={`px-4 py-2 rounded ${
+        className={`px-4 py-2 rounded-full ${
           !canCreate
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
             : "bg-yellow-500"
@@ -159,50 +150,51 @@ export default function DepartmentManager() {
         Create Department
       </button>
 
-      {/* CONFIRM MODAL */}
       <ConfirmModal
         open={!!confirmState}
         onCancel={() => setConfirmState(null)}
         onConfirm={handleConfirm}
       />
 
-      {/* TABLE */}
       <div className="w-full bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
         <DataTable columns={departmentColumns} data={departments} />
       </div>
 
-      {/* MODAL */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-white p-6 w-[400px] space-y-4">
+        
+          <div className="bg-white rounded-xl p-6 w-[400px] space-y-4">
+                   <h2 className="text-xl text-center text-violet-600  font-bold">
+              {editing ? "Edit Department" : "Create Department"}
+            </h2>
             <input
               placeholder="Department Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="border p-2 w-full"
+              className="w-full border border-gray-300 p-2 rounded-full"
             />
 
             <textarea
               placeholder="Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="border p-2 w-full"
+              className="w-full border border-gray-300 p-2 rounded-2xl"
             />
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-center gap-2">
               <button
                 onClick={() => {
                   resetForm();
                   setOpen(false);
                 }}
-                className="border px-3 py-1"
+                className="px-4 py-1 cursor-pointer border rounded-full"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleSubmit}
-                className="bg-black text-white px-3 py-1"
+                className="px-4 py-1 bg-black  cursor-pointer text-white rounded-full"
               >
                 {editing ? "Update" : "Create"}
               </button>

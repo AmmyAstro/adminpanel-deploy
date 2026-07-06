@@ -125,7 +125,7 @@ export default function RolesManager() {
                             setEditingRole(row);
                             setOpenModal(true);
                         }}
-                        className={`px-3 py-1 text-xs rounded ${!canUpdate
+                        className={`px-3 py-1 text-xs rounded-full ${!canUpdate
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                             : "bg-blue-500 text-white"
                             }`}
@@ -141,7 +141,7 @@ export default function RolesManager() {
                         mutationFn={deleteRole}
                         variables={{ roleId: row.id }}
                         onSuccess={refetch}
-                        className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+                        className="px-3 py-1 text-xs bg-red-500 text-white rounded-full"
                     >
                         Delete
                     </ProtectedActionButton>
@@ -160,7 +160,7 @@ export default function RolesManager() {
                     resetForm();
                     setOpenModal(true);
                 }}
-                className={`px-5 py-2 rounded-lg ${!canCreate
+                className={`px-5 py-2 rounded-full ${!canCreate
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-yellow-500 text-black"
                     }`}
@@ -186,14 +186,14 @@ export default function RolesManager() {
             {openModal && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
                     <div className="bg-white rounded-xl p-6 w-[400px] space-y-4">
-                        <h2 className="text-xl font-semibold">
+                        <h2 className="text-xl text-center text-violet-600  font-bold">
                             {editingRole ? "Edit Role" : "Create Role"}
                         </h2>
 
                         <input
                             type="text"
                             placeholder="Name"
-                            className="w-full border p-2 rounded"
+                            className="w-full border p-2 rounded-full border-gray-300"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
@@ -201,32 +201,32 @@ export default function RolesManager() {
                         <input
                             type="text"
                             placeholder="Slug"
-                            className="w-full border p-2 rounded"
+                            className="w-full border p-2 rounded-full border-gray-300"
                             value={slug}
                             onChange={(e) => setSlug(e.target.value)}
                         />
 
                         <textarea
                             placeholder="Description"
-                            className="w-full border p-2 rounded"
+                            className="w-full border p-2  border-gray-300 rounded-2xl"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
 
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-center gap-3">
                             <button
                                 onClick={() => {
                                     resetForm();
                                     setOpenModal(false);
                                 }}
-                                className="px-4 py-2 border rounded"
+                                className="px-4 py-2 border border-gray-500 rounded-full"
                             >
                                 Cancel
                             </button>
 
                             <button
                                 onClick={handleSubmit}
-                                className="px-4 py-2 bg-black text-white rounded"
+                                className="px-4 py-2 bg-green-600 text-white rounded-full"
                             >
                                 {editingRole ? "Update" : "Create"}
                             </button>

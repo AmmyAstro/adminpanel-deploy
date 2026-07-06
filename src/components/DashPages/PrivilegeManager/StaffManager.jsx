@@ -206,7 +206,7 @@ export default function StaffManager() {
             <button
               disabled={!canUpdate}
               onClick={() => handleEdit(row)}
-              className={`px-3 py-1 text-xs rounded ${
+              className={`px-3 py-1 text-xs rounded-full ${
                 !canUpdate
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-blue-500 text-white"
@@ -223,7 +223,7 @@ export default function StaffManager() {
               mutationFn={deleteStaff}
               variables={{ staffId: row.id }}
               onSuccess={refetch}
-              className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+              className="px-3 py-1 text-xs bg-red-500 text-white rounded-full"
             >
               Delete
             </ProtectedActionButton>
@@ -267,10 +267,10 @@ export default function StaffManager() {
       </div>
 
       {openModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-500">
           <div className="bg-white rounded-xl shadow-lg w-[700px] p-8 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-xl text-center text-violet-700 font-bold">
                 {editingStaff ? "Edit Staff" : "Create Staff"}
               </h3>
 
@@ -287,6 +287,7 @@ export default function StaffManager() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <CustomInput
+                className="w-full"
                 label="Name"
                 value={form.name}
                 onChange={(e) => updateField("name", e.target.value)}
@@ -294,6 +295,7 @@ export default function StaffManager() {
 
               <CustomInput
                 label="Email"
+                className="w-full"
                 value={form.email}
                 onChange={(e) => updateField("email", e.target.value)}
               />
@@ -302,6 +304,7 @@ export default function StaffManager() {
                 <CustomInput
                   label="Password"
                   type="password"
+                  className="w-full"
                   value={form.password}
                   onChange={(e) => updateField("password", e.target.value)}
                 />
@@ -330,34 +333,24 @@ export default function StaffManager() {
                   </option>
                 ))}
               </CustomDropdown>
-
-              {/* PERMISSIONS */}
               <div className="flex flex-col col-span-2">
-                <div className="border rounded-md p-3 max-h-60 overflow-y-auto grid grid-cols-2 gap-2">
+                <div className="border border-gray-300 rounded-2xl p-3 max-h-60 overflow-y-auto grid grid-cols-2 gap-2">
                   <div className="col-span-2">
                     <label className="mb-3 block font-semibold text-gray-700">
                       Permissions
                     </label>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 max-h-[420px] overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 overflow-y-auto pr-2">
                       {Object.values(groupedPermissions).map((module) => (
                         <div
                           key={module.id}
                           className="border border-gray-300  rounded-xl shadow-sm overflow-hidden"
                         >
-                          {/* Header */}
-
                           <div className="bg-purple-200 px-4 py-2 flex items-center justify-between border-b">
                             <h3 className="font-semibold text-xs text-violet-700">
                               {module.name}
                             </h3>
-
-                            {/* <span className="bg-violet-200 text-violet-700 text-xs px-2 py-1 rounded-full">
-                              {module.permissions.length}
-                            </span> */}
                           </div>
-
-                          {/* Permissions */}
 
                           <div className="divide-y">
                             {module.permissions.map((permission) => {
@@ -387,10 +380,6 @@ export default function StaffManager() {
                                         updateField("permissionIds", updated);
                                       }}
                                     />
-
-                                    {/* <span className="text-sm font-medium">
-                                      {formatPermissionName(permission.name)}
-                                    </span> */}
                                   </div>
 
                                   <span

@@ -16,7 +16,6 @@ import BannerManager from "@/components/DashPages/SideBar/HomesidePage/bannerman
 // import AstrologerMain from "@/components/DashPages/Astrologer/Astrologermain";
 // import AddAstro from "@/components/DashPages/Astrologer/AddAstro";
 import AstroList from "@/components/DashPages/Astrologer/astroList";
-import AstroProfile from "@/app/Admindash/astromain/page";
 
 
 
@@ -78,7 +77,7 @@ export default function AdminPanel() {
   --------------------------- */
 
   const thirdLevel = {
-    astroprofile: <AstroProfile />,
+
     customerprofile: <CuustomerProfile />,
   };
 
@@ -111,13 +110,7 @@ export default function AdminPanel() {
   /* ---------- LEVEL 4 (dynamic id) ---------- */
 
   else if (path.length === 4) {
-    if (
-      path[0] === "astromain" &&
-      path[1] === "astrolist" &&
-      path[2] === "astroprofile"
-    ) {
-      Componentrender = <AstroProfile id={path[3]} />;
-    }
+  
 
     if (
       path[0] === "custommain" &&
