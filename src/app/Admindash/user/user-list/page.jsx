@@ -121,7 +121,7 @@ export default function UsersListPage() {
         render: (row) => (
           <div>         
             <Link
-              href={`/Admindash/usermain/userprofile/${row.id}`}
+              href={`/Admindash/user/userprofile/${row.id}`}
               className="font-semibold text-violet-600 flex flex-col  hover:underline"
             >
               {row.name || "N/A"}
@@ -180,7 +180,7 @@ export default function UsersListPage() {
         header: "Actions",
         render: (row) => (
           <Link
-            href={`/Admindash/usermain/userprofile/${row.id}`}
+            href={`/Admindash/user/userprofile/${row.id}`}
             className=" rounded-full px-3 py-1 text-xs text-white hover:scale-104 bg-blue-400"
           >
             View

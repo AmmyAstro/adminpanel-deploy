@@ -141,7 +141,7 @@ export default function UserChatHistoryPage() {
         render: (row) => (
           <div>
             <Link
-              href={`/Admindash/usermain/userprofile/${row.userId}`}
+              href={`/Admindash/user/userprofile/${row.userId}`}
               className="font-semibold text-violet-600 hover:underline"
             >
               {row.userName}

@@ -41,7 +41,6 @@ export default function AdminPanel() {
     // giftpage: <Giftpage />,
     // couponmain: <CouponMain />,
     // blogmain: <BlogMain />,
-    // astromain: <AstrologerMain />,
     // testimonialmain: <TestimonialList />,
     // custommain: <CustomerMain />,
   };
@@ -57,10 +56,7 @@ export default function AdminPanel() {
 
 
 
-    astromain: {
-      // addastro: <AddAstro />,
-      astrolist: <AstroList />,
-    },
+ 
 
     testimonialmain: {
       // addtesti: <AddTestimonial />,
@@ -98,9 +94,7 @@ export default function AdminPanel() {
   /* ---------- LEVEL 3 ---------- */
 
   else if (path.length === 3) {
-    if (path[0] === "astromain" && path[1] === "astrolist") {
-      Componentrender = thirdLevel[path[2]];
-    }
+   
 
     if (path[0] === "custommain" && path[1] === "customerlist") {
       Componentrender = thirdLevel[path[2]];

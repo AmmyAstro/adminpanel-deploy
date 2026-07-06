@@ -246,7 +246,7 @@ export default function AstrologerActivities({ astrologerId }) {
         render: (row) => (
           <div className="flex flex-col">
             <Link
-              href={`/Admindash/usermain/userprofile/${row.user.id}`}
+              href={`/Admindash/user/userprofile/${row.user.id}`}
               className="font-semibold text-violet-600 hover:underline"
             >
               {row.user.name || "N/A"}
@@ -280,7 +280,7 @@ export default function AstrologerActivities({ astrologerId }) {
         header: "Action",
         render: (row) => (
           <Link
-            href={`/Admindash/usermain/userprofile/${row.user.id}`}
+            href={`/Admindash/user/userprofile/${row.user.id}`}
             className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs"
           >
             View User

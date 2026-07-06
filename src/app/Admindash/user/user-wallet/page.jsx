@@ -106,7 +106,7 @@ export default function WalletTransactionsPage() {
         render: (row) => (
           <div>
                <Link
-                  href={`/Admindash/usermain/userprofile/${row?.userWallet?.user?.id}`}
+                  href={`/Admindash/user/userprofile/${row?.userWallet?.user?.id}`}
                   className="font-semibold text-violet-600 hover:underline"
                 >
                       {row?.userWallet?.user?.name || "N/A"}

@@ -633,7 +633,7 @@ export default function Page() {
                       <div>
                         <div className="flex items-center gap-5">
                           <Link
-                            href={`/Admindash/usermain/userprofile/${review.userId}`}
+                            href={`/Admindash/user/userprofile/${review.userId}`}
                             className="font-semibold text-violet-600 hover:underline"
                           >
                             {review.userName}
@@ -707,7 +707,7 @@ export default function Page() {
                           <h3 className="font-semibold">{gift.giftName}</h3>
 
                           <Link
-                            href={`/Admindash/usermain/userprofile/${gift.user.id}`}
+                            href={`/Admindash/user/userprofile/${gift.user.id}`}
                             className="text-violet-600 hover:underline text-sm"
                           >
                             {gift.user.name}
@@ -733,7 +733,7 @@ export default function Page() {
 
                     <div className="flex justify-end mt-4">
                       <Link
-                        href={`/Admindash/usermain/userprofile/${gift.user.id}`}
+                        href={`/Admindash/user/userprofile/${gift.user.id}`}
                         className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1 rounded-full"
                       >
                         View User

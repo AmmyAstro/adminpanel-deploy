@@ -125,7 +125,7 @@ export default function FraudLogsPage() {
           const profilePath =
             row.senderName?.toLowerCase() === "astrologer"
               ? `/Admindash/asrologer/astroprofile/${row.senderId}`
-              : `/Admindash/usermain/userprofile/${row.senderId}`;
+              : `/Admindash/user/userprofile/${row.senderId}`;
 
           return (
             <div>
@@ -148,7 +148,7 @@ export default function FraudLogsPage() {
           const profilePath =
             row.receiverName?.toLowerCase() === "astrologer"
               ? `/Admindash/asrologer/astroprofile/${row.receiverId}`
-              : `/Admindash/usermain/userprofile/${row.receiverId}`;
+              : `/Admindash/user/userprofile/${row.receiverId}`;
 
           return (
             <div>
