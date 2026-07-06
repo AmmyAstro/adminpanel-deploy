@@ -111,10 +111,10 @@ export default function FraudLogsPage() {
   const columns = useMemo(
     () => [
       {
-        header: "Order ID",
+        header: "Session ID",
         render: (row) => (
           <div>
-            <p className="font-medium">{row.orderId?.slice(0, 8)}</p>
+            <p className="font-medium">{row.sessionId?.slice(0, 8)}</p>
           </div>
         ),
       },
