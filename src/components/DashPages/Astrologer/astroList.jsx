@@ -72,11 +72,11 @@ export default function AstroList() {
   const astrologers = data?.getAstrologerListBySearch?.data || [];
 
   const viewProfile = (id) => {
-    router.push(`/Admindash/astromain/astroprofile/${id}`);
+    router.push(`/Admindash/asrologer/astroprofile/${id}`);
   };
 
   const handleEdit = (id) => {
-    router.push(`/Admindash/astromain/edit-astrologer/${id}`);
+    router.push(`/Admindash/asrologer/edit-astrologer/${id}`);
   };
 
   const columns = [
@@ -107,7 +107,7 @@ export default function AstroList() {
       render: (row) => (
         <div className="flex flex-col">
           <Link
-            href={`/Admindash/astromain/astroprofile/${row.id}`}
+            href={`/Admindash/asrologer/astroprofile/${row.id}`}
             className="font-bold text-purple-500"
           >
             {row.displayName}

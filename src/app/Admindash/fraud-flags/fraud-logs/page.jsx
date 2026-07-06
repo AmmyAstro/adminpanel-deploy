@@ -16,7 +16,7 @@ import ProtectedActionButton from "@/components/Custom/ActionButton";
 import { usePermissions } from "@/context/PermissionContext";
 
 import { useActionHandler } from "@/hooks/useActionHandler";
-import SessionMessagesModal from "../../usermain/SessionModal";
+import SessionMessagesModal from "../../user/SessionModal";
 import Link from "next/link";
 
 // ======================================================
@@ -124,7 +124,7 @@ export default function FraudLogsPage() {
         render: (row) => {
           const profilePath =
             row.senderName?.toLowerCase() === "astrologer"
-              ? `/Admindash/astromain/astroprofile/${row.senderId}`
+              ? `/Admindash/asrologer/astroprofile/${row.senderId}`
               : `/Admindash/usermain/userprofile/${row.senderId}`;
 
           return (
@@ -147,7 +147,7 @@ export default function FraudLogsPage() {
         render: (row) => {
           const profilePath =
             row.receiverName?.toLowerCase() === "astrologer"
-              ? `/Admindash/astromain/astroprofile/${row.receiverId}`
+              ? `/Admindash/asrologer/astroprofile/${row.receiverId}`
               : `/Admindash/usermain/userprofile/${row.receiverId}`;
 
           return (

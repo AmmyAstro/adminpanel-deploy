@@ -190,7 +190,7 @@ export default function UserCallHistoryPage() {
         render: (row) => (
           <div>
             <Link
-              href={`/Admindash/astromain/astroprofile/${row.astrologerId}`}
+              href={`/Admindash/asrologer/astroprofile/${row.astrologerId}`}
               className="font-semibold text-violet-600 hover:underline"
             >
               {row.astrologerName}

@@ -9,7 +9,7 @@ import Link from "next/link";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import { GET_USER_REVIEWS, TOGGLE_REVIEW_FLAG, UPDATE_REVIEW_COMMENT } from "@/app/graphQL/astroHiring";
 import { useRouter } from "next/navigation";
-import SessionMessagesModal from "../../usermain/SessionModal";
+import SessionMessagesModal from "../../user/SessionModal";
 import toast from "react-hot-toast";
 
 
@@ -178,7 +178,7 @@ export default function ReviewsPage() {
         header: "Astrologer",
         render: (row) => (
           <Link
-            href={`/Admindash/astromain/astroprofile/${row.astrologerId}`}
+            href={`/Admindash/asrologer/astroprofile/${row.astrologerId}`}
             className="font-semibold text-purple-600 hover:underline"
           >
             {row.displayName}

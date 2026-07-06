@@ -199,7 +199,7 @@ export default function AstrologerHiring() {
         <div>
           <Link
             className="text-xs font-semibold text-purple-500"
-            href={`/Admindash/astromain/astroprofile/${row.receiverId}`}
+            href={`/Admindash/asrologer/astroprofile/${row.receiverId}`}
           >
             {row.name}
           </Link>
@@ -332,7 +332,7 @@ console.log("ROW ID=========================================== =", row.id);
             disabled={isAdded || row.approvalStatus !== "APPROVED"}
             onClick={() => {
               if (!isAdded) {
-                window.location.href = `/Admindash/astromain/add-astrologer?appId=${row.id}`;
+                window.location.href = `/Admindash/asrologer/add-astrologer?appId=${row.id}`;
               }
             }}
             

@@ -25,7 +25,7 @@ import { MdCancel } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import AstrologerActivities from "../../AstrologerActivities";
 import Link from "next/link";
-import SessionMessagesModal from "@/app/Admindash/usermain/SessionModal";
+import SessionMessagesModal from "@/app/Admindash/user/SessionModal";
 import dayjs from "dayjs";
 export default function Page() {
   const [activeTab, setActiveTab] = useState("call");
@@ -329,7 +329,7 @@ export default function Page() {
           <div className="flex justify-between items-center bg-purple-200 p-2 rounded-full shadow px-4">
             <h5 className="text-sm font-bold">Astrologers Details</h5>
             <Link
-              href={`/Admindash/astromain/edit-astrologer/${astrologerprofile?.id}`}
+              href={`/Admindash/asrologer/edit-astrologer/${astrologerprofile?.id}`}
               variant={"black"}
               className="text-xs bg-black rounded-full px-3 py-1 text-white"
             >

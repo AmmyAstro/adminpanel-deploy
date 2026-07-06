@@ -14,10 +14,10 @@ import {
   GET_CALL_RECORDING,
 } from "@/app/graphQL/astroHiring";
 import DataTable from "@/components/utils/DataTable";
-import SessionMessagesModal from "../usermain/SessionModal";
+import SessionMessagesModal from "../user/SessionModal";
 import Link from "next/link";
 import dayjs from "dayjs";
-import SessionRemedyModal from "../usermain/SessionRemedyModal";
+import SessionRemedyModal from "../user/SessionRemedyModal";
 
 export default function AstrologerActivities({ astrologerId }) {
   const [activeTab, setActiveTab] = useState("earnings");

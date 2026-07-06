@@ -156,7 +156,7 @@ export default function AstrologerEarningsPage() {
         header: "Astrologer",
         render: (row) => (
           <div>
-            <Link href={`/Admindash/astromain/astroprofile/${row.astrologerId}`} className="font-semibold">
+            <Link href={`/Admindash/astro/astroprofile/${row.astrologerId}`} className="font-semibold">
               {row.astrologerName}
             </Link>
 

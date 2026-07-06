@@ -156,7 +156,7 @@ export default function AstrologerWalletTransactionsPage() {
         render: (row) => (
           <div>
             <Link
-              href={`/Admindash/astromain/astroprofile/${row?.astrologerWallet?.astrologer?.id}`}
+              href={`/Admindash/astrologer/astroprofile/${row?.astrologerWallet?.astrologer?.id}`}
               className="font-semibold text-purple-500"
             >
               {row?.astrologerWallet?.astrologer?.displayName || "N/A"}
