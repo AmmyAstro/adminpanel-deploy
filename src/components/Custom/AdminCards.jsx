@@ -84,7 +84,7 @@ const cards = [
   {
     title: "Reviews",
     img: "/admin-img/gif/chat.gif",
-    link: "#",
+    link: "/Admindash/reviews",
     bg: "bg-[#E1AFD1]",
   },
   {

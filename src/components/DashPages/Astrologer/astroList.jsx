@@ -134,7 +134,7 @@ export default function AstroList() {
               if (!canView) return;
               viewProfile(row.id);
             }}
-            className={`px-2 py-1 text-xs rounded ${
+            className={`px-2 py-1 text-xs rounded-full ${
               !canView
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-500 text-white"
@@ -150,7 +150,7 @@ export default function AstroList() {
               if (!canUpdate) return;
               handleEdit(row.id);
             }}
-            className={`px-2 py-1 text-xs rounded ${
+            className={`px-2 py-1 text-xs rounded-full ${
               !canUpdate
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-yellow-500 text-white"
@@ -167,7 +167,7 @@ export default function AstroList() {
             mutationFn={deleteAstrologer}
             variables={{ astrologerId: row.id }}
             onSuccess={refetch}
-            className="px-2 py-1 text-xs bg-red-500 text-white rounded"
+            className="px-2 py-1 text-xs bg-red-500 text-white rounded-full"
           >
             Delete
           </ProtectedActionButton>

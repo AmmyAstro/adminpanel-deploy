@@ -67,12 +67,12 @@ const GET_APPLICATION_BY_ID = gql`
 
 export default function AddAstro() {
   const params = useParams(); // edit mode ke liye rehne do
-
+const [previewImage, setPreviewImage] = useState(null);
   const searchParams = useSearchParams();
   const appId = searchParams.get("appId");
-  console.log("URL APP ID============== =", appId);
+  // console.log("URL APP ID============== =", appId);
   const astrologerId = params?.id;
-const router = useRouter();
+  const router = useRouter();
   const isEditMode = !!astrologerId;
   const [fileInputKey, setFileInputKey] = useState(0);
   const {
@@ -86,7 +86,7 @@ const router = useRouter();
     skip: !isEditMode,
   });
 
-  console.log("ASTRO DATAxxxxxxxxxxxxxxxxxxx:", astroData);
+  // console.log("ASTRO DATAxxxxxxxxxxxxxxxxxxx:", astroData);
 
   const [existingDocs, setExistingDocs] = useState({});
   const { data: appData, loading: appLoading } = useQuery(
@@ -434,7 +434,35 @@ const router = useRouter();
     const astro = astroData.getAstrologerById;
 
     const primaryAddress = astro.addresses?.[0];
+const pricingTypes = [
+  "CHAT",
+  "CALL",
+  "VIDEO",
+  "AUDIO",
+  "GIFT_COMMISSION",
+  "OFFER",
+];
 
+const pricing = pricingTypes.map((type) => {
+  const existing = astro.pricing?.find((p) => p.type === type);
+
+  const eligibilityMap = {
+    CHAT: astro.isEligibleChat,
+    CALL: astro.isEligibleCall,
+    VIDEO: astro.isEligibleVideo,
+    AUDIO: astro.isEligibleAudio,
+    GIFT_COMMISSION: !!existing,
+    OFFER: !!existing,
+  };
+
+  return {
+    type,
+    price: existing?.price ?? "",
+    offerPrice: existing?.offerPrice ?? "",
+    commissionPercent: existing?.commissionPercent ?? "",
+    isActive: eligibilityMap[type] ?? false,
+  };
+});
     reset({
       astroname: astro.name || "",
       displayName: astro.displayName || "",
@@ -467,7 +495,7 @@ const router = useRouter();
       tags: astro.tags || "New",
       vtags: astro.vtags || "not verified",
 
-      pricing: astro.pricing?.length > 0 ? astro.pricing : emptyForm.pricing,
+    pricing,
 
       bankDetails: {
         accountHolderName: astro.kycDetail?.accountHolderName || "",
@@ -484,21 +512,20 @@ const router = useRouter();
       },
     });
 
-    const BASE_URL = "https://dhwaniastro.com/adminAuth/api/upload-documents";
+const getFileUrl = (path) => {
+  if (!path) return null;
 
-    setExistingDocs({
-      aadhaar: astro.kycDetail?.aadhaarImage
-        ? BASE_URL + astro.kycDetail.aadhaarImage
-        : null,
+  if (path.startsWith("http")) return path;
 
-      panCard: astro.kycDetail?.panImage
-        ? BASE_URL + astro.kycDetail.panImage
-        : null,
+  return `https://dhwaniastro.com${path}`;
+};
 
-      passbook: astro.kycDetail?.passbookImage
-        ? BASE_URL + astro.kycDetail.passbookImage
-        : null,
-    });
+  setExistingDocs({
+  profilePic: getFileUrl(astro.profilePic),
+  aadhaar: getFileUrl(astro.kycDetail?.aadhaarImage),
+  panCard: getFileUrl(astro.kycDetail?.panImage),
+  passbook: getFileUrl(astro.kycDetail?.passbookImage),
+});
   }, [astroData, reset]);
 
   useEffect(() => {
@@ -535,13 +562,13 @@ const router = useRouter();
   const onSubmit = async (formData) => {
     try {
       const fd = new FormData();
-      // PROFILE PIC
-      console.log("FORM PROFILE PIC:", formData.profilePic);
+      
+      // console.log("FORM PROFILE PIC:", formData.profilePic);
 
       if (formData.profilePic instanceof File) {
         fd.append("profilePic", formData.profilePic);
 
-        console.log("PROFILE APPENDED");
+        // console.log("PROFILE APPENDED");
       }
 
       Object.entries(formData.documents).forEach(([key, file]) => {
@@ -557,29 +584,30 @@ const router = useRouter();
       );
 
       const uploadedFiles = await uploadRes.json();
+   const existingData = isEditMode
+  ? astroData?.getAstrologerById
+  : appData?.getApplicationById;
+  const safeFiles = {
+  profilePic:
+    typeof uploadedFiles?.profilePic === "string"
+      ? uploadedFiles.profilePic
+      : existingData?.profilePic || null,
 
-      // Sanitize: replace {} or non-string values with null
-      const safeFiles = {
-        profilePic:
-          typeof uploadedFiles?.profilePic === "string"
-            ? uploadedFiles.profilePic
-            : null,
+  aadhaar:
+    typeof uploadedFiles?.aadhaar === "string"
+      ? uploadedFiles.aadhaar
+      : existingData?.kycDetail?.aadhaarImage || null,
 
-        aadhaar:
-          typeof uploadedFiles?.aadhaar === "string"
-            ? uploadedFiles.aadhaar
-            : appData?.getApplicationById?.kycDetail?.aadhaarImage || null,
+  panCard:
+    typeof uploadedFiles?.panCard === "string"
+      ? uploadedFiles.panCard
+      : existingData?.kycDetail?.panImage || null,
 
-        panCard:
-          typeof uploadedFiles?.panCard === "string"
-            ? uploadedFiles.panCard
-            : appData?.getApplicationById?.kycDetail?.panImage || null,
-
-        passbook:
-          typeof uploadedFiles?.passbook === "string"
-            ? uploadedFiles.passbook
-            : appData?.getApplicationById?.kycDetail?.passbookImage || null,
-      };
+  passbook:
+    typeof uploadedFiles?.passbook === "string"
+      ? uploadedFiles.passbook
+      : existingData?.kycDetail?.passbookImage || null,
+};
 
       const payload = mapAstrologerPayload({
         ...formData,
@@ -603,8 +631,7 @@ const router = useRouter();
         console.log("UPDATE RESPONSE:", res?.data?.updateAstrologer);
 
         toast.success("Astrologer updated successfully ✅");
-                 router.replace("/Admindash/astrologer/astrologer-list");
-
+        router.replace("/Admindash/astrologer/astrologer-list");
       } else {
         res = await addAstrologer({
           variables: {
@@ -614,7 +641,7 @@ const router = useRouter();
 
         if (res?.data?.addAstrologer?.success) {
           toast.success(res.data.addAstrologer.message);
-           router.replace("/Admindash/astrologer/astrologer-list");
+          router.replace("/Admindash/astrologer/astrologer-list");
         }
       }
 
@@ -692,7 +719,7 @@ const router = useRouter();
     </button>
   );
   const isSubmitting = addLoading || updateLoading;
-
+console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
   return (
     <div className="min-h-screen">
       <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
@@ -789,8 +816,16 @@ const router = useRouter();
                       field.onChange(file);
                     }}
                   />
+                  
                 )}
               />
+                 <button
+  type="button"
+  onClick={() => setPreviewImage(existingDocs.profilePic)}
+  className="text-blue-600 text-xs underline"
+>
+  View
+</button>
             </div>
 
             {errors.profilePic && (
@@ -798,6 +833,7 @@ const router = useRouter();
                 {errors.profilePic.message}
               </p>
             )}
+    
           </div>
 
           <div>
@@ -1107,7 +1143,7 @@ const router = useRouter();
                 const isActive = useWatch({
                   control,
                   name: `pricing.${index}.isActive`,
-                  defaultValue: true,
+                  defaultValue: false,
                 });
 
                 return (
@@ -1129,7 +1165,7 @@ const router = useRouter();
                         name={`pricing.${index}.isActive`}
                         render={({ field }) => (
                           <Toggle
-                            value={field.value ?? true}
+                           value={field.value ?? false}
                             onChange={(val) => {
                               field.onChange(val);
 
@@ -1413,33 +1449,32 @@ const router = useRouter();
                         {item.label} :
                       </label>
 
-                      {/* 🔥 Existing file preview */}
-                      {existingDocs[item.name] && (
-                        <a
-                          href={existingDocs[item.name]}
-                          target="_blank"
-                          className="text-blue-600 text-xs underline"
-                        >
-                          View
-                        </a>
-                      )}
 
-                      {/* Upload new */}
+
+                   
                       <Controller
                         name={`documents.${item.name}`}
                         control={control}
                         render={({ field }) => (
                           <input
                             type="file"
-                                                className="w-full outline-none border rounded-full px-2 py-2 border-gray-300 bg-transparent text-sm"
-
+                            className="w-full outline-none border rounded-full px-2 py-2 border-gray-300 bg-transparent text-sm"
                             key={`${item.name}-${fileInputKey}`}
                             onChange={(e) =>
                               field.onChange(e.target.files?.[0])
                             }
                           />
+                          
                         )}
+                        
                       />
+                                    <button
+  type="button"
+  onClick={() => setPreviewImage(existingDocs[item.name])}
+  className="text-blue-600 text-xs underline"
+>
+  View
+</button>
                     </div>
                   ))}
                   {/* {errors?.bankDetails?.documents?.profile && (
@@ -1499,6 +1534,31 @@ const router = useRouter();
           <p className="text-red-500 text-sm text-center">{error.message}</p>
         )}
       </form>
+      {previewImage && (
+  <div
+    className="fixed inset-0 z-50   flex items-center justify-center bg-black/60"
+    onClick={() => setPreviewImage(null)}
+  >
+    <div
+      className="relative bg-white max-h-[70vh] rounded-xl p-4 shadow-xl max-w-lg w-[90%]"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        onClick={() => setPreviewImage(null)}
+        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600"
+      >
+        ✕
+      </button>
+
+      <img
+        src={previewImage}
+        alt="Preview"
+        className="w-full max-h-[70vh] object-contain rounded-lg"
+      />
+    </div>
+  </div>
+)}
     </div>
   );
 }

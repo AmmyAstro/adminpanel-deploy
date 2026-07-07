@@ -448,6 +448,7 @@ export default function Page() {
                   <CustomToggle
                     id="call"
                     checked={availability.call}
+                      disabled={!astrologerprofile?.isEligibleCall}
                     onChange={(val) => handleAvailabilityChange("call", val)}
                   />
                 </div>
@@ -464,6 +465,7 @@ export default function Page() {
                   <CustomToggle
                     id="chat"
                     checked={availability.chat}
+                      disabled={!astrologerprofile?.isEligibleChat}
                     onChange={(val) => handleAvailabilityChange("chat", val)}
                   />
                 </div>

@@ -209,7 +209,10 @@ export const GET_ASTROLOGER_BY_ID = gql`
       isBusy
       isOnline
       isPromotional
-
+isEligibleChat
+isEligibleCall
+isEligibleVideo
+isEligibleAudio
       pricing {
         type
         price
@@ -357,7 +360,7 @@ export const GET_ASTROLOGER_CHAT_HISTORY = gql`
 
         astrologerCommission
         dhwaniCommission
-
+        hasRemedy
         coinsDeducted
 
         status
@@ -561,7 +564,7 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
     $amount: Float
     $filterType: String
     $startDate: String
-     $astrologerId: ID
+    $astrologerId: ID
     $endDate: String
   ) {
     getAstrologerWalletTransactions(
@@ -569,7 +572,7 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
       limit: $limit
       type: $type
       contactNo: $contactNo
-       astrologerId: $astrologerId
+      astrologerId: $astrologerId
       amount: $amount
       filterType: $filterType
       startDate: $startDate
@@ -584,7 +587,7 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
         amount
         description
         createdAt
-updatedBalance
+        updatedBalance
         astrologerWallet {
           astrologer {
             id
@@ -708,12 +711,21 @@ export const GET_NOTICES = gql`
   }
 `;
 export const UPDATE_REVIEW_COMMENT = gql`
-  mutation UpdateReviewComment($reviewId: ID!, $comment: String!) {
-    updateReviewComment(reviewId: $reviewId, comment: $comment) {
-      reviewId
-      comment
-    }
+ mutation UpdateReviewComment(
+  $reviewId: ID!
+  $comment: String
+  $rating: Int
+) {
+  updateReviewComment(
+    reviewId: $reviewId
+    comment: $comment
+    rating: $rating
+  ) {
+    reviewId
+    comment
+    rating
   }
+}
 `;
 export const UPDATE_GIFT_STATUS = gql`
   mutation UpdateGiftStatus($id: ID!, $status: String!) {
@@ -734,7 +746,6 @@ export const GET_USER_REVIEWS = gql`
       data {
         reviewId
         sessionId
-
         userId
         userName
         mobile

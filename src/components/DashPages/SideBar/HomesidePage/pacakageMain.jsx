@@ -36,6 +36,7 @@ export default function PackageMain() {
     talktime: "",
     validityDays: "",
     isActive: true,
+      hideAfterFirstRecharge:false,
   });
 
   const { can, isSuperAdmin } = usePermissions();
@@ -83,6 +84,7 @@ export default function PackageMain() {
       talktime: "",
       validityDays: "",
       isActive: true,
+      hideAfterFirstRecharge: false,
     });
     setErrors({});
     setEditPack(null);
@@ -109,6 +111,8 @@ export default function PackageMain() {
         talktime: parseInt(form.talktime),
         validityDays: parseInt(form.validityDays),
         isActive: form.isActive,
+          hideAfterFirstRecharge:
+        form.hideAfterFirstRecharge,
       };
 
       if (editPack) {
@@ -183,13 +187,16 @@ export default function PackageMain() {
       await updatePack({
         variables: {
           id: pkg.id,
-          input: {
-            name: pkg.name,
-            description: pkg.description,
-            price: pkg.price,
-            talktime: pkg.talktime,
-            isActive: !pkg.isActive,
-          },
+       input: {
+  name: pkg.name,
+  description: pkg.description,
+  price: pkg.price,
+  coins: pkg.coins,
+  talktime: pkg.talktime,
+  validityDays: pkg.validityDays,
+  hideAfterFirstRecharge: pkg.hideAfterFirstRecharge,
+  isActive: !pkg.isActive,
+}
         },
       });
 
@@ -229,6 +236,12 @@ export default function PackageMain() {
       ),
     },
     {
+  header: "Hide After First Recharge",
+  render: (row) => (
+    row.hideAfterFirstRecharge ? "Yes" : "No"
+  ),
+},
+    {
       header: "Created At",
       render: (row) =>
         row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "-",
@@ -248,6 +261,7 @@ export default function PackageMain() {
                 coins: String(row.coins),
                 talktime: String(row.talktime),
                 validityDays: String(row.validityDays),
+                hideAfterFirstRecharge: row.hideAfterFirstRecharge,
               });
               setOpen(true);
             }}
@@ -418,6 +432,7 @@ export default function PackageMain() {
                       </p>
                     )}
                   </div>
+      
                   <div className="space-y-2">
                     {" "}
                     <label className="text-sm font-semibold text-gray-700">
@@ -457,6 +472,28 @@ export default function PackageMain() {
                   }
                 />
               </div>
+                          <div className="flex items-center justify-between rounded-xl border p-4">
+    <div>
+        <p className="font-medium">
+            Hide After First Recharge
+        </p>
+
+        <p className="text-sm text-gray-500">
+            If enabled, this package will no longer be visible
+            after the user's first successful recharge.
+        </p>
+    </div>
+
+    <CustomToggle
+        checked={form.hideAfterFirstRecharge}
+        onChange={(val)=>
+            setForm(prev=>({
+                ...prev,
+                hideAfterFirstRecharge:val
+            }))
+        }
+    />
+</div>
 
               <div className="flex justify-center gap-3 border-t border-gray-100 py-5">
                 <CustomButton

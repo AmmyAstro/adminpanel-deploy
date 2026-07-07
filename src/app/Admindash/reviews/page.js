@@ -9,8 +9,8 @@ import Link from "next/link";
 import CustomToggle from "@/components/Custom/CustomToggle";
 import { GET_USER_REVIEWS, TOGGLE_REVIEW_FLAG, UPDATE_REVIEW_COMMENT } from "@/app/graphQL/astroHiring";
 import { useRouter } from "next/navigation";
-import SessionMessagesModal from "../../user/SessionModal";
 import toast from "react-hot-toast";
+import SessionMessagesModal from "../user/SessionModal";
 
 
 
@@ -19,7 +19,7 @@ export default function ReviewsPage() {
   const [selectedReviewId, setSelectedReviewId] = useState(null);
   const [editedComment, setEditedComment] = useState("");
   const [searchName, setSearchName] = useState("");
-
+const [editedRating, setEditedRating] = useState(5);
   const [searchMobile, setSearchMobile] = useState("");
 
   const [searchAstrologerName, setSearchAstrologerName] = useState("");
@@ -274,6 +274,7 @@ export default function ReviewsPage() {
                 onClick={() => {
                   setSelectedReviewId(row.reviewId);
                   setEditedComment(row.comment || "");
+                  setEditedRating(row.rating);
                   setEditModalOpen(true);
                 }}
                 className="px-3 py-1 bg-black/50 text-white rounded-full hover:scale-104 cursor-pointer text-[10px]"
@@ -488,7 +489,23 @@ export default function ReviewsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg">
             <h2 className="text-lg font-semibold mb-4">Edit Review Comment</h2>
+<div className="mb-4">
+  <label className="block text-sm font-medium mb-2">
+    Rating
+  </label>
 
+  <select
+    value={editedRating}
+    onChange={(e) => setEditedRating(Number(e.target.value))}
+    className="w-full border rounded-lg p-3"
+  >
+    {[1, 2, 3, 4, 5].map((r) => (
+      <option key={r} value={r}>
+        {r} Star
+      </option>
+    ))}
+  </select>
+</div>
             <textarea
               rows={6}
               value={editedComment}
@@ -514,10 +531,11 @@ export default function ReviewsPage() {
                 onClick={async () => {
                   try {
                     await updateReviewComment({
-                      variables: {
-                        reviewId: selectedReviewId,
-                        comment: editedComment,
-                      },
+                     variables: {
+  reviewId: selectedReviewId,
+  comment: editedComment,
+  rating: editedRating,
+},
                     });
 
                     toast.success("Review updated");
