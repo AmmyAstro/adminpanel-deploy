@@ -12,6 +12,7 @@ export const GET_RECHARGE_PACKS = gql`
 validityDays
       isActive
       createdAt
+      hideAfterFirstRecharge
     }
   }
 `;

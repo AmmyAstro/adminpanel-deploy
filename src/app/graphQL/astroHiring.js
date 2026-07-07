@@ -906,3 +906,41 @@ export const END_SESSION_BY_ADMIN = gql`
     endSessionByAdmin(sessionId: $sessionId)
   }
 `;
+export const GET_ASTROLOGER_WAITING_USERS = gql`
+  query GetAstrologerWaitingUsers($astrologerId: ID!) {
+    getAstrologerWaitingUsers(astrologerId: $astrologerId) {
+      waitingCount
+      waitingUsers {
+        userId
+        name
+        mobile
+        roomId
+        maximumTime
+      }
+    }
+  }
+`;
+export const GET_ALL_WAITING_QUEUES = gql`
+  query GetAllWaitingQueues {
+    getAllWaitingQueues {
+      astrologerId
+      astrologerName
+      astrologerProfilePic
+      isOnline
+      isBusy
+      waitingCount
+
+      waitingUsers {
+        userId
+        name
+        mobile
+        countryCode
+        
+        roomId
+        maximumTime
+        source
+        type
+      }
+    }
+  }
+`;
