@@ -17,6 +17,10 @@ export default function WaitingQueue({ astrologerId }) {
 
   const queues = data?.getAllWaitingQueues || [];
 
+const hasWaitingUsers = queues.some(
+  (astro) => astro.waitingUsers?.length > 0
+);
+
   //   if (loading) {
   //     return <div className="p-10 text-center">Loading Queue...</div>;
   //   }
@@ -25,23 +29,34 @@ export default function WaitingQueue({ astrologerId }) {
   //     return <div className="p-10 text-center text-red-500">{error.message}</div>;
   //   }
 
-  return (
-    <div className="space-y-6">
-      {queues.map((astro) => (
+return (
+  <div className="space-y-6">
+    {!hasWaitingUsers ? (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16">
+        <BsPersonCircle className="mb-4 text-6xl text-gray-300" />
+        <h2 className="text-lg font-semibold text-gray-700">
+          No Waiting Requests
+        </h2>
+        <p className="mt-2 text-sm text-gray-500">
+          There are currently no users waiting to connect with an astrologer.
+        </p>
+      </div>
+    ) : (
+      queues.map((astro) => (
         <div
           key={astro.astrologerId}
-          className="rounded-xl border bg-white shadow"
+          className="rounded-xl border border-gray-300 bg-white shadow"
         >
           <div className="flex items-center justify-between border-b p-5">
             <div className="flex items-center gap-4">
               <img
                 src={astro.astrologerProfilePic}
                 className="h-12 w-12 rounded-full"
+                alt={astro.astrologerName}
               />
 
               <div>
                 <h2 className="font-semibold">{astro.astrologerName}</h2>
-
                 <p className="text-sm text-gray-500">
                   Waiting : {astro.waitingCount}
                 </p>
@@ -91,14 +106,14 @@ export default function WaitingQueue({ astrologerId }) {
 
                 <div className="flex items-center gap-6">
                   <div>{user.type}</div>
-
                   <div>{user.maximumTime} Min</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      ))}
-    </div>
-  );
+      ))
+    )}
+  </div>
+);
 }
