@@ -85,11 +85,10 @@ export default function AstrologerActivities({ astrologerId }) {
     },
   );
 
-  const chatPagination = chatData?.getAstrologerChatHistory?.pagination;
-  const callPagination = callData?.getAstrologerCallHistory?.pagination;
-  const walletPagination =
-    walletData?.getAstrologerWalletTransactions?.pagination;
-  const followersPagination = followersData?.getAstrologerFollowers?.pagination;
+const chatPagination = chatData?.getAstrologerChatHistory;
+const callPagination = callData?.getAstrologerCallHistory;
+const walletPagination = walletData?.getAstrologerWalletTransactions;
+const followersPagination = followersData?.getAstrologerFollowers;
   const wallet = walletData?.getAstrologerWalletTransactions?.data || [];
   const chats = chatData?.getAstrologerChatHistory?.data || [];
 
