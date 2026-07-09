@@ -485,7 +485,7 @@ const followersPagination = followersData?.getAstrologerFollowers;
           <p>Loading chat history...</p>
         ) : (
           <>
-            <DataTable columns={historyColumns} data={chats} />
+            <DataTable columns={historyColumns} data={chats}  startIndex={(chatPage - 1) * LIMIT} />
 
             <Pagination
               page={chatPage}
@@ -503,7 +503,7 @@ const followersPagination = followersData?.getAstrologerFollowers;
           <p>Loading call history...</p>
         ) : (
           <>
-            <DataTable columns={historyColumns} data={calls} />
+            <DataTable columns={historyColumns} data={calls}  startIndex={(callPage - 1) * LIMIT}/>
 
             <Pagination
               page={callPage}
@@ -519,7 +519,7 @@ const followersPagination = followersData?.getAstrologerFollowers;
           <p>Loading followers...</p>
         ) : (
           <>
-            <DataTable columns={followerColumns} data={followers} />
+            <DataTable columns={followerColumns} data={followers}   startIndex={(followersPage - 1) * LIMIT}/>
 
             <Pagination
               page={followersPage}
@@ -534,7 +534,7 @@ const followersPagination = followersData?.getAstrologerFollowers;
           <p>Loading Astrologer Wallet...</p>
         ) : (
           <>
-            <DataTable columns={walletColumns} data={wallet} />
+            <DataTable columns={walletColumns} data={wallet} startIndex={(walletPage - 1) * LIMIT}/>
 
             <Pagination
               page={walletPage}
