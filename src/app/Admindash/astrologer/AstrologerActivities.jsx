@@ -27,6 +27,12 @@ export default function AstrologerActivities({ astrologerId }) {
   const [openRemedyModal, setOpenRemedyModal] = useState(false);
   const [search, setSearch] = useState("");
   const client = useApolloClient();
+  const LIMIT = 10;
+
+  const [chatPage, setChatPage] = useState(1);
+  const [callPage, setCallPage] = useState(1);
+  const [walletPage, setWalletPage] = useState(1);
+  const [followersPage, setFollowersPage] = useState(1);
   const { data: statsData } = useQuery(GET_ASTROLOGER_DASHBOARD_STATS, {
     variables: { astrologerId },
     skip: !astrologerId,
@@ -38,10 +44,9 @@ export default function AstrologerActivities({ astrologerId }) {
     {
       variables: {
         astrologerId,
-        page: 1,
-        limit: 10,
+        page: chatPage,
+        limit: LIMIT,
       },
-
       skip: !astrologerId || activeTab !== "chat",
     },
   );
@@ -50,26 +55,41 @@ export default function AstrologerActivities({ astrologerId }) {
     {
       variables: {
         astrologerId,
-        page: 1,
-        limit: 10,
+        page: callPage,
+        limit: LIMIT,
       },
-
       skip: !astrologerId || activeTab !== "call",
     },
   );
-const { data: walletData, loading: walletLoading } = useQuery(
-  GET_ASTROLOGER_WALLET_TRANSACTIONS,
-  {
-    variables: {
-      astrologerId,
-      page: 1,
-      limit: 20,
+  const { data: walletData, loading: walletLoading } = useQuery(
+    GET_ASTROLOGER_WALLET_TRANSACTIONS,
+    {
+      variables: {
+        astrologerId,
+        page: walletPage,
+        limit: LIMIT,
+      },
+      skip: !astrologerId || activeTab !== "wallet",
     },
-    skip: !astrologerId || activeTab !== "wallet",
-  },
-);
-const wallet =
-  walletData?.getAstrologerWalletTransactions?.data || [];
+  );
+  const { data: followersData, loading: followersLoading } = useQuery(
+    GET_ASTROLOGER_FOLLOWERS,
+    {
+      variables: {
+        astrologerId,
+        page: followersPage,
+        limit: LIMIT,
+      },
+      skip: !astrologerId || activeTab !== "followers",
+    },
+  );
+
+  const chatPagination = chatData?.getAstrologerChatHistory?.pagination;
+  const callPagination = callData?.getAstrologerCallHistory?.pagination;
+  const walletPagination =
+    walletData?.getAstrologerWalletTransactions?.pagination;
+  const followersPagination = followersData?.getAstrologerFollowers?.pagination;
+  const wallet = walletData?.getAstrologerWalletTransactions?.data || [];
   const chats = chatData?.getAstrologerChatHistory?.data || [];
 
   const calls = callData?.getAstrologerCallHistory?.data || [];
@@ -222,7 +242,7 @@ const wallet =
               </button>
             )}
 
-               {row.hasRemedy && (
+            {row.hasRemedy && (
               <button
                 title="View Remedy"
                 onClick={() => {
@@ -241,18 +261,6 @@ const wallet =
       },
     ],
     [activeTab],
-  );
-
-  const { data: followersData, loading: followersLoading } = useQuery(
-    GET_ASTROLOGER_FOLLOWERS,
-    {
-      variables: {
-        astrologerId,
-        page: 1,
-        limit: 50,
-      },
-      skip: !astrologerId || activeTab !== "followers",
-    },
   );
 
   const followers = followersData?.getAstrologerFollowers?.data || [];
@@ -308,49 +316,48 @@ const wallet =
     [],
   );
   const walletColumns = useMemo(
-  () => [
-    {
-      header: "Transaction ID",
-      render: (row) => row.id.slice(0, 8),
-    },
-    {
-      header: "Type",
-      render: (row) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-            row.type === "CREDIT"
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {row.type}
-        </span>
-      ),
-    },
-    {
-      header: "Amount",
-      render: (row) => row.coins,
-    },
-    {
-      header: "Wallet Balance",
-      render: (row) => `₹ ${row.updatedBalance ?? 0}`,
-    },
-    {
-      header: "Description",
-      render: (row) => row.description || "-",
-    },
-    {
-      header: "Session",
-      render: (row) => row.session?.id?.slice(0, 8) || "-",
-    },
-    {
-      header: "Created At",
-      render: (row) =>
-        dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
-    },
-  ],
-  [],
-);
+    () => [
+      {
+        header: "Transaction ID",
+        render: (row) => row.id.slice(0, 8),
+      },
+      {
+        header: "Type",
+        render: (row) => (
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              row.type === "CREDIT"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {row.type}
+          </span>
+        ),
+      },
+      {
+        header: "Amount",
+        render: (row) => row.coins,
+      },
+      {
+        header: "Wallet Balance",
+        render: (row) => `₹ ${row.updatedBalance ?? 0}`,
+      },
+      {
+        header: "Description",
+        render: (row) => row.description || "-",
+      },
+      {
+        header: "Session",
+        render: (row) => row.session?.id?.slice(0, 8) || "-",
+      },
+      {
+        header: "Created At",
+        render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="p-4 rounded-2xl flex w-full flex-col gap-3 shadow-xl bg-white w-full">
@@ -417,7 +424,7 @@ const wallet =
         <button
           onClick={() => setActiveTab("wallet")}
           className={`px-4 py-2 rounded-full text-sm ${
-            activeTab === "followers"
+            activeTab === "wallet"
               ? "bg-purple-500 text-white"
               : "bg-gray-100"
           }`}
@@ -477,7 +484,16 @@ const wallet =
         (chatLoading ? (
           <p>Loading chat history...</p>
         ) : (
-          <DataTable columns={historyColumns} data={chats} />
+          <>
+            <DataTable columns={historyColumns} data={chats} />
+
+            <Pagination
+              page={chatPage}
+              totalPages={chatPagination?.totalPages || 1}
+              onPrevious={() => setChatPage((p) => p - 1)}
+              onNext={() => setChatPage((p) => p + 1)}
+            />
+          </>
         ))}
 
       {/* Call */}
@@ -486,20 +502,47 @@ const wallet =
         (callLoading ? (
           <p>Loading call history...</p>
         ) : (
-          <DataTable columns={historyColumns} data={calls} />
+          <>
+            <DataTable columns={historyColumns} data={calls} />
+
+            <Pagination
+              page={callPage}
+              totalPages={callPagination?.totalPages || 1}
+              onPrevious={() => setCallPage((p) => p - 1)}
+              onNext={() => setCallPage((p) => p + 1)}
+            />
+          </>
         ))}
 
       {activeTab === "followers" &&
         (followersLoading ? (
           <p>Loading followers...</p>
         ) : (
-          <DataTable columns={followerColumns} data={followers} />
+          <>
+            <DataTable columns={followerColumns} data={followers} />
+
+            <Pagination
+              page={followersPage}
+              totalPages={followersPagination?.totalPages || 1}
+              onPrevious={() => setFollowersPage((p) => p - 1)}
+              onNext={() => setFollowersPage((p) => p + 1)}
+            />
+          </>
         ))}
-            {activeTab === "wallet" &&
+      {activeTab === "wallet" &&
         (walletLoading ? (
           <p>Loading Astrologer Wallet...</p>
         ) : (
-          <DataTable columns={walletColumns} data={wallet} />
+          <>
+            <DataTable columns={walletColumns} data={wallet} />
+
+            <Pagination
+              page={walletPage}
+              totalPages={walletPagination?.totalPages || 1}
+              onPrevious={() => setWalletPage((p) => p - 1)}
+              onNext={() => setWalletPage((p) => p + 1)}
+            />
+          </>
         ))}
 
       <SessionMessagesModal

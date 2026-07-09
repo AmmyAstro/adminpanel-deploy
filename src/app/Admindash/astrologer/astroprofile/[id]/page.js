@@ -520,7 +520,7 @@ export default function Page() {
                   doc.image ? (
                     <div
                       key={doc.label}
-                      className="group relative overflow-hidden rounded-lg border"
+                      className="group relative overflow-hidden rounded-lg border border-purple-100 shadow-xl"
                     >
                       <Image
                         height={100}
@@ -613,7 +613,7 @@ export default function Page() {
           <AstrologerActivities astrologerId={astrologerId} />
 
           <div
-            className=" rounded-xl border shadow mt-6 p-5 flex flex-col"
+            className=" rounded-xl border border-purple-100  shadow-2xl mt-6 p-5 flex flex-col"
             style={{ maxHeight: "500px" }}
           >
             <h2 className="text-lg font-semibold mb-5 flex-shrink-0">
@@ -625,11 +625,11 @@ export default function Page() {
             ) : reviews.length === 0 ? (
               <p className="text-gray-500">No reviews found.</p>
             ) : (
-              <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+              <div className="grid grid-cols-2 overflow-y-auto pr-2 space-y-2">
                 {reviews.map((review) => (
                   <div
                     key={review.reviewId}
-                    className="border rounded-lg p-2 shadow-sm"
+                    className="border border-purple-100  shadow-2xl bg-violet-100 rounded-lg p-2 shadow-sm"
                   >
                     <div className="flex justify-between">
                       <div>
@@ -680,7 +680,7 @@ export default function Page() {
             )}
           </div>
 
-          <div className="bg-white rounded-xl border shadow mt-6 p-5">
+          <div className="bg-white rounded-xl border border-purple-100 shadow-2xl mt-6 p-5">
             <h2 className="text-lg font-semibold mb-5">
               Gift History ({gifts.length})
             </h2>
