@@ -19,6 +19,7 @@ import SessionMessagesModal from "../user/SessionModal";
 import Link from "next/link";
 import dayjs from "dayjs";
 import SessionRemedyModal from "../user/SessionRemedyModal";
+import Pagination from "../Pagination";
 
 export default function AstrologerActivities({ astrologerId }) {
   const [activeTab, setActiveTab] = useState("earnings");
