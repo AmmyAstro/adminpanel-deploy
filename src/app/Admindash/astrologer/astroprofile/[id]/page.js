@@ -625,11 +625,11 @@ export default function Page() {
             ) : reviews.length === 0 ? (
               <p className="text-gray-500">No reviews found.</p>
             ) : (
-              <div className="grid grid-cols-2 overflow-y-auto pr-2 space-y-2">
+              <div className="grid grid-cols-2 gap-5 overflow-y-auto pr-2 space-y-2">
                 {reviews.map((review) => (
                   <div
                     key={review.reviewId}
-                    className="border border-purple-100  shadow-2xl bg-violet-100 rounded-lg p-2 shadow-sm"
+                    className="border border-purple-100  shadow-2xl bg-violet-100 rounded-xl p-2 shadow-sm"
                   >
                     <div className="flex justify-between">
                       <div>
