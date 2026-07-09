@@ -147,7 +147,7 @@ export default function UsersListPage() {
         ),
       },
       {
-        header: "Wallet Coins",
+        header: "Wallet Balance",
         render: (row) => (
           <span className="font-semibold text-green-600">
             {row.userCoins || 0}

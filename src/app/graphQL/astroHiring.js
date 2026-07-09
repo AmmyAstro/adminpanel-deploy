@@ -511,6 +511,7 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
         amount
         description
         createdAt
+        sessionId
         updatedBalance
         rechargePack {
           id
