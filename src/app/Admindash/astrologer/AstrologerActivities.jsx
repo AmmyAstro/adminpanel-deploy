@@ -128,7 +128,7 @@ const handleDownloadRecording = async (sessionId) => {
 
     window.URL.revokeObjectURL(blobUrl);
   } catch (err) {
-    console.error(err);
+    console.error("cccccc",err);
     alert("Unable to download recording");
   }
 };
