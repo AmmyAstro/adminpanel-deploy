@@ -507,9 +507,7 @@ export default function UserProfile({ userId }) {
 
             <p className="text-gray-800 text-sm">#{user?.id}</p>
 
-            {/* <p className="text-sm text-gray-700">
-              {user?.countryCode} {user?.mobile}
-            </p> */}
+         
           </div>
         </div>
         <CustomButton
@@ -538,14 +536,14 @@ export default function UserProfile({ userId }) {
                 <CustomInput
                   type="text"
                   placeholder="Enter Amount"
-                  className="  px-3 py-2 text-sm "
+                  className="  px-3 py-2 text-sm w-full"
                   onChange={(e) => setPrice(e.target.value)}
                 />
 
                 <textarea
                   className="px-3"
                   onChange={(e) => setRemarks(e.target.value)}
-                  placeholder="Remarks"
+                  placeholder="Remarks w-full boredr border-gray-300 rounded-xl"
                 ></textarea>
               </div>
 
@@ -554,6 +552,7 @@ export default function UserProfile({ userId }) {
                   variant="green"
                   loading={manageWalletLoading}
                   onClick={() => Manageprice("add")}
+                  className="px-3 py-1 "
                 >
                   Add Gems
                 </CustomButton>
@@ -562,6 +561,7 @@ export default function UserProfile({ userId }) {
                   variant="red"
                   loading={manageWalletLoading}
                   onClick={() => Manageprice("deduct")}
+                  className="px-3 py-1 "
                 >
                   Deduct Gems
                 </CustomButton>

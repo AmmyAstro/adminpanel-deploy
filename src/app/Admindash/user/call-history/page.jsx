@@ -168,6 +168,14 @@ export default function UserCallHistoryPage() {
   // TABLE COLUMNS
   const columns = useMemo(
     () => [
+        {
+        header: "Session Id",
+        render: (row) => (
+          <div>
+            <p className="text-xs text-gray-500">{row.sessionId?.slice(0, 8)}</p>
+          </div>
+        ),
+      },
       {
         header: "User",
         render: (row) => (
