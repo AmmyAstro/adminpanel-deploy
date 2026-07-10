@@ -298,7 +298,7 @@ export default function Page() {
               />
 
               <textarea
-                className="px-3 w-full"
+                className="px-3 w-full border border-gray-300 rounded-xl"
                 onChange={(e) => setRemarks(e.target.value)}
                 placeholder="Remarks"
               ></textarea>
@@ -357,7 +357,7 @@ export default function Page() {
                   {astrologerprofile?.displayName || astrologerprofile?.name}
                 </span>
                 <small className="font-semibold text-gray-600  break-words">
-                  Astrologer ID : {astrologerprofile?.id}
+                  Astrologer ID : {astrologerprofile?.id?.slice(0,8)}
                 </small>
               </div>
             </div>
@@ -374,14 +374,16 @@ export default function Page() {
               <div className="flex justify-between items-center">
                 <div className="font-semibold text-sm">Mobile:</div>
                 <div className="text-sm">{astrologerprofile?.contactNo}</div>
-              </div>{" "}
-              <div className="flex justify-between items-center">
-                <div className="font-semibold text-sm">Address:</div>
-                <div className="text-sm break-words">
-                  {address?.street},{address?.city},{address?.state},
-                  {address?.country}
-                </div>
-              </div>{" "}
+              </div>
+         <div className="flex justify-between items-start">
+  <div className="font-semibold text-sm">Address:</div>
+
+  <div className="text-sm text-right max-w-[220px] break-all">
+    {[address?.street, address?.city, address?.state, address?.country]
+      .filter(Boolean)
+      .join(", ")}
+  </div>
+</div>
               <div className="flex justify-between items-center">
                 <div className="font-semibold text-sm">Experience:</div>
 
@@ -394,27 +396,35 @@ export default function Page() {
 
                 <div className="text-sm">{astrologerprofile?.gender}</div>
               </div>
-              <div className="flex justify-between items-center">
-                <div className="font-semibold text-sm">Languages:</div>
+         <div className="flex justify-between items-start">
+  <div className="font-semibold text-sm">Languages:</div>
 
-                <div className="text-sm">{astrologerprofile?.languages}</div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="font-semibold text-sm">Skills:</div>
+  <div className="text-sm text-right max-w-[220px] break-words">
+    {Array.isArray(astrologerprofile?.languages)
+      ? astrologerprofile.languages.join(", ")
+      : astrologerprofile?.languages}
+  </div>
+</div>
+          <div className="flex justify-between items-start">
+  <div className="font-semibold text-sm">Skills:</div>
 
-                <div className="text-sm">{astrologerprofile?.skills}</div>
-              </div>
+  <div className="text-sm text-right max-w-[220px] break-words">
+    {Array.isArray(astrologerprofile?.skills)
+      ? astrologerprofile.skills.join(", ")
+      : astrologerprofile?.skills}
+  </div>
+</div>
               <div className="mt-4">
                 <h6 className="font-semibold mb-2">About</h6>
 
                 <div
-                  className="prose prose-sm max-w-none text-gray-600"
+                  className=" text-xs max-w-none text-gray-600"
                   dangerouslySetInnerHTML={{
                     __html: astrologerprofile?.about || "",
                   }}
                 />
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex text-xs justify-between items-center">
                 <div className="font-semibold text-sm  ">Joined From:</div>
                 <p>
                   {dayjs(astrologerprofile.createdAt).format(
