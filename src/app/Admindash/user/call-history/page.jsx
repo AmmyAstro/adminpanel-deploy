@@ -293,20 +293,45 @@ export default function UserCallHistoryPage() {
         },
       },
 
-      {
-        header: "Time",
-        render: (row) => (
-          <div className="flex flex-col text-xs">
-            <span>           
-              S:
-              {row.startedAt ? new Date(row.startedAt).toLocaleString() : "N/A"}
-            </span>
-            <p className="text-xs text-gray-500">
-              E:{row.endedAt ? new Date(row.endedAt).toLocaleString() : "N/A"}
-            </p>
-          </div>
-        ),
-      },
+    {
+  header: "Time",
+  render: (row) => {
+    const started = row.startedAt ? new Date(row.startedAt) : null;
+    const ended = row.endedAt ? new Date(row.endedAt) : null;
+
+    return (
+      <div className="flex flex-col">
+        <span className="text-sm font-medium text-gray-900">
+          {started
+            ? started.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A"}
+        </span>
+
+        <span className="text-xs text-gray-500">
+          {started
+            ? started.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : "N/A"}
+          {"  -  "}
+          {ended
+            ? ended.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : "N/A"}
+        </span>
+      </div>
+    );
+  },
+},
       {
         header: "Actions",
         render: (row) => (
@@ -351,15 +376,15 @@ export default function UserCallHistoryPage() {
         <h1 className="text-2xl font-bold">User Call History</h1>
 
         <div className="flex flex-wrap gap-3">
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold">
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-semibold">
             Coins Deducted : {totalCoinsDeducted}
           </div>
 
-          <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-semibold">
+          <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold">
             Coins Earned : {totalCoinsEarned}
           </div>
 
-          <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg text-sm font-semibold">
+          <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-semibold">
             Commission : {totalCommission}
           </div>
 
@@ -369,14 +394,14 @@ export default function UserCallHistoryPage() {
         </div>
       </div>
 
-      {/* SEARCH */}
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 bg-white p-5 rounded-xl shadow border">
+     
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 bg-white p-5 rounded-full border-purple-100 shadow-md border">
         <input
           type="text"
           placeholder="Search by user name"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
-          className="border rounded-lg px-4 py-2 outline-none"
+          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
         />
 
         <input
@@ -384,7 +409,7 @@ export default function UserCallHistoryPage() {
           placeholder="Search by mobile"
           value={searchMobile}
           onChange={(e) => setSearchMobile(e.target.value)}
-          className="border rounded-lg px-4 py-2 outline-none"
+          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
         />
 
         <input
@@ -392,13 +417,13 @@ export default function UserCallHistoryPage() {
           placeholder="Search astrologer"
           value={searchAstrologerName}
           onChange={(e) => setSearchAstrologerName(e.target.value)}
-          className="border rounded-lg px-4 py-2 outline-none"
+          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
         />
 
         <select
           value={searchStatus}
           onChange={(e) => setSearchStatus(e.target.value)}
-          className="border rounded-lg px-4 py-2 outline-none"
+          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
         >
           <option value="">All Status</option>
 
@@ -418,7 +443,7 @@ export default function UserCallHistoryPage() {
         <select
           value={searchFilterType}
           onChange={(e) => setSearchFilterType(e.target.value)}
-          className="border rounded-lg px-4 py-2 outline-none"
+          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
         >
           <option value="">All Time</option>
 
@@ -452,7 +477,7 @@ export default function UserCallHistoryPage() {
         )}
       </div>
 
-      {/* TABLE */}
+  
       <div className="overflow-x-auto">
         <div className="w-full bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
           {loading ? (
@@ -463,7 +488,7 @@ export default function UserCallHistoryPage() {
         </div>
       </div>
 
-      {/* PAGINATION */}
+    
       <div className="flex items-center justify-between">
         <button
           disabled={page === 1}
