@@ -252,7 +252,6 @@ export default function GiftManager() {
 
   return (
     <div className="p-10 space-y-5">
-      {/* CREATE BUTTON */}
       <button
         disabled={!canCreate}
         onClick={() => {
@@ -278,7 +277,7 @@ export default function GiftManager() {
 
       {openModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-[400px] space-y-4">
             <h2 className="text-lg font-semibold">
               {editingGift ? "Edit Gift" : "Create Gift"}
             </h2>
@@ -287,7 +286,7 @@ export default function GiftManager() {
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded"
+              className="w-full border border-purple-200 p-2 rounded-full"
             />
 
             <input
@@ -295,7 +294,7 @@ export default function GiftManager() {
               placeholder="Amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full border p-2 rounded"
+              className="w-full border border-purple-200 p-2 rounded-full"
             />
 
             {preview && (
@@ -309,13 +308,13 @@ export default function GiftManager() {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-purple-200 p-2 rounded-full"
             />
 
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full border p-2 rounded"
+              className="w-full border border-purple-200 p-2 rounded-full"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -324,7 +323,7 @@ export default function GiftManager() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setOpenModal(false)}
-                className="px-4 py-2 border rounded"
+                className="px-4 py-2 border border-gray-300 shadow-lg rounded-full"
               >
                 Cancel
               </button>
@@ -332,7 +331,7 @@ export default function GiftManager() {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="px-4 py-2 bg-black text-white rounded"
+                className="px-4 py-2 bg-black  text-white rounded-full shadow-lg"
               >
                 {submitting
                   ? "Processing..."

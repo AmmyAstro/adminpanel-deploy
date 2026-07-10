@@ -286,19 +286,19 @@ export default function BannerManager() {
 
   return (
     <div className="p-10 space-y-5">
-      {/* CREATE */}
+   
       <button
         disabled={!canCreate}
         onClick={() => {
           resetForm();
           setOpenModal(true);
         }}
-        className="px-5 py-2 bg-purple-500 text-white rounded-full"
+        className="px-5 py-2 bg-purple-500 text-white cursor-pointer rounded-full"
       >
         Add Banner
       </button>
 
-      {/* CONFIRM */}
+    
       <ConfirmModal
         open={!!confirmState}
         onCancel={() => setConfirmState(null)}

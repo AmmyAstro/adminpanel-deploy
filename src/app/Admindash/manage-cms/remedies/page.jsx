@@ -15,11 +15,7 @@ import {
 import toast from "react-hot-toast";
 
 export default function RemedyAdminPage() {
-
-
   const [editId, setEditId] = useState(null);
-
-
 
   const { register, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
@@ -31,27 +27,16 @@ export default function RemedyAdminPage() {
     },
   });
 
-
-
   const { data, loading, refetch } = useQuery(GET_REMEDIES);
-
-  
 
   const [createRemedy, { loading: createLoading }] = useMutation(CREATE_REMEDY);
 
-
   const [updateRemedy, { loading: updateLoading }] = useMutation(UPDATE_REMEDY);
-
-
 
   const [deleteRemedy] = useMutation(DELETE_REMEDY);
 
-
-
   const onSubmit = async (values) => {
     try {
-
-
       if (editId) {
         await updateRemedy({
           variables: {
@@ -67,11 +52,8 @@ export default function RemedyAdminPage() {
           },
         });
 
-        toast.success("Remedy Updated")
-      }
-
-      
-      else {
+        toast.success("Remedy Updated");
+      } else {
         await createRemedy({
           variables: {
             input: {
@@ -82,10 +64,8 @@ export default function RemedyAdminPage() {
           },
         });
 
-       toast.success("Remedy Created")
+        toast.success("Remedy Created");
       }
-
-
 
       reset({
         title: "",
@@ -103,8 +83,6 @@ export default function RemedyAdminPage() {
     }
   };
 
-
-
   const handleEdit = (item) => {
     setEditId(item.id);
 
@@ -121,7 +99,6 @@ export default function RemedyAdminPage() {
       behavior: "smooth",
     });
   };
-
 
   const handleDelete = async (id) => {
     const confirmDelete = confirm("Delete this remedy?");
@@ -143,23 +120,20 @@ export default function RemedyAdminPage() {
 
   return (
     <div className="p-10 space-y-10">
-      {/* ================= FORM ================= */}
-
-      <div className="border rounded-2xl p-6 space-y-6">
-        <h2 className="text-3xl font-bold">
+      <div className="  w-full border border-gray-200 rounded-2xl  p-4 space-y-4">
+        <h2 className="text-2xl font-semibold">
           {editId ? "Update Remedy" : "Create Remedy"}
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* TITLE */}
-
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4 flex flex-col"
+        >
           <input
             {...register("title")}
             placeholder="Remedy Title"
-            className="border p-4 rounded-xl w-full"
+            className="w-full border border-gray-200 p-2 rounded-full"
           />
-
-          {/* DESCRIPTION */}
 
           <TapEditor
             value={watch("description")}
@@ -167,20 +141,16 @@ export default function RemedyAdminPage() {
             placeholder="Remedy Description"
           />
 
-          {/* ACTIVE */}
-
           <div className="flex items-center gap-3">
             <input type="checkbox" {...register("isActive")} />
 
             <label>Active Remedy</label>
           </div>
 
-          {/* SUBMIT */}
-
           <button
             type="submit"
             disabled={createLoading || updateLoading}
-            className="bg-purple-600 text-white px-8 py-3 rounded-xl"
+            className="bg-purple-600 text-white px-8 py-2 justify-self-align rounded-full"
           >
             {createLoading || updateLoading
               ? "Saving..."
@@ -191,54 +161,52 @@ export default function RemedyAdminPage() {
         </form>
       </div>
 
-      {/* ================= LIST ================= */}
-
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">Remedies</h2>
-
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          data?.getRemedies?.map((item) => (
-            <div key={item.id} className="border rounded-2xl p-6 space-y-5">
-              {/* HEADER */}
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-semibold">{item.title}</h3>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    Status: {item.isActive ? "Active" : "Inactive"}
-                  </p>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="bg-blue-500 text-white px-5 py-2 rounded-lg"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="bg-red-500 text-white px-5 py-2 rounded-lg"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-
-              {/* DESCRIPTION */}
-
+        <h2 className="text-2xl font-bold">Remedies</h2>
+        <div className="grid grid-cols-3 gap-8">
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            data?.getRemedies?.map((item) => (
               <div
-                dangerouslySetInnerHTML={{
-                  __html: item.description,
-                }}
-              />
-            </div>
-          ))
-        )}
+                key={item.id}
+                className="border border-gray-300 rounded-2xl p-6 space-y-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-semibold">{item.title}</h3>
+
+                    <p className="text-sm bg-black/10 rounded-full text-gray-500 mt-1">
+                      Status: {item.isActive ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 text-sm">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="bg-blue-500 text-white px-5 py-1 rounded-full"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="bg-red-500 text-white px-5 py-1 rounded-full"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: item.description,
+                  }}
+                />
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
