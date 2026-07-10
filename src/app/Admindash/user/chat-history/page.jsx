@@ -249,45 +249,26 @@ export default function UserChatHistoryPage() {
         },
       },
 
-      {
-  header: "Time",
-  render: (row) => {
-    const started = row.startedAt ? new Date(row.startedAt) : null;
-    const ended = row.endedAt ? new Date(row.endedAt) : null;
-
-    return (
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-gray-900">
-          {started
-            ? started.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
-            : "N/A"}
-        </span>
-
-        <span className="text-xs text-gray-500">
-          {started
-            ? started.toLocaleTimeString("en-IN", {
+{
+        header: "Created Date",
+        render: (row) => (
+          <div className="text-xs">
+            {new Date(row.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "Asia/Kolkata",
+            })}
+            <p className="text-xs text-gray-500">
+              {new Date(row.createdAt).toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
                 hour: "2-digit",
                 minute: "2-digit",
-                hour12: true,
-              })
-            : "N/A"}
-          {"  -  "}
-          {ended
-            ? ended.toLocaleTimeString("en-IN", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })
-            : "N/A"}
-        </span>
-      </div>
-    );
-  },
-},
+              })}
+            </p>
+          </div>
+        ),
+      },
       {
         header: "Actions",
         render: (row) => (
@@ -369,7 +350,7 @@ export default function UserChatHistoryPage() {
           placeholder="Search by user name"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         />
 
         {/* MOBILE */}
@@ -378,7 +359,7 @@ export default function UserChatHistoryPage() {
           placeholder="Search by mobile"
           value={searchMobile}
           onChange={(e) => setSearchMobile(e.target.value)}
-          className="rounded-full text-xs border-purple-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-purple-200 px-4 py-2 outline-none"
         />
 
         {/* ASTROLOGER */}
@@ -387,14 +368,14 @@ export default function UserChatHistoryPage() {
           placeholder="Search astrologer"
           value={searchAstrologerName}
           onChange={(e) => setSearchAstrologerName(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         />
 
         {/* STATUS */}
         <select
           value={searchStatus}
           onChange={(e) => setSearchStatus(e.target.value)}
-          className="rounded-full text-xs border-violet-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-violet-200 px-4 py-2 outline-none"
         >
           <option value="">All Status</option>
 
@@ -415,7 +396,7 @@ export default function UserChatHistoryPage() {
         <select
           value={searchFilterType}
           onChange={(e) => setSearchFilterType(e.target.value)}
-          className="rounded-full text-xs border-purple-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-purple-200 px-4 py-2 outline-none"
         >
           <option value="">All Time</option>
 

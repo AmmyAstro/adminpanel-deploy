@@ -401,7 +401,7 @@ export default function UserCallHistoryPage() {
           placeholder="Search by user name"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         />
 
         <input
@@ -409,7 +409,7 @@ export default function UserCallHistoryPage() {
           placeholder="Search by mobile"
           value={searchMobile}
           onChange={(e) => setSearchMobile(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         />
 
         <input
@@ -417,13 +417,13 @@ export default function UserCallHistoryPage() {
           placeholder="Search astrologer"
           value={searchAstrologerName}
           onChange={(e) => setSearchAstrologerName(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         />
 
         <select
           value={searchStatus}
           onChange={(e) => setSearchStatus(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         >
           <option value="">All Status</option>
 
@@ -443,7 +443,7 @@ export default function UserCallHistoryPage() {
         <select
           value={searchFilterType}
           onChange={(e) => setSearchFilterType(e.target.value)}
-          className="rounded-full text-xs border-gray-200 px-4 py-2 outline-none"
+          className="rounded-full text-xs border border-gray-200 px-4 py-2 outline-none"
         >
           <option value="">All Time</option>
 
