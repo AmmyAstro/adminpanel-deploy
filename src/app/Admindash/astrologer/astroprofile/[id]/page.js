@@ -690,11 +690,11 @@ export default function Page() {
             ) : gifts.length === 0 ? (
               <p className="text-gray-500">No gifts found.</p>
             ) : (
-              <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
+              <div className="max-h-[500px] overflow-y-auto grid grid-cols-2 gap-8 space-y-4 pr-2">
                 {gifts.map((gift) => (
                   <div
                     key={gift.id}
-                    className="border rounded-lg p-4 shadow-sm"
+                    className="border border-violet-200 rounded-lg p-4 shadow-xl"
                   >
                     <div className="flex justify-between">
                       {/* Left */}
@@ -702,7 +702,7 @@ export default function Page() {
                         <img
                           src={`https://dhwaniastro.com${gift.gift?.image}`}
                           alt={gift.giftName}
-                          className="w-14 h-14 rounded-lg object-cover border"
+                          className="w-14 h-14 rounded-lg object-cover "
                         />
 
                         <div>

@@ -209,10 +209,10 @@ export const GET_ASTROLOGER_BY_ID = gql`
       isBusy
       isOnline
       isPromotional
-isEligibleChat
-isEligibleCall
-isEligibleVideo
-isEligibleAudio
+      isEligibleChat
+      isEligibleCall
+      isEligibleVideo
+      isEligibleAudio
       pricing {
         type
         price
@@ -506,19 +506,19 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
 
       data {
         id
-        
+
         type
         coins
         amount
         description
         createdAt
         sessionId
-         userWallet {
-    user {
-      name
-      mobile
-    }
-  }
+        userWallet {
+          user {
+            name
+            mobile
+          }
+        }
         updatedBalance
         rechargePack {
           id
@@ -719,21 +719,17 @@ export const GET_NOTICES = gql`
   }
 `;
 export const UPDATE_REVIEW_COMMENT = gql`
- mutation UpdateReviewComment(
-  $reviewId: ID!
-  $comment: String
-  $rating: Int
-) {
-  updateReviewComment(
-    reviewId: $reviewId
-    comment: $comment
-    rating: $rating
-  ) {
-    reviewId
-    comment
-    rating
+  mutation UpdateReviewComment($reviewId: ID!, $comment: String, $rating: Int) {
+    updateReviewComment(
+      reviewId: $reviewId
+      comment: $comment
+      rating: $rating
+    ) {
+      reviewId
+      comment
+      rating
+    }
   }
-}
 `;
 export const UPDATE_GIFT_STATUS = gql`
   mutation UpdateGiftStatus($id: ID!, $status: String!) {
@@ -943,7 +939,7 @@ export const GET_ALL_WAITING_QUEUES = gql`
         name
         mobile
         countryCode
-        
+
         roomId
         maximumTime
         source

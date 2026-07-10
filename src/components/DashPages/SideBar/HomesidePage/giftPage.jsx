@@ -86,14 +86,11 @@ export default function GiftManager() {
     setPreview(URL.createObjectURL(selected));
   };
 
-  //  MAIN SUBMIT LOGIC
+
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-
       let imageUrl = editingGift?.image || "";
-
-      // STEP 1: upload file
       if (file) {
         const formData = new FormData();
         formData.append("image", file);
@@ -115,7 +112,6 @@ export default function GiftManager() {
         imageUrl = data.url;
       }
 
-      // STEP 2: GraphQL mutation
       if (editingGift) {
         await updateGift({
           variables: {
@@ -263,7 +259,7 @@ export default function GiftManager() {
           resetForm();
           setOpenModal(true);
         }}
-        className={`px-5 py-2 rounded ${
+        className={`px-5 py-2 rounded-full ${
           canCreate
             ? "bg-yellow-500 text-black"
             : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -272,17 +268,14 @@ export default function GiftManager() {
         Add Gift
       </button>
 
-      {/* CONFIRM MODAL */}
       <ConfirmModal
         open={!!confirmState}
         onCancel={() => setConfirmState(null)}
         onConfirm={handleConfirm}
       />
 
-      {/* TABLE */}
       <DataTable columns={giftColumns} data={gifts} />
 
-      {/* MODAL */}
       {openModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
@@ -305,7 +298,6 @@ export default function GiftManager() {
               className="w-full border p-2 rounded"
             />
 
-            {/* IMAGE PREVIEW */}
             {preview && (
               <img
                 src={preview}
