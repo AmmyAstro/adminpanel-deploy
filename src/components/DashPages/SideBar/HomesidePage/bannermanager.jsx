@@ -84,7 +84,6 @@ export default function BannerManager() {
     setEditingBanner(null);
   };
 
-  // 🔥 Auto slug
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -116,7 +115,6 @@ export default function BannerManager() {
     }));
   };
 
-  // 🔥 Upload (multer)
   const uploadFile = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -133,7 +131,6 @@ export default function BannerManager() {
     return data.url;
   };
 
-  // 🔥 Submit
   const handleSubmit = async () => {
     try {
       if (!form.heading || !form.slug) {
@@ -188,22 +185,22 @@ export default function BannerManager() {
     { header: "Sort", accessor: "sortorder" },
 
     {
-  header: "Image",
-  render: (row) => (
-    <img
-      src={
-        row.imageUrl
-          ? `https://dhwaniastro.com${row.imageUrl}`
-          : "/no-image.png"
-      }
-      alt={row.heading}
-      onError={(e) => {
-        e.target.src = "/no-image.png";
-      }}
-      className="h-14 w-24 object-cover rounded-md border"
-    />
-  ),
-},
+      header: "Image",
+      render: (row) => (
+        <img
+          src={
+            row.imageUrl
+              ? `https://dhwaniastro.com${row.imageUrl}`
+              : "/no-image.png"
+          }
+          alt={row.heading}
+          onError={(e) => {
+            e.target.src = "/no-image.png";
+          }}
+          className="h-14 w-24 object-cover rounded-md "
+        />
+      ),
+    },
     {
       header: "Status",
       render: (row) => (
@@ -241,38 +238,21 @@ export default function BannerManager() {
             }}
             className="sr-only peer"
           />
-
-<div
-  className={`w-12 h-6 rounded-full relative transition ${
-    row.status ? "bg-green-500" : "bg-gray-300"
-  }`}
->
-  <div
-    className={`absolute top-0.5 h-5 w-5 bg-white rounded-full transition ${
-      row.status ? "translate-x-6" : "translate-x-0.5"
-    }`}
-  />
-</div>        </label>
+          <div
+            className={`w-12 h-6 rounded-full relative transition ${
+              row.status ? "bg-green-500" : "bg-gray-300"
+            }`}
+          >
+            <div
+              className={`absolute top-0.5 h-5 w-5 bg-white rounded-full transition ${
+                row.status ? "translate-x-6" : "translate-x-0.5"
+              }`}
+            />
+          </div>{" "}
+        </label>
       ),
     },
 
-    // 🔥 IMAGE
-    // {
-    //   header: "Image",
-    //   render: (row) => (
-    //     <img
-    //       src={
-    //         row.imageUrl
-    //           ? `http://localhost:4000${row.imageUrl}`
-    //           : "/no-image.png"
-    //       }
-    //       onError={(e) => (e.target.src = "/no-image.png")}
-    //       className="h-12 w-20 object-cover rounded"
-    //     />
-    //   ),
-    // },
-
-    // 🔥 ACTIONS
     {
       header: "Actions",
       render: (row) => (
@@ -283,7 +263,7 @@ export default function BannerManager() {
               setEditingBanner(row);
               setOpenModal(true);
             }}
-            className="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+            className="px-3 py-1 text-xs bg-blue-500 text-white rounded-full"
           >
             Edit
           </button>
@@ -295,7 +275,7 @@ export default function BannerManager() {
             mutationFn={deleteBanner}
             variables={{ id: row.id }}
             onSuccess={refetch}
-            className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+            className="px-3 py-1 text-xs bg-red-500 text-white rounded-full"
           >
             Delete
           </ProtectedActionButton>
@@ -313,7 +293,7 @@ export default function BannerManager() {
           resetForm();
           setOpenModal(true);
         }}
-        className="px-5 py-2 bg-purple-500 text-white rounded"
+        className="px-5 py-2 bg-purple-500 text-white rounded-full"
       >
         Add Banner
       </button>
@@ -325,18 +305,15 @@ export default function BannerManager() {
         onConfirm={handleConfirm}
       />
 
-      {/* EMPTY */}
-      {localBanners.length === 0 && (
+  
+
+      <DataTable columns={bannerColumns} data={localBanners} />
+    {localBanners.length === 0 && (
         <p className="text-center py-10 text-gray-500">No banners found 🚫</p>
       )}
-
-      {/* TABLE */}
-      <DataTable columns={bannerColumns} data={localBanners} />
-
-      {/* MODAL */}
       {openModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-          <div className="bg-white p-6 rounded w-[500px] space-y-3">
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-[500px] space-y-3">
             <h2 className="text-xl font-semibold">
               {editingBanner ? "Edit" : "Create"}
             </h2>
@@ -346,7 +323,7 @@ export default function BannerManager() {
               placeholder="Heading"
               value={form.heading}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-200 p-2 rounded-full"
             />
 
             <input
@@ -354,7 +331,7 @@ export default function BannerManager() {
               placeholder="Subheading"
               value={form.subheading}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-200 p-2 rounded-full"
             />
 
             <input
@@ -362,7 +339,7 @@ export default function BannerManager() {
               placeholder="Slug"
               value={form.slug}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-200 p-2 rounded-full"
             />
 
             <input
@@ -370,7 +347,7 @@ export default function BannerManager() {
               placeholder="Link"
               value={form.bannerlink}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-200 p-2 rounded-full"
             />
 
             <input
@@ -379,25 +356,25 @@ export default function BannerManager() {
               placeholder="Sort"
               value={form.sortorder}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-200 p-2 rounded-full"
             />
 
-            <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+            <input className="w-full border border-purple-200 p-2 rounded-full" type="file" onChange={(e) => setFile(e.target.files[0])} />
 
             {file && <img src={URL.createObjectURL(file)} className="h-20" />}
 
             {editingBanner?.imageUrl && !file && (
-        <img
-  src={`https://dhwaniastro.com${editingBanner.imageUrl}`}
-  className="h-20 w-32 object-cover rounded"
-/>
+              <img
+                src={`https://dhwaniastro.com${editingBanner.imageUrl}`}
+                className="h-20 w-32 object-cover rounded"
+              />
             )}
 
             <select
               name="language"
               value={form.language}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-200 p-2 rounded-full"
             >
               <option value="en">English</option>
               <option value="hi">Hindi</option>
@@ -409,7 +386,7 @@ export default function BannerManager() {
               <button
                 onClick={handleSubmit}
                 disabled={uploading}
-                className="px-4 py-2 bg-black text-white rounded"
+                className="px-4 py-2 bg-black  text-white rounded-full"
               >
                 {uploading
                   ? "Uploading..."
