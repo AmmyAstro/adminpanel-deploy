@@ -506,12 +506,19 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
 
       data {
         id
+        
         type
         coins
         amount
         description
         createdAt
         sessionId
+         userWallet {
+    user {
+      name
+      mobile
+    }
+  }
         updatedBalance
         rechargePack {
           id
