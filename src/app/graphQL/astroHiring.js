@@ -596,6 +596,10 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
         description
         createdAt
         updatedBalance
+        session {
+          id
+          type
+        }
         astrologerWallet {
           astrologer {
             id

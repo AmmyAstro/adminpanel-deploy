@@ -93,36 +93,45 @@ const followersPagination = followersData?.getAstrologerFollowers;
   const chats = chatData?.getAstrologerChatHistory?.data || [];
 
   const calls = callData?.getAstrologerCallHistory?.data || [];
-  const handleDownloadRecording = async (sessionId) => {
-    try {
-      const { data } = await client.query({
-        query: GET_CALL_RECORDING,
-        variables: {
-          sessionId,
-        },
-        fetchPolicy: "network-only",
-      });
+const handleDownloadRecording = async (sessionId) => {
+  try {
+    const { data } = await client.query({
+      query: GET_CALL_RECORDING,
+      variables: { sessionId },
+      fetchPolicy: "network-only",
+    });
 
-      const recording = data?.getCallRecording;
+    const recording = data?.getCallRecording;
 
-      if (!recording?.fileUrl) {
-        alert("Recording not found");
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.href = recording.fileUrl;
-      link.download = recording.fileName || "call-recording.webm";
-      link.target = "_blank";
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.error(err);
-      alert("Unable to download recording");
+    if (!recording?.fileUrl) {
+      alert("Recording not found");
+      return;
     }
-  };
+
+    const response = await fetch(recording.fileUrl);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recording");
+    }
+
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = recording.fileName || "call-recording.webm";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    console.error(err);
+    alert("Unable to download recording");
+  }
+};
   const historyColumns = useMemo(
     () => [
       {
@@ -347,10 +356,7 @@ const followersPagination = followersData?.getAstrologerFollowers;
         header: "Description",
         render: (row) => row.description || "-",
       },
-      {
-        header: "Session",
-        render: (row) => row.session?.id?.slice(0, 8) || "-",
-      },
+    
       {
         header: "Created At",
         render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
