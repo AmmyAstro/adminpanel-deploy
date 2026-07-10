@@ -590,16 +590,14 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
 
       data {
         id
+        sessionId
         type
         coins
         amount
         description
         createdAt
         updatedBalance
-        session {
-          id
-          type
-        }
+      
         astrologerWallet {
           astrologer {
             id
