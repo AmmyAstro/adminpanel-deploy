@@ -950,3 +950,166 @@ export const GET_ALL_WAITING_QUEUES = gql`
     }
   }
 `;
+
+
+export const GET_SKILLS = gql`
+  query GetSkills {
+    getSkills {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_SKILL = gql`
+  query GetSkill($id: ID!) {
+    getSkill(id: $id) {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_SKILL = gql`
+  mutation CreateSkill($input: CreateSkillInput!) {
+    createSkill(input: $input) {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+    }
+  }
+`;
+
+export const UPDATE_SKILL = gql`
+  mutation UpdateSkill(
+    $id: ID!
+    $input: UpdateSkillInput!
+  ) {
+    updateSkill(
+      id: $id
+      input: $input
+    ) {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+    }
+  }
+`;
+
+export const DELETE_SKILL = gql`
+  mutation DeleteSkill($id: ID!) {
+    deleteSkill(id: $id)
+  }
+`;
+
+export const UPDATE_SKILL_STATUS = gql`
+  mutation UpdateSkillStatus(
+    $id: ID!
+    $status: Boolean!
+  ) {
+    updateSkillStatus(
+      id: $id
+      status: $status
+    ) {
+      id
+      isActive
+    }
+  }
+`;
+
+
+
+export const GET_PROBLEMS = gql`
+  query GetProblems {
+    getProblems {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_PROBLEM = gql`
+  query GetProblem($id: ID!) {
+    getProblem(id: $id) {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_PROBLEM = gql`
+  mutation CreateProblem(
+    $input: CreateProblemInput!
+  ) {
+    createProblem(input: $input) {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+    }
+  }
+`;
+
+export const UPDATE_PROBLEM = gql`
+  mutation UpdateProblem(
+    $id: ID!
+    $input: UpdateProblemInput!
+  ) {
+    updateProblem(
+      id: $id
+      input: $input
+    ) {
+      id
+      name
+      slug
+      sortOrder
+      isActive
+    }
+  }
+`;
+
+export const DELETE_PROBLEM = gql`
+  mutation DeleteProblem($id: ID!) {
+    deleteProblem(id: $id)
+  }
+`;
+
+export const UPDATE_PROBLEM_STATUS = gql`
+  mutation UpdateProblemStatus(
+    $id: ID!
+    $status: Boolean!
+  ) {
+    updateProblemStatus(
+      id: $id
+      status: $status
+    ) {
+      id
+      isActive
+    }
+  }
+`;

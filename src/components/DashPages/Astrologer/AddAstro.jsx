@@ -17,6 +17,8 @@ import toast from "react-hot-toast";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   GET_ASTROLOGER_BY_ID,
+  GET_PROBLEMS,
+  GET_SKILLS,
   UPDATE_ASTROLOGER,
 } from "../../../app/graphQL/astroHiring";
 const ADD_ASTROLOGER = gql`
@@ -67,7 +69,7 @@ const GET_APPLICATION_BY_ID = gql`
 
 export default function AddAstro() {
   const params = useParams(); // edit mode ke liye rehne do
-const [previewImage, setPreviewImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const searchParams = useSearchParams();
   const appId = searchParams.get("appId");
   // console.log("URL APP ID============== =", appId);
@@ -434,35 +436,35 @@ const [previewImage, setPreviewImage] = useState(null);
     const astro = astroData.getAstrologerById;
 
     const primaryAddress = astro.addresses?.[0];
-const pricingTypes = [
-  "CHAT",
-  "CALL",
-  "VIDEO",
-  "AUDIO",
-  "GIFT_COMMISSION",
-  "OFFER",
-];
+    const pricingTypes = [
+      "CHAT",
+      "CALL",
+      "VIDEO",
+      "AUDIO",
+      "GIFT_COMMISSION",
+      "OFFER",
+    ];
 
-const pricing = pricingTypes.map((type) => {
-  const existing = astro.pricing?.find((p) => p.type === type);
+    const pricing = pricingTypes.map((type) => {
+      const existing = astro.pricing?.find((p) => p.type === type);
 
-  const eligibilityMap = {
-    CHAT: astro.isEligibleChat,
-    CALL: astro.isEligibleCall,
-    VIDEO: astro.isEligibleVideo,
-    AUDIO: astro.isEligibleAudio,
-    GIFT_COMMISSION: !!existing,
-    OFFER: !!existing,
-  };
+      const eligibilityMap = {
+        CHAT: astro.isEligibleChat,
+        CALL: astro.isEligibleCall,
+        VIDEO: astro.isEligibleVideo,
+        AUDIO: astro.isEligibleAudio,
+        GIFT_COMMISSION: !!existing,
+        OFFER: !!existing,
+      };
 
-  return {
-    type,
-    price: existing?.price ?? "",
-    offerPrice: existing?.offerPrice ?? "",
-    commissionPercent: existing?.commissionPercent ?? "",
-    isActive: eligibilityMap[type] ?? false,
-  };
-});
+      return {
+        type,
+        price: existing?.price ?? "",
+        offerPrice: existing?.offerPrice ?? "",
+        commissionPercent: existing?.commissionPercent ?? "",
+        isActive: eligibilityMap[type] ?? false,
+      };
+    });
     reset({
       astroname: astro.name || "",
       displayName: astro.displayName || "",
@@ -495,7 +497,7 @@ const pricing = pricingTypes.map((type) => {
       tags: astro.tags || "New",
       vtags: astro.vtags || "not verified",
 
-    pricing,
+      pricing,
 
       bankDetails: {
         accountHolderName: astro.kycDetail?.accountHolderName || "",
@@ -512,20 +514,20 @@ const pricing = pricingTypes.map((type) => {
       },
     });
 
-const getFileUrl = (path) => {
-  if (!path) return null;
+    const getFileUrl = (path) => {
+      if (!path) return null;
 
-  if (path.startsWith("http")) return path;
+      if (path.startsWith("http")) return path;
 
-  return `https://dhwaniastro.com${path}`;
-};
+      return `https://dhwaniastro.com${path}`;
+    };
 
-  setExistingDocs({
-  profilePic: getFileUrl(astro.profilePic),
-  aadhaar: getFileUrl(astro.kycDetail?.aadhaarImage),
-  panCard: getFileUrl(astro.kycDetail?.panImage),
-  passbook: getFileUrl(astro.kycDetail?.passbookImage),
-});
+    setExistingDocs({
+      profilePic: getFileUrl(astro.profilePic),
+      aadhaar: getFileUrl(astro.kycDetail?.aadhaarImage),
+      panCard: getFileUrl(astro.kycDetail?.panImage),
+      passbook: getFileUrl(astro.kycDetail?.passbookImage),
+    });
   }, [astroData, reset]);
 
   useEffect(() => {
@@ -562,7 +564,7 @@ const getFileUrl = (path) => {
   const onSubmit = async (formData) => {
     try {
       const fd = new FormData();
-      
+
       // console.log("FORM PROFILE PIC:", formData.profilePic);
 
       if (formData.profilePic instanceof File) {
@@ -584,30 +586,30 @@ const getFileUrl = (path) => {
       );
 
       const uploadedFiles = await uploadRes.json();
-   const existingData = isEditMode
-  ? astroData?.getAstrologerById
-  : appData?.getApplicationById;
-  const safeFiles = {
-  profilePic:
-    typeof uploadedFiles?.profilePic === "string"
-      ? uploadedFiles.profilePic
-      : existingData?.profilePic || null,
+      const existingData = isEditMode
+        ? astroData?.getAstrologerById
+        : appData?.getApplicationById;
+      const safeFiles = {
+        profilePic:
+          typeof uploadedFiles?.profilePic === "string"
+            ? uploadedFiles.profilePic
+            : existingData?.profilePic || null,
 
-  aadhaar:
-    typeof uploadedFiles?.aadhaar === "string"
-      ? uploadedFiles.aadhaar
-      : existingData?.kycDetail?.aadhaarImage || null,
+        aadhaar:
+          typeof uploadedFiles?.aadhaar === "string"
+            ? uploadedFiles.aadhaar
+            : existingData?.kycDetail?.aadhaarImage || null,
 
-  panCard:
-    typeof uploadedFiles?.panCard === "string"
-      ? uploadedFiles.panCard
-      : existingData?.kycDetail?.panImage || null,
+        panCard:
+          typeof uploadedFiles?.panCard === "string"
+            ? uploadedFiles.panCard
+            : existingData?.kycDetail?.panImage || null,
 
-  passbook:
-    typeof uploadedFiles?.passbook === "string"
-      ? uploadedFiles.passbook
-      : existingData?.kycDetail?.passbookImage || null,
-};
+        passbook:
+          typeof uploadedFiles?.passbook === "string"
+            ? uploadedFiles.passbook
+            : existingData?.kycDetail?.passbookImage || null,
+      };
 
       const payload = mapAstrologerPayload({
         ...formData,
@@ -675,13 +677,22 @@ const getFileUrl = (path) => {
     });
     setFileInputKey((prev) => prev + 1);
   };
+  const { data: skillsData } = useQuery(GET_SKILLS);
+
+  const { data: problemsData } = useQuery(GET_PROBLEMS);
+  const skillOptions =
+    skillsData?.getSkills?.filter((x) => x.isActive)?.map((x) => x.name) || [];
+
+  const problemOptions =
+    problemsData?.getProblems?.filter((x) => x.isActive)?.map((x) => x.name) ||
+    [];
 
   const selectFields = [
     {
       label: "Skills & Expertise",
       name: "expertise",
-      placeholder: "Select Expertise",
-      options: ["Palmistry", "Face Reading", "Tarot", "Numerology"],
+      placeholder: "Select Skills",
+      options: skillOptions,
     },
     {
       label: "Language Known",
@@ -693,7 +704,7 @@ const getFileUrl = (path) => {
       label: "Problems Handled",
       name: "problems",
       placeholder: "Select Problems",
-      options: ["Love", "Career", "Health", "Finance"],
+      options: problemOptions,
     },
   ];
 
@@ -719,7 +730,7 @@ const getFileUrl = (path) => {
     </button>
   );
   const isSubmitting = addLoading || updateLoading;
-console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
+  console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv", existingDocs);
   return (
     <div className="min-h-screen">
       <div className="shadow-md rounded-xl p-3 bg-purple-200 mb-6 flex items-center justify-between">
@@ -816,16 +827,15 @@ console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
                       field.onChange(file);
                     }}
                   />
-                  
                 )}
               />
-                 <button
-  type="button"
-  onClick={() => setPreviewImage(existingDocs.profilePic)}
-  className="text-blue-600 text-xs underline"
->
-  View
-</button>
+              <button
+                type="button"
+                onClick={() => setPreviewImage(existingDocs.profilePic)}
+                className="text-blue-600 text-xs underline"
+              >
+                View
+              </button>
             </div>
 
             {errors.profilePic && (
@@ -833,7 +843,6 @@ console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
                 {errors.profilePic.message}
               </p>
             )}
-    
           </div>
 
           <div>
@@ -1165,7 +1174,7 @@ console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
                         name={`pricing.${index}.isActive`}
                         render={({ field }) => (
                           <Toggle
-                           value={field.value ?? false}
+                            value={field.value ?? false}
                             onChange={(val) => {
                               field.onChange(val);
 
@@ -1449,9 +1458,6 @@ console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
                         {item.label} :
                       </label>
 
-
-
-                   
                       <Controller
                         name={`documents.${item.name}`}
                         control={control}
@@ -1464,17 +1470,15 @@ console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
                               field.onChange(e.target.files?.[0])
                             }
                           />
-                          
                         )}
-                        
                       />
-                                    <button
-  type="button"
-  onClick={() => setPreviewImage(existingDocs[item.name])}
-  className="text-blue-600 text-xs underline"
->
-  View
-</button>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewImage(existingDocs[item.name])}
+                        className="text-blue-600 text-xs underline"
+                      >
+                        View
+                      </button>
                     </div>
                   ))}
                   {/* {errors?.bankDetails?.documents?.profile && (
@@ -1535,30 +1539,30 @@ console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",existingDocs);
         )}
       </form>
       {previewImage && (
-  <div
-    className="fixed inset-0 z-50   flex items-center justify-center bg-black/60"
-    onClick={() => setPreviewImage(null)}
-  >
-    <div
-      className="relative bg-white max-h-[70vh] rounded-xl p-4 shadow-xl max-w-lg w-[90%]"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        type="button"
-        onClick={() => setPreviewImage(null)}
-        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600"
-      >
-        ✕
-      </button>
+        <div
+          className="fixed inset-0 z-50   flex items-center justify-center bg-black/60"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="relative bg-white max-h-[70vh] rounded-xl p-4 shadow-xl max-w-lg w-[90%]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600"
+            >
+              ✕
+            </button>
 
-      <img
-        src={previewImage}
-        alt="Preview"
-        className="w-full max-h-[70vh] object-contain rounded-lg"
-      />
-    </div>
-  </div>
-)}
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-full max-h-[70vh] object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
