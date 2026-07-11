@@ -108,30 +108,43 @@ const handleDownloadRecording = async (sessionId) => {
       return;
     }
 
-    const response = await fetch(recording.fileUrl);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch recording");
-    }
-
-    const blob = await response.blob();
-
-    const blobUrl = window.URL.createObjectURL(blob);
-
     const link = document.createElement("a");
-    link.href = blobUrl;
+    link.href = recording.fileUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
     link.download = recording.fileName || "call-recording.webm";
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    window.URL.revokeObjectURL(blobUrl);
   } catch (err) {
-    console.error("cccccc",err);
+    console.error(err);
     alert("Unable to download recording");
   }
 };
+
+// const handleDownloadRecording = async (sessionId) => {
+//   try {
+//     const { data } = await client.query({
+//       query: GET_CALL_RECORDING,
+//       variables: { sessionId },
+//       fetchPolicy: "network-only",
+//     });
+
+//     const recording = data?.getCallRecording;
+
+//     if (!recording?.fileUrl) {
+//       alert("Recording not found");
+//       return;
+//     }
+
+//     window.open(recording.fileUrl, "_blank");
+
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
   const historyColumns = useMemo(
     () => [
       {
