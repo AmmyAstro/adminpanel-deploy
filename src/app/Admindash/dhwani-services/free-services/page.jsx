@@ -97,7 +97,7 @@ export default function FreeServicesAdmin() {
     <div className="max-w-7xl mx-auto p-6">
 
       {/* Create Form */}
-      <div className="border border-gary-300 shadow-2xl rounded-xl p-6 mb-10">
+      <div className="border border-gray-300 shadow-2xl rounded-xl p-6 mb-10">
         <h2 className="text-2xl font-bold mb-4">
           Add Free Service
         </h2>
@@ -107,7 +107,7 @@ export default function FreeServicesAdmin() {
           className="grid grid-cols-2 gap-8"
         >
           <input
-            className="border border-gary-300 shadow-2xl rounded-full p-3 "
+            className="border border-gray-300 shadow-2xl rounded-full p-3 "
             placeholder="Title"
             value={form.title}
             onChange={(e) =>
@@ -119,7 +119,7 @@ export default function FreeServicesAdmin() {
           />
 
           <input
-            className="border border-gary-300 shadow-2xl rounded-full p-3 "
+            className="border border-gray-300 shadow-2xl rounded-full p-3 "
             placeholder="Slug"
             value={form.slug}
             onChange={(e) =>
@@ -131,7 +131,7 @@ export default function FreeServicesAdmin() {
           />
 
           <input
-            className="border p-3 border-gary-300 shadow-2xl rounded-full"
+            className="border p-3 border-gray-300 shadow-2xl rounded-full"
             placeholder="Href"
             value={form.href}
             onChange={(e) =>
@@ -143,7 +143,7 @@ export default function FreeServicesAdmin() {
           />
 
           <input
-            className="border p-3 border-gary-300 shadow-2xl rounded-full"
+            className="border p-3 border-gray-300 shadow-2xl rounded-full"
             placeholder="Icon URL"
             value={form.icon}
             onChange={(e) =>
@@ -156,7 +156,7 @@ export default function FreeServicesAdmin() {
 
           <input
             type="number"
-            className="border p-3 border-gary-300 shadow-2xl rounded-full"
+            className="border p-3 border-gray-300 shadow-2xl rounded-full"
             placeholder="Order"
             value={form.order}
             onChange={(e) =>
@@ -177,7 +177,7 @@ export default function FreeServicesAdmin() {
       </div>
 
    
-      <div className="border border-gary-300 shadow-2xl  rounded-xl p-6">
+      <div className="border border-gray-300 shadow-2xl  rounded-xl p-6">
         <h2 className="text-2xl font-bold mb-4">
           Free Services
         </h2>
@@ -187,7 +187,7 @@ export default function FreeServicesAdmin() {
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gary-300  bg-purple-100 rounded-xl p-2">
+              <tr className="border-b border-gray-300  bg-purple-100 rounded-xl p-2">
                 <th className="text-left py-3">Title</th>
                 <th className="text-left py-3">Slug</th>
                 <th className="text-left py-3">Href</th>

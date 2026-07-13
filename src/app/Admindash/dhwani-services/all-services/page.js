@@ -130,8 +130,6 @@ export default function DhwaniServicesAdmin() {
   });
   const [file, setFile] = useState(null);
 
-  const [isNewCategory, setIsNewCategory] = useState(false);
-  const [newCategoryInput, setNewCategoryInput] = useState("");
   const [preview, setPreview] = useState("");
   const [modalType, setModalType] = useState("service");
 
