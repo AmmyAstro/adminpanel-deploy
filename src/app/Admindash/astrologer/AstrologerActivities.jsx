@@ -85,66 +85,65 @@ export default function AstrologerActivities({ astrologerId }) {
     },
   );
 
-const chatPagination = chatData?.getAstrologerChatHistory;
-const callPagination = callData?.getAstrologerCallHistory;
-const walletPagination = walletData?.getAstrologerWalletTransactions;
-const followersPagination = followersData?.getAstrologerFollowers;
+  const chatPagination = chatData?.getAstrologerChatHistory;
+  const callPagination = callData?.getAstrologerCallHistory;
+  const walletPagination = walletData?.getAstrologerWalletTransactions;
+  const followersPagination = followersData?.getAstrologerFollowers;
   const wallet = walletData?.getAstrologerWalletTransactions?.data || [];
   const chats = chatData?.getAstrologerChatHistory?.data || [];
 
   const calls = callData?.getAstrologerCallHistory?.data || [];
-const handleDownloadRecording = async (sessionId) => {
-  try {
-    const { data } = await client.query({
-      query: GET_CALL_RECORDING,
-      variables: { sessionId },
-      fetchPolicy: "network-only",
-    });
+  const handleDownloadRecording = async (sessionId) => {
+    try {
+      const { data } = await client.query({
+        query: GET_CALL_RECORDING,
+        variables: { sessionId },
+        fetchPolicy: "network-only",
+      });
 
-    const recording = data?.getCallRecording;
+      const recording = data?.getCallRecording;
 
-    if (!recording?.fileUrl) {
-      alert("Recording not found");
-      return;
+      if (!recording?.fileUrl) {
+        alert("Recording not found");
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = recording.fileUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.download = recording.fileName || "call-recording.webm";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error(err);
+      alert("Unable to download recording");
     }
+  };
 
-    const link = document.createElement("a");
-    link.href = recording.fileUrl;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.download = recording.fileName || "call-recording.webm";
+  // const handleDownloadRecording = async (sessionId) => {
+  //   try {
+  //     const { data } = await client.query({
+  //       query: GET_CALL_RECORDING,
+  //       variables: { sessionId },
+  //       fetchPolicy: "network-only",
+  //     });
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  //     const recording = data?.getCallRecording;
 
-  } catch (err) {
-    console.error(err);
-    alert("Unable to download recording");
-  }
-};
+  //     if (!recording?.fileUrl) {
+  //       alert("Recording not found");
+  //       return;
+  //     }
 
-// const handleDownloadRecording = async (sessionId) => {
-//   try {
-//     const { data } = await client.query({
-//       query: GET_CALL_RECORDING,
-//       variables: { sessionId },
-//       fetchPolicy: "network-only",
-//     });
+  //     window.open(recording.fileUrl, "_blank");
 
-//     const recording = data?.getCallRecording;
-
-//     if (!recording?.fileUrl) {
-//       alert("Recording not found");
-//       return;
-//     }
-
-//     window.open(recording.fileUrl, "_blank");
-
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
   const historyColumns = useMemo(
     () => [
       {
@@ -369,7 +368,7 @@ const handleDownloadRecording = async (sessionId) => {
         header: "Description",
         render: (row) => row.description || "-",
       },
-    
+
       {
         header: "Created At",
         render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
@@ -380,7 +379,6 @@ const handleDownloadRecording = async (sessionId) => {
 
   return (
     <div className="p-4 rounded-2xl flex w-full flex-col gap-3 shadow-xl bg-white w-full">
-      {/* Header */}
 
       <div className="flex items-center justify-between border-b border-gray-200 pb-2">
         <h2 className="font-semibold text-sm">Astrologer Activities</h2>
@@ -398,8 +396,6 @@ const handleDownloadRecording = async (sessionId) => {
           />
         </div>
       </div>
-
-      {/* Tabs */}
 
       <div className="flex gap-3">
         <button
@@ -443,16 +439,12 @@ const handleDownloadRecording = async (sessionId) => {
         <button
           onClick={() => setActiveTab("wallet")}
           className={`px-4 py-2 rounded-full text-sm ${
-            activeTab === "wallet"
-              ? "bg-purple-500 text-white"
-              : "bg-gray-100"
+            activeTab === "wallet" ? "bg-purple-500 text-white" : "bg-gray-100"
           }`}
         >
           Wallet
         </button>
       </div>
-
-      {/* Earnings */}
 
       {activeTab === "earnings" && (
         <div className="grid grid-cols-3 gap-4">
@@ -497,14 +489,16 @@ const handleDownloadRecording = async (sessionId) => {
         </div>
       )}
 
-      {/* Chat */}
-
       {activeTab === "chat" &&
         (chatLoading ? (
           <p>Loading chat history...</p>
         ) : (
           <>
-            <DataTable columns={historyColumns} data={chats}  startIndex={(chatPage - 1) * LIMIT} />
+            <DataTable
+              columns={historyColumns}
+              data={chats}
+              startIndex={(chatPage - 1) * LIMIT}
+            />
 
             <Pagination
               page={chatPage}
@@ -515,14 +509,16 @@ const handleDownloadRecording = async (sessionId) => {
           </>
         ))}
 
-      {/* Call */}
-
       {activeTab === "call" &&
         (callLoading ? (
           <p>Loading call history...</p>
         ) : (
           <>
-            <DataTable columns={historyColumns} data={calls}  startIndex={(callPage - 1) * LIMIT}/>
+            <DataTable
+              columns={historyColumns}
+              data={calls}
+              startIndex={(callPage - 1) * LIMIT}
+            />
 
             <Pagination
               page={callPage}
@@ -538,7 +534,11 @@ const handleDownloadRecording = async (sessionId) => {
           <p>Loading followers...</p>
         ) : (
           <>
-            <DataTable columns={followerColumns} data={followers}   startIndex={(followersPage - 1) * LIMIT}/>
+            <DataTable
+              columns={followerColumns}
+              data={followers}
+              startIndex={(followersPage - 1) * LIMIT}
+            />
 
             <Pagination
               page={followersPage}
@@ -553,7 +553,11 @@ const handleDownloadRecording = async (sessionId) => {
           <p>Loading Astrologer Wallet...</p>
         ) : (
           <>
-            <DataTable columns={walletColumns} data={wallet} startIndex={(walletPage - 1) * LIMIT}/>
+            <DataTable
+              columns={walletColumns}
+              data={wallet}
+              startIndex={(walletPage - 1) * LIMIT}
+            />
 
             <Pagination
               page={walletPage}

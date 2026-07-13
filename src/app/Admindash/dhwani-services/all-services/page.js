@@ -196,7 +196,7 @@ export default function DhwaniServicesAdmin() {
       name: "",
       slug: "",
       type: "DIRECT_SERVICE",
-  
+
       description: "",
       longText: "",
       categoryId: "",
@@ -235,9 +235,9 @@ export default function DhwaniServicesAdmin() {
     setMappingOpen(false);
   };
 
-   const handleCancelMappings =() =>{
-     setMappingOpen(false);
-   }
+  const handleCancelMappings = () => {
+    setMappingOpen(false);
+  };
 
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -372,7 +372,7 @@ export default function DhwaniServicesAdmin() {
             setModalType("category");
             setOpen(true);
           }}
-          className="bg-green-600 text-white px-4 py-2 rounded"
+          className="bg-green-600 text-white px-4 py-2 rounded-full"
         >
           + Add Category
         </button>
@@ -383,7 +383,7 @@ export default function DhwaniServicesAdmin() {
             setModalType("service");
             setOpen(true);
           }}
-          className="bg-purple-600 text-white px-4 py-2 rounded"
+          className="bg-purple-600 text-white px-4 py-2 rounded-full"
         >
           + Add Service
         </button>
@@ -396,7 +396,7 @@ export default function DhwaniServicesAdmin() {
       />
 
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2 shadow-xl rounded-xl px-4 py-3">
+        <div className="flex flex-col gap-2 shadow-xl  rounded-2xl border border-gray-200 px-4 py-3">
           <h2 className="text-2xl font-bold mb-4">Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {catData?.getCategories?.map((cat) => (
@@ -426,7 +426,7 @@ export default function DhwaniServicesAdmin() {
                         setEditing(cat);
                         setOpen(true);
                       }}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs"
+                      className="bg-blue-500 text-white cursor-pointer px-3 py-1 rounded-full text-xs"
                     >
                       Edit
                     </button>
@@ -438,7 +438,7 @@ export default function DhwaniServicesAdmin() {
                       mutationFn={deleteCategory}
                       variables={{ id: cat.id }}
                       onSuccess={refetch}
-                      className="bg-red-500 text-white px-3 py-1 rounded-full text-xs"
+                      className="bg-red-500 text-white cursor-pointer px-3 py-1 rounded-full text-xs"
                     >
                       Delete
                     </ProtectedActionButton>
@@ -450,7 +450,7 @@ export default function DhwaniServicesAdmin() {
         </div>
 
         {/* LIST */}
-        <div className="flex flex-col gap-2 shadow-xl rounded-xl px-4 py-3">
+        <div className="flex flex-col gap-2 shadow-xl border border-gray-200 rounded-2xl px-4 py-3">
           <h2 className="text-2xl font-bold mb-4">Services</h2>
           <div className="grid grid-cols-3 gap-4">
             {data?.getServices?.map((item) => (
@@ -459,6 +459,8 @@ export default function DhwaniServicesAdmin() {
                 className="p-4 flex items-start justify-between bg-white shadow rounded-xl"
               >
                 <div className="flex flex-col items-center">
+                  <h3 className="font-semibold">{item.name}</h3>
+
                   {item.image && (
                     <Image
                       src={`https://dhwaniastro.com${item.image}`}
@@ -468,8 +470,6 @@ export default function DhwaniServicesAdmin() {
                       className="h-32 w-full object-cover rounded mb-2"
                     />
                   )}
-                  <h3>{item.name}</h3>
-              
                 </div>
 
                 <div className="p-2">
@@ -493,7 +493,7 @@ export default function DhwaniServicesAdmin() {
                         setEditing(item);
                         setOpen(true);
                       }}
-                      className="bg-blue-500 rounded-full text-white px-2 py-1 text-xs"
+                      className="bg-blue-500 cursor-pointer rounded-full text-white px-2 py-1 text-xs"
                     >
                       Edit
                     </button>
@@ -505,14 +505,14 @@ export default function DhwaniServicesAdmin() {
                       mutationFn={deleteService}
                       variables={{ id: item.id }}
                       onSuccess={refetch}
-                      className="bg-red-500 text-white rounded-full px-2 py-1 text-xs"
+                      className="bg-red-500 text-white cursor-pointer rounded-full px-2 py-1 text-xs"
                     >
                       Delete
                     </ProtectedActionButton>
                   </div>
                   <button
                     onClick={() => openMappingModal(item)}
-                    className="bg-green-600 text-white px-2 mt-2 py-1 text-xs rounded"
+                    className="bg-green-600 cursor-pointer text-white px-2 mt-2 py-1 text-xs rounded"
                   >
                     Map Astrologers
                   </button>
@@ -531,13 +531,12 @@ export default function DhwaniServicesAdmin() {
               {modalType === "category" ? "Add Category" : "Add Service"}
             </h2>
 
-            {/* CATEGORY FORM */}
 
             {modalType === "category" && (
               <>
                 <input
                   placeholder="Category Name"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   value={form.name}
                   onChange={(e) =>
                     setForm({
@@ -549,7 +548,7 @@ export default function DhwaniServicesAdmin() {
 
                 <input
                   placeholder="Category Slug"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   value={form.slug}
                   onChange={(e) =>
                     setForm({
@@ -561,7 +560,7 @@ export default function DhwaniServicesAdmin() {
 
                 <input
                   type="file"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   onChange={handleImageChange}
                 />
 
@@ -571,26 +570,26 @@ export default function DhwaniServicesAdmin() {
                     alt=""
                     width={300}
                     height={200}
-                    className="w-full h-40 object-cover rounded mb-3"
+                    className="w-full h-30 object-cover rounded-xl mb-2"
                   />
                 )}
 
                 <button
                   onClick={handleCategorySubmit}
-                  className="bg-green-600 text-white w-full p-2 rounded"
+                  className="bg-green-600 text-white w-full p-2 rounded-full"
                 >
                   Save Category
                 </button>
               </>
             )}
 
-            {/* SERVICE FORM */}
+ 
 
             {modalType === "service" && (
               <>
                 <input
                   placeholder="Service Name"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   value={form.name}
                   onChange={(e) =>
                     setForm({
@@ -602,7 +601,7 @@ export default function DhwaniServicesAdmin() {
 
                 <input
                   placeholder="Service Slug"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   value={form.slug}
                   onChange={(e) =>
                     setForm({
@@ -615,7 +614,7 @@ export default function DhwaniServicesAdmin() {
                 {/* CATEGORY DROPDOWN */}
 
                 <select
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   value={form.categoryId}
                   onChange={(e) =>
                     setForm({
@@ -633,10 +632,9 @@ export default function DhwaniServicesAdmin() {
                   ))}
                 </select>
 
-
                 <input
                   placeholder="Short Description"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-2xl p-2 w-full mb-3"
                   value={form.description}
                   onChange={(e) =>
                     setForm({
@@ -648,7 +646,7 @@ export default function DhwaniServicesAdmin() {
 
                 <textarea
                   placeholder="Long Description"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-2xl p-2 w-full mb-3"
                   rows={5}
                   value={form.longText}
                   onChange={(e) =>
@@ -661,7 +659,7 @@ export default function DhwaniServicesAdmin() {
 
                 <input
                   type="file"
-                  className="border p-2 w-full mb-3"
+                  className="border border-gray-200 rounded-full p-2 w-full mb-3"
                   onChange={handleImageChange}
                 />
 
@@ -671,13 +669,13 @@ export default function DhwaniServicesAdmin() {
                     alt=""
                     width={300}
                     height={200}
-                    className="w-full h-40 object-cover rounded mb-3"
+                    className="w-full h-30 object-cover rounded-xl mb-3"
                   />
                 )}
 
                 <button
                   onClick={handleServiceSubmit}
-                  className="bg-purple-600 text-white w-full p-2 rounded"
+                  className="bg-purple-600 text-white w-full p-2 rounded-full"
                 >
                   Save Service
                 </button>
@@ -753,20 +751,20 @@ export default function DhwaniServicesAdmin() {
               })}
             </div>
 
-           <div className="flex  gap-5 items-center justify-center">
-             <button
-              onClick={handleSaveMappings}
-              className="bg-green-600 text-white px-4 py-1 rounded-xl mt-4"
-            >
-              Save Mapping
-            </button>
-                <button
-              onClick={handleCancelMappings}
-              className="bg-green-600 text-white px-4 py-1 rounded-xl mt-4"
-            >
-              Cancel
-            </button>
-           </div>
+            <div className="flex  gap-5 items-center justify-center">
+              <button
+                onClick={handleSaveMappings}
+                className="bg-green-600 text-white px-4 py-1 rounded-xl mt-4"
+              >
+                Save Mapping
+              </button>
+              <button
+                onClick={handleCancelMappings}
+                className="bg-gray-400 text-white px-4 py-1 rounded-xl mt-4"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

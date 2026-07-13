@@ -35,7 +35,6 @@ export default function Page() {
 
       <h1 className="text-xl font-semibold">Offer Analytics</h1>
 
-      {/* -------- CARDS -------- */}
       <div className="grid md:grid-cols-3 gap-4">
 
         <StatCard title="Total Users" value={stats?.totalUsers} />
@@ -54,8 +53,8 @@ export default function Page() {
 
       </div>
 
-      {/* -------- BAR -------- */}
-      <div className="border rounded-xl p-5">
+     
+      <div className="border border-gray-300  rounded-2xl p-5">
         <h2 className="mb-4 font-medium">Usage Comparison</h2>
 
         <Bar label="First Offer" percent={firstPercent} color="bg-purple-500" />
@@ -70,7 +69,7 @@ export default function Page() {
 
 function StatCard({ title, value, extra }) {
   return (
-    <div className="p-4 border rounded-xl shadow-sm">
+    <div className="p-4 border border-gray-300  rounded-2xl shadow-xl">
       <p className="text-sm text-gray-500">{title}</p>
       <h2 className="text-xl font-semibold">{value ?? 0}</h2>
       {extra && <p className="text-xs text-green-600">{extra}</p>}
