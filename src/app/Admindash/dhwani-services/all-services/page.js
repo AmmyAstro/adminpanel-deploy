@@ -258,7 +258,7 @@ export default function DhwaniServicesAdmin() {
   };
 
   const handleServiceSubmit = async () => {
-    let imageUrl = "";
+    let imageUrl = editing?.image || "";
 
     if (file) {
       const formData = new FormData();
@@ -286,18 +286,37 @@ export default function DhwaniServicesAdmin() {
       imageUrl = data.url;
     }
 
-    await createService({
-      variables: {
-        input: {
-          name: form.name,
-          slug: form.slug,
-          image: imageUrl,
-          description: form.description,
-          longText: form.longText,
-          categoryId: form.categoryId || null,
+    const input = {
+      name: form.name,
+      slug: form.slug,
+      image: imageUrl || editing?.image,
+      description: form.description,
+      longText: form.longText,
+      categoryId: form.categoryId || null,
+    };
+
+    if (editing) {
+      await updateService({
+        variables: {
+          id: editing.id,
+          input,
         },
-      },
-    });
+      });
+
+      toast.success("Service Updated");
+    } else {
+      await createService({
+        variables: {
+          input,
+        },
+      });
+
+      toast.success("Service Created");
+    }
+
+    await refetch();
+    resetForm();
+    setOpen(false);
 
     toast.success("Service Created");
 
@@ -362,8 +381,8 @@ export default function DhwaniServicesAdmin() {
     setOpen(false);
   };
 
-function clickClose () {
- setOpen(false);
+  function clickClose() {
+    setOpen(false);
   }
 
   return (
@@ -375,7 +394,7 @@ function clickClose () {
             setModalType("category");
             setOpen(true);
           }}
-          className="bg-green-600 text-white px-4 py-2 rounded-full"
+          className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-full"
         >
           + Add Category
         </button>
@@ -386,7 +405,7 @@ function clickClose () {
             setModalType("service");
             setOpen(true);
           }}
-          className="bg-purple-600 text-white px-4 py-2 rounded-full"
+          className="bg-purple-600 cursor-pointer text-white px-4 py-2 rounded-full"
         >
           + Add Service
         </button>
@@ -479,7 +498,7 @@ function clickClose () {
                   <p>{item.description}</p>
 
                   <p>Category: {item.category?.name || "None"}</p>
-                  <div className="mt-2 text-xs">
+                  <div className="mt-2 overflow-y-auto h-16 text-xs">
                     {item.astrologerMappings?.map((m) => (
                       <p key={m.astrologer.displayName}>
                         {m.astrologer.displayName}
@@ -526,19 +545,21 @@ function clickClose () {
         </div>
       </div>
 
-      {/* MODAL */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-[500px] max-h-[90vh] overflow-y-auto">
-         <div>
-             <h2 className="text-xl font-semibold mb-4">
-              {modalType === "category" ? "Add Category" : "Add Service"}
-            </h2>
-            <button onClick={clickClose()}>
-              X
-            </button>
-         </div>
-
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold mb-4">
+                {modalType === "category"
+                  ? editing
+                    ? "Edit Category"
+                    : "Add Category"
+                  : editing
+                    ? "Edit Service"
+                    : "Add Service"}
+              </h2>
+              <button onClick={() => clickClose()}>X</button>
+            </div>
 
             {modalType === "category" && (
               <>
@@ -591,8 +612,6 @@ function clickClose () {
               </>
             )}
 
- 
-
             {modalType === "service" && (
               <>
                 <input
@@ -618,8 +637,6 @@ function clickClose () {
                     })
                   }
                 />
-
-                {/* CATEGORY DROPDOWN */}
 
                 <select
                   className="border border-gray-200 rounded-full p-2 w-full mb-3"
