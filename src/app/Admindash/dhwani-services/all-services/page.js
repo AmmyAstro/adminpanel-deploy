@@ -361,7 +361,10 @@ export default function DhwaniServicesAdmin() {
     resetForm();
     setOpen(false);
   };
-  /* ------------------ UI ------------------ */
+
+function clickClose () {
+ setOpen(false);
+  }
 
   return (
     <div className="p-6">
@@ -527,9 +530,14 @@ export default function DhwaniServicesAdmin() {
       {open && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-[500px] max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4">
+         <div>
+             <h2 className="text-xl font-semibold mb-4">
               {modalType === "category" ? "Add Category" : "Add Service"}
             </h2>
+            <button onClick={clickClose()}>
+              X
+            </button>
+         </div>
 
 
             {modalType === "category" && (
