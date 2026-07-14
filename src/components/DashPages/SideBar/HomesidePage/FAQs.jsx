@@ -30,7 +30,7 @@ export default function FAQPage() {
         answer: "",
     });
 
-    // 🔐 Permissions
+   
     const canCreate = isSuperAdmin || can("faqs", "create");
     const canUpdate = isSuperAdmin || can("faqs", "update");
 
@@ -68,6 +68,7 @@ export default function FAQPage() {
             setOpen(false);
             setEditing(null);
             refetch();
+            setForm("");
         } catch (err) {
             console.error(err);
         }
@@ -75,40 +76,40 @@ export default function FAQPage() {
 
     return (
         <div className="p-10 space-y-6">
-            {/* CREATE */}
+            
             <button
                 onClick={() => {
                     if (!canCreate) return;
                     setEditing(null);
                     setOpen(true);
                 }}
-                className={`px-5 py-2 rounded bg-yellow-500 text-black ${!canCreate ? "cursor-not-allowed opacity-70" : "cursor-pointer"
+                className={`px-5 py-2 rounded-full bg-yellow-500 text-black ${!canCreate ? "cursor-not-allowed opacity-70" : "cursor-pointer"
                     }`}
             >
                 Create FAQ
             </button>
 
-            {/* CONFIRM */}
+           
             <ConfirmModal
                 open={!!confirmState}
                 onCancel={() => setConfirmState(null)}
                 onConfirm={handleConfirm}
             />
 
-            {/* LIST */}
+       
             <div className="grid gap-4">
                 {data?.faqs?.map((faq) => (
                     <div
                         key={faq.id}
-                        className="border p-4 rounded shadow flex justify-between"
+                        className="border border-gray-300  p-4 rounded-2xl shadow-xl flex flex-col "
                     >
-                        <div>
+                        <div className="flex flex-col gap-3">
                             <h2 className="font-semibold">{faq.question}</h2>
                             <p className="text-gray-600">{faq.answer}</p>
                         </div>
 
-                        <div className="flex gap-2">
-                            {/* EDIT */}
+                        <div className="flex justify-end justify-self-end gap-2">
+                   
                             <button
                                 onClick={() => {
                                     if (!canUpdate) return;
@@ -121,7 +122,7 @@ export default function FAQPage() {
                                 Edit
                             </button>
 
-                            {/* DELETE */}
+                          
                             <ProtectedActionButton
                                 module="faqs"
                                 action="delete"
@@ -144,17 +145,17 @@ export default function FAQPage() {
                 ))}
             </div>
 
-            {/* MODAL */}
+         
             {open && (
                 <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded w-[400px] space-y-4">
+                    <div className="bg-white p-6 rounded-2xl shadow-xl w-[400px] space-y-4">
                         <h2 className="text-xl font-semibold">
                             {editing ? "Edit FAQ" : "Create FAQ"}
                         </h2>
 
                         <input
                             placeholder="Question"
-                            className="w-full border p-2"
+                            className="w-full border border-gray-300 rounded-full p-2"
                             value={form.question}
                             onChange={(e) =>
                                 setForm({ ...form, question: e.target.value })
@@ -163,19 +164,19 @@ export default function FAQPage() {
 
                         <textarea
                             placeholder="Answer"
-                            className="w-full border p-2"
+                            className="w-full border   border-gray-300 rounded-full p-2"
                             value={form.answer}
                             onChange={(e) =>
                                 setForm({ ...form, answer: e.target.value })
                             }
                         />
 
-                        <div className="flex justify-end gap-3">
-                            <button onClick={() => setOpen(false)}>Cancel</button>
+                        <div className="flex justify-center gap-3">
+                            <button className="rounded-full bg-gray-400 cursor-pointer" onClick={() => setOpen(false)}>Cancel</button>
 
                             <button
                                 onClick={handleSubmit}
-                                className="px-4 py-2 bg-black text-white rounded"
+                                className="px-4 py-2 bg-black text-white cursor-pointer rounded-full"
                             >
                                 {editing ? "Update" : "Create"}
                             </button>

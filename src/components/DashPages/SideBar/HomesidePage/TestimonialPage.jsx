@@ -127,6 +127,13 @@ export default function TestimonialPage() {
       setOpen(false);
       setEditing(null);
       refetch();
+      setForm({
+        name: "",
+        address: "",
+        content: "",
+        image: "",
+        rating: 5,
+      });
     } catch (err) {
       console.error(err);
     }
@@ -148,7 +155,7 @@ export default function TestimonialPage() {
             setEditing(null);
             setOpen(true);
           }}
-          className={`px-4 py-2 rounded bg-blue-600 text-white ${getPermissionClass(
+          className={`px-4 py-2 rounded-full shadow-xl bg-blue-600 text-white ${getPermissionClass(
             canCreate,
           )}`}
         >
@@ -166,7 +173,7 @@ export default function TestimonialPage() {
       {/* LIST */}
       <div className="grid grid-cols-3 gap-4">
         {data?.testimonials?.map((t) => (
-          <div key={t.id} className="border p-4 rounded shadow">
+          <div key={t.id} className="border border-gray-300  p-4 rounde-2xl shadow-2xl">
             <img
               src={
                 t.image?.startsWith("http")
@@ -177,9 +184,10 @@ export default function TestimonialPage() {
             />
 
             <h2 className="font-bold">{t.name}</h2>
+              <div className="flex gap-5">
             <p className="text-sm text-gray-500">{t.address}</p>
 
-            <div className="flex">
+          
               {Array.from({ length: t.rating }).map((_, i) => (
                 <span key={i}>⭐</span>
               ))}
@@ -195,7 +203,7 @@ export default function TestimonialPage() {
                   setEditing(t);
                   setOpen(true);
                 }}
-                className={`px-3 py-1 text-xs rounded bg-blue-500 text-white ${getPermissionClass(
+                className={`px-3 py-1 text-xs rounded-full shadow-xl bg-blue-500 text-white ${getPermissionClass(
                   canUpdate,
                 )}`}
               >
@@ -213,7 +221,7 @@ export default function TestimonialPage() {
                   // toast.success("Deleted");
                   refetch();
                 }}
-                className={`px-3 py-1 text-xs bg-red-500 text-white rounded ${getPermissionClass(
+                className={`px-3 py-1 text-xs bg-red-500 shadow-xl text-white rounded ${getPermissionClass(
                   canDelete,
                 )}`}
               >
@@ -227,28 +235,28 @@ export default function TestimonialPage() {
       {/* MODAL */}
       {open && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded w-[400px]">
-            <h2 className="text-xl mb-4">
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-[400px]">
+            <h2 className="text-xl font-semibold text-center mb-4">
               {editing ? "Edit Testimonial" : "Create Testimonial"}
             </h2>
 
             <input
               placeholder="Name"
-              className="w-full border p-2 mb-2"
+              className="w-full border rounded-full border-gray-300 shadow-xl p-2 mb-2"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
 
             <input
               placeholder="Address"
-              className="w-full border p-2 mb-2"
+              className="w-full border rounded-full border-gray-300 shadow-xl p-2 mb-2"
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
 
             <textarea
               placeholder="Review"
-              className="w-full border p-2 mb-2"
+              className="w-full border rounded-2xl border-gray-300 shadow-xl p-2 mb-2"
               value={form.content}
               onChange={(e) => setForm({ ...form, content: e.target.value })}
             />
@@ -256,12 +264,14 @@ export default function TestimonialPage() {
               <img
                 src={preview}
                 alt="preview"
-                className="w-24 h-24 object-cover rounded mb-3"
+                className="w-24 h-24 object-cover rounded-2xl mb-3"
               />
             )}
             <input
               type="file"
-              className="mb-2"
+           
+                            className="w-full border rounded-2xl border-gray-300 shadow-xl p-2 mb-2"
+
               onChange={(e) => {
                 const selectedFile = e.target.files?.[0];
 
@@ -273,7 +283,7 @@ export default function TestimonialPage() {
             />
 
             <select
-              className="w-full border p-2 mb-4"
+              className="w-full border rounded-2xl border-gray-300 shadow-xl p-2 mb-2"
               value={form.rating}
               onChange={(e) =>
                 setForm({ ...form, rating: Number(e.target.value) })
@@ -286,12 +296,12 @@ export default function TestimonialPage() {
               ))}
             </select>
 
-            <div className="flex justify-between">
-              <button onClick={() => setOpen(false)}>Cancel</button>
+            <div className="flex justify-center gap-5">
+              <button className=" rounded-full bg-gray-400 " onClick={() => setOpen(false)}>Cancel</button>
 
               <button
                 onClick={handleSubmit}
-                className={`px-4 py-2 rounded bg-green-600 text-white ${getPermissionClass(
+                className={`px-4 py-2 rounded-full bg-green-600 text-white ${getPermissionClass(
                   editing ? canUpdate : canCreate,
                 )}`}
               >

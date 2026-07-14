@@ -246,7 +246,7 @@ export default function BlogForm({ mode = "create", slug }) {
                             name="title"
                             value={formData.title}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-full p-3 mt-1"
+                            className="w-full border border-gray-300 rounded-full p-3 mt-1 bg-white/50"
                         />
                     </div>
 
@@ -258,7 +258,7 @@ export default function BlogForm({ mode = "create", slug }) {
                             name="slug"
                             value={formData.slug}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-full p-3 mt-1"
+                            className="w-full border bg-white/50 border-gray-300 rounded-full p-3 mt-1"
                         />
                     </div>
 
@@ -270,7 +270,7 @@ export default function BlogForm({ mode = "create", slug }) {
                             name="shortDescription"
                             value={formData.shortDescription}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-full p-3 mt-1"
+                            className="w-full bg-white/50 border border-gray-300 rounded-2xl p-3 mt-1"
                         />
                     </div>
 
@@ -295,6 +295,7 @@ export default function BlogForm({ mode = "create", slug }) {
                         <input
                             type="file"
                             accept="image/*"
+                            className="rounded-full px-3 py-2 bg-white/50"
                             onChange={(e) =>
                                 setFormData((prev) => ({
                                     ...prev,
@@ -327,7 +328,7 @@ export default function BlogForm({ mode = "create", slug }) {
                                 placeholder="Meta Title"
                                 value={formData.metaTitle}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-full p-3"
+                                className="w-full border border-gray-300 bg-white/50 rounded-full p-3"
                             />
 
                             <textarea
@@ -336,7 +337,7 @@ export default function BlogForm({ mode = "create", slug }) {
                                 placeholder="Meta Description"
                                 value={formData.metaDescription}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-full p-3"
+                                className="w-full border border-gray-300 bg-white/50 rounded-full p-3"
                             />
 
                             <input
@@ -345,7 +346,7 @@ export default function BlogForm({ mode = "create", slug }) {
                                 placeholder="Meta Keywords"
                                 value={formData.metaKeywords}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-full p-3"
+                                className="w-full border bg-white/50 border-gray-300 rounded-full p-3"
                             />
                         </div>
                     </div>
@@ -358,7 +359,7 @@ export default function BlogForm({ mode = "create", slug }) {
                             placeholder="#astro,#kundli,#numerology"
                             value={formData.hashtags}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-full p-3 mt-2"
+                            className="w-full border bg-white/50 border-gray-300 rounded-full p-3 mt-2"
                         />
                     </div>
 
@@ -371,14 +372,14 @@ export default function BlogForm({ mode = "create", slug }) {
                             value={formData.schemaMarkup}
                             onChange={handleChange}
                             placeholder="Paste JSON-LD schema"
-                            className="w-full border border-gray-300 rounded-lg p-3 mt-2 font-mono"
+                            className="w-full border bg-white/50 border-gray-300 rounded-lg p-3 mt-2 font-mono"
                         />
                     </div>
                 </div>
 
                 {/* RIGHT */}
-                <div className="space-y-5">
-                    <div className="border border-gray-300 rounded-xl p-4">
+                <div className="space-y-5 ">
+                    <div className="border border-gray-300 shadow-xl rounded-xl p-4">
                         <h3 className="font-bold mb-4">Publish</h3>
 
                         <input
@@ -386,7 +387,7 @@ export default function BlogForm({ mode = "create", slug }) {
                             name="date"
                             value={formData.date}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded p-2 mb-3"
+                            className="w-full border border-gray-300 rounded-full bg-white/50 p-2 mb-3"
                         />
 
                         <input
@@ -394,21 +395,21 @@ export default function BlogForm({ mode = "create", slug }) {
                             name="time"
                             value={formData.time}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded p-2 mb-3"
+                            className="w-full border border-gray-300 rounded-full bg-white/50 p-2 mb-3"
                         />
 
                         <select
                             name="status"
                             value={formData.status}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded p-2"
+                            className="w-full border border-gray-300 rounded-full bg-white/50 p-2"
                         >
                             <option value="DRAFT">Draft</option>
                             <option value="SCHEDULED">Scheduled</option>
                             <option value="PUBLISHED">Published</option>
                         </select>
                     </div>
-                    <div className="border border-gray-300 rounded-xl p-4">
+                    <div className="border border-gray-300 shadow-xl rounded-full bg-white/50 p-4">
                         <h3 className="font-bold mb-4">Language</h3>
 
                         <select
@@ -424,7 +425,7 @@ export default function BlogForm({ mode = "create", slug }) {
                             <option value="Hindi">Hindi</option>
                         </select>
                     </div>
-                    <div className="border rounded-xl p-4">
+                    <div className="border bg-white/50 rounded-xl p-4">
                         <h3 className="font-bold mb-4">Categories</h3>
 
                         <div className="space-y-2">
