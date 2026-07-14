@@ -187,7 +187,7 @@ export default function FreeServicesAdmin() {
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-300  bg-purple-100 rounded-xl p-2">
+              <tr className="border-b border-gray-300  bg-purple-100 rounded-2xl p-2">
                 <th className="text-left py-3">Title</th>
                 <th className="text-left py-3">Slug</th>
                 <th className="text-left py-3">Href</th>
@@ -199,7 +199,7 @@ export default function FreeServicesAdmin() {
               {data?.freeServices?.map((service) => (
                 <tr
                   key={service.id}
-                  className="border-b"
+                  className="border-b border-gray-300  bg-purple-100 rounded-2xl p-2"
                 >
                   <td className="py-3">
                     {service.title}
