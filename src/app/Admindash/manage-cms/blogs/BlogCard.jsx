@@ -30,7 +30,7 @@ export default function BlogCard({ blog, onEdit, onDelete }) {
       />
 
       <div className="p-3">
-        <h2 className="text-2xl font-medium mb-2">{blog.title}</h2>
+        <h2 className="text-xl font-medium mb-2">{blog.title}</h2>
 
         <div className="flex gap-2 text-xs font-bold text-gray-500 mb-2">
           <span>by {blog.author}</span>

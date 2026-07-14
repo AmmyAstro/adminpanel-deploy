@@ -55,7 +55,7 @@ const handleDelete = async (id) => {
 
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="xl:col-span-3">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {blogData?.blogs?.map((blog) => (

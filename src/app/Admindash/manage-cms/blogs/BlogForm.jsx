@@ -230,7 +230,7 @@ export default function BlogForm({ mode = "create", slug }) {
 
             toast.error(error?.message || "Something went wrong");
         }
-        router.push("/Admindash/managecms/blogs");
+        router.push("/Admindash/manage-cms/blogs");
     };
 
     return (
@@ -274,7 +274,7 @@ export default function BlogForm({ mode = "create", slug }) {
                         />
                     </div>
 
-                    <div>
+                    <div className="overflow-y-auto max-h-120">
                    
                         <label className="font-semibold block mb-2">Blog Content</label>
 
@@ -409,14 +409,14 @@ export default function BlogForm({ mode = "create", slug }) {
                             <option value="PUBLISHED">Published</option>
                         </select>
                     </div>
-                    <div className="border border-gray-300 shadow-xl rounded-full bg-white/50 p-4">
+                    <div className="border border-gray-300 shadow-xl rounded-2xl bg-white/50 p-4">
                         <h3 className="font-bold mb-4">Language</h3>
 
                         <select
                             name="language"
                             value={formData.language}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded p-2"
+                            className="w-full border border-gray-300 rounded-full p-2"
                         >
                             <option value="">Select Language</option>
 
