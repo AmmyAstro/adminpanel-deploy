@@ -89,16 +89,16 @@ export default function Page() {
 
         <button
           onClick={() => setShowForm(true)}
-          className="bg-indigo-600 text-white px-4 py-2 rounded"
+          className="bg-indigo-600 text-white px-4 py-2 rounded-full shadow-xl "
         >
           Create Blog Category
         </button>
       </div>
 
-      {/* FORM */}
+    
 
       {showForm && (
-        <div className="border rounded-lg p-5 mb-8 bg-white">
+        <div className="border rounded-2xl border-gray-300 shadow-xl p-5 mb-8 bg-white">
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"
@@ -110,7 +110,7 @@ export default function Page() {
                   name: e.target.value,
                 })
               }
-              className="border p-3 rounded"
+              className="border border-gray-300  p-3 rounded-full"
             />
 
             <input
@@ -123,14 +123,14 @@ export default function Page() {
                   slug: e.target.value,
                 })
               }
-              className="border p-3 rounded"
+              className="border border-gray-300  p-3 rounded-full"
             />
           </div>
 
           <div className="flex gap-3 mt-5">
             <button
               onClick={handleSubmit}
-              className="bg-green-600 text-white px-4 py-2 rounded"
+              className="bg-green-600 text-white px-4 py-2 rounded-full"
             >
               {editing ? "Update" : "Submit"}
             </button>
@@ -146,7 +146,7 @@ export default function Page() {
                   slug: "",
                 });
               }}
-              className="bg-gray-500 text-white px-4 py-2 rounded"
+              className="bg-gray-500 text-white px-4 py-2 rounded-full"
             >
               Cancel
             </button>
@@ -156,7 +156,7 @@ export default function Page() {
 
       {/* LIST */}
 
-      <div className="bg-white rounded-lg border">
+      <div className="bg-white rounded-lg border border-gray-500">
         <table className="w-full">
           <thead>
             <tr className="border-b">
@@ -171,7 +171,7 @@ export default function Page() {
           <tbody>
             {!loading &&
               data?.blogCategories?.map((item) => (
-                <tr key={item.id} className="border-b">
+                <tr key={item.id} className="border-b border-gray-300">
                   <td className="p-4">{item.name}</td>
 
                   <td className="p-4">{item.slug}</td>
@@ -206,14 +206,14 @@ export default function Page() {
                   <td className="p-4 flex gap-2">
                     <button
                       onClick={() => handleEdit(item)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                      className="bg-blue-500 text-white px-3 py-1 rounded-full"
                     >
                       Edit
                     </button>
 
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
+                      className="bg-red-500 text-white px-3 py-1 rounded-full"
                     >
                       Delete
                     </button>
