@@ -3,8 +3,10 @@ import { useQuery } from "@apollo/client/react";
 import BlogSidebar from "./BlogSidebar";
 import { GET_BLOG_CATEGORIES } from "@/app/graphQL/managecms";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function BlogLayout({ children }) {
+  const pathname = usePathname();
   const { data: categoryData } = useQuery(GET_BLOG_CATEGORIES);
   const isBlogPage = pathname.startsWith("/manage-cms/blogs/create");
 
