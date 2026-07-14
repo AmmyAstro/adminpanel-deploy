@@ -203,8 +203,7 @@ export default function DhwaniServicesAdmin() {
     setPreview("");
     setFile(null);
     setEditing(null);
-    setIsNewCategory(false);
-    setNewCategoryInput("");
+ 
   };
 
   /* ------------------ IMAGE ------------------ */
