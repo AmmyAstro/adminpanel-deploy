@@ -173,17 +173,17 @@ export default function TestimonialPage() {
       {/* LIST */}
       <div className="grid grid-cols-3 gap-4">
         {data?.testimonials?.map((t) => (
-          <div key={t.id} className="border border-gray-300  p-4 rounde-2xl shadow-2xl">
+          <div key={t.id} className="border border-gray-300  p-4 rounded-2xl shadow-2xl">
             <img
               src={
                 t.image?.startsWith("http")
                   ? t.image
                   : `https://dhwaniastro.com${t.image}`
               }
-              className="h-32 w-full object-cover"
+              className="h-32 w-full rounded-xl object-cover"
             />
 
-            <h2 className="font-bold">{t.name}</h2>
+            <h2 className="font-bold mt-1">{t.name}</h2>
               <div className="flex gap-5">
             <p className="text-sm text-gray-500">{t.address}</p>
 
@@ -221,7 +221,7 @@ export default function TestimonialPage() {
                   // toast.success("Deleted");
                   refetch();
                 }}
-                className={`px-3 py-1 text-xs bg-red-500 shadow-xl text-white rounded ${getPermissionClass(
+                className={`px-3 py-1 text-xs bg-red-500 shadow-xl text-white rounded-full ${getPermissionClass(
                   canDelete,
                 )}`}
               >
