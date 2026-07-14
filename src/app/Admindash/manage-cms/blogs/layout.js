@@ -9,8 +9,8 @@ export default function BlogLayout({ children }) {
   return (
     <div className="container mx-auto py-10">
       <Link
-        href="/Admindash/managecms/blogs/create"
-        className="bg-indigo-600 text-white px-6 py-3 rounded-lg"
+        href="/Admindash/manage-cms/blogs/create"
+        className="bg-indigo-600 text-white px-6 py-3 rounded-full"
       >
         Add New Blog
       </Link>

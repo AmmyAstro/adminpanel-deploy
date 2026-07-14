@@ -25,20 +25,20 @@ export default function BlogSidebar({ categories }) {
     <div className="space-y-10">
       {/* Recent Posts */}
 
-      <div className="bg-white rounded-xl border p-5">
-        <h3 className="font-semibold text-gray-400 uppercase mb-5">
+      <div className="bg-white rounded-xl border border-gray-300 shadow-xl p-5">
+        <h3 className="font-semibold text-gray-400 text-center uppercase mb-5">
           Recent Posts
         </h3>
 
         <div className="space-y-5">
           {recentPosts.map((post, index) => (
-            <div key={index} className="flex gap-3">
+            <div key={index} className="flex p-2 shadow-xl rounded-xl gap-3">
               <Image
                 src={post.image}
                 alt={post.title}
                 width={90}
                 height={70}
-                className="rounded-md object-cover"
+                className="rounded-full object-cover"
               />
 
               <div>
@@ -53,8 +53,8 @@ export default function BlogSidebar({ categories }) {
 
       {/* Categories */}
 
-      <div className="bg-white rounded-xl border p-5">
-        <h3 className="font-semibold text-gray-400 uppercase mb-5">
+      <div className="bg-white rounded-xl border border-gray-300 shadow-xl p-5">
+        <h3 className="font-semibold text-center text-gray-400 uppercase mb-5">
           Categories
         </h3>
 
