@@ -153,6 +153,7 @@ export default function AstrologerActivities({ astrologerId }) {
       {
         header: "User",
         render: (row) => (
+          
           <div>
             <p className="font-semibold text-violet-600">{row.userName}</p>
             <p className="text-xs text-gray-500">{row.userId?.slice(0, 8)}</p>
@@ -339,19 +340,19 @@ export default function AstrologerActivities({ astrologerId }) {
   const walletColumns = useMemo(
     () => [
       {
-        header: "Session ID",
+        header: " ID",
          render: (row) => (
      <div className="flex flex-col gap-1">
   <span
-    className={`px-2 py- rounded-full text-xs font-light ${
+    className={`px-2 py- rounded-full text-xs font-semibold ${
       row.type === "CREDIT"
-        ? "bg-green-100 text-green-700"
-        : "bg-red-100 text-red-700"
+        ? " text-green-700"
+        : " text-red-700"
     }`}
   >
     {row.sessionId?.trim()
-      ? `Session ID : ${row.sessionId.slice(0, 8)}`
-      : `Transaction ID : ${row.id?.slice(0, 8)}`}
+      ? `Session : ${row.sessionId.slice(0, 8)}`
+      : `TXN : ${row.id?.slice(0, 8)}`}
   </span>
 </div>
         ),
@@ -363,8 +364,8 @@ export default function AstrologerActivities({ astrologerId }) {
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${
               row.type === "CREDIT"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
+                ? " text-green-700"
+                : " text-red-700"
             }`}
           >
             {row.type}

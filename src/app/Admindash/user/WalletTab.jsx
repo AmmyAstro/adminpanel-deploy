@@ -30,19 +30,34 @@ export default function WalletTab({ userId }) {
   const columns = useMemo(
     () => [
       {
-        header: "Transaction ID",
-        render: (row) => row.id?.slice(0, 8),
+        header: " ID",
+        render: (row) => (
+               <div className="flex flex-col gap-1">
+  <span
+    className={`px-2 py- rounded-full text-[10px] font-semibold ${
+      row.type === "CREDIT"
+        ? " text-green-700"
+        : "text-red-700"
+    }`}
+  >
+    {row.sessionId?.trim()
+      ? `Session : ${row.sessionId.slice(0, 8)}`
+      : `TXN : ${row.id?.slice(0, 8)}`}
+  </span>
+</div>
+
+        ), 
       },
 
       {
         header: "Type",
         render: (row) => (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium
+            className={`px-3 py-1 rounded-full text-xs font-semibold
             ${
               row.type === "CREDIT"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
+                ? " text-green-700"
+                : " text-red-700"
             }`}
           >
             {row.type}
