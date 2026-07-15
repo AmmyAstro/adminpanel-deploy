@@ -326,7 +326,7 @@ export const GET_SESSION_ANALYTICS = gql`
         status
         ratePerMin
         durationSec
-    
+
         coinsDeducted
         startedAt
         endedAt
@@ -353,7 +353,7 @@ export const GET_ASTROLOGER_CHAT_HISTORY = gql`
         sessionId
         by
         userName
-
+        userId
         ratePerMin
 
         durationSec
@@ -388,7 +388,7 @@ export const GET_ASTROLOGER_CALL_HISTORY = gql`
         sessionId
         by
         userName
-
+        userId
         ratePerMin
 
         durationSec
@@ -515,6 +515,7 @@ export const GET_USER_WALLET_TRANSACTIONS = gql`
         sessionId
         userWallet {
           user {
+            id
             name
             mobile
           }
@@ -587,7 +588,6 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
       endDate: $endDate
     ) {
       totalCount
-
       data {
         id
         sessionId
@@ -597,14 +597,44 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
         description
         createdAt
         updatedBalance
-      
+
         astrologerWallet {
+          balanceCoins
+          totalEarned
+          totalWithdrawn
+
           astrologer {
             id
             displayName
             contactNo
             email
           }
+        }
+
+        session {
+          id
+          type
+          status
+          ratePerMin
+          durationSec
+          coinsDeducted
+          coinsEarned
+          commission
+          source
+          roomId
+          startedAt
+          endedAt
+          createdAt
+        }
+
+        payment {
+          id
+          amount
+          coins
+          provider
+          status
+          razorpayPaymentId
+          createdAt
         }
       }
     }
@@ -951,7 +981,6 @@ export const GET_ALL_WAITING_QUEUES = gql`
   }
 `;
 
-
 export const GET_SKILLS = gql`
   query GetSkills {
     getSkills {
@@ -993,14 +1022,8 @@ export const CREATE_SKILL = gql`
 `;
 
 export const UPDATE_SKILL = gql`
-  mutation UpdateSkill(
-    $id: ID!
-    $input: UpdateSkillInput!
-  ) {
-    updateSkill(
-      id: $id
-      input: $input
-    ) {
+  mutation UpdateSkill($id: ID!, $input: UpdateSkillInput!) {
+    updateSkill(id: $id, input: $input) {
       id
       name
       slug
@@ -1017,21 +1040,13 @@ export const DELETE_SKILL = gql`
 `;
 
 export const UPDATE_SKILL_STATUS = gql`
-  mutation UpdateSkillStatus(
-    $id: ID!
-    $status: Boolean!
-  ) {
-    updateSkillStatus(
-      id: $id
-      status: $status
-    ) {
+  mutation UpdateSkillStatus($id: ID!, $status: Boolean!) {
+    updateSkillStatus(id: $id, status: $status) {
       id
       isActive
     }
   }
 `;
-
-
 
 export const GET_PROBLEMS = gql`
   query GetProblems {
@@ -1062,9 +1077,7 @@ export const GET_PROBLEM = gql`
 `;
 
 export const CREATE_PROBLEM = gql`
-  mutation CreateProblem(
-    $input: CreateProblemInput!
-  ) {
+  mutation CreateProblem($input: CreateProblemInput!) {
     createProblem(input: $input) {
       id
       name
@@ -1076,14 +1089,8 @@ export const CREATE_PROBLEM = gql`
 `;
 
 export const UPDATE_PROBLEM = gql`
-  mutation UpdateProblem(
-    $id: ID!
-    $input: UpdateProblemInput!
-  ) {
-    updateProblem(
-      id: $id
-      input: $input
-    ) {
+  mutation UpdateProblem($id: ID!, $input: UpdateProblemInput!) {
+    updateProblem(id: $id, input: $input) {
       id
       name
       slug
@@ -1100,14 +1107,8 @@ export const DELETE_PROBLEM = gql`
 `;
 
 export const UPDATE_PROBLEM_STATUS = gql`
-  mutation UpdateProblemStatus(
-    $id: ID!
-    $status: Boolean!
-  ) {
-    updateProblemStatus(
-      id: $id
-      status: $status
-    ) {
+  mutation UpdateProblemStatus($id: ID!, $status: Boolean!) {
+    updateProblemStatus(id: $id, status: $status) {
       id
       isActive
     }

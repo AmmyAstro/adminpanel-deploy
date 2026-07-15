@@ -148,15 +148,28 @@ export default function AstrologerActivities({ astrologerId }) {
     () => [
       {
         header: "Session ID",
-        render: (row) => row.sessionId?.slice(0, 8),
+        render: (row) =>
+           <div className="flex flex-col gap-1">
+            <span
+              className={`px-2 py- rounded-full text-xs font-semibold`}
+            >
+              {row.sessionId?.slice(0, 8)}
+            </span>
+          </div>
+           
       },
       {
         header: "User",
         render: (row) => (
-          
           <div>
-            <p className="font-semibold text-violet-600">{row.userName}</p>
-            <p className="text-xs text-gray-500">{row.userId?.slice(0, 8)}</p>
+              <Link
+              href={`/Admindash/user/userprofile/${row.userId}`}
+              className="font-semibold text-violet-600 hover:underline"
+            >
+              {row.userName || "N/A"}
+            </Link>
+           
+            <p className="text-[10px] text-gray-500">{row.userId?.slice(0, 8)}</p>
           </div>
         ),
       },
@@ -170,7 +183,7 @@ export default function AstrologerActivities({ astrologerId }) {
       },
       {
         header: "Dhwani Earned",
-        render: (row) => `₹ ${row. astrologerCommission ?? 0}`,
+        render: (row) => `₹ ${row.astrologerCommission ?? 0}`,
       },
       {
         header: " Deducted",
@@ -341,31 +354,26 @@ export default function AstrologerActivities({ astrologerId }) {
     () => [
       {
         header: " ID",
-         render: (row) => (
-     <div className="flex flex-col gap-1">
-  <span
-    className={`px-2 py- rounded-full text-xs font-semibold ${
-      row.type === "CREDIT"
-        ? " text-green-700"
-        : " text-red-700"
-    }`}
-  >
-    {row.sessionId?.trim()
-      ? `Session : ${row.sessionId.slice(0, 8)}`
-      : `TXN : ${row.id?.slice(0, 8)}`}
-  </span>
-</div>
+        render: (row) => (
+          <div className="flex flex-col gap-1">
+            <span
+              className={`px-2 py- rounded-full text-xs font-semibold ${
+                row.type === "CREDIT" ? " text-green-700" : " text-red-700"
+              }`}
+            >
+              {row.sessionId?.trim()
+                ? `Session : ${row.sessionId.slice(0, 8)}`
+                : `TXN : ${row.id?.slice(0, 8)}`}
+            </span>
+          </div>
         ),
-       
       },
       {
         header: "Type",
         render: (row) => (
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              row.type === "CREDIT"
-                ? " text-green-700"
-                : " text-red-700"
+              row.type === "CREDIT" ? " text-green-700" : " text-red-700"
             }`}
           >
             {row.type}
@@ -374,12 +382,12 @@ export default function AstrologerActivities({ astrologerId }) {
       },
       {
         header: "Amount",
-        render: (row) => row.coins,
+        render: (row) => `₹ ${row.session?.commission ?? 0}`,
       },
-      {
-        header: "Wallet Balance",
-        render: (row) => `₹ ${row.updatedBalance ?? 0}`,
-      },
+      // {
+      //   header: "Wallet Balance",
+      //   render: (row) => `₹ ${row.updatedBalance ?? 0}`,
+      // },
       {
         header: "Description",
         render: (row) => row.description || "-",
@@ -395,7 +403,6 @@ export default function AstrologerActivities({ astrologerId }) {
 
   return (
     <div className="p-4 rounded-2xl flex w-full flex-col gap-3 shadow-xl bg-white w-full">
-
       <div className="flex items-center justify-between border-b border-gray-200 pb-2">
         <h2 className="font-semibold text-sm">Astrologer Activities</h2>
 

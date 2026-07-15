@@ -175,7 +175,7 @@ export default function UserCallHistoryPage() {
         header: "Session Id",
         render: (row) => (
           <div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs font-semibold text-purple-500">
               {row.sessionId?.slice(0, 8)}
             </p>
           </div>
@@ -193,7 +193,7 @@ export default function UserCallHistoryPage() {
             </Link>
 
             <p className="text-xs text-gray-500">{row.userId?.slice(0, 8)}</p>
-            <p className="text-xs text-gray-500">{row.source}</p>
+            <p className="text-[10px] text-purple-500">{row.source}</p>
           </div>
         ),
       },

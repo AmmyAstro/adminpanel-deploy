@@ -131,7 +131,7 @@ export default function UserChatHistoryPage() {
       {
         header: "SessionID",
         render: (row) => (
-          <span className="font-extralight text-blue-600">
+          <span className="font-semibold text-blue-600">
             {row.sessionId?.slice(0, 8)}
           </span>
         ),

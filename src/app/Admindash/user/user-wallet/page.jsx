@@ -106,9 +106,9 @@ export default function WalletTransactionsPage() {
                 </Link>
           
 
-            {/* <p className="text-xs text-gray-500">
-              {row?.userWallet?.user?.mobile || "N/A"}
-            </p> */}
+            <p className="text-[10px]  text-violet-500">
+              {row?.userWallet?.user?.id.slice(0,8) || "N/A"}
+            </p>
           </div>
         ),
       },
@@ -117,22 +117,22 @@ export default function WalletTransactionsPage() {
         header: " ID",
         render: (row) => (
           <div className="flex flex-col gap-1">  <span
-            className={`px-2 py- rounded-full text-xs font-light ${
+            className={`px-2 w-fit  rounded-full text-xs font-light ${
               row.type === "CREDIT"
                 ? "bg-green-100 text-green-700"
                 : "bg-red-100 text-red-700"
             }`}
           >
-           Session ID : {row.sessionId?.slice(0,8)}
+           Session : {row.sessionId?.slice(0,8)}
           </span>
             <span
-            className={`px-2 py- rounded-full text-xs font-light ${
+            className={`px-2 w-fit py- rounded-full text-xs font-light ${
               row.type === "CREDIT"
                 ? "bg-green-100 text-green-700"
                 : "bg-red-100 text-red-700"
             }`}
           >
-           Transaction ID : {row.id?.slice(0,8)}
+           TXN : {row.id?.slice(0,8)}
           </span></div>
         
         ),

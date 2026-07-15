@@ -154,7 +154,13 @@ export default function UserProfile({ userId }) {
     () => [
       {
         header: "Session ID",
-        render: (row) => row.sessionId?.slice(0, 8),
+        render: (row) =>         <div className="flex flex-col gap-1">
+            <span
+              className={`px-2 py- rounded-full text-xs font-semibold`}
+            >
+              {row.sessionId?.slice(0, 8)}
+            </span>
+          </div>
       },
       {
         header: "Astrologer",
@@ -186,7 +192,7 @@ export default function UserProfile({ userId }) {
         render: (row) => row.commission ?? "-",
       },
          {
-        header: "Amount Deducted",
+        header: " Deducted",
         render: (row) => row.coinsDeducted ?? "-",
       },
       {
