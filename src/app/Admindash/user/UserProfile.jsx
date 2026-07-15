@@ -176,17 +176,18 @@ export default function UserProfile({ userId }) {
         header: "Rate / Min",
         render: (row) => `₹${row.ratePerMin || 0}`,
       },
+   
       {
-        header: "Coins Deducted",
-        render: (row) => row.coinsDeducted ?? "-",
-      },
-      {
-        header: "Coins Earned",
+        header: "Dhwani Earned",
         render: (row) => row.coinsEarned ?? "-",
       },
       {
-        header: "Commission",
+        header: "Astrologer Earned",
         render: (row) => row.commission ?? "-",
+      },
+         {
+        header: "Amount Deducted",
+        render: (row) => row.coinsDeducted ?? "-",
       },
       {
         header: "Duration",

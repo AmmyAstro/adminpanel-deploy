@@ -38,17 +38,15 @@ export default function Homeside() {
               overflow-hidden
               bg-yellow-500 text-black
               rounded-r-xl
-                hover:scale-105 hover:px-4 w-fit
+                hover:scale-104 hover:px-3 w-fit
           
               transition-all duration-300 ease-in-out
 
-              px-3 py-2
+              px-2 py-2
               whitespace-nowrap
             "
           >
-            <span className="block text-xs line-clamp-2 ">
-              {item.name}
-            </span>
+            <span className="block text-xs line-clamp-2 ">{item.name}</span>
           </Link>
         ))}
       </div>

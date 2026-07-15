@@ -407,6 +407,7 @@ export default function CouponMain() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-2">
                 <div className="space-y-1">
                   <CustomInput
+                  className="w-[80%]"
                     label="Coupon Code"
                     value={coupon.code}
                     onChange={(e) => handleChange("code", e.target.value)}
@@ -418,6 +419,8 @@ export default function CouponMain() {
                 </div>
                 <div className="space-y-1">
                   <CustomInput
+                                    className="w-[80%]"
+
                     label="Description"
                     value={coupon.description}
                     onChange={(e) =>
@@ -431,6 +434,8 @@ export default function CouponMain() {
 
                 <div className="space-y-1">
                   <CustomDropdown
+                                    className="w-[80%]"
+
                     label="Applicable On"
                     value={coupon.applicable}
                     onChange={(e) => handleChange("applicable", e.target.value)}
@@ -443,7 +448,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomDropdown
+                  <CustomDropdown                   className="w-[80%]"
+
                     label="Coupon Type"
                     value={coupon.type}
                     onChange={(e) => handleChange("type", e.target.value)}
@@ -456,7 +462,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="Percentage"
                     type="number"
                     value={coupon.percentage}
@@ -467,7 +474,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="Max Discount"
                     type="number"
                     value={coupon.maxDiscount}
@@ -480,7 +488,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="Min Order Amount"
                     type="number"
                     value={coupon.minOrderAmount}
@@ -495,7 +504,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="Redeem Limit"
                     type="number"
                     value={coupon.redeemLimit}
@@ -508,7 +518,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="Coupon Count"
                     type="number"
                     value={coupon.couponCount}
@@ -521,7 +532,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="Start Date"
                     type="date"
                     value={coupon.startDate}
@@ -532,7 +544,8 @@ export default function CouponMain() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <CustomInput
+                  <CustomInput                   className="w-[80%]"
+
                     label="End Date"
                     type="date"
                     value={coupon.endDate}
@@ -543,7 +556,7 @@ export default function CouponMain() {
                   )}
                 </div>
 
-                <div className="rounded-2xl border border-violet-100 bg-violet-50 p-5">
+                <div className="rounded-2xl w-[80%] border border-violet-100 bg-violet-50 p-5">
                   <div className="flex justify-between items-center">
                     <div>
                       <h4 className="font-semibold">Coupon Status</h4>

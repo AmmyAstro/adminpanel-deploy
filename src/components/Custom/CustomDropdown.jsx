@@ -25,7 +25,7 @@ const CustomDropdown = ({
         value={value || ""}
         onChange={(e) => onChange(e)}
         required={required}
-        className={`w-full border rounded-full border-gray-300 p-2 ${className || ""}`}
+        className={` border rounded-full border-gray-300 p-2 ${className || ""}`}
       >
         {/* 🔥 Priority: children > options */}
 

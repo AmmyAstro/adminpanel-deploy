@@ -326,7 +326,7 @@ export const GET_SESSION_ANALYTICS = gql`
         status
         ratePerMin
         durationSec
-        coinsEarned
+    
         coinsDeducted
         startedAt
         endedAt

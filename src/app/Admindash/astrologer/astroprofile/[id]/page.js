@@ -455,7 +455,7 @@ export default function Page() {
                 </label>
                 <div className="flex items-center gap-5">
                   <label className="text-sm font-semibold text-gray-700">
-                    ₹ {callPricing?.offerPrice || callPricing?.price || 0}
+                    ₹ {callPricing?.price || callPricing?.price || 0}
                   </label>
                   <CustomToggle
                     id="call"
@@ -472,7 +472,7 @@ export default function Page() {
                 </label>
                 <div className="flex items-center gap-5">
                   <label className="text-sm font-semibold text-gray-700">
-                    ₹ {chatPricing?.offerPrice || chatPricing?.price || 0}
+                    ₹ {chatPricing?.price || chatPricing?.price || 0}
                   </label>
                   <CustomToggle
                     id="chat"

@@ -164,15 +164,15 @@ export default function AstrologerActivities({ astrologerId }) {
         render: (row) => `₹${row.ratePerMin || 0}`,
       },
       {
-        header: "Astrologer Commission",
-        render: (row) => `₹ ${row.astrologerCommission ?? 0}`,
-      },
-      {
-        header: "Dhwani Commission",
+        header: "Astrologer Earned",
         render: (row) => `₹ ${row.dhwaniCommission ?? 0}`,
       },
       {
-        header: "Amount deducted",
+        header: "Dhwani Earned",
+        render: (row) => `₹ ${row. astrologerCommission ?? 0}`,
+      },
+      {
+        header: " Deducted",
         render: (row) => `₹ ${row.coinsDeducted ?? 0}`,
       },
       {
@@ -339,8 +339,23 @@ export default function AstrologerActivities({ astrologerId }) {
   const walletColumns = useMemo(
     () => [
       {
-        header: "Transaction ID",
-        render: (row) => row.id.slice(0, 8),
+        header: "Session ID",
+         render: (row) => (
+     <div className="flex flex-col gap-1">
+  <span
+    className={`px-2 py- rounded-full text-xs font-light ${
+      row.type === "CREDIT"
+        ? "bg-green-100 text-green-700"
+        : "bg-red-100 text-red-700"
+    }`}
+  >
+    {row.sessionId?.trim()
+      ? `Session ID : ${row.sessionId.slice(0, 8)}`
+      : `Transaction ID : ${row.id?.slice(0, 8)}`}
+  </span>
+</div>
+        ),
+       
       },
       {
         header: "Type",
