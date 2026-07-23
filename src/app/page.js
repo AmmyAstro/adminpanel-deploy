@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import client, { authTokenVar } from "@/components/utils/apolloClient";
+import SocketContext from "@/context/socketContext";
 
 const LOGIN_STAFF = gql`
   mutation LoginStaff($email: String!, $password: String!) {
@@ -34,20 +35,29 @@ export default function StaffLogin() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-
+  const { connectSocket } = useContext(SocketContext);
   const [loginStaff, { loading }] = useMutation(LOGIN_STAFF, {
     onCompleted: async (data) => {
       const { accessToken, user } = data.loginStaff;
 
       authTokenVar(accessToken);
+
       localStorage.setItem("token", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
 
+      // Socket connect
+      connectSocket({
+        adminId: user.id,
+        token: accessToken,
+      });
+
       toast.success(`Welcome ${user.name}`);
+
       await client.resetStore();
 
       router.push("/Admindash");
     },
+
     onError: (err) => {
       toast.error(err.message || "Login failed");
     },
@@ -70,21 +80,36 @@ export default function StaffLogin() {
       variables: { email, password },
     });
   };
+  onCompleted: async (data) => {
+    const { accessToken, user } = data.loginStaff;
 
+    authTokenVar(accessToken);
+
+    localStorage.setItem("token", accessToken);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    connectSocket({
+      adminId: user.id,
+      token: accessToken,
+    });
+
+    toast.success(`Welcome ${user.name}`);
+
+    await client.resetStore();
+
+    router.push("/Admindash");
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0b0b0f] relative overflow-hidden">
-      
-      {/* 🌌 Background Glow Effects */}
       <div className="absolute w-[800px] h-[800px] bg-purple-600 opacity-20 blur-3xl rounded-full top-[-100px] left-[-100px]" />
       <div className="absolute w-[500px] h-[500px] bg-blue-500 opacity-20 blur-3xl rounded-full bottom-[-100px] right-[-100px]" />
 
-      {/* 🔥 Glass Card */}
-      <div className="relative z-10 w-full max-w-md p-8 rounded-3xl 
+      <div
+        className="relative z-10 w-full max-w-md p-8 rounded-3xl 
         bg-black/5 backdrop-blur-xl border border-white/20
         shadow-[0_8px_32px_0_rgba(0,0,0,0.6)]
-      ">
-        
-        {/* Logo */}
+      "
+      >
         <Image
           src="/admin-img/adlogo.png"
           alt="logo"
@@ -98,8 +123,6 @@ export default function StaffLogin() {
         </h2>
 
         <div className="space-y-5 flex flex-col items-center w-full">
-          
-          {/* Email */}
           <div className="w-full">
             <label className="text-sm text-gray-300">Email</label>
             <input
@@ -116,7 +139,6 @@ export default function StaffLogin() {
             />
           </div>
 
-          {/* Password */}
           <div className="relative w-full">
             <label className="text-sm text-gray-300">Password</label>
 
@@ -141,7 +163,6 @@ export default function StaffLogin() {
             </button>
           </div>
 
-          {/* Button (Neomorphic + Glow) */}
           <button
             onClick={handleSubmit}
             disabled={loading}
@@ -156,7 +177,6 @@ export default function StaffLogin() {
           </button>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-gray-400 text-xs mt-6">
           Secure Admin Access • Dhwani Astro
         </p>

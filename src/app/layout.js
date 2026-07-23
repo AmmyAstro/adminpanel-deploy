@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import ApolloWrapper from "@/providers/ApolloProvider";
 import { PermissionProvider } from "@/context/PermissionContext";
+import { SocketProvider } from "@/context/socketContext";
 
 
 
@@ -27,13 +28,13 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
         <Provider store={store}>
-
+<SocketProvider>
           <ApolloWrapper>
             <PermissionProvider>
               {children}
             </PermissionProvider>
           </ApolloWrapper>
-
+</SocketProvider>
         </Provider>
 
       </body>

@@ -321,12 +321,14 @@ export const GET_SESSION_ANALYTICS = gql`
 
       recentSessions {
         sessionId
+        roomId
         type
         userName
         status
         ratePerMin
         durationSec
-
+        userId
+        astrologerId
         coinsDeducted
         startedAt
         endedAt
