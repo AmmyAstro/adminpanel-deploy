@@ -52,6 +52,7 @@ const handleEndSession = (item) => {
     room_id: item.roomId,
     astroId: item.astrologerId,
     userId: item.userId,
+    sessionId:item.sessionId,
   };
 
   console.log("Emitting chatCompletedByAdmin");
