@@ -19,18 +19,23 @@ export const authTokenVar = makeVar(null);
 
 
 const httpLink = new HttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "https://dhwaniastro.com/adminAuth/graphql",
+  uri:
+    process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+    "https://dhwaniastro.com/adminAuth/graphql",
+  credentials: "include",
 });
 
-// upload link
 const uploadLink = new UploadHttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "https://dhwaniastro.com/adminAuth/graphql",
+  uri:
+    process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+    "https://dhwaniastro.com/adminAuth/graphql",
+  credentials: "include",
   headers: {
     "apollo-require-preflight": "true",
   },
 });
 
-// 🔥 split logic
+
 const link = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -41,7 +46,7 @@ const link = split(
   uploadLink,
   httpLink
 );
-// 🔐 Auth Link
+
 const authLink = setContext((_, { headers }) => {
   const token = authTokenVar();
 
@@ -53,7 +58,7 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// ⚠️ Error Link (optional but good)
+
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     console.log("GraphQL Errors:", graphQLErrors);
@@ -63,7 +68,6 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-// 🚀 FINAL CLIENT
 const client = new ApolloClient({
   link: from([
     errorLink,

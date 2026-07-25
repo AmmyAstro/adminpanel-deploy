@@ -39,7 +39,7 @@ const handleEndSession = (item) => {
   console.log("Socket Connected:", socket?.connected);
 
   if (chatEndedRef.current) {
-    console.log("Chat already ended");
+    console.log("Session already ended");
     return;
   }
 
@@ -52,13 +52,26 @@ const handleEndSession = (item) => {
     room_id: item.roomId,
     astroId: item.astrologerId,
     userId: item.userId,
-    sessionId:item.sessionId,
+    sessionId: item.sessionId,
+    type: item.type,
   };
 
-  console.log("Emitting chatCompletedByAdmin");
+  const eventName =
+    item.type === "CHAT"
+      ? "chatCompletedByAdmin"
+      : item.type === "CALL"
+      ? "callCompletedByAdmin"
+      : null;
+
+  if (!eventName) {
+    console.error("Invalid session type:", item.type);
+    return;
+  }
+
+  console.log(`Emitting ${eventName}`);
   console.log("Payload:", payload);
 
-  socket.emit("chatCompletedByAdmin", payload);
+  socket.emit(eventName, payload);
 
   console.log("Emit called successfully");
 

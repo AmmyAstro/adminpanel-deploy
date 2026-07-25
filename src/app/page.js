@@ -37,27 +37,33 @@ export default function StaffLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const { connectSocket } = useContext(SocketContext);
   const [loginStaff, { loading }] = useMutation(LOGIN_STAFF, {
-    onCompleted: async (data) => {
-      const { accessToken, user } = data.loginStaff;
+onCompleted: async (data) => {
+  console.log("Login Response:", data);
 
-      authTokenVar(accessToken);
+  const { accessToken, refreshToken, user } = data.loginStaff;
 
-      localStorage.setItem("token", accessToken);
-      localStorage.setItem("user", JSON.stringify(user));
+  console.log("Access Token:", accessToken);
+  console.log("Refresh Token:", refreshToken);
+  console.log("User:", user);
 
-      // Socket connect
-      connectSocket({
-        adminId: user.id,
-        token: accessToken,
-      });
+  authTokenVar(accessToken);
 
-      toast.success(`Welcome ${user.name}`);
+  localStorage.setItem("token", accessToken);
+  localStorage.setItem("user", JSON.stringify(user));
 
-      await client.resetStore();
+  console.log("LocalStorage Token:", localStorage.getItem("token"));
 
-      router.push("/Admindash");
-    },
+  connectSocket({
+    adminId: user.id,
+    token: accessToken,
+  });
 
+  toast.success(`Welcome ${user.name}`);
+
+  await client.resetStore();
+
+  router.push("/Admindash");
+},
     onError: (err) => {
       toast.error(err.message || "Login failed");
     },
@@ -80,25 +86,25 @@ export default function StaffLogin() {
       variables: { email, password },
     });
   };
-  onCompleted: async (data) => {
-    const { accessToken, user } = data.loginStaff;
+  // onCompleted: async (data) => {
+  //   const { accessToken, user } = data.loginStaff;
 
-    authTokenVar(accessToken);
+  //   authTokenVar(accessToken);
 
-    localStorage.setItem("token", accessToken);
-    localStorage.setItem("user", JSON.stringify(user));
+  //   localStorage.setItem("token", accessToken);
+  //   localStorage.setItem("user", JSON.stringify(user));
 
-    connectSocket({
-      adminId: user.id,
-      token: accessToken,
-    });
+  //   connectSocket({
+  //     adminId: user.id,
+  //     token: accessToken,
+  //   });
 
-    toast.success(`Welcome ${user.name}`);
+  //   toast.success(`Welcome ${user.name}`);
 
-    await client.resetStore();
+  //   await client.resetStore();
 
-    router.push("/Admindash");
-  };
+  //   router.push("/Admindash");
+  // };
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0b0b0f] relative overflow-hidden">
       <div className="absolute w-[800px] h-[800px] bg-purple-600 opacity-20 blur-3xl rounded-full top-[-100px] left-[-100px]" />
