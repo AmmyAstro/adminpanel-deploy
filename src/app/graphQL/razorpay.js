@@ -1,34 +1,66 @@
 import { gql } from "@apollo/client";
 
 export const GET_PAYMENT_REPORTS = gql`
-    query GetPaymentReports(
-        $searchInput: PaymentReportSearchInput!
-    ) {
-        getPaymentReports(searchInput: $searchInput) {
-            totalCount
-            currentPage
-            totalPages
-            totalAmount
-            totalCoins
-            paidAmount
-            failedAmount
-            paidCount
-            failedCount
+  query GetPaymentReports($searchInput: PaymentReportSearchInput!) {
+    getPaymentReports(searchInput: $searchInput) {
+      totalCount
+      totalPages
+      currentPage
 
-            data {
-                id
-                userId
-                userName
-                mobile
-                rechargePackId
-                rechargePackName
-                razorpayOrderId
-                amount
-                coins
-                status
-                createdAt
-                updatedAt
-            }
-        }
+      totalAmount
+      totalCoins
+
+      totalTax
+      totalGST
+      totalCGST
+      totalSGST
+      paidAmount
+      failedAmount
+      totalPGCharge
+      paidCount
+      failedCount
+
+      data {
+        id
+        invoiceNo
+
+        userName
+        mobile
+
+        rechargePackName
+
+        amount
+        coins
+
+        taxableAmount
+
+        gstRate
+
+        cgst
+        sgst
+        igst
+        pgChargeRate
+        pgCharge
+        pgIgst
+        pgTotal
+        receivableAmount
+        totalTax
+
+        totalAmount
+
+        country
+        state
+        city
+
+        platform
+
+        razorpayOrderId
+        razorpayPaymentId
+
+        status
+
+        createdAt
+      }
     }
+  }
 `;
