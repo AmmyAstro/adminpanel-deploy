@@ -239,10 +239,14 @@ export default function AstroList() {
         </div>
         <ExportMenu
           onExcel={() => exportExcel(exportData)}
-          onCSV={() => exportCSV(exportData)}
-          onPDF={() => exportPDF(exportData)}
+          onCSV={() => exportCSV(currentExportData, "Astrologers")}
+          onPDF={() => exportPDF(
+  currentExportData,
+  "Astrologer Report",
+  "Astrologers.pdf"
+)}
           onPrint={() => printTable()}
-          onExportCurrent={() => exportExcel(currentExportData)}
+          onExportCurrent={() => exportExcel(currentExportData, "Astrologers", "Astrologers.xlsx")}
           onExportAll={handleExportAll}
         />
       </div>

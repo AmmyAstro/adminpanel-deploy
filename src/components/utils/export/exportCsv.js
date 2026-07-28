@@ -1,16 +1,24 @@
 import { saveAs } from "file-saver";
 
-export const exportCSV = (rows, filename = "astrologers") => {
+export const exportCSV = (
+  rows,
+  filename = "Export"
+) => {
+  if (!rows?.length) return;
+
+  const headers = Object.keys(rows[0]);
+
   const csv = [
-    ["Name", "Email", "Phone", "Joined On"],
-    ...rows.map((x) => [
-      x.displayName,
-      x.email,
-      x.contactNo,
-      x.createdAt,
-    ]),
+    headers,
+    ...rows.map((row) =>
+      headers.map((header) => {
+        const value = row[header] ?? "";
+
+        return `"${String(value).replace(/"/g, '""')}"`;
+      })
+    ),
   ]
-    .map((e) => e.join(","))
+    .map((row) => row.join(","))
     .join("\n");
 
   const blob = new Blob([csv], {

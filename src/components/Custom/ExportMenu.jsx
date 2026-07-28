@@ -29,8 +29,7 @@ export default function ExportMenu({
 
     document.addEventListener("mousedown", close);
 
-    return () =>
-      document.removeEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
   return (
@@ -40,21 +39,17 @@ export default function ExportMenu({
         className="flex items-center gap-2 rounded-lg bg-violet-600 text-white px-4 py-2 hover:bg-violet-700"
       >
         <Download size={18} />
-
         Export
-
         <ChevronDown size={16} />
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white shadow-xl border z-50">
-
+        <div className="absolute right-0 mt-2 w-44 text-xs rounded-xl bg-white shadow-xl border z-50">
           <button
             onClick={onExcel}
             className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
           >
             <FileSpreadsheet size={18} />
-
             Excel (.xlsx)
           </button>
 
@@ -70,7 +65,6 @@ export default function ExportMenu({
             className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
           >
             <FileText size={18} />
-
             PDF
           </button>
 
@@ -79,7 +73,6 @@ export default function ExportMenu({
             className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
           >
             <Printer size={18} />
-
             Print
           </button>
 

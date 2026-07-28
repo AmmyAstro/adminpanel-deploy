@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useLazyQuery } from "@apollo/client/react";
+import { useApolloClient, useLazyQuery } from "@apollo/client/react";
 import DataTable from "@/components/utils/DataTable";
 import { GET_PAYMENT_REPORTS } from "@/app/graphQL/razorpay";
 import PaymentInvoice from "../PaymentInvoice";
 import { useReactToPrint } from "react-to-print";
-
+import { exportExcel } from "@/components/utils/export/exportExcel";
+import { exportPDF } from "@/components/utils/export/exportPDF";
+import { exportCSV } from "@/components/utils/export/exportCsv";
+import { printTable } from "@/components/utils/export/exportPrint";
+import ExportMenu from "@/components/Custom/ExportMenu";
 export default function RazorpayReports() {
   const [filters, setFilters] = useState({
     query: "",
@@ -22,7 +26,23 @@ export default function RazorpayReports() {
     page: 1,
     limit: 10,
   });
+  const client = useApolloClient();
 
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  const toggleSelection = (id) => {
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedRows.length === reportData.length) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(reportData.map((x) => x.id));
+    }
+  };
   const [searchText, setSearchText] = useState("");
 
   const [getReports, { data, loading, error }] = useLazyQuery(
@@ -129,7 +149,180 @@ export default function RazorpayReports() {
 
   const reportData = data?.getPaymentReports?.data || [];
   const summary = data?.getPaymentReports || {};
+  const currentExportData = reportData.map((x) => ({
+    Date: new Date(x.createdAt).toLocaleString("en-IN"),
 
+    Invoice: x.invoiceNo,
+
+    Customer: x.userName,
+
+    Mobile: x.mobile,
+
+    RechargePack: x.rechargePackName,
+
+    Coins: x.coins,
+
+    PaidAmount: x.amount,
+
+    TaxableAmount: x.taxableAmount,
+
+    GST: x.gstRate,
+
+    CGST: x.cgst,
+
+    SGST: x.sgst,
+
+    IGST: x.igst,
+
+    TotalTax: x.totalTax,
+
+    TotalAmount: x.totalAmount,
+
+    PGCharge: x.pgCharge,
+
+    PGTotal: x.pgTotal,
+
+    ReceivableAmount: x.receivableAmount,
+
+    Platform: x.platform,
+
+    Provider: x.provider,
+
+    Status: x.status,
+
+    City: x.city,
+
+    State: x.state,
+
+    Country: x.country,
+
+    OrderId: x.razorpayOrderId,
+
+    PaymentId: x.razorpayPaymentId,
+  }));
+  const selectedExportData = reportData
+    .filter((x) => selectedRows.includes(x.id))
+    .map((x) => ({
+      Date: new Date(x.createdAt).toLocaleString("en-IN"),
+
+      Invoice: x.invoiceNo,
+
+      Customer: x.userName,
+
+      Mobile: x.mobile,
+
+      RechargePack: x.rechargePackName,
+
+      Coins: x.coins,
+
+      PaidAmount: x.amount,
+
+      TaxableAmount: x.taxableAmount,
+
+      GST: x.gstRate,
+
+      CGST: x.cgst,
+
+      SGST: x.sgst,
+
+      IGST: x.igst,
+
+      TotalTax: x.totalTax,
+
+      TotalAmount: x.totalAmount,
+
+      PGCharge: x.pgCharge,
+
+      PGTotal: x.pgTotal,
+
+      ReceivableAmount: x.receivableAmount,
+
+      Platform: x.platform,
+
+      Provider: x.provider,
+
+      Status: x.status,
+
+      City: x.city,
+
+      State: x.state,
+
+      Country: x.country,
+
+      OrderId: x.razorpayOrderId,
+
+      PaymentId: x.razorpayPaymentId,
+    }));
+  const exportData =
+    selectedRows.length > 0 ? selectedExportData : currentExportData;
+  const handleExportAll = async () => {
+    const { data } = await client.query({
+      query: GET_PAYMENT_REPORTS,
+      variables: {
+        searchInput: {
+          ...buildSearchInput(filters),
+          page: 1,
+          limit: 100000,
+        },
+      },
+      fetchPolicy: "network-only",
+    });
+
+    const allData =
+      data?.getPaymentReports?.data?.map((x) => ({
+        Date: new Date(x.createdAt).toLocaleString("en-IN"),
+
+        Invoice: x.invoiceNo,
+
+        Customer: x.userName,
+
+        Mobile: x.mobile,
+
+        RechargePack: x.rechargePackName,
+
+        Coins: x.coins,
+
+        PaidAmount: x.amount,
+
+        TaxableAmount: x.taxableAmount,
+
+        GST: x.gstRate,
+
+        CGST: x.cgst,
+
+        SGST: x.sgst,
+
+        IGST: x.igst,
+
+        TotalTax: x.totalTax,
+
+        TotalAmount: x.totalAmount,
+
+        PGCharge: x.pgCharge,
+
+        PGTotal: x.pgTotal,
+
+        ReceivableAmount: x.receivableAmount,
+
+        Platform: x.platform,
+
+        Provider: x.provider,
+
+        Status: x.status,
+
+        City: x.city,
+
+        State: x.state,
+
+        Country: x.country,
+
+        OrderId: x.razorpayOrderId,
+
+        PaymentId: x.razorpayPaymentId,
+      })) || [];
+
+    exportExcel(allData);
+  };
   const cards = [
     {
       title: "Total Amount",
@@ -137,7 +330,7 @@ export default function RazorpayReports() {
       color: "text-green-600",
     },
     {
-      title: "Paid Amount",
+      title: "Total Paid Amount",
       value: `₹${summary.paidAmount || 0}`,
       color: "text-blue-600",
     },
@@ -147,32 +340,28 @@ export default function RazorpayReports() {
       color: "text-red-600",
     },
     {
-      title: "Transactions",
+      title: "Total Transactions",
       value: summary.totalCount || 0,
       color: "text-purple-600",
     },
+ 
     {
-      title: "Coins Sold",
-      value: summary.totalCoins || 0,
-      color: "text-yellow-600",
-    },
-    {
-      title: "GST",
+      title: "Total GST",
       value: `₹${summary.totalGST || 0}`,
       color: "text-pink-600",
     },
     {
-      title: "CGST",
+      title: " Total CGST",
       value: `₹${summary.totalCGST || 0}`,
       color: "text-orange-600",
     },
     {
-      title: "SGST / IGST",
+      title: "Total SGST / IGST",
       value: `₹${summary.totalSGST || 0}`,
       color: "text-indigo-600",
     },
     {
-      title: "Pg Charges",
+      title: "Total Pg Charges",
       value: `₹${summary.totalPGCharge || 0}`,
       color: "text-indigo-600",
     },
@@ -186,6 +375,27 @@ export default function RazorpayReports() {
     documentTitle: `Invoice-${selectedInvoice?.invoiceNo}`,
   });
   const columns = [
+    {
+      header: (
+        <input
+          type="checkbox"
+          checked={
+            selectedRows.length === reportData.length && reportData.length > 0
+          }
+          onChange={toggleSelectAll}
+        />
+      ),
+
+      render: (row) => (
+        <input
+          type="checkbox"
+          checked={selectedRows.includes(row.id)}
+          onChange={() => toggleSelection(row.id)}
+        />
+      ),
+
+      width: "30px",
+    },
     {
       header: "Date",
       render: (row) => (
@@ -209,17 +419,6 @@ export default function RazorpayReports() {
     },
 
     {
-      header: "Invoice",
-      render: (row) => (
-        <div className="text-[10px]">
-          <p className="font-semibold">{row.invoiceNo || "-"}</p>
-
-          <p className="text-xs text-gray-500">{row.provider}</p>
-        </div>
-      ),
-    },
-
-    {
       header: "Customer",
       render: (row) => (
         <div>
@@ -231,16 +430,20 @@ export default function RazorpayReports() {
     },
 
     {
-      header: "Recharge Pack",
-      accessor: "rechargePackName",
+      header: "Service",
+      render: (row) => (
+        <div>
+          <p className=" text-[10px]">{row.rechargePackName || "-"}</p>
+        </div>
+      ),
     },
 
     {
       header: "Amount",
       render: (row) => (
         <div>
-          <p className="text-xs text-gray-500">Amount : ₹{row.coins} </p>
-          <p className="font-semibold text-xs "> Paid : ₹{row.amount}</p>
+          <p className="text-[10px] text-gray-500">Amount : ₹{row.coins} </p>
+          <p className="font-semibold text-[10px] "> Paid : ₹{row.amount}</p>
         </div>
       ),
     },
@@ -254,11 +457,11 @@ export default function RazorpayReports() {
       header: "GST",
       render: (row) => (
         <div className="text-[10px] grid grid-cols-2 leading-5">
-          <div>GST : {row.gstRate || 0}%</div>
-          <div>IGST : ₹{row.igst || 0}</div>
-          <div>CGST : ₹{row.cgst || 0}</div>
+          <div>GST: {row.gstRate || 0}%</div>
+          <div>IGST: ₹{row.igst || 0}</div>
+          <div>CGST: ₹{row.cgst || 0}</div>
 
-          <div>SGST : ₹{row.sgst || 0}</div>
+          <div>SGST: ₹{row.sgst || 0}</div>
         </div>
       ),
     },
@@ -266,46 +469,39 @@ export default function RazorpayReports() {
     {
       header: "Tax",
       render: (row) => (
-        <span className="font-medium">₹{row.totalTax || 0}</span>
+        <span className="font-medium text-[10px]">₹{row.totalTax || 0}</span>
       ),
     },
 
     {
       header: "Total",
       render: (row) => (
-        <span className="font-bold text-blue-600">₹{row.totalAmount || 0}</span>
+        <span className="font-bold text-xs text-blue-600">
+          ₹{row.totalAmount || 0}
+        </span>
       ),
     },
     {
       header: "PG Rates",
       render: (row) => (
-        <span className="font-bold text-blue-600">
-          ₹{row.pgChargeRate || 0}
-        </span>
+        <span className=" text-[10px]">{row.pgChargeRate || 0}%</span>
       ),
     },
     {
-      header: "PG Amount",
+      header: "PG Charges",
       render: (row) => (
-        <span className="font-bold text-blue-600">₹{row.pgCharge || 0}</span>
+        <div className=" text-[10px] grid grid-cols-1 gap-1 ">
+          <span className=" ">Amount : ₹{row.pgCharge || 0}</span>
+          <span className=" ">IGST : ₹{row.pgIgst || 0}</span>
+          <span className=" text-[10px]">Total : ₹{row.pgTotal || 0}</span>
+        </div>
       ),
     },
-    {
-      header: "PG IGST",
-      render: (row) => (
-        <span className="font-bold text-blue-600">₹{row.pgIgst || 0}</span>
-      ),
-    },
-    {
-      header: "PG Total",
-      render: (row) => (
-        <span className="font-bold text-blue-600">₹{row.pgTotal || 0}</span>
-      ),
-    },
+
     {
       header: "Recievable Amount ",
       render: (row) => (
-        <span className="font-bold text-blue-600">
+        <span className="font-bold text-xs text-blue-600">
           ₹{row.receivableAmount || 0}
         </span>
       ),
@@ -314,7 +510,7 @@ export default function RazorpayReports() {
     {
       header: "Location",
       render: (row) => (
-        <div className="text-xs flex gap-1">
+        <div className="text-[10px] flex flex-wrap gap-1">
           <div>{row.city || "-"}</div>
 
           <div>{row.state || "-"}</div>
@@ -328,7 +524,7 @@ export default function RazorpayReports() {
       header: "Platform",
       render: (row) => {
         const styles = {
-          WEB: "bg-blue-100 text-blue-700",
+          WEB: "bg-blue-100  text-blue-700",
           ANDROID: "bg-green-100 text-green-700",
           IOS: "bg-gray-200 text-gray-700",
         };
@@ -349,7 +545,7 @@ export default function RazorpayReports() {
       header: "Order ID",
       render: (row) => (
         <div className="max-w-[170px] break-all text-[10px]">
-          {row.razorpayOrderId}
+          {row.razorpayOrderId?.slice(0, 10)}
         </div>
       ),
     },
@@ -358,7 +554,7 @@ export default function RazorpayReports() {
       header: "Payment ID",
       render: (row) => (
         <div className="max-w-[170px] break-all text-[10px]">
-          {row.razorpayPaymentId}
+          {row.razorpayPaymentId?.slice(0, 10)}
         </div>
       ),
     },
@@ -380,11 +576,11 @@ export default function RazorpayReports() {
 
         return (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            className={`px-3 py-1 rounded-full text-[10px] font-semibold ${
               styles[row.status] || "bg-gray-100 text-gray-600"
             }`}
           >
-            {row.status}
+            {row.status.slice(0, 1)}
           </span>
         );
       },
@@ -393,32 +589,36 @@ export default function RazorpayReports() {
       header: "Invoice",
 
       render: (row) => (
-        <button
-          onClick={() => {
-            setSelectedInvoice(row);
+        <div className="flex gap-1 items-center">
+          <p className="font-semibold text-[10px]">{row.invoiceNo || "-"}</p>
 
-            setTimeout(() => {
-              handlePrint();
-            }, 100);
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height={20}
-            width={20}
-            viewBox="0 0 640 640"
+          <button
+            onClick={() => {
+              setSelectedInvoice(row);
+
+              setTimeout(() => {
+                handlePrint();
+              }, 100);
+            }}
           >
-            <path
-              fill="rgb(30, 48, 80)"
-              d="M352 96C352 78.3 337.7 64 320 64C302.3 64 288 78.3 288 96L288 306.7L246.6 265.3C234.1 252.8 213.8 252.8 201.3 265.3C188.8 277.8 188.8 298.1 201.3 310.6L297.3 406.6C309.8 419.1 330.1 419.1 342.6 406.6L438.6 310.6C451.1 298.1 451.1 277.8 438.6 265.3C426.1 252.8 405.8 252.8 393.3 265.3L352 306.7L352 96zM160 384C124.7 384 96 412.7 96 448L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 448C544 412.7 515.3 384 480 384L433.1 384L376.5 440.6C345.3 471.8 294.6 471.8 263.4 440.6L206.9 384L160 384zM464 440C477.3 440 488 450.7 488 464C488 477.3 477.3 488 464 488C450.7 488 440 477.3 440 464C440 450.7 450.7 440 464 440z"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height={18}
+              width={18}
+              viewBox="0 0 640 640"
+            >
+              <path
+                fill="rgb(30, 48, 80)"
+                d="M352 96C352 78.3 337.7 64 320 64C302.3 64 288 78.3 288 96L288 306.7L246.6 265.3C234.1 252.8 213.8 252.8 201.3 265.3C188.8 277.8 188.8 298.1 201.3 310.6L297.3 406.6C309.8 419.1 330.1 419.1 342.6 406.6L438.6 310.6C451.1 298.1 451.1 277.8 438.6 265.3C426.1 252.8 405.8 252.8 393.3 265.3L352 306.7L352 96zM160 384C124.7 384 96 412.7 96 448L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 448C544 412.7 515.3 384 480 384L433.1 384L376.5 440.6C345.3 471.8 294.6 471.8 263.4 440.6L206.9 384L160 384zM464 440C477.3 440 488 450.7 488 464C488 477.3 477.3 488 464 488C450.7 488 440 477.3 440 464C440 450.7 450.7 440 464 440z"
+              />
+            </svg>
+          </button>
+        </div>
       ),
     },
   ];
   return (
-    <div className="p-6 space-y-6">
+    <div className="p- space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Payment Reports</h1>
       </div>
@@ -429,7 +629,7 @@ export default function RazorpayReports() {
         {cards.map((card) => (
           <div
             key={card.title}
-            className="bg-white rounded-xl border shadow-sm p-4"
+            className="bg-white rounded-2xl border border-gray-300 shadow-sm p-4"
           >
             <p className="text-xs text-gray-500">{card.title}</p>
 
@@ -446,7 +646,7 @@ export default function RazorpayReports() {
         <div className="grid lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2 flex gap-2">
             <input
-              className="border rounded-lg px-4 py-2 w-full"
+              className="border rounded-full border-gray-300 px-4 py-2 w-full"
               placeholder="Search Customer / Invoice / Order / Payment ID"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -454,7 +654,7 @@ export default function RazorpayReports() {
 
             <button
               onClick={handleSearch}
-              className="bg-indigo-600 text-white px-5 rounded-lg"
+              className="bg-indigo-600 text-white px-5 rounded-full"
             >
               Search
             </button>
@@ -463,7 +663,7 @@ export default function RazorpayReports() {
           <select
             value={filters.status}
             onChange={(e) => handleFilterChange("status", e.target.value)}
-            className="border rounded-lg px-3"
+            className="border rounded-full border-gray-300 px-3"
           >
             <option value="">All Status</option>
             <option value="SUCCESS">SUCCESS</option>
@@ -472,18 +672,9 @@ export default function RazorpayReports() {
           </select>
 
           <select
-            value={filters.provider}
-            onChange={(e) => handleFilterChange("provider", e.target.value)}
-            className="border rounded-lg px-3"
-          >
-            <option value="">Provider</option>
-            <option value="RAZORPAY">Razorpay</option>
-          </select>
-
-          <select
             value={filters.platform}
             onChange={(e) => handleFilterChange("platform", e.target.value)}
-            className="border rounded-lg px-3"
+            className="border rounded-full border-gray-300 px-3"
           >
             <option value="">Platform</option>
             <option value="ANDROID">Android</option>
@@ -492,11 +683,11 @@ export default function RazorpayReports() {
           </select>
         </div>
 
-        <div className="grid md:grid-cols-6 gap-4">
+        <div className="grid md:grid-cols-7 gap-4">
           <select
             value={filters.country}
             onChange={(e) => handleFilterChange("country", e.target.value)}
-            className="border rounded-lg px-3"
+            className="border rounded-full border-gray-300 px-3"
           >
             <option value="">Country</option>
             <option value="India">India</option>
@@ -505,7 +696,7 @@ export default function RazorpayReports() {
           <select
             value={filters.filterType}
             onChange={(e) => handleFilterChange("filterType", e.target.value)}
-            className="border rounded-lg px-3"
+            className="border rounded-full border-gray-300 px-3"
           >
             <option value="TODAY">Today</option>
             <option value="WEEK">Week</option>
@@ -517,7 +708,7 @@ export default function RazorpayReports() {
           <input
             type="number"
             placeholder="Min Amount"
-            className="border rounded-lg px-3"
+            className="border rounded-full border-gray-300 px-3"
             value={filters.minAmount}
             onChange={(e) =>
               setFilters({
@@ -530,7 +721,7 @@ export default function RazorpayReports() {
           <input
             type="number"
             placeholder="Max Amount"
-            className="border rounded-lg px-3"
+            className="border rounded-full border-gray-300 px-3"
             value={filters.maxAmount}
             onChange={(e) =>
               setFilters({
@@ -542,23 +733,37 @@ export default function RazorpayReports() {
 
           <button
             onClick={() => fetchReports(filters)}
-            className="bg-green-600 text-white rounded-lg"
+            className="bg-green-600 text-white rounded-full border-gray-300"
           >
             Apply
           </button>
 
-          <button onClick={resetFilters} className="border rounded-lg">
+          <button
+            onClick={resetFilters}
+            className="border rounded-full border-gray-300"
+          >
             Reset
           </button>
-          <div className="flex gap-3">
-            <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-medium">
-              Export Excel
-            </button>
-
-            <button className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg font-medium">
-              Export PDF
-            </button>
-          </div>
+          <ExportMenu
+            onExcel={() => exportExcel(exportData)}
+            onCSV={() => exportCSV(currentExportData, "Payment Reports")}
+            onPDF={() =>
+              exportPDF(
+                currentExportData,
+                "Payment Reports",
+                "PaymentReports.pdf",
+              )
+            }
+            onPrint={() => printTable()}
+            onExportCurrent={() =>
+              exportExcel(
+                currentExportData,
+                "Payment Reports",
+                "PaymentReports.xlsx",
+              )
+            }
+            onExportAll={handleExportAll}
+          />
         </div>
 
         {filters.filterType === "CUSTOM" && (
