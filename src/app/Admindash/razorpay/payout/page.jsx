@@ -53,7 +53,7 @@ const GET_PAYOUT_REPORT = gql`
       tdsAmount
 
       lastPaidAmount
-
+totalPaid
       payableAmount
     }
   }
@@ -334,6 +334,11 @@ export default function RazorpayPayouts() {
     {
       header: "Deducted TDS",
       render: (r) => `₹${r.tdsAmount.toFixed(2)}`,
+    },
+    
+    {
+      header: "Deducted TDS",
+      render: (r) => `₹${r.totalPaid.toFixed(2)}`,
     },
 
     {
