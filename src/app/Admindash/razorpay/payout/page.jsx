@@ -95,8 +95,8 @@ export default function RazorpayPayouts() {
         toDate: new Date(`${filters.endDate}T23:59:59.999`).toISOString(),
       },
     });
-
-    return data.exportPayout.map((x) => ({
+    console.log("Mutation Response", data);
+    return data.exportPayoutReport.map((x) => ({
       Astrologer: x.astrologerName,
 
       AccountHolder: x.accountHolderName,
@@ -356,42 +356,42 @@ export default function RazorpayPayouts() {
 
     exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
 
-    handleMakePayment();
+   await  handleMakePayment();
   };
   const handleCSVExport = async () => {
     const rows = await getExportData();
 
     exportCSV(rows, "PayoutReport");
 
-    handleMakePayment();
+   await  handleMakePayment();
   };
   const handlePDFExport = async () => {
     const rows = await getExportData();
 
     exportPDF(rows, "Payout Report", "PayoutReport.pdf");
 
-    handleMakePayment();
+   await  handleMakePayment();
   };
   const handlePrintExport = async () => {
     await getExportData();
 
     printTable();
 
-    handleMakePayment();
+   await  handleMakePayment();
   };
   const handleExportCurrent = async () => {
     const rows = await getExportData();
 
     exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
 
-    handleMakePayment();
+   await  handleMakePayment();
   };
   const handleExportAll = async () => {
     const rows = await getExportData();
 
     exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
 
-    handleMakePayment();
+   await  handleMakePayment();
   };
   return (
     <div className="p- space-y-6">

@@ -1118,7 +1118,7 @@ export const UPDATE_PROBLEM_STATUS = gql`
 `;
 export const EXPORT_PAYOUT_REPORT = gql`
   mutation ExportPayoutReport($fromDate: String!, $toDate: String!) {
-    exportPayout(fromDate: $fromDate, toDate: $toDate) {
+    exportPayoutReport(fromDate: $fromDate, toDate: $toDate) {
       astrologerId
       astrologerName
       profilePic
@@ -1131,7 +1131,6 @@ export const EXPORT_PAYOUT_REPORT = gql`
       state
 
       totalSessions
-
       totalRevenue
 
       commissionPercent
@@ -1155,7 +1154,6 @@ export const EXPORT_PAYOUT_REPORT = gql`
       tdsAmount
 
       lastPaidAmount
-
       payableAmount
     }
   }
