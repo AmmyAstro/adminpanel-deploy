@@ -1116,3 +1116,47 @@ export const UPDATE_PROBLEM_STATUS = gql`
     }
   }
 `;
+export const EXPORT_PAYOUT_REPORT = gql`
+  mutation ExportPayoutReport($fromDate: String!, $toDate: String!) {
+    exportPayout(fromDate: $fromDate, toDate: $toDate) {
+      astrologerId
+      astrologerName
+      profilePic
+
+      accountHolderName
+      accountNumber
+      bankName
+      ifsc
+      panNumber
+      state
+
+      totalSessions
+
+      totalRevenue
+
+      commissionPercent
+      commission
+
+      earning
+
+      pgChargeRate
+      pgCharge
+
+      gstRate
+      cgst
+      sgst
+      igst
+
+      pgTotal
+
+      grossAmount
+
+      tdsPercent
+      tdsAmount
+
+      lastPaidAmount
+
+      payableAmount
+    }
+  }
+`;

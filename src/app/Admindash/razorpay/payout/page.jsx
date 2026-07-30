@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useApolloClient, useLazyQuery } from "@apollo/client/react";
+import {
+  useApolloClient,
+  useLazyQuery,
+  useMutation,
+} from "@apollo/client/react";
 import { gql } from "@apollo/client";
 import { exportExcel } from "@/components/utils/export/exportExcel";
 import { exportPDF } from "@/components/utils/export/exportPDF";
@@ -9,6 +13,7 @@ import { exportCSV } from "@/components/utils/export/exportCsv";
 import { printTable } from "@/components/utils/export/exportPrint";
 import ExportMenu from "@/components/Custom/ExportMenu";
 import DataTable from "@/components/utils/DataTable";
+import { EXPORT_PAYOUT_REPORT } from "@/app/graphQL/astroHiring";
 const GET_PAYOUT_REPORT = gql`
   query PayoutReport($fromDate: String!, $toDate: String!) {
     payoutReport(fromDate: $fromDate, toDate: $toDate) {
@@ -82,6 +87,55 @@ export default function RazorpayPayouts() {
       fetchPolicy: "network-only",
     },
   );
+  const [exportPayoutReport] = useMutation(EXPORT_PAYOUT_REPORT);
+  const getExportData = async () => {
+    const { data } = await exportPayoutReport({
+      variables: {
+        fromDate: new Date(filters.startDate).toISOString(),
+        toDate: new Date(`${filters.endDate}T23:59:59.999`).toISOString(),
+      },
+    });
+
+    return data.exportPayout.map((x) => ({
+      Astrologer: x.astrologerName,
+
+      AccountHolder: x.accountHolderName,
+
+      AccountNumber: x.accountNumber,
+
+      Bank: x.bankName,
+
+      IFSC: x.ifsc,
+
+      PAN: x.panNumber,
+
+      State: x.state,
+
+      Sessions: x.totalSessions,
+
+      Revenue: x.totalRevenue,
+
+      Earning: x.earning,
+
+      PGCharge: x.pgCharge,
+
+      IGST: x.igst,
+
+      CGST: x.cgst,
+
+      SGST: x.sgst,
+
+      PGTotal: x.pgTotal,
+
+      GrossAmount: x.grossAmount,
+
+      TDS: x.tdsAmount,
+
+      LastPaid: x.lastPaidAmount,
+
+      Payable: x.payableAmount,
+    }));
+  };
   const [reportData, setReportData] = useState([]);
 
   const [searched, setSearched] = useState(false);
@@ -196,16 +250,11 @@ export default function RazorpayPayouts() {
       header: "Astrologer",
       render: (row) => (
         <div className="flex items-center gap-2">
-          <img
-            src={`https://dhwaniastro.com${row?.profilePic}`}
-            className="w-7 h-7 rounded-full object-cover"
-          />
-
           <div>
             <div className="font-semibold">{row.astrologerName}</div>
 
             <div className="text-xs text-gray-500">
-              Astrologer : {row.astrologerId.slice(0, 6)}
+              {row.astrologerId.slice(0, 6)}
             </div>
           </div>
         </div>
@@ -224,19 +273,19 @@ export default function RazorpayPayouts() {
 
     {
       header: "Bank Name",
-      accessor: "bankName",
-    },
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          <div className="font-semibold">{row.bankName}</div>
 
-    {
-      header: "IFSC",
-      accessor: "ifsc",
+          <div className="font-semibold">{row.ifsc}</div>
+        </div>
+      ),
     },
 
     {
       header: "PAN Card",
       accessor: "panNumber",
     },
-
     {
       header: "State",
       accessor: "state",
@@ -253,7 +302,7 @@ export default function RazorpayPayouts() {
     },
 
     {
-      header: "Deducted PG Charges (11.8464%)",
+      header: "Deducted PG Charges (2.11%)",
       render: (r) => `₹${r.pgCharge.toFixed(2)}`,
     },
 
@@ -302,6 +351,48 @@ export default function RazorpayPayouts() {
       ),
     },
   ];
+  const handleExcelExport = async () => {
+    const rows = await getExportData();
+
+    exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
+
+    handleMakePayment();
+  };
+  const handleCSVExport = async () => {
+    const rows = await getExportData();
+
+    exportCSV(rows, "PayoutReport");
+
+    handleMakePayment();
+  };
+  const handlePDFExport = async () => {
+    const rows = await getExportData();
+
+    exportPDF(rows, "Payout Report", "PayoutReport.pdf");
+
+    handleMakePayment();
+  };
+  const handlePrintExport = async () => {
+    await getExportData();
+
+    printTable();
+
+    handleMakePayment();
+  };
+  const handleExportCurrent = async () => {
+    const rows = await getExportData();
+
+    exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
+
+    handleMakePayment();
+  };
+  const handleExportAll = async () => {
+    const rows = await getExportData();
+
+    exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
+
+    handleMakePayment();
+  };
   return (
     <div className="p- space-y-6">
       <div className="flex justify-between items-center">
@@ -324,7 +415,7 @@ export default function RazorpayPayouts() {
                   startDate: e.target.value,
                 })
               }
-              className="border rounded-lg px-4 py-2 w-56"
+              className="border rounded-full border-gray-300 px-4 py-2 w-56"
             />
           </div>
 
@@ -340,7 +431,7 @@ export default function RazorpayPayouts() {
                   endDate: e.target.value,
                 })
               }
-              className="border rounded-lg px-4 py-2 w-56"
+              className="border rounded-full border-gray-300 px-4 py-2 w-56"
             />
           </div>
 
@@ -353,28 +444,12 @@ export default function RazorpayPayouts() {
 
           {searched && (
             <ExportMenu
-              onExcel={() =>
-                exportExcel(exportData, "Payout Report", "PayoutReport.xlsx")
-              }
-              onCSV={() => exportCSV(exportData, "PayoutReport")}
-              onPDF={() =>
-                exportPDF(exportData, "Payout Report", "PayoutReport.pdf")
-              }
-              onPrint={() => printTable()}
-              onExportCurrent={() =>
-                exportExcel(
-                  currentExportData,
-                  "Payout Report",
-                  "PayoutReport.xlsx",
-                )
-              }
-              onExportAll={() =>
-                exportExcel(
-                  currentExportData,
-                  "Payout Report",
-                  "PayoutReport.xlsx",
-                )
-              }
+              onExcel={handleExcelExport}
+              onCSV={handleCSVExport}
+              onPDF={handlePDFExport}
+              onPrint={handlePrintExport}
+              onExportCurrent={handleExportCurrent}
+              onExportAll={handleExportAll}
             />
           )}
         </div>
