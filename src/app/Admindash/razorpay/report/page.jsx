@@ -329,11 +329,11 @@ export default function RazorpayReports() {
       value: `₹${summary.totalAmount || 0}`,
       color: "text-green-600",
     },
-    {
-      title: "Total Paid Amount",
-      value: `₹${summary.paidAmount || 0}`,
-      color: "text-blue-600",
-    },
+{
+  title: "Total Paid Amount",
+  value: `₹${summary?.paidAmount?.toFixed?.(2) ?? "0.00"}`,
+  color: "text-blue-600",
+},
     {
       title: "Failed Amount",
       value: `₹${summary.failedAmount || 0}`,
