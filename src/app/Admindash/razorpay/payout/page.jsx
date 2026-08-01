@@ -274,10 +274,10 @@ export default function RazorpayPayouts() {
     {
       header: "Bank Name",
       render: (row) => (
-        <div className="flex items-center gap-2">
-          <div className="font-semibold">{row.bankName}</div>
+        <div className="flex flex-col text-xs items-center gap-1">
+          <div className="">{row.bankName}</div>
 
-          <div className="font-semibold">{row.ifsc}</div>
+          <div className="">{row.ifsc}</div>
         </div>
       ),
     },
@@ -337,7 +337,7 @@ export default function RazorpayPayouts() {
     },
     
     {
-      header: "Deducted TDS",
+      header: "Total Paid",
       render: (r) => `₹${r.totalPaid.toFixed(2)}`,
     },
 
