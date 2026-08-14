@@ -179,11 +179,11 @@ export default function AstrologerActivities({ astrologerId }) {
       },
       {
         header: "Astrologer Earned",
-        render: (row) => `₹ ${row.dhwaniCommission ?? 0}`,
+        render: (row) => `₹ ${row.astrologerCommission ?? 0}`,
       },
       {
         header: "Dhwani Earned",
-        render: (row) => `₹ ${row.astrologerCommission ?? 0}`,
+        render: (row) => `₹ ${row.dhwaniCommission ?? 0}`,
       },
       {
         header: " Deducted",
