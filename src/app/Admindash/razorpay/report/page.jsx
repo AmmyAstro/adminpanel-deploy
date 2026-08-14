@@ -329,11 +329,11 @@ export default function RazorpayReports() {
       value: `₹${summary.totalAmount || 0}`,
       color: "text-green-600",
     },
-{
-  title: "Total Paid Amount",
-  value: `₹${summary?.paidAmount?.toFixed?.(2) ?? "0.00"}`,
-  color: "text-blue-600",
-},
+    {
+      title: "Total Paid Amount",
+      value: `₹${summary?.paidAmount?.toFixed?.(2) ?? "0.00"}`,
+      color: "text-blue-600",
+    },
     {
       title: "Failed Amount",
       value: `₹${summary.failedAmount || 0}`,
@@ -344,7 +344,7 @@ export default function RazorpayReports() {
       value: summary.totalCount || 0,
       color: "text-purple-600",
     },
- 
+
     {
       title: "Total GST",
       value: `₹${summary.totalGST || 0}`,

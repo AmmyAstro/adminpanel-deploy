@@ -147,7 +147,7 @@ export default function AstrologerWalletTransactionsPage() {
 
       {
         header: "Amount",
-        accessor: "coins",
+        accessor: "amount",
       },
 
 {
