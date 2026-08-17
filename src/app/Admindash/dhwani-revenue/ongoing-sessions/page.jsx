@@ -10,7 +10,7 @@ import SocketContext from "@/context/socketContext";
 import { useContext, useEffect, useRef } from "react";
 
 export default function OngoingSessions() {
-    const chatEndedRef = useRef(false);
+  const chatEndedRef = useRef(false);
 
   const { data, loading, error } = useQuery(GET_SESSION_ANALYTICS, {
     variables: {
@@ -20,63 +20,63 @@ export default function OngoingSessions() {
     fetchPolicy: "network-only",
   });
   const { socket, connectSocket } = useContext(SocketContext);
-useEffect(() => {
-  if (!socket) {
-    const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (!socket) {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
-      console.log("No token found");
+      if (!token) {
+        console.log("No token found");
+        return;
+      }
+
+      connectSocket({ token });
+    }
+  }, [socket]);
+  const handleEndSession = (item) => {
+    console.log("===== END BUTTON CLICKED =====");
+    console.log("Item:", item);
+    console.log("Socket:", socket);
+    console.log("Socket Connected:", socket?.connected);
+
+    if (chatEndedRef.current) {
+      console.log("Session already ended");
       return;
     }
 
-    connectSocket({ token });
-  }
-}, [socket]);
-const handleEndSession = (item) => {
-  console.log("===== END BUTTON CLICKED =====");
-  console.log("Item:", item);
-  console.log("Socket:", socket);
-  console.log("Socket Connected:", socket?.connected);
+    if (!socket) {
+      console.log("Socket not available");
+      return;
+    }
 
-  if (chatEndedRef.current) {
-    console.log("Session already ended");
-    return;
-  }
+    const payload = {
+      room_id: item.roomId,
+      astroId: item.astrologerId,
+      userId: item.userId,
+      sessionId: item.sessionId,
+      type: item.type,
+    };
 
-  if (!socket) {
-    console.log("Socket not available");
-    return;
-  }
+    const eventName =
+      item.type === "CHAT"
+        ? "chatCompletedByAdmin"
+        : item.type === "CALL"
+          ? "callCompletedByAdmin"
+          : null;
 
-  const payload = {
-    room_id: item.roomId,
-    astroId: item.astrologerId,
-    userId: item.userId,
-    sessionId: item.sessionId,
-    type: item.type,
+    if (!eventName) {
+      console.error("Invalid session type:", item.type);
+      return;
+    }
+
+    console.log(`Emitting ${eventName}`);
+    console.log("Payload:", payload);
+
+    socket.emit(eventName, payload);
+
+    console.log("Emit called successfully");
+
+    // chatEndedRef.current = true;
   };
-
-  const eventName =
-    item.type === "CHAT"
-      ? "chatCompletedByAdmin"
-      : item.type === "CALL"
-      ? "callCompletedByAdmin"
-      : null;
-
-  if (!eventName) {
-    console.error("Invalid session type:", item.type);
-    return;
-  }
-
-  console.log(`Emitting ${eventName}`);
-  console.log("Payload:", payload);
-
-  socket.emit(eventName, payload);
-
-  console.log("Emit called successfully");
-
-  // chatEndedRef.current = true;
-};
 
   const sessions = data?.getSessionAnalytics?.recentSessions || [];
 

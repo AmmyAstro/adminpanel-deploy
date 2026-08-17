@@ -4,8 +4,10 @@ import {
   GET_ALL_WAITING_QUEUES,
   GET_ASTROLOGER_WAITING_USERS,
 } from "@/app/graphQL/astroHiring";
+import SocketContext from "@/context/socketContext";
 import { useQuery } from "@apollo/client/react";
 import Image from "next/image";
+import { useContext, useEffect, useRef } from "react";
 import { BsPersonCircle } from "react-icons/bs";
 import { FiClock } from "react-icons/fi";
 import { MdChat } from "react-icons/md";
@@ -14,12 +16,70 @@ export default function WaitingQueue({ astrologerId }) {
   const { data, loading, error, refetch } = useQuery(GET_ALL_WAITING_QUEUES, {
     fetchPolicy: "network-only",
   });
-
+  const chatEndedRef = useRef(false);
   const queues = data?.getAllWaitingQueues || [];
 
-const hasWaitingUsers = queues.some(
-  (astro) => astro.waitingUsers?.length > 0
-);
+  const hasWaitingUsers = queues.some(
+    (astro) => astro.waitingUsers?.length > 0,
+  );
+  const { socket, connectSocket } = useContext(SocketContext);
+  useEffect(() => {
+    if (!socket) {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.log("No token found");
+        return;
+      }
+
+      connectSocket({ token });
+    }
+  }, [socket]);
+  const handleEndSession = (item) => {
+    console.log("===== END BUTTON CLICKED =====");
+    console.log("Item:", item);
+    console.log("Socket:", socket);
+    console.log("Socket Connected:", socket?.connected);
+
+    if (chatEndedRef.current) {
+      console.log("Session already ended");
+      return;
+    }
+
+    if (!socket) {
+      console.log("Socket not available");
+      return;
+    }
+
+    const payload = {
+      room_id: item.roomId,
+      astroId: item.astrologerId,
+      userId: item.userId,
+      sessionId: item.sessionId,
+      type: item.type,
+    };
+
+    const eventName =
+      item.type === "chat"
+        ? "chatCompletedByAdmin"
+        : item.type === "call"
+          ? "callCompletedByAdmin"
+          : null;
+
+    if (!eventName) {
+      console.error("Invalid session type:", item.type);
+      return;
+    }
+
+    console.log(`Emitting ${eventName}`);
+    console.log("Payload:", payload);
+
+    socket.emit(eventName, payload);
+
+    console.log("Emit called successfully");
+
+    // chatEndedRef.current = true;
+  };
 
   //   if (loading) {
   //     return <div className="p-10 text-center">Loading Queue...</div>;
@@ -29,91 +89,99 @@ const hasWaitingUsers = queues.some(
   //     return <div className="p-10 text-center text-red-500">{error.message}</div>;
   //   }
 
-return (
-  <div className="space-y-6">
-    {!hasWaitingUsers ? (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16">
-        <BsPersonCircle className="mb-4 text-6xl text-gray-300" />
-        <h2 className="text-lg font-semibold text-gray-700">
-          No Waiting Requests
-        </h2>
-        <p className="mt-2 text-sm text-gray-500">
-          There are currently no users waiting to connect with an astrologer.
-        </p>
-      </div>
-    ) : (
-      queues.map((astro) => (
-        <div
-          key={astro.astrologerId}
-          className="rounded-xl border border-gray-300 bg-white shadow"
-        >
-          <div className="flex items-center justify-between border-b p-5">
-            <div className="flex items-center gap-4">
-              <img
-                src={astro.astrologerProfilePic}
-                className="h-12 w-12 rounded-full"
-                alt={astro.astrologerName}
-              />
-
-              <div>
-                <h2 className="font-semibold">{astro.astrologerName}</h2>
-                <p className="text-sm text-gray-500">
-                  Waiting : {astro.waitingCount}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <span
-                className={`rounded px-3 py-1 text-sm ${
-                  astro.isOnline
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {astro.isOnline ? "Online" : "Offline"}
-              </span>
-
-              <span
-                className={`rounded px-3 py-1 text-sm ${
-                  astro.isBusy
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-blue-100 text-blue-700"
-                }`}
-              >
-                {astro.isBusy ? "Busy" : "Free"}
-              </span>
-            </div>
-          </div>
-
-          <div className="divide-y">
-            {astro.waitingUsers.map((user, index) => (
-              <div
-                key={user.roomId}
-                className="flex items-center justify-between p-4"
-              >
-                <div>
-                  <div className="font-medium">
-                    #{index + 1} {user.name}
-                  </div>
-
-                  <div className="text-sm text-gray-500">
-                    {user.countryCode} {user.mobile}
-                  </div>
-
-                  <div className="text-xs text-gray-400">{user.roomId}</div>
-                </div>
-
-                <div className="flex items-center gap-6">
-                  <div>{user.type}</div>
-                  <div>{user.maximumTime} Min</div>
-                </div>
-              </div>
-            ))}
-          </div>
+  return (
+    <div className="space-y-6">
+      {!hasWaitingUsers ? (
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16">
+          <BsPersonCircle className="mb-4 text-6xl text-gray-300" />
+          <h2 className="text-lg font-semibold text-gray-700">
+            No Waiting Requests
+          </h2>
+          <p className="mt-2 text-sm text-gray-500">
+            There are currently no users waiting to connect with an astrologer.
+          </p>
         </div>
-      ))
-    )}
-  </div>
-);
+      ) : (
+        queues.map((astro) => (
+          <div
+            key={astro.astrologerId}
+            className="rounded-xl border border-gray-300 bg-white shadow"
+          >
+            <div className="flex items-center justify-between border-b p-3">
+              <div className="flex items-center gap-4">
+                <img
+                  src={`https://dhwaniastro.com${astro.astrologerProfilePic}`}
+                  className="h-10 w-10 rounded-full"
+                  alt={astro.astrologerName}
+                />
+
+                <div>
+                  <h2 className="font-semibold text-sm">
+                    {astro.astrologerName}
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    Waiting : {astro.waitingCount}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs ${
+                    astro.isOnline
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {astro.isOnline ? "Online" : "Offline"}
+                </span>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-xs ${
+                    astro.isBusy
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-blue-100 text-blue-700"
+                  }`}
+                >
+                  {astro.isBusy ? "Busy" : "Free"}
+                </span>
+              </div>
+            </div>
+
+            <div className="divide-y">
+              {astro.waitingUsers.map((user, index) => (
+                <div
+                  key={user.roomId}
+                  className="flex items-center justify-between p-2"
+                >
+                  <div>
+                    <div className="font-medium text-xs">
+                      #{index + 1} {user.name}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center text-xs gap-6">
+                    <div>{user.type}</div>
+                    <div>{user.maximumTime} Min</div>
+
+                    <button
+                      disabled={index === 0}
+                      className={`px-4 py-1 rounded-full text-xs text-white ${
+                        index === 0
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-red-600 hover:bg-red-700"
+                      }`}
+                      onClick={() => handleEndSession(user)}
+                    >
+                      End
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
 }
