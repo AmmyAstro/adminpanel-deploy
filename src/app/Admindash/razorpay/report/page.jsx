@@ -326,7 +326,7 @@ export default function RazorpayReports() {
   const cards = [
     {
       title: "Total Amount",
-      value: `₹${summary.totalAmount || 0}`,
+      value: `₹${Number(summary.totalAmount || 0).toFixed(1)}`,
       color: "text-green-600",
     },
     {
@@ -362,7 +362,7 @@ export default function RazorpayReports() {
     },
     {
       title: "Total Pg Charges",
-      value: `₹${summary.totalPGCharge || 0}`,
+      value: `₹${Number(summary.totalPGCharge || 0).toFixed(1)}`,
       color: "text-indigo-600",
     },
   ];
