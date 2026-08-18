@@ -382,7 +382,7 @@ export default function AstrologerActivities({ astrologerId }) {
       },
       {
         header: "Amount",
-        render: (row) => `₹ ${row.session?.commission ?? 0}`,
+        render: (row) => `₹ ${row.session?.amount ?? 0}`,
       },
       // {
       //   header: "Wallet Balance",
