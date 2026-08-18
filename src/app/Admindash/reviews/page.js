@@ -326,7 +326,7 @@ const [editedRating, setEditedRating] = useState(5);
 
         <div className="flex flex-wrap gap-3">
           <div className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg text-sm font-semibold">
-            Average Rating : {Number(averageRating).toFixed(0)}
+            Average Rating : {Number(averageRating).toFixed(1)}
           </div>
 
           <div className="bg-black text-white px-4 py-2 rounded-lg text-sm font-semibold">
