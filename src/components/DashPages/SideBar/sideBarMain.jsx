@@ -25,8 +25,7 @@ export default function SideBarMain() {
   });
 
   const modules = data?.getModulesBySection || [];
-  console.log("pathname:", pathname);
-  console.log("section:", section);
+  // console.log("pathname:", pathname);
 
   const allowedModules = modules.filter(
     (mod) => isSuperAdmin || can(mod.slug, "read")

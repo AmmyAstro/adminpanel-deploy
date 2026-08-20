@@ -1,16 +1,17 @@
 "use client";
 
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import dayjs from "dayjs";
-import {
-  END_SESSION_BY_ADMIN,
-  GET_SESSION_ANALYTICS,
-} from "@/app/graphQL/astroHiring";
+import { GET_SESSION_ANALYTICS } from "@/app/graphQL/astroHiring";
 import SocketContext from "@/context/socketContext";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import ConfirmModal from "@/components/Custom/ConfirmModal";
 
 export default function OngoingSessions() {
   const chatEndedRef = useRef(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
 
   const { data, loading, error } = useQuery(GET_SESSION_ANALYTICS, {
     variables: {
@@ -19,7 +20,9 @@ export default function OngoingSessions() {
     },
     fetchPolicy: "network-only",
   });
+
   const { socket, connectSocket } = useContext(SocketContext);
+
   useEffect(() => {
     if (!socket) {
       const token = localStorage.getItem("token");
@@ -31,9 +34,21 @@ export default function OngoingSessions() {
 
       connectSocket({ token });
     }
-  }, [socket]);
-  const handleEndSession = (item) => {
-    console.log("===== END BUTTON CLICKED =====");
+  }, [socket, connectSocket]);
+
+  // End button click -> only open modal
+  const handleEndClick = (item) => {
+    setSelectedSession(item);
+    setShowConfirmModal(true);
+  };
+
+  // Confirm button -> actually end session
+  const handleEndSession = () => {
+    if (!selectedSession) return;
+
+    const item = selectedSession;
+
+    console.log("===== CONFIRM END SESSION =====");
     console.log("Item:", item);
     console.log("Socket:", socket);
     console.log("Socket Connected:", socket?.connected);
@@ -75,7 +90,15 @@ export default function OngoingSessions() {
 
     console.log("Emit called successfully");
 
-    // chatEndedRef.current = true;
+    // Prevent duplicate end
+    chatEndedRef.current = true;
+
+    // Close modal
+    setShowConfirmModal(false);
+    setSelectedSession(null);
+
+    // Refresh page
+    window.location.reload();
   };
 
   const sessions = data?.getSessionAnalytics?.recentSessions || [];
@@ -95,6 +118,7 @@ export default function OngoingSessions() {
       </div>
     );
   }
+
   const getDuration = (startedAt) => {
     if (!startedAt) return "-";
 
@@ -112,77 +136,95 @@ export default function OngoingSessions() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow p-5">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-semibold text-[#2c0a4d]">
-          Ongoing Sessions
-        </h2>
+    <>
+      <div className="bg-white rounded-2xl shadow p-5">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-xl font-semibold text-[#2c0a4d]">
+            Ongoing Sessions
+          </h2>
 
-        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-          {sessions.length} Active
-        </span>
+          <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+            {sessions.length} Active
+          </span>
+        </div>
+
+        {sessions.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">
+            No ongoing sessions found.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-purple-50 text-[#2c0a4d]">
+                  <th className="text-left p-3">User</th>
+                  <th>Type</th>
+                  <th className="text-left p-3">Session</th>
+                  <th className="text-left p-3">Rate/Min</th>
+                  <th className="text-left p-3">Amount</th>
+                  <th className="text-left p-3">Duration</th>
+                  <th className="text-left p-3">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {sessions.map((item) => (
+                  <tr
+                    key={item.sessionId}
+                    className="border-b hover:bg-gray-50"
+                  >
+                    <td className="p-3 font-medium">{item.userName || "-"}</td>
+
+                    <td className="p-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          item.type === "CHAT"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {item.type}
+                      </span>
+                    </td>
+
+                    <td className="p-3 text-xs">
+                      {item.roomId?.slice(0, 8) || "-"}
+                    </td>
+
+                    <td className="p-3">₹{item.ratePerMin || 0}/min</td>
+
+                    <td className="p-3 font-semibold text-green-600">
+                      ₹{item.coinsDeducted || 0}
+                    </td>
+
+                    <td className="p-3 font-medium text-orange-600">
+                      {getDuration(item.startedAt)}
+                    </td>
+
+                    <td className="p-3">
+                      <button
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+                        onClick={() => handleEndClick(item)}
+                      >
+                        End
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {sessions.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">
-          No ongoing sessions found.
-        </p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-purple-50 text-[#2c0a4d]">
-                <th className="text-left p-3">User</th>
-                <th>Type</th>
-                <th className="text-left p-3">Session</th>
-                <th className="text-left p-3">Rate/Min</th>
-                <th className="text-left p-3">Amount</th>
-                <th className="text-left p-3">Duration</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {sessions.map((item) => (
-                <tr key={item.sessionId} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-medium">{item.userName || "-"}</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        item.type === "CHAT"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {item.type}
-                    </span>
-                  </td>
-                  <td className="p-3 text-xs">
-                    {item.roomId.slice(0, 8) || "-"}
-                  </td>
-
-                  <td className="p-3">₹{item.ratePerMin || 0}/min</td>
-
-                  <td className="p-3 font-semibold text-green-600">
-                    ₹{item.coinsDeducted || 0}
-                  </td>
-
-                  <td className="p-3 font-medium text-orange-600">
-                    {getDuration(item.startedAt)}
-                  </td>
-                  <td className="p-3">
-                    <button
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
-                      onClick={() => handleEndSession(item)}
-                    >
-                      End
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      <ConfirmModal
+        open={showConfirmModal}
+        onCancel={() => {
+          setShowConfirmModal(false);
+          setSelectedSession(null);
+        }}
+        onConfirm={handleEndSession}
+      />
+    </>
   );
 }

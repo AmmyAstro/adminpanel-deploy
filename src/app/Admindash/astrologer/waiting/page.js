@@ -4,15 +4,19 @@ import {
   GET_ALL_WAITING_QUEUES,
   GET_ASTROLOGER_WAITING_USERS,
 } from "@/app/graphQL/astroHiring";
+import ConfirmModal from "@/components/Custom/ConfirmModal";
 import SocketContext from "@/context/socketContext";
 import { useQuery } from "@apollo/client/react";
 import Image from "next/image";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { BsPersonCircle } from "react-icons/bs";
 import { FiClock } from "react-icons/fi";
 import { MdChat } from "react-icons/md";
 
 export default function WaitingQueue({ astrologerId }) {
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const { data, loading, error, refetch } = useQuery(GET_ALL_WAITING_QUEUES, {
     fetchPolicy: "network-only",
   });
@@ -35,8 +39,16 @@ export default function WaitingQueue({ astrologerId }) {
       connectSocket({ token });
     }
   }, [socket]);
-  const handleEndSession = (item) => {
-    console.log("===== END BUTTON CLICKED =====");
+  const handleEndClick = (item) => {
+    setSelectedItem(item);
+    setShowConfirmModal(true);
+  };
+  const handleEndSession = async () => {
+    if (!selectedItem) return;
+
+    const item = selectedItem;
+
+    console.log("===== CONFIRM END SESSION =====");
     console.log("Item:", item);
     console.log("Socket:", socket);
     console.log("Socket Connected:", socket?.connected);
@@ -47,24 +59,21 @@ export default function WaitingQueue({ astrologerId }) {
     }
 
     if (!socket) {
-      console.log("Socket not available");
+      toast.error("Socket connection not available");
       return;
     }
 
     const payload = {
       room_id: item.roomId,
-      astroId: item.astrologerId,
-      userId: item.userId,
-      sessionId: item.sessionId,
+      astroid: item.astrologerId,
+      user_id: item.userId,
       type: item.type,
     };
 
     const eventName =
-      item.type === "chat"
-        ? "chatCompletedByAdmin"
-        : item.type === "call"
-          ? "callCompletedByAdmin"
-          : null;
+      item.type === "chat" || item.type === "call"
+        ? "cancel_chat_request_by_admin"
+        : null;
 
     if (!eventName) {
       console.error("Invalid session type:", item.type);
@@ -78,16 +87,15 @@ export default function WaitingQueue({ astrologerId }) {
 
     console.log("Emit called successfully");
 
-    // chatEndedRef.current = true;
+    // Close modal
+    setShowConfirmModal(false);
+    setSelectedItem(null);
+
+    // Refresh queue data
+    await refetch();
+
+    toast.success(`${item.type} request successfully removed`);
   };
-
-  //   if (loading) {
-  //     return <div className="p-10 text-center">Loading Queue...</div>;
-  //   }
-
-  //   if (error) {
-  //     return <div className="p-10 text-center text-red-500">{error.message}</div>;
-  //   }
 
   return (
     <div className="space-y-6">
@@ -171,7 +179,12 @@ export default function WaitingQueue({ astrologerId }) {
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-red-600 hover:bg-red-700"
                       }`}
-                      onClick={() => handleEndSession(user)}
+                      onClick={() =>
+                        handleEndClick({
+                          ...user,
+                          astrologerId: astro.astrologerId,
+                        })
+                      }
                     >
                       End
                     </button>
@@ -182,6 +195,14 @@ export default function WaitingQueue({ astrologerId }) {
           </div>
         ))
       )}
+      <ConfirmModal
+        open={showConfirmModal}
+        onCancel={() => {
+          setShowConfirmModal(false);
+          setSelectedItem(null);
+        }}
+        onConfirm={handleEndSession}
+      />
     </div>
   );
 }
