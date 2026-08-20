@@ -62,6 +62,9 @@ export default function Page() {
   const chatPricing = astrologerprofile?.pricing?.find(
     (item) => item.type === "CHAT",
   );
+    const giftPricing = astrologerprofile?.pricing?.find(
+    (item) => item.type === "GIFT",
+  );
   const {
     data: reviewData,
     loading: reviewLoading,
@@ -507,6 +510,24 @@ export default function Page() {
                   }
                 />
               </div>
+              <div>
+                <h3>Commission Percentage</h3>
+           
+              <div className="grid grid-cols-2 gap-3 text-xs ">
+                <div className="flex items-center gap-2">
+                  <h2>Chat : </h2>
+                  <span> {chatPricing?.commissionPercent  || 0} %</span>
+                </div>
+                   <div className="flex items-center gap-2">
+                  <h2>Call :</h2>
+                  <span> {callPricing?.commissionPercent  || 0} %</span>
+                </div>
+                 <div className="flex items-center gap-2">
+                  <h2>Gift : </h2>
+                  <span> {giftPricing?.commissionPercent  || 0} %</span>
+                </div>
+              </div>
+                 </div>
             </div>
 
             <hr className="text-gray-300" />
