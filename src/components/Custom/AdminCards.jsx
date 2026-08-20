@@ -12,7 +12,7 @@ const cards = [
   },
   {
     title: "Dhwani",
-    subtitle: "Revenue",
+    subtitle: "",
     img: "/admin-img/gif/revenue.gif",
     link: "/Admindash/dhwani-revenue",
     bg: "bg-[#AD88C6]",
