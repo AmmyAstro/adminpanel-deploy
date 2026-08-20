@@ -63,7 +63,7 @@ export default function Page() {
     (item) => item.type === "CHAT",
   );
     const giftPricing = astrologerprofile?.pricing?.find(
-    (item) => item.type === "GIFT",
+    (item) => item.type === "GIFT_COMMISSION",
   );
   const {
     data: reviewData,
