@@ -173,7 +173,7 @@ export default function WaitingQueue({ astrologerId }) {
                     <div>{user.maximumTime} Min</div>
 
                     <button
-                      disabled={index === 0}
+                      // disabled={index === 0}
                       className={`px-4 py-1 rounded-full text-xs text-white ${
                         index === 0
                           ? "bg-gray-400 cursor-not-allowed"
