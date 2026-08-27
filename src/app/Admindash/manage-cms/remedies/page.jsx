@@ -119,7 +119,7 @@ export default function RemedyAdminPage() {
   };
 
   return (
-    <div className="p-10 space-y-10">
+    <div className="p-10 bg-white rounded-xl space-y-10">
       <div className="  w-full border border-gray-200 rounded-2xl  p-4 space-y-4">
         <h2 className="text-2xl font-semibold">
           {editId ? "Update Remedy" : "Create Remedy"}
@@ -132,7 +132,7 @@ export default function RemedyAdminPage() {
           <input
             {...register("title")}
             placeholder="Remedy Title"
-            className="w-full border border-gray-200 p-2 rounded-full"
+            className="w-full border border-gray-200 bg-white p-2 rounded-full"
           />
 
           <TapEditor
@@ -150,7 +150,7 @@ export default function RemedyAdminPage() {
           <button
             type="submit"
             disabled={createLoading || updateLoading}
-            className="bg-purple-600 text-white px-8 py-2 justify-self-align rounded-full"
+            className="bg-purple-600 text-white px-8 py-2 w-50 place-self-center rounded-full"
           >
             {createLoading || updateLoading
               ? "Saving..."
@@ -170,18 +170,18 @@ export default function RemedyAdminPage() {
             data?.getRemedies?.map((item) => (
               <div
                 key={item.id}
-                className="border border-gray-300 rounded-2xl p-6 space-y-5"
+                className="border border-gray-200 bg-white shadow-xl  rounded-2xl p-6 space-y-5"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-2xl font-semibold">{item.title}</h3>
 
-                    <p className="text-sm bg-black/10 rounded-full text-gray-500 mt-1">
+                    <p className="text-[10px] text-white  bg-green-400 px-2 py-1  rounded-full  mt-1">
                       Status: {item.isActive ? "Active" : "Inactive"}
                     </p>
                   </div>
 
-                  <div className="flex gap-3 text-sm">
+                  <div className="flex gap-3 text-xs">
                     <button
                       onClick={() => handleEdit(item)}
                       className="bg-blue-500 text-white px-5 py-1 rounded-full"
