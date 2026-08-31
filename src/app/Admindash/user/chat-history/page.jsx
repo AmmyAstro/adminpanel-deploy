@@ -31,9 +31,8 @@ export default function UserChatHistoryPage() {
   const [endDate, setEndDate] = useState("");
 
   // PAGINATION
-  const [page, setPage] = useState(1);
-
-  const limit = 10;
+const [page, setPage] = useState(1);
+const [limit, setLimit] = useState(30);
 
   // FILTERS
   const [filters, setFilters] = useState({
@@ -455,35 +454,66 @@ export default function UserChatHistoryPage() {
       </div>
 
       {/* PAGINATION */}
-      <div className="flex items-center justify-between">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
-          className={`px-4 py-2 rounded-lg ${
-            page === 1
-              ? "bg-gray-200 cursor-not-allowed"
-              : "bg-black text-white"
-          }`}
-        >
-          Previous
-        </button>
+     {/* PAGINATION */}
+<div className="flex flex-col md:flex-row items-center justify-between gap-4">
 
-        <div className="font-medium">
-          Page {page} of {totalPages || 1}
-        </div>
+  {/* ITEMS PER PAGE */}
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium text-gray-600">
+      Show
+    </span>
 
-        <button
-          disabled={page >= totalPages}
-          onClick={() => setPage((prev) => prev + 1)}
-          className={`px-4 py-2 rounded-lg ${
-            page >= totalPages
-              ? "bg-gray-200 cursor-not-allowed"
-              : "bg-black text-white"
-          }`}
-        >
-          Next
-        </button>
-      </div>
+    <select
+      value={limit}
+      onChange={(e) => {
+        setLimit(Number(e.target.value));
+        setPage(1);
+      }}
+      className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none bg-white"
+    >
+      <option value={30}>30</option>
+      <option value={50}>50</option>
+      <option value={80}>80</option>
+      <option value={100}>100</option>
+    </select>
+
+    <span className="text-sm font-medium text-gray-600">
+      per page
+    </span>
+  </div>
+
+  {/* PREVIOUS */}
+  <button
+    disabled={page === 1}
+    onClick={() => setPage((prev) => prev - 1)}
+    className={`px-4 py-2 rounded-lg ${
+      page === 1
+        ? "bg-gray-200 cursor-not-allowed"
+        : "bg-black text-white"
+    }`}
+  >
+    Previous
+  </button>
+
+  {/* PAGE INFO */}
+  <div className="font-medium">
+    Page {page} of {totalPages || 1}
+  </div>
+
+  {/* NEXT */}
+  <button
+    disabled={page >= totalPages}
+    onClick={() => setPage((prev) => prev + 1)}
+    className={`px-4 py-2 rounded-lg ${
+      page >= totalPages
+        ? "bg-gray-200 cursor-not-allowed"
+        : "bg-black text-white"
+    }`}
+  >
+    Next
+  </button>
+
+</div>
     </div>
   );
 }
