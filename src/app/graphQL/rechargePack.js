@@ -32,14 +32,14 @@ validityDays
 `;
 
 export const UPDATE_RECHARGE_PACK = gql`
-  mutation UpdateRechargePack($id: ID!, $input: RechargePackInput!) {
+  mutation UpdateRechargePack($id: ID!, $input: UpdateRechargePackInput!) {
     updateRechargePack(id: $id, input: $input) {
       id
       name
       price
       talktime
       coins
-validityDays
+      validityDays
       isActive
     }
   }

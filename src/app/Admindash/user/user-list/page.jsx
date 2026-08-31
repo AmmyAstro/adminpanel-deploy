@@ -46,7 +46,7 @@ export default function UsersListPage() {
   // PAGINATION
   const [page, setPage] = useState(1);
 
- const limit = 80;
+ const limit = 50;
 
   // FINAL FILTERS
   const [filters, setFilters] = useState({
@@ -243,13 +243,13 @@ export default function UsersListPage() {
  
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4 bg-white p-3 rounded-xl shadow border border-gray-200">
    
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
-          className="border rounded-full border-gray-300 placeholder:text-gray-300 px-4 py-1 outline-none"
-        />
+      <input
+  type="text"
+  placeholder="Search by name or ID"
+  value={searchName}
+  onChange={(e) => setSearchName(e.target.value)}
+  className="border rounded-full border-gray-300 placeholder:text-gray-300 px-4 py-1 outline-none"
+/>
         <input
           type="text"
           placeholder="Search by mobile"

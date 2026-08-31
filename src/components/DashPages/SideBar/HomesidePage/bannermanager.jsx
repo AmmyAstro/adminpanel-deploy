@@ -286,7 +286,6 @@ export default function BannerManager() {
 
   return (
     <div className="p-10 space-y-5">
-   
       <button
         disabled={!canCreate}
         onClick={() => {
@@ -298,17 +297,14 @@ export default function BannerManager() {
         Add Banner
       </button>
 
-    
       <ConfirmModal
         open={!!confirmState}
         onCancel={() => setConfirmState(null)}
         onConfirm={handleConfirm}
       />
 
-  
-
       <DataTable columns={bannerColumns} data={localBanners} />
-    {localBanners.length === 0 && (
+      {localBanners.length === 0 && (
         <p className="text-center py-10 text-gray-500">No banners found 🚫</p>
       )}
       {openModal && (
@@ -359,7 +355,11 @@ export default function BannerManager() {
               className="w-full border border-gray-200 p-2 rounded-full"
             />
 
-            <input className="w-full border border-purple-200 p-2 rounded-full" type="file" onChange={(e) => setFile(e.target.files[0])} />
+            <input
+              className="w-full border border-purple-200 p-2 rounded-full"
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
 
             {file && <img src={URL.createObjectURL(file)} className="h-20" />}
 
