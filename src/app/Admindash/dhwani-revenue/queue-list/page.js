@@ -164,7 +164,7 @@ export default function WaitingQueue({ astrologerId }) {
                 >
                   <div>
                     <div className="font-medium text-xs">
-                      #{index + 1} {user.name}
+                      #{index} {user.name} (UserId: {user.userId})
                     </div>
                   </div>
 

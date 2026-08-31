@@ -112,7 +112,7 @@ const cards = [
   {
     title: "Playstore",
     img: "/admin-img/playstore.gif",
-    link: "#",
+    link: "https://play.google.com/store/apps/details?id=com.DhwaniAstro.app&hl=en_IN",
     bg: "bg-[#a682a7ce]",
     rounded: true,
   },

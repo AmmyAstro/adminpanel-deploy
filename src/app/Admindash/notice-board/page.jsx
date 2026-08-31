@@ -70,10 +70,10 @@ export default function CreateNotice() {
 
   const [createNotice] = useMutation(CREATE_NOTICE);
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
     const isEditMode = !!formData.id;
 
     try {
@@ -121,19 +121,19 @@ export default function CreateNotice() {
 
           refetchQueries: [GET_NOTICES],
         });
-setErrors({});
+        setErrors({});
         toast.success("Notice Created");
       }
 
       // reset form
-   setFormData({
-    id: null,
-    title: "",
-    description: "",
-    targetType: "ALL",
-    astrologers: [],
-    isActive: true,
-});
+      setFormData({
+        id: null,
+        title: "",
+        description: "",
+        targetType: "ALL",
+        astrologers: [],
+        isActive: true,
+      });
     } catch (err) {
       toast.error(err?.message || "Something went wrong");
     }
@@ -190,7 +190,7 @@ setErrors({});
 
           <input
             type="text"
-            className="border rounded-lg w-full p-3"
+            className="border border-gray-300  rounded-full w-full p-3"
             value={formData.title}
             maxLength={100}
             onChange={(e) => handleChange("title", e.target.value)}
@@ -207,22 +207,20 @@ setErrors({});
 
           <textarea
             rows={6}
-            className="border rounded-lg w-full p-3"
+            className="border border-gray-300  rounded-2xl w-full p-3"
             value={formData.description}
             maxLength={1000}
             onChange={(e) => handleChange("description", e.target.value)}
           />
-        <div className="flex justify-between mt-1">
-    {errors.description && (
-        <p className="text-xs text-red-500">
-            {errors.description}
-        </p>
-    )}
+          <div className="flex justify-between mt-1">
+            {errors.description && (
+              <p className="text-xs text-red-500">{errors.description}</p>
+            )}
 
-    <p className="text-xs text-gray-400 ml-auto">
-        {formData.description.length}/1000
-    </p>
-</div>
+            <p className="text-xs text-gray-400 ml-auto">
+              {formData.description.length}/1000
+            </p>
+          </div>
         </div>
 
         {/* Audience */}
@@ -231,7 +229,7 @@ setErrors({});
           <label className="block mb-2">Audience</label>
 
           <select
-            className="border rounded-lg w-full p-3"
+            className="border border-gray-300  rounded-2xl w-full p-3"
             value={formData.targetType}
             onChange={(e) => handleChange("targetType", e.target.value)}
           >
@@ -250,7 +248,7 @@ setErrors({});
           <div>
             <label className="block mb-2 font-medium">Select Astrologers</label>
 
-            <div className="border rounded-lg max-h-64 overflow-y-auto p-3 space-y-3">
+            <div className="border-gray-300  rounded-2xl   max-h-64 overflow-y-auto p-3 space-y-3">
               {astrologers.map((astro) => (
                 <label
                   key={astro.id}
@@ -293,21 +291,19 @@ setErrors({});
 
         {/* Active */}
 
-        <div className="flex items-center justify-between border rounded-lg p-3">
+        <div className="flex items-center justify-between border-gray-300  rounded-full  p-3">
           <span className="font-medium">Active Notice</span>
 
           <CustomToggle
             id="activeNotice"
             checked={formData.isActive}
-            onChange={(val) =>
-             handleChange("isActive", val)
-            }
+            onChange={(val) => handleChange("isActive", val)}
           />
         </div>
 
         <CustomButton
           type="submit"
-          className="bg-green-600 text-white px-6 py-3 rounded-lg"
+          className="bg-green-600 text-white px-6 py-3 rounded-full shadow-lg"
         >
           {formData.id ? "Update Notice" : "Create Notice"}
         </CustomButton>
@@ -320,7 +316,7 @@ setErrors({});
           {notices.map((notice) => (
             <div
               key={notice.id}
-              className="border rounded-xl p-5 bg-white shadow-sm"
+              className="border-gray-300  rounded-2xl  p-5 bg-white shadow-sm"
             >
               <div className="flex justify-between items-start">
                 <div>
@@ -328,7 +324,7 @@ setErrors({});
 
                   <p className="text-gray-600 mt-2">{notice.description}</p>
 
-                  <p className="text-sm text-gray-600">
+                  <p className="text-[10px] text-gray-600">
                     {new Date(Number(notice.createdAt)).toLocaleString(
                       "en-IN",
                       {
@@ -346,6 +342,7 @@ setErrors({});
 
                 <div className="flex gap-2">
                   <CustomButton
+                  className="px-2 py-1 text-xs"
                     variant="black"
                     onClick={() => {
                       setFormData({
@@ -368,6 +365,8 @@ setErrors({});
 
                   <CustomButton
                     variant="red"
+                                      className="px-2 py-1 text-xs"
+
                     onClick={() => handleDelete(notice.id)}
                   >
                     Delete
