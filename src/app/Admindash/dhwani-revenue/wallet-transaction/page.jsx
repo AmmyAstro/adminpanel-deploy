@@ -215,12 +215,12 @@ export default function AllWalletTransactionsPage() {
                   }
                 </p>
 
-                <p className="text-xs text-gray-500">
+                {/* <p className="text-xs text-gray-500">
                   {
                     row?.userWallet?.user
                       ?.mobile
                   }
-                </p>
+                </p> */}
               </div>
             );
           }
@@ -233,14 +233,14 @@ export default function AllWalletTransactionsPage() {
                     ?.astrologer?.displayName
                 }
               </p>
-
+{/* 
               <p className="text-xs text-gray-500">
                 {
                   row?.astrologerWallet
                     ?.astrologer
                     ?.contactNo
                 }
-              </p>
+              </p> */}
             </div>
           );
         },

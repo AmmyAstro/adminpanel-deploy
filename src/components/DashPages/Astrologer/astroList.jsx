@@ -112,7 +112,7 @@ export default function AstroList() {
           >
             {row.displayName}
           </Link>
-          <small className="text-gray-400">ID: {row.id?.slice(0, 15)}</small>
+          <small className="text-gray-400">ID: {row.id?.slice(0,8)}</small>
         </div>
       ),
     },

@@ -548,9 +548,9 @@ export default function UserProfile({ userId }) {
                 />
 
                 <textarea
-                  className="px-3"
+                  className="px-3 placeholder:text-gray-300 border border-gray-300 roundded-xl p-2"
                   onChange={(e) => setRemarks(e.target.value)}
-                  placeholder="Remarks w-full boredr border-gray-300 rounded-xl"
+                  placeholder="Add remarks "
                 ></textarea>
               </div>
 

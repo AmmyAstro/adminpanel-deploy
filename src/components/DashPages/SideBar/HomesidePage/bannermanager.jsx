@@ -83,6 +83,24 @@ export default function BannerManager() {
     setFile(null);
     setEditingBanner(null);
   };
+  const validateBannerFile = (file) => {
+    if (!file) return true;
+
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    const maxSize = 2 * 1024 * 1024; // 2 MB
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Only JPG, JPEG and PNG images are allowed");
+      return false;
+    }
+
+    if (file.size >= maxSize) {
+      toast.error("Image size must be less than 2 MB");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -141,9 +159,17 @@ export default function BannerManager() {
       let imageUrl;
 
       if (file) {
+        if (!validateBannerFile(file)) {
+          return;
+        }
+
         setUploading(true);
-        imageUrl = await uploadFile(file);
-        setUploading(false);
+
+        try {
+          imageUrl = await uploadFile(file);
+        } finally {
+          setUploading(false);
+        }
       }
 
       const input = {
@@ -358,7 +384,20 @@ export default function BannerManager() {
             <input
               className="w-full border border-purple-200 p-2 rounded-full"
               type="file"
-              onChange={(e) => setFile(e.target.files[0])}
+              accept="image/jpeg,image/jpg,image/png"
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+
+                if (!selectedFile) return;
+
+                if (!validateBannerFile(selectedFile)) {
+                  e.target.value = "";
+                  setFile(null);
+                  return;
+                }
+
+                setFile(selectedFile);
+              }}
             />
 
             {file && <img src={URL.createObjectURL(file)} className="h-20" />}
