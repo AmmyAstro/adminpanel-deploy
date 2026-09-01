@@ -1204,7 +1204,7 @@ export default function AddAstro() {
                                 {...register(`pricing.${index}.price`, {
                                   valueAsNumber: true,
                                 })}
-                                placeholder="Price"
+                                placeholder=" Offer"
                                 className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
                               />
 
@@ -1212,7 +1212,7 @@ export default function AddAstro() {
                                 {...register(`pricing.${index}.offerPrice`, {
                                   valueAsNumber: true,
                                 })}
-                                placeholder="Offer"
+                                placeholder="Price"
                                 className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
                               />
                             </>

@@ -197,10 +197,7 @@ export default function AstrologerHiring() {
       header: "Name",
       render: (row) => (
         <div>
-          <Link
-            className="text-xs font-semibold text-purple-500"
-            href={`/Admindash/astrologer/astroprofile/${row.receiverId}`}
-          >
+          <Link className="text-xs font-semibold text-purple-500" href={`#`}>
             {row.name}
           </Link>
           <p className="text-xs text-gray-500">{row.phoneNumber}</p>
@@ -326,7 +323,7 @@ export default function AstrologerHiring() {
       header: "Profile",
       render: (row) => {
         const isAdded = !!row.astrologerId;
-// console.log("ROW ID=========================================== =", row.id);
+        // console.log("ROW ID=========================================== =", row.id);
         return (
           <button
             disabled={isAdded || row.approvalStatus !== "APPROVED"}
@@ -335,7 +332,6 @@ export default function AstrologerHiring() {
                 window.location.href = `/Admindash/astrologer/add-astrologer?appId=${row.id}`;
               }
             }}
-            
             className={`px-3 py-1 rounded text-xs ${
               isAdded
                 ? "bg-blue-600 text-white"
@@ -389,14 +385,30 @@ export default function AstrologerHiring() {
               <h2>{selected.name}</h2>
               <button onClick={() => setOpenModal(false)}>✕</button>
             </div>
-
-            <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl">
-              <button onClick={() => setActiveTab("interview")}>
+            <div className="flex justify-evenly bg-purple-200 p-2 rounded-xl gap-2">
+              <button
+                onClick={() => setActiveTab("interview")}
+                className={`flex-1 py-2 rounded-lg transition-colors ${
+                  activeTab === "interview"
+                    ? "bg-purple-400 text-white"
+                    : "bg-transparent"
+                }`}
+              >
                 Interview
               </button>
+
               <button
                 disabled={selected.interviewStatus !== "PASSED"}
                 onClick={() => setActiveTab("documents")}
+                className={`flex-1 py-2 rounded-lg transition-colors ${
+                  activeTab === "documents"
+                    ? "bg-purple-400 text-white"
+                    : "bg-transparent"
+                } ${
+                  selected.interviewStatus !== "PASSED"
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 Documents
               </button>
