@@ -36,18 +36,18 @@ export default function ExportMenu({
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-lg bg-violet-600 text-white px-4 py-2 hover:bg-violet-700"
+        className="flex items-center gap-2 rounded-full bg-violet-600 text-white px-4 py-2 hover:bg-violet-700"
       >
         <Download size={18} />
-        Export
-        <ChevronDown size={16} />
+        
+        {/* <ChevronDown size={16} /> */}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-44 text-xs rounded-xl bg-white shadow-xl border z-50">
+        <div className="absolute overflow-hidden right-0 mt-2 w-44 text-xs rounded-xl  bg-white shadow-xl border z-50">
           <button
             onClick={onExcel}
-            className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+            className="w-full px-4 py-2 text-[10px] cursor-pointer hover:bg-gray-50 flex items-center gap-3"
           >
             <FileSpreadsheet size={18} />
             Excel (.xlsx)
@@ -55,14 +55,14 @@ export default function ExportMenu({
 
           <button
             onClick={onCSV}
-            className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+            className="w-full px-4 py-2 text-[10px] cursor-pointer hover:bg-gray-50 flex items-center gap-3"
           >
             📄 CSV
           </button>
 
           <button
             onClick={onPDF}
-            className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+            className="w-full px-4 py-2 text-[10px] hover:bg-gray-50 cursor-pointer flex items-center gap-3"
           >
             <FileText size={18} />
             PDF
@@ -70,7 +70,7 @@ export default function ExportMenu({
 
           <button
             onClick={onPrint}
-            className="w-full px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+            className="w-full px-4 py-2 text-[10px] hover:bg-gray-50 cursor-pointer flex items-center gap-3"
           >
             <Printer size={18} />
             Print
@@ -80,14 +80,14 @@ export default function ExportMenu({
 
           <button
             onClick={onExportCurrent}
-            className="w-full px-4 py-3 hover:bg-gray-50 text-left"
+            className="w-full px-4 py-2 text-[10px] hover:bg-gray-50 cursor-pointer text-left"
           >
             📤 Export Current Page
           </button>
 
           <button
             onClick={onExportAll}
-            className="w-full px-4 py-3 hover:bg-gray-50 text-left"
+            className="w-full px-4 py-2 text-[10px] cursor-pointer hover:bg-gray-50 text-left"
           >
             🌍 Export All Results
           </button>

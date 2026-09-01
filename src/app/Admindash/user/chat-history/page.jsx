@@ -9,15 +9,14 @@ import SessionMessagesModal from "../SessionModal";
 import { GET_USERS_CHAT_HISTORY } from "@/app/graphQL/astroHiring";
 import Link from "next/link";
 import SessionRemedyModal from "../SessionRemedyModal";
-
+import ExportMenu from "@/components/Custom/ExportMenu";
+import { exportExcel } from "@/components/utils/export/exportExcel";
+import { exportPDF } from "@/components/utils/export/exportPDF";
 export default function UserChatHistoryPage() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
-  // SEARCH STATES
   const [searchName, setSearchName] = useState("");
-
   const [searchMobile, setSearchMobile] = useState("");
-
   const [searchAstrologerName, setSearchAstrologerName] = useState("");
   const [openRemedyModal, setOpenRemedyModal] = useState(false);
   const [searchType, setSearchType] = useState("");
@@ -31,8 +30,8 @@ export default function UserChatHistoryPage() {
   const [endDate, setEndDate] = useState("");
 
   // PAGINATION
-const [page, setPage] = useState(1);
-const [limit, setLimit] = useState(30);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(30);
 
   // FILTERS
   const [filters, setFilters] = useState({
@@ -123,7 +122,45 @@ const [limit, setLimit] = useState(30);
   const totalCoinsEarned = data?.getUsersChatHistory?.totalCoinsEarned || 0;
 
   const totalCommission = data?.getUsersChatHistory?.totalCommission || 0;
+  const exportData = history.map((row) => ({
+    SessionID: row.sessionId,
+    UserID: row.userId,
+    UserName: row.userName,
+    Mobile: row.mobile,
+    Astrologer: row.astrologerName,
+    AstrologerID: row.astrologerId,
+    Source: row.source,
+    Status: row.status,
+    RatePerMin: row.ratePerMin,
+    CoinsDeducted: row.coinsDeducted,
+    CoinsEarned: row.coinsEarned,
+    Commission: row.commission,
+    By: row.by,
+    DurationSec: row.durationSec,
+    HasRemedy: row.hasRemedy ? "Yes" : "No",
+    CreatedAt: row.createdAt
+      ? new Date(row.createdAt).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+        })
+      : "",
+  }));
+  const handleExcelExport = () => {
+    if (!exportData.length) {
+      alert("No data available to export");
+      return;
+    }
 
+    exportExcel(exportData, "Users Chat History", "UsersChatHistory.xlsx");
+  };
+
+  const handlePDFExport = () => {
+    if (!exportData.length) {
+      alert("No data available to export");
+      return;
+    }
+
+    exportPDF(exportData, "Users Chat History", "UsersChatHistory.pdf");
+  };
   // TABLE COLUMNS
   const columns = useMemo(
     () => [
@@ -248,7 +285,7 @@ const [limit, setLimit] = useState(30);
         },
       },
 
-{
+      {
         header: "Created Date",
         render: (row) => (
           <div className="text-xs">
@@ -342,7 +379,7 @@ const [limit, setLimit] = useState(30);
       </div>
 
       {/* SEARCH */}
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 bg-white p-5 rounded-full border-purple-100 shadow-mdshadow border">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 bg-white p-5 rounded-2xl border-purple-100 shadow-mdshadow border">
         {/* USER NAME */}
         <input
           type="text"
@@ -416,7 +453,7 @@ const [limit, setLimit] = useState(30);
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="border rounded-lg px-4 py-2 outline-none"
+            className="border rounded-full border-purple-200 px-4 py-2 outline-none"
           />
         )}
 
@@ -426,9 +463,18 @@ const [limit, setLimit] = useState(30);
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="border rounded-lg px-4 py-2 outline-none"
+            className="border rounded-full border-purple-200 px-4 py-2 outline-none"
           />
         )}
+
+          <ExportMenu
+        onExcel={handleExcelExport}
+        onPDF={handlePDFExport}
+        onCSV={() => {}}
+        onPrint={() => {}}
+        onExportCurrent={handleExcelExport}
+        onExportAll={() => {}}
+      />
       </div>
 
       <SessionMessagesModal
@@ -441,6 +487,7 @@ const [limit, setLimit] = useState(30);
         onClose={() => setOpenRemedyModal(false)}
         sessionId={selectedSession}
       />
+    
 
       {/* TABLE */}
       <div className="overflow-x-auto">
@@ -453,67 +500,58 @@ const [limit, setLimit] = useState(30);
         </div>
       </div>
 
-      {/* PAGINATION */}
-     {/* PAGINATION */}
-<div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-600">Show</span>
 
-  {/* ITEMS PER PAGE */}
-  <div className="flex items-center gap-2">
-    <span className="text-sm font-medium text-gray-600">
-      Show
-    </span>
+          <select
+            value={limit}
+            onChange={(e) => {
+              setLimit(Number(e.target.value));
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none bg-white"
+          >
+            <option value={30}>30</option>
+            <option value={50}>50</option>
+            <option value={80}>80</option>
+            <option value={100}>100</option>
+          </select>
 
-    <select
-      value={limit}
-      onChange={(e) => {
-        setLimit(Number(e.target.value));
-        setPage(1);
-      }}
-      className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none bg-white"
-    >
-      <option value={30}>30</option>
-      <option value={50}>50</option>
-      <option value={80}>80</option>
-      <option value={100}>100</option>
-    </select>
+          <span className="text-sm font-medium text-gray-600">per page</span>
+        </div>
 
-    <span className="text-sm font-medium text-gray-600">
-      per page
-    </span>
-  </div>
+        {/* PREVIOUS */}
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((prev) => prev - 1)}
+          className={`px-4 py-2 rounded-lg ${
+            page === 1
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-black text-white"
+          }`}
+        >
+          Previous
+        </button>
 
-  {/* PREVIOUS */}
-  <button
-    disabled={page === 1}
-    onClick={() => setPage((prev) => prev - 1)}
-    className={`px-4 py-2 rounded-lg ${
-      page === 1
-        ? "bg-gray-200 cursor-not-allowed"
-        : "bg-black text-white"
-    }`}
-  >
-    Previous
-  </button>
+        {/* PAGE INFO */}
+        <div className="font-medium">
+          Page {page} of {totalPages || 1}
+        </div>
 
-  {/* PAGE INFO */}
-  <div className="font-medium">
-    Page {page} of {totalPages || 1}
-  </div>
-
-  {/* NEXT */}
-  <button
-    disabled={page >= totalPages}
-    onClick={() => setPage((prev) => prev + 1)}
-    className={`px-4 py-2 rounded-lg ${
-      page >= totalPages
-        ? "bg-gray-200 cursor-not-allowed"
-        : "bg-black text-white"
-    }`}
-  >
-    Next
-  </button>
-
-</div>
+        {/* NEXT */}
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage((prev) => prev + 1)}
+          className={`px-4 py-2 rounded-lg ${
+            page >= totalPages
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-black text-white"
+          }`}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

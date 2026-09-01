@@ -11,6 +11,9 @@ import {
 } from "@/app/graphQL/astroHiring";
 import Link from "next/link";
 import SessionRemedyModal from "../SessionRemedyModal";
+import ExportMenu from "@/components/Custom/ExportMenu";
+import { exportExcel } from "@/components/utils/export/exportExcel";
+import { exportPDF } from "@/components/utils/export/exportPDF";
 
 export default function UserCallHistoryPage() {
   // SEARCH STATES
@@ -30,8 +33,7 @@ export default function UserCallHistoryPage() {
   const [endDate, setEndDate] = useState("");
 
   const [page, setPage] = useState(1);
-
-  const limit = 10;
+  const [limit, setLimit] = useState(30);
 
   const client = useApolloClient();
 
@@ -152,7 +154,45 @@ export default function UserCallHistoryPage() {
   const totalCoinsEarned = data?.getUserCallHistory?.totalCoinsEarned || 0;
 
   const totalCommission = data?.getUserCallHistory?.totalCommission || 0;
+  const exportData = history.map((row) => ({
+    SessionID: row.sessionId,
+    UserID: row.userId,
+    UserName: row.userName,
+    Mobile: row.mobile,
+    Astrologer: row.astrologerName,
+    AstrologerID: row.astrologerId,
+    Source: row.source,
+    Status: row.status,
+    RatePerMin: row.ratePerMin,
+    CoinsDeducted: row.coinsDeducted,
+    CoinsEarned: row.coinsEarned,
+    Commission: row.commission,
+    By: row.by,
+    DurationSec: row.durationSec,
+    HasRemedy: row.hasRemedy ? "Yes" : "No",
+    CreatedAt: row.createdAt
+      ? new Date(row.createdAt).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+        })
+      : "",
+  }));
+  const handleExcelExport = () => {
+    if (!exportData.length) {
+      alert("No data available to export");
+      return;
+    }
 
+    exportExcel(exportData, "Users Chat History", "UsersChatHistory.xlsx");
+  };
+
+  const handlePDFExport = () => {
+    if (!exportData.length) {
+      alert("No data available to export");
+      return;
+    }
+
+    exportPDF(exportData, "Users Chat History", "UsersChatHistory.pdf");
+  };
   // STATUS COLORS
   const statusStyles = {
     REQUESTED: "bg-yellow-100 text-yellow-700",
@@ -346,18 +386,21 @@ export default function UserCallHistoryPage() {
               </svg>
             </button>
 
-            <button
-              title="View Remedy"
-              onClick={() => {
-                setSelectedSession(row.sessionId);
-                setOpenRemedyModal(true);
-              }}
-              className="flex hover:scale-104 cursor-pointer items-center justify-center text-green-600 hover:text-green-800"
-            >
-              <svg height={20} width={20} viewBox="0 0 640 640">
-                <path d="M311.6 95C297.5 75.5 274.9 64 250.9 64C209.5 64 176 97.5 176 138.9L176 141.3C176 205.7 258 274.7 298.2 304.6C311.2 314.3 328.7 314.3 341.7 304.6C381.9 274.6 463.9 205.7 463.9 141.3L463.9 138.9C463.9 97.5 430.4 64 389 64C365 64 342.4 75.5 328.3 95L320 106.7L311.6 95zM141.3 405.5L98.7 448L64 448C46.3 448 32 462.3 32 480L32 544C32 561.7 46.3 576 64 576L384.5 576C413.5 576 441.8 566.7 465.2 549.5L591.8 456.2C609.6 443.1 613.4 418.1 600.3 400.3C587.2 382.5 562.2 378.7 544.4 391.8L424.6 480L312 480C298.7 480 288 469.3 288 456C288 442.7 298.7 432 312 432L384 432C401.7 432 416 417.7 416 400C416 382.3 401.7 368 384 368L231.8 368C197.9 368 165.3 381.5 141.3 405.5z" />
-              </svg>
-            </button>
+               {row.hasRemedy && (
+              <button
+                title="View Remedy"
+                onClick={() => {
+                  setSelectedSession(row.sessionId);
+                  setOpenRemedyModal(true);
+                }}
+                className="flex hover:scale-104 cursor-pointer items-center justify-center text-green-600 hover:text-green-800"
+              >
+                <svg height={20} width={20} viewBox="0 0 640 640">
+                  <path d="M311.6 95C297.5 75.5 274.9 64 250.9 64C209.5 64 176 97.5 176 138.9L176 141.3C176 205.7 258 274.7 298.2 304.6C311.2 314.3 328.7 314.3 341.7 304.6C381.9 274.6 463.9 205.7 463.9 141.3L463.9 138.9C463.9 97.5 430.4 64 389 64C365 64 342.4 75.5 328.3 95L320 106.7L311.6 95zM141.3 405.5L98.7 448L64 448C46.3 448 32 462.3 32 480L32 544C32 561.7 46.3 576 64 576L384.5 576C413.5 576 441.8 566.7 465.2 549.5L591.8 456.2C609.6 443.1 613.4 418.1 600.3 400.3C587.2 382.5 562.2 378.7 544.4 391.8L424.6 480L312 480C298.7 480 288 469.3 288 456C288 442.7 298.7 432 312 432L384 432C401.7 432 416 417.7 416 400C416 382.3 401.7 368 384 368L231.8 368C197.9 368 165.3 381.5 141.3 405.5z" />
+                </svg>
+              </button>
+            )}
+
           </div>
         ),
       },
@@ -475,6 +518,15 @@ export default function UserCallHistoryPage() {
             className="border rounded-lg px-4 py-2 outline-none"
           />
         )}
+
+                  <ExportMenu
+                onExcel={handleExcelExport}
+                onPDF={handlePDFExport}
+                onCSV={() => {}}
+                onPrint={() => {}}
+                onExportCurrent={handleExcelExport}
+                onExportAll={() => {}}
+              />
       </div>
 
   
@@ -489,7 +541,28 @@ export default function UserCallHistoryPage() {
       </div>
 
     
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-600">Show</span>
+
+          <select
+            value={limit}
+            onChange={(e) => {
+              setLimit(Number(e.target.value));
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none bg-white"
+          >
+            <option value={30}>30</option>
+            <option value={50}>50</option>
+            <option value={80}>80</option>
+            <option value={100}>100</option>
+          </select>
+
+          <span className="text-sm font-medium text-gray-600">per page</span>
+        </div>
+
+        {/* PREVIOUS */}
         <button
           disabled={page === 1}
           onClick={() => setPage((prev) => prev - 1)}
@@ -502,10 +575,12 @@ export default function UserCallHistoryPage() {
           Previous
         </button>
 
+        {/* PAGE INFO */}
         <div className="font-medium">
           Page {page} of {totalPages || 1}
         </div>
 
+        {/* NEXT */}
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((prev) => prev + 1)}
