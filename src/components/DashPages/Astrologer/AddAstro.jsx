@@ -326,38 +326,38 @@ export default function AddAstro() {
           price: "",
           offerPrice: "",
           commissionPercent: "",
-          isActive: true,
+          isActive: false,
         },
         {
           type: "CALL",
           price: "",
           offerPrice: "",
           commissionPercent: "",
-          isActive: true,
+          isActive: false,
         },
         {
           type: "VIDEO",
           price: "",
           offerPrice: "",
           commissionPercent: "",
-          isActive: true,
+          isActive: false,
         },
         {
           type: "AUDIO",
           price: "",
           offerPrice: "",
           commissionPercent: "",
-          isActive: true,
+          isActive: false,
         },
         {
           type: "GIFT_COMMISSION",
           commissionPercent: "",
-          isActive: true,
+          isActive: false,
         },
         {
           type: "OFFER",
           commissionPercent: "",
-          isActive: true,
+          isActive: false,
         },
       ],
       bankDetails: {
@@ -832,7 +832,7 @@ export default function AddAstro() {
               <button
                 type="button"
                 onClick={() => setPreviewImage(existingDocs.profilePic)}
-                className="text-blue-600 text-xs underline"
+                className="text-blue-600 text-[10px] cursor-pointer"
               >
                 View
               </button>
@@ -1180,13 +1180,13 @@ export default function AddAstro() {
 
                               if (!val) {
                                 if (!isCommissionOnly) {
-                                  setValue(`pricing.${index}.price`, 0);
-                                  setValue(`pricing.${index}.offerPrice`, 0);
+                                  setValue(`pricing.${index}.price`, "");
+                                  setValue(`pricing.${index}.offerPrice`, "");
                                 }
 
                                 setValue(
                                   `pricing.${index}.commissionPercent`,
-                                  0,
+                                  "",
                                 );
                               }
                             }}
@@ -1202,28 +1202,31 @@ export default function AddAstro() {
                             <>
                               <input
                                 {...register(`pricing.${index}.price`, {
-                                  valueAsNumber: true,
+                                     setValueAs: (value) => value === "" ? "" : Number(value),
+
                                 })}
                                 placeholder=" Offer"
-                                className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                                className="border placeholder:text-xs placeholder:text-gray-300 border-gray-200 rounded-xl p-1 text-sm w-1/3"
                               />
 
                               <input
                                 {...register(`pricing.${index}.offerPrice`, {
-                                  valueAsNumber: true,
+                                     setValueAs: (value) => value === "" ? "" : Number(value),
+
                                 })}
                                 placeholder="Price"
-                                className="border border-gray-200 rounded-xl p-1 text-sm w-1/3"
+                                className="border placeholder:text-xs placeholder:text-gray-300 border-gray-200 rounded-xl p-1 text-sm w-1/3"
                               />
                             </>
                           )}
 
                           <input
                             {...register(`pricing.${index}.commissionPercent`, {
-                              valueAsNumber: true,
+                                setValueAs: (value) => value === "" ? "" : Number(value),
+
                             })}
                             placeholder="%"
-                            className={`border border-gray-200 rounded-xl p-1 text-sm ${
+                            className={`border border-gray-200 placeholder:text-xs placeholder:text-gray-300 rounded-xl p-1 text-sm ${
                               isCommissionOnly ? "w-full" : "w-1/3"
                             }`}
                           />
@@ -1475,7 +1478,7 @@ export default function AddAstro() {
                       <button
                         type="button"
                         onClick={() => setPreviewImage(existingDocs[item.name])}
-                        className="text-blue-600 text-xs underline"
+                        className="text-blue-600 text-[10px] cursor-pointer"
                       >
                         View
                       </button>
@@ -1550,7 +1553,7 @@ export default function AddAstro() {
             <button
               type="button"
               onClick={() => setPreviewImage(null)}
-              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600"
+              className="absolute top-2 right-2 w-6 h-6 cursor-pointer rounded-full bg-red-500 text-white hover:bg-red-600"
             >
               ✕
             </button>
@@ -1558,7 +1561,7 @@ export default function AddAstro() {
             <img
               src={previewImage}
               alt="Preview"
-              className="w-full max-h-[70vh] object-contain rounded-lg"
+              className="w-full max-h-[50vh] object-contain rounded-lg"
             />
           </div>
         </div>
