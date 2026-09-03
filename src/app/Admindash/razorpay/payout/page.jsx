@@ -100,13 +100,13 @@ export default function RazorpayPayouts() {
     );
   };
 
-  const toggleSelectAll = () => {
-    if (selectedRows.length === reportData.length) {
-      setSelectedRows([]);
-    } else {
-      setSelectedRows(reportData.map((x) => x.id));
-    }
-  };
+const toggleSelectAll = () => {
+  if (selectedRows.length === reportData.length) {
+    setSelectedRows([]);
+  } else {
+    setSelectedRows(reportData.map((x) => x.astrologerId));
+  }
+};
 
   const [getPayoutReport, { loading, error }] = useLazyQuery(
     GET_PAYOUT_REPORT,
@@ -232,7 +232,7 @@ const { data } = await exportPayoutReport({
   }));
 
   const selectedExportData = reportData
-    .filter((x) => selectedRows.includes(x.astrologerName))
+    .filter((x) => selectedRows.includes(x.astrologerId))
     .map((x) => ({
       Astrologer: x.astrologerName,
 
@@ -408,57 +408,94 @@ const { data } = await exportPayoutReport({
       ),
     },
   ];
-  const handleExcelExport = () => {
-    openRemarkModal("excel");
-  };
+const handleExcelExport = () => {
+  exportExcel(exportData, "Payout Report", "PayoutReport.xlsx");
+};
 
-  const handleCSVExport = () => {
-    openRemarkModal("csv");
-  };
+const handleCSVExport = () => {
+  exportCSV(exportData, "PayoutReport");
+};
 
-  const handlePDFExport = () => {
-    openRemarkModal("pdf");
-  };
+const handlePDFExport = () => {
+  exportPDF(exportData, "Payout Report", "PayoutReport.pdf");
+};
 
-  const submitExport = async () => {
-    if (!remark.trim()) {
-      alert("Please enter remark");
-      return;
+const submitExport = async () => {
+  if (!remark.trim()) {
+    alert("Please enter remark");
+    return;
+  }
+
+  try {
+    setExportLoading(true);
+
+    // =========================
+    // EXPORT ONLY
+    // =========================
+    if (pendingExport === "excel") {
+      exportExcel(
+        exportData,
+        "Payout Report",
+        "PayoutReport.xlsx"
+      );
     }
 
-    try {
-      setExportLoading(true);
+    if (pendingExport === "csv") {
+      exportCSV(exportData, "PayoutReport");
+    }
 
-      const rows = await getExportData();
+    if (pendingExport === "pdf") {
+      exportPDF(
+        exportData,
+        "Payout Report",
+        "PayoutReport.pdf"
+      );
+    }
 
-      // Existing export logic
-      switch (pendingExport) {
-        case "excel":
-          exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
-          break;
+    // =========================
+    // PROCESS PAYOUT ONLY
+    // =========================
+    if (pendingExport === "payout") {
+      const astrologerIds =
+        selectedRows.length > 0
+          ? selectedRows
+          : reportData.map((x) => x.astrologerId);
 
-        case "csv":
-          exportCSV(rows, "PayoutReport");
-          break;
+      await exportPayoutReport({
+        variables: {
+          fromDate: new Date(
+            filters.startDate
+          ).toISOString(),
 
-        case "pdf":
-          exportPDF(rows, "Payout Report", "PayoutReport.pdf");
-          break;
-      }
+          toDate: new Date(
+            `${filters.endDate}T23:59:59.999`
+          ).toISOString(),
 
-      // Existing logic
+          remark: remark.trim(),
+
+          astrologerIds,
+        },
+      });
+
+      alert("Payout processed successfully");
+
+      setSelectedRows([]);
+
+      // refresh report
       await handleMakePayment();
-
-      setShowRemarkModal(false);
-      setRemark("");
-      setPendingExport(null);
-    } catch (error) {
-      console.error("Export failed:", error);
-      alert("Export failed");
-    } finally {
-      setExportLoading(false);
     }
-  };
+
+    setShowRemarkModal(false);
+    setRemark("");
+    setPendingExport(null);
+
+  } catch (error) {
+    console.error("Action failed:", error);
+    alert("Action failed");
+  } finally {
+    setExportLoading(false);
+  }
+};
 
   return (
     <div className="p- space-y-6">
@@ -509,13 +546,24 @@ const { data } = await exportPayoutReport({
             Search
           </button>
 
-          {searched && (
-            <ExportMenu
-              onExcel={handleExcelExport}
-              onCSV={handleCSVExport}
-              onPDF={handlePDFExport}
-            />
-          )}
+       {searched && (
+  <div className="flex items-center gap-3">
+    <ExportMenu
+      onExcel={handleExcelExport}
+      onCSV={handleCSVExport}
+      onPDF={handlePDFExport}
+    />
+
+    <button
+      type="button"
+      onClick={() => openRemarkModal("payout")}
+      disabled={!reportData.length}
+      className="rounded-full bg-green-600 px-6 py-2 text-white font-medium hover:bg-green-700 disabled:opacity-50"
+    >
+      Process Payout
+    </button>
+  </div>
+)}
         </div>
       </div>
 
