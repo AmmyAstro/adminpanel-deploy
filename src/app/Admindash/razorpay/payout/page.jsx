@@ -13,7 +13,7 @@ import { exportCSV } from "@/components/utils/export/exportCsv";
 import { printTable } from "@/components/utils/export/exportPrint";
 import ExportMenu from "@/components/Custom/ExportMenu";
 import DataTable from "@/components/utils/DataTable";
-import { EXPORT_PAYOUT_REPORT } from "@/app/graphQL/astroHiring";
+import { EXPORT_PAYOUT_REPORT, GET_ASTROLOGER_PAYOUT_HISTORY } from "@/app/graphQL/astroHiring";
 const GET_PAYOUT_REPORT = gql`
   query PayoutReport($fromDate: String!, $toDate: String!) {
     payoutReport(fromDate: $fromDate, toDate: $toDate) {
@@ -53,18 +53,45 @@ const GET_PAYOUT_REPORT = gql`
       tdsAmount
 
       lastPaidAmount
-totalPaid
+      totalPaid
       payableAmount
     }
   }
 `;
 export default function RazorpayPayouts() {
+  const [showRemarkModal, setShowRemarkModal] = useState(false);
+  const [remark, setRemark] = useState("");
+  const [pendingExport, setPendingExport] = useState(null);
+  const [exportLoading, setExportLoading] = useState(false);
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
   });
   const client = useApolloClient();
+  const [selectedAstrologer, setSelectedAstrologer] = useState(null);
+  const [showPayoutHistory, setShowPayoutHistory] = useState(false);
 
+  const [
+    getAstrologerPayoutHistory,
+    { data: payoutHistoryData, loading: payoutHistoryLoading },
+  ] = useLazyQuery(GET_ASTROLOGER_PAYOUT_HISTORY, {
+    fetchPolicy: "network-only",
+  });
+  const handleViewPayoutHistory = async (astrologer) => {
+    setSelectedAstrologer(astrologer);
+    setShowPayoutHistory(true);
+
+    await getAstrologerPayoutHistory({
+      variables: {
+        astrologerId: astrologer.astrologerId,
+      },
+    });
+  };
+  const openRemarkModal = (exportType) => {
+    setPendingExport(exportType);
+    setRemark("");
+    setShowRemarkModal(true);
+  };
   const [selectedRows, setSelectedRows] = useState([]);
 
   const toggleSelection = (id) => {
@@ -89,12 +116,17 @@ export default function RazorpayPayouts() {
   );
   const [exportPayoutReport] = useMutation(EXPORT_PAYOUT_REPORT);
   const getExportData = async () => {
-    const { data } = await exportPayoutReport({
-      variables: {
-        fromDate: new Date(filters.startDate).toISOString(),
-        toDate: new Date(`${filters.endDate}T23:59:59.999`).toISOString(),
-      },
-    });
+const { data } = await exportPayoutReport({
+  variables: {
+    fromDate: new Date(filters.startDate).toISOString(),
+
+    toDate: new Date(
+      `${filters.endDate}T23:59:59.999`
+    ).toISOString(),
+
+    remark: remark.trim(),
+  },
+});
     console.log("Mutation Response", data);
     return data.exportPayoutReport.map((x) => ({
       Astrologer: x.astrologerName,
@@ -335,17 +367,11 @@ export default function RazorpayPayouts() {
       header: "Deducted TDS",
       render: (r) => `₹${r.tdsAmount.toFixed(2)}`,
     },
-    
-    {
-      header: "Total Paid",
-      render: (r) => `₹${r.totalPaid.toFixed(2)}`,
-    },
 
-    {
-      header: "Last Payout",
-      render: (r) => `₹${r.lastPaidAmount.toFixed(2)}`,
-    },
-
+    // {
+    //   header: "Total Paid",
+    //   render: (r) => `₹${r.totalPaid.toFixed(2)}`,
+    // },
     {
       header: "Payable Amount",
 
@@ -355,49 +381,85 @@ export default function RazorpayPayouts() {
         </span>
       ),
     },
+
+    {
+      header: "Last Payout",
+      render: (r) => `₹${r.lastPaidAmount.toFixed(2)}`,
+    },
+    {
+      header: "Action",
+      render: (r) => (
+        <button
+          type="button"
+          title="View Payout History"
+          onClick={() => handleViewPayoutHistory(r)}
+          className="flex cursor-pointer hover:scale-105 items-center justify-center text-blue-600 hover:text-blue-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            height={20}
+            width={20}
+            viewBox="0 0 640 640"
+            fill="currentColor"
+          >
+            <path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z" />
+          </svg>
+        </button>
+      ),
+    },
   ];
-  const handleExcelExport = async () => {
-    const rows = await getExportData();
-
-    exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
-
-   await  handleMakePayment();
+  const handleExcelExport = () => {
+    openRemarkModal("excel");
   };
-  const handleCSVExport = async () => {
-    const rows = await getExportData();
 
-    exportCSV(rows, "PayoutReport");
-
-   await  handleMakePayment();
+  const handleCSVExport = () => {
+    openRemarkModal("csv");
   };
-  const handlePDFExport = async () => {
-    const rows = await getExportData();
 
-    exportPDF(rows, "Payout Report", "PayoutReport.pdf");
-
-   await  handleMakePayment();
+  const handlePDFExport = () => {
+    openRemarkModal("pdf");
   };
-  const handlePrintExport = async () => {
-    await getExportData();
 
-    printTable();
+  const submitExport = async () => {
+    if (!remark.trim()) {
+      alert("Please enter remark");
+      return;
+    }
 
-   await  handleMakePayment();
+    try {
+      setExportLoading(true);
+
+      const rows = await getExportData();
+
+      // Existing export logic
+      switch (pendingExport) {
+        case "excel":
+          exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
+          break;
+
+        case "csv":
+          exportCSV(rows, "PayoutReport");
+          break;
+
+        case "pdf":
+          exportPDF(rows, "Payout Report", "PayoutReport.pdf");
+          break;
+      }
+
+      // Existing logic
+      await handleMakePayment();
+
+      setShowRemarkModal(false);
+      setRemark("");
+      setPendingExport(null);
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Export failed");
+    } finally {
+      setExportLoading(false);
+    }
   };
-  const handleExportCurrent = async () => {
-    const rows = await getExportData();
 
-    exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
-
-   await  handleMakePayment();
-  };
-  const handleExportAll = async () => {
-    const rows = await getExportData();
-
-    exportExcel(rows, "Payout Report", "PayoutReport.xlsx");
-
-   await  handleMakePayment();
-  };
   return (
     <div className="p- space-y-6">
       <div className="flex justify-between items-center">
@@ -442,9 +504,9 @@ export default function RazorpayPayouts() {
 
           <button
             onClick={handleMakePayment}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-lg font-medium"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-full "
           >
-            Make Payment
+            Search
           </button>
 
           {searched && (
@@ -452,23 +514,20 @@ export default function RazorpayPayouts() {
               onExcel={handleExcelExport}
               onCSV={handleCSVExport}
               onPDF={handlePDFExport}
-              onPrint={handlePrintExport}
-              onExportCurrent={handleExportCurrent}
-              onExportAll={handleExportAll}
             />
           )}
         </div>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-400 shadow-sm overflow-hidden">
         {!searched ? (
           <div className="py-24 text-center text-gray-500">
             <h2 className="text-xl font-semibold mb-2">No Report</h2>
 
             <p>
               Select Start Date and End Date then click
-              <b> Make Payment</b>.
+              <b> Search button</b>.
             </p>
           </div>
         ) : loading ? (
@@ -543,6 +602,183 @@ export default function RazorpayPayouts() {
           </button>
         </div>
       </div> */}
+      {showPayoutHistory && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-7xl rounded-xl bg-white shadow-2xl">
+            {/* HEADER */}
+            <div className="flex items-center justify-between border-b px-6 py-4">
+              <div>
+                <h2 className="text-xl font-bold">
+                  {selectedAstrologer?.astrologerName}
+                </h2>
+
+                <p className="text-sm text-gray-500">
+                  ID: {selectedAstrologer?.astrologerId}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPayoutHistory(false);
+                  setSelectedAstrologer(null);
+                }}
+                className="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* BODY */}
+            <div className="max-h-[70vh] overflow-auto p-6">
+              {payoutHistoryLoading ? (
+                <div className="py-20 text-center">
+                  Loading payout history...
+                </div>
+              ) : payoutHistoryData?.getAstrologerPayoutHistory?.length ===
+                0 ? (
+                <div className="py-20 text-center text-gray-500">
+                  No payout history found.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[1200px] border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100 text-left text-sm">
+                        <th className="border p-3">#</th>
+                        <th className="border p-3">Remark</th>
+                        <th className="border p-3">Earning</th>
+                        <th className="border p-3">Deducted PG Charges</th>
+                        <th className="border p-3">Sub Total</th>
+                        <th className="border p-3">Deducted TDS</th>
+                        <th className="border p-3">Paid Amount</th>
+                        <th className="border p-3">Start Date</th>
+                        <th className="border p-3">End Date</th>
+                        <th className="border p-3">Paid On</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {payoutHistoryData?.getAstrologerPayoutHistory?.map(
+                        (payout, index) => (
+                          <tr key={payout.id} className="text-sm">
+                            <td className="border p-3">{index + 1}</td>
+
+                            <td className="border p-3">
+                              {payout.remark || "-"}
+                            </td>
+
+                            <td className="border p-3">
+                              ₹{Number(payout.earning || 0).toFixed(2)}
+                            </td>
+
+                            <td className="border p-3">
+                              ₹{Number(payout.pgCharge || 0).toFixed(2)}
+                            </td>
+
+                            <td className="border p-3">
+                              ₹{Number(payout.subTotal || 0).toFixed(2)}
+                            </td>
+
+                            <td className="border p-3">
+                              ₹{Number(payout.tdsAmount || 0).toFixed(2)}
+                            </td>
+
+                            <td className="border p-3">
+                              <span className="font-bold text-green-600">
+                                ₹{Number(payout.paidAmount || 0).toFixed(2)}
+                              </span>
+                            </td>
+
+                            <td className="border p-3">
+                              {payout.startDate
+                                ? new Date(
+                                    payout.startDate,
+                                  ).toLocaleDateString()
+                                : "-"}
+                            </td>
+
+                            <td className="border p-3">
+                              {payout.endDate
+                                ? new Date(payout.endDate).toLocaleDateString()
+                                : "-"}
+                            </td>
+
+                            <td className="border p-3">
+                              {payout.paidOn
+                                ? new Date(payout.paidOn).toLocaleString()
+                                : "-"}
+                            </td>
+                          </tr>
+                        ),
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {showRemarkModal && (
+  <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4">
+
+    <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+
+      <div className="border-b px-6 py-4">
+        <h2 className="text-lg font-bold">
+          Add Remark
+        </h2>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Please enter a remark before exporting the payout report.
+        </p>
+      </div>
+
+      <div className="p-6">
+
+        <label className="mb-2 block text-sm font-medium">
+          Remark
+        </label>
+
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          placeholder="Enter payout remark..."
+          rows={4}
+          className="w-full resize-none rounded-lg border border-gray-300 p-3 outline-none focus:border-indigo-500"
+        />
+
+        <div className="mt-5 flex justify-end gap-3">
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowRemarkModal(false);
+              setRemark("");
+              setPendingExport(null);
+            }}
+            disabled={exportLoading}
+            className="rounded-lg border border-gray-300 px-5 py-2 hover:bg-gray-100"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={submitExport}
+            disabled={exportLoading}
+            className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {exportLoading ? "Processing..." : "Submit"}
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

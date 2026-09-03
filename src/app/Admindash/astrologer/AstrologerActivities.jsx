@@ -392,6 +392,11 @@ export default function AstrologerActivities({ astrologerId }) {
         header: "Description",
         render: (row) => row.description || "-",
       },
+          {
+        header: "Wallet",
+        render: (row) => row.updatedBalance != null ? `₹${row.updatedBalance}` : "-",
+      },
+      
 
       {
         header: "Created At",
@@ -402,7 +407,7 @@ export default function AstrologerActivities({ astrologerId }) {
   );
 
   return (
-    <div className="p-4 rounded-2xl flex w-full flex-col gap-3 shadow-xl bg-white w-full">
+    <div className="p-4 rounded-2xl flex flex-col gap-3 shadow-xl bg-white w-full">
       <div className="flex items-center justify-between border-b border-gray-200 pb-2">
         <h2 className="font-semibold text-sm">Astrologer Activities</h2>
 

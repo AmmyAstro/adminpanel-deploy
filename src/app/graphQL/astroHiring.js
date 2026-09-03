@@ -590,6 +590,7 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS = gql`
       endDate: $endDate
     ) {
       totalCount
+      totalPages
       data {
         id
         sessionId
@@ -1116,9 +1117,27 @@ export const UPDATE_PROBLEM_STATUS = gql`
     }
   }
 `;
+export const GET_ASTROLOGER_PAYOUT_HISTORY = gql`
+  query GetAstrologerPayoutHistory($astrologerId: ID!) {
+    getAstrologerPayoutHistory(astrologerId: $astrologerId) {
+      id
+      astrologerId
+      astrologerName
+      remark
+      earning
+      pgCharge
+      subTotal
+      tdsAmount
+      paidAmount
+      startDate
+      endDate
+      paidOn
+    }
+  }
+`;
 export const EXPORT_PAYOUT_REPORT = gql`
-  mutation ExportPayoutReport($fromDate: String!, $toDate: String!) {
-    exportPayoutReport(fromDate: $fromDate, toDate: $toDate) {
+  mutation ExportPayoutReport($fromDate: String!, $toDate: String!,     $remark: String) {
+    exportPayoutReport(fromDate: $fromDate, toDate: $toDate, remark: $remark) {
       astrologerId
       astrologerName
       profilePic

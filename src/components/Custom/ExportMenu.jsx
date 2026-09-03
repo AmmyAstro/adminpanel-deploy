@@ -13,9 +13,7 @@ export default function ExportMenu({
   onExcel,
   onCSV,
   onPDF,
-  onPrint,
-  onExportCurrent,
-  onExportAll,
+
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -68,29 +66,7 @@ export default function ExportMenu({
             PDF
           </button>
 
-          <button
-            onClick={onPrint}
-            className="w-full px-4 py-2 text-[10px] hover:bg-gray-50 cursor-pointer flex items-center gap-3"
-          >
-            <Printer size={18} />
-            Print
-          </button>
-
-          <hr />
-
-          <button
-            onClick={onExportCurrent}
-            className="w-full px-4 py-2 text-[10px] hover:bg-gray-50 cursor-pointer text-left"
-          >
-            📤 Export Current Page
-          </button>
-
-          <button
-            onClick={onExportAll}
-            className="w-full px-4 py-2 text-[10px] cursor-pointer hover:bg-gray-50 text-left"
-          >
-            🌍 Export All Results
-          </button>
+      
         </div>
       )}
     </div>
