@@ -164,7 +164,7 @@ export default function RefundList() {
             </p>
 
             <p className="text-[10px] text-gray-500">
-              Staff ID: {row.requestedByStaffId || "-"}
+              ID: {row.requestedByStaffId?.slice(0,8) || "-"}
             </p>
           </div>
         ),
@@ -206,7 +206,7 @@ export default function RefundList() {
             </p>
 
             <p className="text-[10px] text-gray-500">
-              ID: {row.userId || "-"}
+              ID: {row.userId?.slice(0,8) || "-"}
             </p>
 
             {row.userMobile && (
@@ -230,7 +230,7 @@ export default function RefundList() {
             </p>
 
             <p className="text-[10px] text-gray-500">
-              ID: {row.astrologerId || "-"}
+              ID: {row.astrologerId?.slice(0,8) || "-"}
             </p>
           </div>
         ),
@@ -394,59 +394,65 @@ export default function RefundList() {
       // ACTION
       // --------------------------------
 
-      {
-        header: "Action",
-        accessor: "action",
-        width: "150px",
+    {
+  header: "Action",
+  accessor: "action",
+  width: "150px",
 
-        render: (row) => {
-          if (row.status === "APPROVED") {
-            return (
-              <span className="font-semibold text-green-600">
-                Completed
-              </span>
-            );
-          }
+  headerClassName:
+    "sticky right-0 z-30 bg-purple-400 shadow-[-4px_0_8px_rgba(0,0,0,0.08)]",
 
-          if (row.status === "REJECTED") {
-            return (
-              <div>
-                <span className="font-semibold text-red-600">
-                  Rejected
-                </span>
+  cellClassName:
+    "sticky right-0 z-20 bg-white shadow-[-4px_0_8px_rgba(0,0,0,0.08)]",
 
-                {row.rejectionReason && (
-                  <p className="mt-1 text-[10px] text-gray-500">
-                    {row.rejectionReason}
-                  </p>
-                )}
-              </div>
-            );
-          }
+  render: (row) => {
+    if (row.status === "APPROVED") {
+      return (
+        <span className="font-semibold text-green-600">
+          Completed
+        </span>
+      );
+    }
 
-          return (
-            <div className="flex flex-col items-center gap-2">
-              <button
-                type="button"
-                disabled={approving || rejecting}
-                onClick={() => handleApprove(row)}
-                className="w-[75px] rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {approving ? "..." : "Approve"}
-              </button>
+    if (row.status === "REJECTED") {
+      return (
+        <div>
+          <span className="font-semibold text-red-600">
+            Rejected
+          </span>
 
-              <button
-                type="button"
-                disabled={approving || rejecting}
-                onClick={() => handleRejectClick(row)}
-                className="w-[75px] rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Reject
-              </button>
-            </div>
-          );
-        },
-      },
+          {row.rejectionReason && (
+            <p className="mt-1 text-[10px] text-gray-500">
+              {row.rejectionReason}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center justify-center gap-2">
+        <button
+          type="button"
+          disabled={approving || rejecting}
+          onClick={() => handleApprove(row)}
+          className="rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {approving ? "..." : "Approve"}
+        </button>
+
+        <button
+          type="button"
+          disabled={approving || rejecting}
+          onClick={() => handleRejectClick(row)}
+          className="rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Reject
+        </button>
+      </div>
+    );
+  },
+},
     ],
     [approving, rejecting]
   );
@@ -522,7 +528,7 @@ export default function RefundList() {
             No refund requests found.
           </div>
         ) : (
-          <div className="min-w-[1900px]">
+          <div className="min-w-[2100px]">
             <DataTable
               columns={columns}
               data={refundList}

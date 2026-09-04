@@ -15,21 +15,21 @@ export default function SessionDurationModal({
   const [error, setError] = useState("");
 
   const durationSec = Number(session?.durationSec || 0);
-  const [createRefundRequest] = useMutation(
-  CREATE_REFUND_REQUEST
-);
-  // Example:
-  // 150 sec => max 2 min
-  // 460 sec => max 7 min
-  const maxMinutes = Math.floor(durationSec / 60);
+
+  const maxMinutes =
+    durationSec >= 30 ? Math.floor((durationSec + 30) / 60) : 0;
+  const [createRefundRequest] = useMutation(CREATE_REFUND_REQUEST);
 
   useEffect(() => {
     if (open) {
-      setMinutes("");
+      const calculatedMinutes =
+        durationSec >= 30 ? Math.floor((durationSec + 30) / 60) : 0;
+
+      setMinutes(calculatedMinutes > 0 ? String(calculatedMinutes) : "");
       setRemark("");
       setError("");
     }
-  }, [open]);
+  }, [open, durationSec]);
 
   if (!open) return null;
 
@@ -66,27 +66,40 @@ export default function SessionDurationModal({
 
   const calculatedAmount = ratePerMin * enteredMinutes;
 
-  const handleSubmit = async () => {
-    const enteredMinutes = Number(minutes);
+const handleSubmit = async () => {
+  const enteredMinutes = Number(minutes);
 
-    if (!minutes) {
-      setError("Please enter duration.");
-      return;
-    }
+  if (!minutes) {
+    setError("Please enter duration.");
+    return;
+  }
 
-    if (enteredMinutes < 1) {
-      setError("Duration must be at least 1 minute.");
-      return;
-    }
+  if (enteredMinutes < 1) {
+    setError("Duration must be at least 1 minute.");
+    return;
+  }
 
-    if (enteredMinutes > maxMinutes) {
-      setError(
-        `Duration cannot be more than ${maxMinutes} minute${
-          maxMinutes !== 1 ? "s" : ""
-        }.`,
-      );
-      return;
-    }
+  if (enteredMinutes > maxMinutes) {
+    setError(
+      `Duration cannot be more than ${maxMinutes} minute${
+        maxMinutes !== 1 ? "s" : ""
+      }.`,
+    );
+    return;
+  }
+
+  try {
+    await createRefundRequest({
+      variables: {
+        input: {
+          sessionId: session.sessionId,
+          refundDuration: enteredMinutes,
+          refundReason: remark.trim(),
+          refundType: "Complete",
+          mode: "Chat",
+        },
+      },
+    });
 
     onSubmit({
       sessionId: session?.sessionId,
@@ -96,29 +109,14 @@ export default function SessionDurationModal({
     });
 
     onClose();
-      try {
-  await createRefundRequest({
-  variables: {
-    input: {
-      sessionId: session.sessionId,
-      refundDuration: Number(minutes),
-      refundReason: remark,
-      refundType: "Complete",
-      mode: "Chat",
-    },
-  },
-});
-
-    onClose();
-
-    // optional toast
   } catch (error) {
     console.error(error);
+
     setError(
       error?.message || "Failed to create refund request"
     );
   }
-  };
+};
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4">
