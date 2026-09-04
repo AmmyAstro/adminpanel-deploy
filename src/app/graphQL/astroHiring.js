@@ -1177,3 +1177,125 @@ export const EXPORT_PAYOUT_REPORT = gql`
     }
   }
 `;
+
+export const GET_REFUND_REQUESTS = gql`
+  query GetRefundRequests(
+    $searchInput: RefundRequestSearchInput
+  ) {
+    getRefundRequests(
+      searchInput: $searchInput
+    ) {
+      totalCount
+      currentPage
+      totalPages
+
+      data {
+        id
+
+        sessionId
+
+        userId
+        userName
+        userMobile
+
+        astrologerId
+        astrologerName
+
+        transactionId
+        orderId
+
+        sessionDuration
+        ratePerMin
+
+        refundDuration
+        refundAmount
+
+        refundType
+        mode
+        refundReason
+
+        requestedByStaffId
+        requestedByStaffName
+
+        status
+
+        approvedByStaffId
+        approvedByStaffName
+        approvedAt
+
+        rejectedByStaffId
+        rejectedByStaffName
+        rejectedAt
+        rejectionReason
+
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+export const CREATE_REFUND_REQUEST = gql`
+  mutation CreateRefundRequest(
+    $input: CreateRefundRequestInput!
+  ) {
+    createRefundRequest(
+      input: $input
+    ) {
+      id
+      status
+
+      sessionId
+
+      refundDuration
+      refundAmount
+      refundReason
+
+      requestedByStaffId
+      requestedByStaffName
+
+      createdAt
+    }
+  }
+`;
+
+export const APPROVE_REFUND_REQUEST = gql`
+  mutation ApproveRefundRequest(
+    $id: ID!
+  ) {
+    approveRefundRequest(
+      id: $id
+    ) {
+      id
+      status
+
+      approvedByStaffId
+      approvedByStaffName
+      approvedAt
+
+      refundDuration
+      refundAmount
+    }
+  }
+`;
+
+export const REJECT_REFUND_REQUEST = gql`
+  mutation RejectRefundRequest(
+    $id: ID!
+    $reason: String!
+  ) {
+    rejectRefundRequest(
+      id: $id
+      reason: $reason
+    ) {
+      id
+      status
+
+      rejectedByStaffId
+      rejectedByStaffName
+      rejectedAt
+
+      rejectionReason
+    }
+  }
+`;

@@ -12,6 +12,7 @@ import SessionRemedyModal from "../SessionRemedyModal";
 import ExportMenu from "@/components/Custom/ExportMenu";
 import { exportExcel } from "@/components/utils/export/exportExcel";
 import { exportPDF } from "@/components/utils/export/exportPDF";
+import SessionDurationModal from "../SessionDurationModal";
 export default function UserChatHistoryPage() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -20,6 +21,7 @@ export default function UserChatHistoryPage() {
   const [searchAstrologerName, setSearchAstrologerName] = useState("");
   const [openRemedyModal, setOpenRemedyModal] = useState(false);
   const [searchType, setSearchType] = useState("");
+  const [openDurationModal, setOpenDurationModal] = useState(false);
 
   const [searchStatus, setSearchStatus] = useState("");
 
@@ -110,7 +112,22 @@ export default function UserChatHistoryPage() {
     },
     fetchPolicy: "network-only",
   });
+const handleDurationSubmit = (payload) => {
+  console.log("Duration adjustment:", payload);
 
+  /*
+    payload:
+
+    {
+      sessionId: "...",
+      durationMinutes: 2,
+      durationSeconds: 120,
+      remark: "Customer disconnected..."
+    }
+
+    Yahan baad mein tumhari GraphQL mutation call hogi.
+  */
+};
   const history = data?.getUsersChatHistory?.data || [];
 
   const totalCount = data?.getUsersChatHistory?.totalCount || 0;
@@ -319,14 +336,36 @@ export default function UserChatHistoryPage() {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                height={20}
-                width={20}
+                height={18}
+                width={18}
                 viewBox="0 0 640 640"
               >
                 {" "}
                 <path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z" />{" "}
               </svg>
             </button>
+        {row.durationSec >= 30 && (
+  <button
+    title="Adjust Duration"
+    onClick={() => {
+      setSelectedSession(row);
+      setOpenDurationModal(true);
+    }}
+    className="flex cursor-pointer hover:scale-104 items-center justify-center text-blue-600 hover:text-blue-800"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height={18}
+      width={18}
+      viewBox="0 0 640 640"
+    >
+      <path
+        fill="rgb(30, 48, 80)"
+        d="M160 128C160 110.3 174.3 96 192 96L456 96C469.3 96 480 106.7 480 120C480 133.3 469.3 144 456 144L379.3 144C397 163.8 409.4 188.6 414 216L456 216C469.3 216 480 226.7 480 240C480 253.3 469.3 264 456 264L414 264C403.6 326.2 353.2 374.9 290.2 382.9L434.6 486C449 496.3 452.3 516.3 442 530.6C431.7 544.9 411.7 548.3 397.4 538L173.4 378C162.1 370 157.3 355.5 161.5 342.2C165.7 328.9 178.1 320 192 320L272 320C307.8 320 338.1 296.5 348.3 264L184 264C170.7 264 160 253.3 160 240C160 226.7 170.7 216 184 216L348.3 216C338.1 183.5 307.8 160 272 160L192 160C174.3 160 160 145.7 160 128z"
+      />
+    </svg>
+  </button>
+)}
 
             {row.hasRemedy && (
               <button
@@ -482,6 +521,15 @@ export default function UserChatHistoryPage() {
         onClose={() => setOpenModal(false)}
         sessionId={selectedSession}
       />
+      <SessionDurationModal
+  open={openDurationModal}
+  onClose={() => {
+    setOpenDurationModal(false);
+    setSelectedSession(null);
+  }}
+  session={selectedSession}
+  onSubmit={handleDurationSubmit}
+/>
       <SessionRemedyModal
         open={openRemedyModal}
         onClose={() => setOpenRemedyModal(false)}
