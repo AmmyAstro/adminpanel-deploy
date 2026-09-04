@@ -6,7 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import DataTable from "@/components/utils/DataTable";
 import SessionMessagesModal from "../SessionModal";
-import { GET_USERS_CHAT_HISTORY } from "@/app/graphQL/astroHiring";
+import {
+  GET_REFUND_REQUESTS,
+  GET_USERS_CHAT_HISTORY,
+} from "@/app/graphQL/astroHiring";
 import Link from "next/link";
 import SessionRemedyModal from "../SessionRemedyModal";
 import ExportMenu from "@/components/Custom/ExportMenu";
@@ -22,8 +25,7 @@ export default function UserChatHistoryPage() {
   const [openRemedyModal, setOpenRemedyModal] = useState(false);
   const [searchType, setSearchType] = useState("");
   const [openDurationModal, setOpenDurationModal] = useState(false);
-const [refundedSessions, setRefundedSessions] = useState(new Set());
-const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [searchStatus, setSearchStatus] = useState("");
 
   const [searchFilterType, setSearchFilterType] = useState("");
@@ -46,7 +48,30 @@ const [showSuccessToast, setShowSuccessToast] = useState(false);
     startDate: "",
     endDate: "",
   });
+  const { data: refundData, refetch: refetchRefunds } = useQuery(
+    GET_REFUND_REQUESTS,
+    {
+      variables: {
+        searchInput: {
+          page: 1,
+          limit: 1000,
+        },
+      },
+      fetchPolicy: "network-only",
+      pollInterval: 50000,
+    },
+  );
+  const refundStatusMap = useMemo(() => {
+    const map = new Map();
 
+    const refunds = refundData?.getRefundRequests?.data || [];
+
+    refunds.forEach((refund) => {
+      map.set(refund.sessionId, refund.status);
+    });
+
+    return map;
+  }, [refundData]);
   // DEBOUNCE SEARCH
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -113,24 +138,17 @@ const [showSuccessToast, setShowSuccessToast] = useState(false);
     },
     fetchPolicy: "network-only",
   });
-const handleDurationSubmit = (payload) => {
-  console.log("Refund successfully created:", payload);
+  const handleDurationSubmit = async (payload) => {
+    console.log("Refund successfully created:", payload);
 
-  // Is session ko refunded mark karo
-  setRefundedSessions((prev) => {
-    const updated = new Set(prev);
-    updated.add(payload.sessionId);
-    return updated;
-  });
+    setShowSuccessToast(true);
 
-  // Success toast
-  setShowSuccessToast(true);
+    setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 3000);
 
-  // 3 sec baad toast hide
-  setTimeout(() => {
-    setShowSuccessToast(false);
-  }, 3000);
-};
+    await refetchRefunds();
+  };
   const history = data?.getUsersChatHistory?.data || [];
 
   const totalCount = data?.getUsersChatHistory?.totalCount || 0;
@@ -327,95 +345,138 @@ const handleDurationSubmit = (payload) => {
       },
       {
         header: "Actions",
-        render: (row) => (
-          <div className="flex items-center justify-center gap-2">
-            <button
-              title="View Chat"
-              onClick={() => {
-                setSelectedSession(row.sessionId);
-                setOpenModal(true);
-              }}
-              className="flex cursor-pointer hover:scale-104 items-center justify-center text-blue-600 hover:text-blue-800"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height={18}
-                width={18}
-                viewBox="0 0 640 640"
-              >
-                {" "}
-                <path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z" />{" "}
-              </svg>
-            </button>
-   {row.durationSec >= 30 && (
-  <button
-    title={
-      refundedSessions.has(row.sessionId)
-        ? "Refund request created"
-        : "Refund"
-    }
-    disabled={refundedSessions.has(row.sessionId)}
-    onClick={() => {
-      if (refundedSessions.has(row.sessionId)) return;
+        render: (row) => {
+          const refundStatus = refundStatusMap
+            .get(row.sessionId)
+            ?.toUpperCase();
 
-      setSelectedSession(row);
-      setOpenDurationModal(true);
-    }}
-    className={`flex items-center justify-center ${
-      refundedSessions.has(row.sessionId)
-        ? "cursor-default text-gray-500"
-        : "cursor-pointer text-blue-600 hover:scale-104 hover:text-blue-800"
-    }`}
-  >
-    {refundedSessions.has(row.sessionId) ? (
-      // SUCCESS / REFUNDED SVG
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 640 640"
-        height={18}
-        width={18}
-      >
-        <path
-          fill="rgb(30, 48, 80)"
-          d="M160 64C142.3 64 128 78.3 128 96C128 113.7 142.3 128 160 128L160 139C160 181.4 176.9 222.1 206.9 252.1L274.8 320L206.9 387.9C176.9 417.9 160 458.6 160 501L160 512C142.3 512 128 526.3 128 544C128 561.7 142.3 576 160 576L480 576C497.7 576 512 561.7 512 544C512 526.3 497.7 512 480 512L480 501C480 458.6 463.1 417.9 433.1 387.9L365.2 320L433.1 252.1C463.1 222.1 480 181.4 480 139L480 128C497.7 128 512 113.7 512 96C512 78.3 497.7 64 480 64L160 64zM224 139L224 128L416 128L416 139C416 158 410.4 176.4 400 192L240 192C229.7 176.4 224 158 224 139zM240 448C243.5 442.7 247.6 437.7 252.1 448L400 448C392.5 437.7 387.9 433.1 387.9 433.1L320 365.2L252.1 433.1C247.6 437.7 243.5 442.7 240 448z"
-        />
-      </svg>
-    ) : (
-      // ORIGINAL REFUND SVG
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        height={18}
-        width={18}
-        viewBox="0 0 640 640"
-      >
-        <path
-          fill="rgb(30, 48, 80)"
-          d="M160 128C160 110.3 174.3 96 192 96L456 96C469.3 96 480 106.7 480 120C480 133.3 469.3 144 456 144L379.3 144C397 163.8 409.4 188.6 414 216L456 216C469.3 216 480 226.7 480 240C480 253.3 469.3 264 456 264L414 264C403.6 326.2 353.2 374.9 290.2 382.9L434.6 486C449 496.3 452.3 516.3 442 530.6C431.7 544.9 411.7 548.3 397.4 538L173.4 378C162.1 370 157.3 355.5 161.5 342.2C165.7 328.9 178.1 320 192 320L272 320C307.8 320 338.1 296.5 348.3 264L184 264C170.7 264 160 253.3 160 240C160 226.7 170.7 216 184 216L348.3 216C338.1 183.5 307.8 160 272 160L192 160C174.3 160 160 145.7 160 128z"
-        />
-      </svg>
-    )}
-  </button>
-)}
-
-            {row.hasRemedy && (
+          return (
+            <div className="flex items-center gap-3">
+              {/* 👁 VIEW CHAT */}
               <button
-                title="View Remedy"
+                type="button"
+                title="View Chat"
                 onClick={() => {
                   setSelectedSession(row.sessionId);
-                  setOpenRemedyModal(true);
+                  setOpenModal(true);
                 }}
-                className="flex hover:scale-104 cursor-pointer items-center justify-center text-green-600 hover:text-green-800"
+                className="text-black hover:text-purple-600 transition"
               >
-                <svg height={20} width={20} viewBox="0 0 640 640">
-                  <path d="M311.6 95C297.5 75.5 274.9 64 250.9 64C209.5 64 176 97.5 176 138.9L176 141.3C176 205.7 258 274.7 298.2 304.6C311.2 314.3 328.7 314.3 341.7 304.6C381.9 274.6 463.9 205.7 463.9 141.3L463.9 138.9C463.9 97.5 430.4 64 389 64C365 64 342.4 75.5 328.3 95L320 106.7L311.6 95zM141.3 405.5L98.7 448L64 448C46.3 448 32 462.3 32 480L32 544C32 561.7 46.3 576 64 576L384.5 576C413.5 576 441.8 566.7 465.2 549.5L591.8 456.2C609.6 443.1 613.4 418.1 600.3 400.3C587.2 382.5 562.2 378.7 544.4 391.8L424.6 480L312 480C298.7 480 288 469.3 288 456C288 442.7 298.7 432 312 432L384 432C401.7 432 416 417.7 416 400C416 382.3 401.7 368 384 368L231.8 368C197.9 368 165.3 381.5 141.3 405.5z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                 </svg>
               </button>
-            )}
-          </div>
-        ),
+
+              {/* ⏳ PENDING */}
+              {refundStatus === "PENDING" && (
+                <button
+                  type="button"
+                  disabled
+                  title="Refund request pending"
+                  className="cursor-not-allowed opacity-70"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 640 640"
+                    width="18"
+                    height="18"
+                  >
+                    <path
+                      fill="rgb(30, 48, 80)"
+                      d="M160 64C142.3 64 128 78.3 128 96C128 113.7 142.3 128 160 128L160 139C160 181.4 176.9 222.1 206.9 252.1L274.8 320L206.9 387.9C176.9 417.9 160 458.6 160 501L160 512C142.3 512 128 526.3 128 544C128 561.7 142.3 576 160 576L480 576C497.7 576 512 561.7 512 544C512 526.3 497.7 512 480 512L480 501C480 458.6 463.1 417.9 433.1 387.9L365.2 320L433.1 252.1C463.1 222.1 480 181.4 480 139L480 128C497.7 128 512 113.7 512 96C512 78.3 497.7 64 480 64L160 64zM224 139L224 128L416 128L416 139C416 158 410.4 176.4 400 192L240 192C229.7 176.4 224 158 224 139zM240 448C243.5 442.7 247.6 437.7 252.1 448L400 448C392.5 437.7 387.9 433.1 387.9 448L320 365.2L252.1 433.1C247.6 437.7 243.5 442.1 240 448z"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {/* ✅ APPROVED */}
+              {refundStatus === "APPROVED" && (
+                <button
+                  type="button"
+                  disabled
+                  title="Refund approved"
+                  className="cursor-not-allowed opacity-80"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="9" fill="#22c55e" />
+                    <path
+                      d="M8 12.5L10.5 15L16 9.5"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {/* ❌ REJECTED */}
+              {refundStatus === "REJECTED" && (
+                <button
+                  type="button"
+                  title="Refund rejected - request again"
+                  onClick={() => {
+                    setSelectedSession(row);
+                    setOpenDurationModal(true);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                   width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="9" fill="#ef4444" />
+                    <path
+                      d="M9 9L15 15M15 9L9 15"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {/* 💰 NO REFUND REQUEST */}
+              {!refundStatus && (
+                <button
+                  type="button"
+                  title="Request refund"
+                  onClick={() => {
+                    setSelectedSession(row);
+                    setOpenDurationModal(true);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 3a9 9 0 1 0 8.49 12H18.3a7 7 0 1 1-1.95-7.05L14 10.3h7V3.3l-2.25 2.25A8.96 8.96 0 0 0 12 3Z" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [setSelectedSession, setOpenModal],
+    [refundStatusMap],
   );
 
   if (error) {
@@ -536,14 +597,14 @@ const handleDurationSubmit = (payload) => {
           />
         )}
 
-          <ExportMenu
-        onExcel={handleExcelExport}
-        onPDF={handlePDFExport}
-        onCSV={() => {}}
-        onPrint={() => {}}
-        onExportCurrent={handleExcelExport}
-        onExportAll={() => {}}
-      />
+        <ExportMenu
+          onExcel={handleExcelExport}
+          onPDF={handlePDFExport}
+          onCSV={() => {}}
+          onPrint={() => {}}
+          onExportCurrent={handleExcelExport}
+          onExportAll={() => {}}
+        />
       </div>
 
       <SessionMessagesModal
@@ -552,20 +613,19 @@ const handleDurationSubmit = (payload) => {
         sessionId={selectedSession}
       />
       <SessionDurationModal
-  open={openDurationModal}
-  onClose={() => {
-    setOpenDurationModal(false);
-    setSelectedSession(null);
-  }}
-  session={selectedSession}
-  onSubmit={handleDurationSubmit}
-/>
+        open={openDurationModal}
+        onClose={() => {
+          setOpenDurationModal(false);
+          setSelectedSession(null);
+        }}
+        session={selectedSession}
+        onSubmit={handleDurationSubmit}
+      />
       <SessionRemedyModal
         open={openRemedyModal}
         onClose={() => setOpenRemedyModal(false)}
         sessionId={selectedSession}
       />
-    
 
       {/* TABLE */}
       <div className="overflow-x-auto">
