@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import DataTable from "@/components/utils/DataTable";
 import {
   GET_CALL_RECORDING,
+  GET_REFUND_REQUESTS,
   GET_USER_CALL_HISTORY,
 } from "@/app/graphQL/astroHiring";
 import Link from "next/link";
@@ -14,12 +15,14 @@ import SessionRemedyModal from "../SessionRemedyModal";
 import ExportMenu from "@/components/Custom/ExportMenu";
 import { exportExcel } from "@/components/utils/export/exportExcel";
 import { exportPDF } from "@/components/utils/export/exportPDF";
+import SessionDurationModal from "../SessionDurationModal";
 
 export default function UserCallHistoryPage() {
   // SEARCH STATES
   const [searchName, setSearchName] = useState("");
   const [selectedSession, setSelectedSession] = useState(null);
-
+const [openDurationModal, setOpenDurationModal] = useState(false);
+const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [searchMobile, setSearchMobile] = useState("");
 
   const [searchAstrologerName, setSearchAstrologerName] = useState("");
@@ -104,7 +107,30 @@ export default function UserCallHistoryPage() {
 
     searchInput.endDate = filters.endDate;
   }
+const { data: refundData, refetch: refetchRefunds } = useQuery(
+  GET_REFUND_REQUESTS,
+  {
+    variables: {
+      searchInput: {
+        page: 1,
+        limit: 1000,
+      },
+    },
+    fetchPolicy: "network-only",
+    pollInterval: 5000,
+  },
+);
+const refundStatusMap = useMemo(() => {
+  const map = new Map();
 
+  const refunds = refundData?.getRefundRequests?.data || [];
+
+  refunds.forEach((refund) => {
+    map.set(refund.sessionId, refund.status);
+  });
+
+  return map;
+}, [refundData]);
   // API CALL
   const { data, loading, error } = useQuery(GET_USER_CALL_HISTORY, {
     variables: {
@@ -142,6 +168,18 @@ export default function UserCallHistoryPage() {
       alert("Unable to download recording");
     }
   };
+
+  const handleDurationSubmit = async (payload) => {
+  console.log("Refund successfully created:", payload);
+
+  setShowSuccessToast(true);
+
+  setTimeout(() => {
+    setShowSuccessToast(false);
+  }, 3000);
+
+  await refetchRefunds();
+};
 
   const history = data?.getUserCallHistory?.data || [];
 
@@ -372,50 +410,153 @@ export default function UserCallHistoryPage() {
     );
   },
 },
-      {
-        header: "Actions",
-        render: (row) => (
-          <div className="flex items-center justify-center gap-2">
-            <button
-              title="Call Details"
-              onClick={() => handleDownloadRecording(row.sessionId)}
-              className="flex cursor-pointer hover:scale-104 items-center justify-center text-orange-600 hover:text-orange-800"
-            >
-              <svg height={20} width={20} viewBox="0 0 640 640">
-                <path d="M352 96C352 78.3 337.7 64 320 64C302.3 64 288 78.3 288 96L288 306.7L246.6 265.3C234.1 252.8 213.8 252.8 201.3 265.3C188.8 277.8 188.8 298.1 201.3 310.6L297.3 406.6C309.8 419.1 330.1 419.1 342.6 406.6L438.6 310.6C451.1 298.1 451.1 277.8 438.6 265.3C426.1 252.8 405.8 252.8 393.3 265.3L352 306.7L352 96zM160 384C124.7 384 96 412.7 96 448L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 448C544 412.7 515.3 384 480 384L433.1 384L376.5 440.6C345.3 471.8 294.6 471.8 263.4 440.6L206.9 384L160 384zM464 440C477.3 440 488 450.7 488 464C488 477.3 477.3 488 464 488C450.7 488 440 477.3 440 464C440 450.7 450.7 440 464 440z" />
-              </svg>
-            </button>
-                {row.durationSec >= 30 &&(
-               <button
-              title="Refund"
-              onClick={() => {
-                setSelectedSession(row.sessionId);
-                setOpenModal(true);
-              }}
-              className="flex cursor-pointer hover:scale-104 items-center justify-center text-blue-600 hover:text-blue-800"
-            >
-           <svg xmlns="http://www.w3.org/2000/svg"   height={18}
-                width={18} viewBox="0 0 640 640"><path fill="rgb(30, 48, 80)" d="M160 128C160 110.3 174.3 96 192 96L456 96C469.3 96 480 106.7 480 120C480 133.3 469.3 144 456 144L379.3 144C397 163.8 409.4 188.6 414 216L456 216C469.3 216 480 226.7 480 240C480 253.3 469.3 264 456 264L414 264C403.6 326.2 353.2 374.9 290.2 382.9L434.6 486C449 496.3 452.3 516.3 442 530.6C431.7 544.9 411.7 548.3 397.4 538L173.4 378C162.1 370 157.3 355.5 161.5 342.2C165.7 328.9 178.1 320 192 320L272 320C307.8 320 338.1 296.5 348.3 264L184 264C170.7 264 160 253.3 160 240C160 226.7 170.7 216 184 216L348.3 216C338.1 183.5 307.8 160 272 160L192 160C174.3 160 160 145.7 160 128z"/></svg>
-            </button>)}
+     {
+  header: "Actions",
+  render: (row) => {
+    const refundStatus = refundStatusMap
+      .get(row.sessionId)
+      ?.toUpperCase();
 
-               {row.hasRemedy && (
-              <button
-                title="View Remedy"
-                onClick={() => {
-                  setSelectedSession(row.sessionId);
-                  setOpenRemedyModal(true);
-                }}
-                className="flex hover:scale-104 cursor-pointer items-center justify-center text-green-600 hover:text-green-800"
-              >
-                <svg height={20} width={20} viewBox="0 0 640 640">
-                  <path d="M311.6 95C297.5 75.5 274.9 64 250.9 64C209.5 64 176 97.5 176 138.9L176 141.3C176 205.7 258 274.7 298.2 304.6C311.2 314.3 328.7 314.3 341.7 304.6C381.9 274.6 463.9 205.7 463.9 141.3L463.9 138.9C463.9 97.5 430.4 64 389 64C365 64 342.4 75.5 328.3 95L320 106.7L311.6 95zM141.3 405.5L98.7 448L64 448C46.3 448 32 462.3 32 480L32 544C32 561.7 46.3 576 64 576L384.5 576C413.5 576 441.8 566.7 465.2 549.5L591.8 456.2C609.6 443.1 613.4 418.1 600.3 400.3C587.2 382.5 562.2 378.7 544.4 391.8L424.6 480L312 480C298.7 480 288 469.3 288 456C288 442.7 298.7 432 312 432L384 432C401.7 432 416 417.7 416 400C416 382.3 401.7 368 384 368L231.8 368C197.9 368 165.3 381.5 141.3 405.5z" />
-                </svg>
-              </button>
-            )}
+    return (
+      <div className="flex items-center justify-center gap-3">
 
-          </div>
-        ),
-      },
+        {/* DOWNLOAD CALL RECORDING */}
+        <button
+          type="button"
+          title="Call Details"
+          onClick={() => handleDownloadRecording(row.sessionId)}
+          className="flex cursor-pointer hover:scale-105 items-center justify-center text-orange-600 hover:text-orange-800"
+        >
+          <svg
+            height={20}
+            width={20}
+            viewBox="0 0 640 640"
+          >
+            <path d="M352 96C352 78.3 337.7 64 320 64C302.3 64 288 78.3 288 96L288 306.7L246.6 265.3C234.1 252.8 213.8 252.8 201.3 265.3C188.8 277.8 188.8 298.1 201.3 310.6L297.3 406.6C309.8 419.1 330.1 419.1 342.6 406.6L438.6 310.6C451.1 298.1 451.1 277.8 438.6 265.3C426.1 252.8 405.8 252.8 393.3 265.3L352 306.7L352 96zM160 384C124.7 384 96 412.7 96 448L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 448C544 412.7 515.3 384 480 384L433.1 384L376.5 440.6C345.3 471.8 294.6 471.8 263.4 440.6L206.9 384L160 384zM464 440C477.3 440 488 450.7 488 464C488 477.3 477.3 488 464 488C450.7 488 440 477.3 440 464C440 450.7 450.7 440 464 440z" />
+          </svg>
+        </button>
+
+        {/* REFUND - PENDING */}
+        {refundStatus === "PENDING" && (
+          <button
+            type="button"
+            disabled
+            title="Refund request pending"
+            className="cursor-not-allowed opacity-70"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 640 640"
+              width="18"
+              height="18"
+            >
+              <path
+                fill="rgb(30, 48, 80)"
+                d="M160 64C142.3 64 128 78.3 128 96C128 113.7 142.3 128 160 128L160 139C160 181.4 176.9 222.1 206.9 252.1L274.8 320L206.9 387.9C176.9 417.9 160 458.6 160 501L160 512C142.3 512 128 526.3 128 544C128 561.7 142.3 576 160 576L480 576C497.7 576 512 561.7 512 544C512 526.3 497.7 512 480 512L480 501C480 458.6 463.1 417.9 433.1 387.9L365.2 320L433.1 252.1C463.1 222.1 480 181.4 480 139L480 128C497.7 128 512 113.7 512 96C512 78.3 497.7 64 480 64L160 64zM224 139L224 128L416 128L416 139C416 158 410.4 176.4 400 192L240 192C229.7 176.4 224 158 224 139zM240 448C243.5 442.7 247.6 437.7 252.1 448L400 448C392.5 437.7 387.9 433.1 387.9 448L320 365.2L252.1 433.1C247.6 437.7 243.5 442.1 240 448z"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* REFUND - APPROVED */}
+        {refundStatus === "APPROVED" && (
+          <button
+            type="button"
+            disabled
+            title="Refund approved"
+            className="cursor-not-allowed opacity-80"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="9" fill="#22c55e" />
+              <path
+                d="M8 12.5L10.5 15L16 9.5"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* REFUND - REJECTED */}
+        {refundStatus === "REJECTED" && (
+          <button
+            type="button"
+            title="Refund rejected - request again"
+            onClick={() => {
+              setSelectedSession(row);
+              setOpenDurationModal(true);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="9" fill="#ef4444" />
+              <path
+                d="M9 9L15 15M15 9L9 15"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* NO REFUND REQUEST */}
+        {!refundStatus && Number(row.durationSec || 0) >= 30 && (
+          <button
+            type="button"
+            title="Request refund"
+            onClick={() => {
+              setSelectedSession(row);
+              setOpenDurationModal(true);
+            }}
+            className="flex cursor-pointer hover:scale-105 items-center justify-center text-blue-600 hover:text-blue-800"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height={18}
+              width={18}
+              viewBox="0 0 640 640"
+            >
+              <path
+                fill="rgb(30, 48, 80)"
+                d="M160 128C160 110.3 174.3 96 192 96L456 96C469.3 96 480 106.7 480 120C480 133.3 469.3 144 456 144L379.3 144C397 163.8 409.4 188.6 414 216L456 216C469.3 216 480 226.7 480 240C480 253.3 469.3 264 456 264L414 264C403.6 326.2 353.2 374.9 290.2 382.9L434.6 486C449 496.3 452.3 516.3 442 530.6C431.7 544.9 411.7 548.3 397.4 538L173.4 378C162.1 370 157.3 355.5 161.5 342.2C165.7 328.9 178.1 320 192 320L272 320C307.8 320 338.1 296.5 348.3 264L184 264C170.7 264 160 253.3 160 240C160 226.7 170.7 216 184 216L348.3 216C338.1 183.5 307.8 160 272 160L192 160C174.3 160 160 145.7 160 128z"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* VIEW REMEDY */}
+        {row.hasRemedy && (
+          <button
+            title="View Remedy"
+            onClick={() => {
+              setSelectedSession(row.sessionId);
+              setOpenRemedyModal(true);
+            }}
+            className="flex hover:scale-105 cursor-pointer items-center justify-center text-green-600 hover:text-green-800"
+          >
+            <svg height={20} width={20} viewBox="0 0 640 640">
+              <path d="M311.6 95C297.5 75.5 274.9 64 250.9 64C209.5 64 176 97.5 176 138.9L176 141.3C176 205.7 258 274.7 298.2 304.6C311.2 314.3 328.7 314.3 341.7 304.6C381.9 274.6 463.9 205.7 463.9 141.3L463.9 138.9C463.9 97.5 430.4 64 389 64C365 64 342.4 75.5 328.3 95L320 106.7L311.6 95zM141.3 405.5L98.7 448L64 448C46.3 448 32 462.3 32 480L32 544C32 561.7 46.3 576 64 576L384.5 576C413.5 576 441.8 566.7 465.2 549.5L591.8 456.2C609.6 443.1 613.4 418.1 600.3 400.3C587.2 382.5 562.2 378.7 544.4 391.8L424.6 480L312 480C298.7 480 288 469.3 288 456C288 442.7 298.7 432 312 432L384 432C401.7 432 416 417.7 416 400C416 382.3 401.7 368 384 368L231.8 368C197.9 368 165.3 381.5 141.3 405.5z" />
+            </svg>
+          </button>
+        )}
+      </div>
+    );
+  },
+},
     ],
     [],
   );
@@ -605,6 +746,15 @@ export default function UserCallHistoryPage() {
           Next
         </button>
       </div>
+      <SessionDurationModal
+  open={openDurationModal}
+  onClose={() => {
+    setOpenDurationModal(false);
+    setSelectedSession(null);
+  }}
+  session={selectedSession}
+  onSubmit={handleDurationSubmit}
+/>
       <SessionRemedyModal
         open={openRemedyModal}
         onClose={() => setOpenRemedyModal(false)}
