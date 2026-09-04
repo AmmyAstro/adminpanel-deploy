@@ -1,6 +1,7 @@
 "use client";
 
 import { CREATE_REFUND_REQUEST } from "@/app/graphQL/astroHiring";
+import { useMutation } from "@apollo/client/react";
 import { useEffect, useState } from "react";
 
 export default function SessionDurationModal({
@@ -14,7 +15,9 @@ export default function SessionDurationModal({
   const [error, setError] = useState("");
 
   const durationSec = Number(session?.durationSec || 0);
-
+  const [createRefundRequest] = useMutation(
+  CREATE_REFUND_REQUEST
+);
   // Example:
   // 150 sec => max 2 min
   // 460 sec => max 7 min
@@ -57,9 +60,7 @@ export default function SessionDurationModal({
       setError("");
     }
   };
-  const [createRefundRequest] = useMutation(
-  CREATE_REFUND_REQUEST
-);
+
   const ratePerMin = Number(session?.ratePerMin || 0);
   const enteredMinutes = Number(minutes || 0);
 

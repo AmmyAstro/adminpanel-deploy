@@ -7,7 +7,7 @@ import DataTable from "@/components/utils/DataTable";
 
 
 
-import { APPROVE_REFUND_REQUEST, GET_REFUND_REQUEST, REJECT_REFUND_REQUEST } from "@/app/graphQL/astroHiring";
+import { APPROVE_REFUND_REQUEST,  GET_REFUND_REQUESTS, REJECT_REFUND_REQUEST } from "@/app/graphQL/astroHiring";
 import RejectRefundModal from "../../user/RejectRefundModal";
 
 export default function RefundList() {
@@ -23,7 +23,7 @@ export default function RefundList() {
   // --------------------------------
 
   const { data, loading, error, refetch } = useQuery(
-    GET_REFUND_REQUEST,
+   GET_REFUND_REQUESTS,
     {
       variables: {
         page,
