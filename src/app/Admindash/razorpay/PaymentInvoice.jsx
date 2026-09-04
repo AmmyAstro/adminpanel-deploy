@@ -3,313 +3,439 @@
 import React from "react";
 
 const PaymentInvoice = React.forwardRef(({ data }, ref) => {
+  const formatDate = (date) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const money = (value) => {
+    const num = Number(value || 0);
+    return num.toFixed(2);
+  };
+
   return (
     <div
       ref={ref}
-      className="w-[210mm] min-h-[297mm] bg-white p-8 text-black text-sm"
+      className="w-[210mm] min-h-[297mm] bg-white text-black px-[10mm] py-[9mm] text-[12px]"
+      style={{
+        fontFamily: "Arial, Helvetica, sans-serif",
+      }}
     >
-      {/* Header */}
+      {/* =========================================================
+          HEADER
+      ========================================================= */}
 
-      <div className="text-center border-b pb-5">
-        <h1 className="text-3xl font-bold text-indigo-700">
-          DHWANI ASTRO
-        </h1>
+      <div className="flex items-start justify-between">
+        {/* Logo / Brand */}
+        <div className="w-[32%] pt-2">
+          <div className="flex flex-col items-start">
+            <div className="w-[58px] h-[58px] rounded-full border-[3px] border-yellow-400 flex items-center justify-center">
+              <div className="text-yellow-500 text-[25px] font-bold">
+                D
+              </div>
+            </div>
 
-        <h2 className="text-xl font-semibold mt-3">
-          PAYMENT INVOICE
-        </h2>
+            <div className="mt-1 text-[21px] font-normal tracking-tight">
+              Dhwani
+            </div>
 
-        <p className="text-gray-500 mt-1">
-          Invoice No : {data.invoiceNo}
-        </p>
-
-        <p className="text-gray-500">
-          Date :
-          {" "}
-          {new Date(data.createdAt).toLocaleDateString("en-IN")}
-        </p>
-      </div>
-
-      {/* Customer */}
-
-      <div className="grid grid-cols-2 gap-6 mt-8">
-
-        <div className="border rounded-lg p-4">
-
-          <h3 className="font-bold text-lg mb-3">
-            Customer Details
-          </h3>
-
-          <p>
-            <b>Name :</b> {data.userName}
-          </p>
-
-          <p>
-            <b>Mobile :</b> {data.mobile}
-          </p>
-
-          <p>
-            <b>Country :</b> {data.country || "-"}
-          </p>
-
-          <p>
-            <b>State :</b> {data.state || "-"}
-          </p>
-
-          <p>
-            <b>City :</b> {data.city || "-"}
-          </p>
-
+            <div className="text-[11px] tracking-[2px]">
+              ASTRO
+            </div>
+          </div>
         </div>
 
-        <div className="border rounded-lg p-4">
+        {/* Invoice Heading */}
+        <div className="w-[68%] text-right">
+          <h1 className="text-[25px] font-bold">
+            Payment Invoice
+          </h1>
 
-          <h3 className="font-bold text-lg mb-3">
-            Payment Details
-          </h3>
+          <p className="text-[13px] mt-1">
+            (Original for recipient)
+          </p>
+
+          <p className="font-bold mt-5">
+            DHWANI ASTRO
+          </p>
 
           <p>
-            <b>Order ID :</b>
+            Supplier GSTIN: {data.supplierGSTIN || "-"}
           </p>
-
-          <p className="break-all text-xs">
-            {data.razorpayOrderId}
-          </p>
-
-          <br />
 
           <p>
-            <b>Payment ID :</b>
+            Website: {data.website || "-"}
           </p>
-
-          <p className="break-all text-xs">
-            {data.razorpayPaymentId}
-          </p>
-
-          <br />
 
           <p>
-            <b>Status :</b> {data.status}
+            E-mail: {data.email || "-"}
           </p>
 
+          <p className="mt-1 leading-5">
+            Address - {data.supplierAddress || "-"}
+          </p>
         </div>
-
       </div>
 
-      {/* Recharge */}
+      {/* =========================================================
+          CUSTOMER + INVOICE INFORMATION
+      ========================================================= */}
 
-      <div className="mt-8">
+      <div className="mt-[45px] grid grid-cols-2 gap-8">
+        {/* Customer */}
+        <div>
+          <p className="font-bold mb-2">
+            Customer Address:
+          </p>
 
-        <table className="w-full border border-collapse">
+          <p>{data.userName || "-"}</p>
 
+          <p>
+            {data.city || "-"}
+            {data.state ? `, ${data.state}` : ""}
+            {data.pincode ? ` - ${data.pincode}` : ""}
+          </p>
+
+          <p>{data.country || "India"}</p>
+
+          <div className="mt-5">
+            <p className="font-bold">
+              Place of Supply:
+            </p>
+
+            <p>{data.placeOfSupply || data.state || "-"}</p>
+          </div>
+        </div>
+
+        {/* Invoice Info */}
+        <div className="text-right">
+          <p>
+            <span className="font-bold">
+              Transaction Id:
+            </span>{" "}
+            {data.transactionId || data.razorpayOrderId || "-"}
+          </p>
+
+          <p className="mt-3">
+            <span className="font-bold">
+              Payment Id:
+            </span>{" "}
+            {data.razorpayPaymentId || "-"}
+          </p>
+
+          <p className="mt-3">
+            <span className="font-bold">
+              Recipient GSTIN:
+            </span>{" "}
+            {data.recipientGSTIN || "-"}
+          </p>
+
+          <p className="mt-3">
+            <span className="font-bold">
+              Invoice Voucher No:
+            </span>{" "}
+            {data.invoiceNo || "-"}
+          </p>
+
+          <p className="mt-3">
+            <span className="font-bold">
+              Invoice Voucher Date:
+            </span>{" "}
+            {formatDate(data.createdAt)}
+          </p>
+        </div>
+      </div>
+
+      {/* =========================================================
+          MAIN PAYMENT TABLE
+      ========================================================= */}
+
+      <div className="mt-[45px]">
+        <table className="w-full border-collapse border border-black">
           <thead>
-
-            <tr className="bg-gray-100">
-
-              <th className="border p-2">
-                Recharge Pack
+            <tr className="font-bold text-center">
+              <th
+                rowSpan="2"
+                className="border border-black px-2 py-2"
+              >
+                Description
               </th>
 
-              <th className="border p-2">
-                Coins
+              <th
+                rowSpan="2"
+                className="border border-black px-2 py-2"
+              >
+                Total
               </th>
 
-              <th className="border p-2">
+              <th
+                rowSpan="2"
+                className="border border-black px-2 py-2"
+              >
+                Discount
+              </th>
+
+              <th
+                rowSpan="2"
+                className="border border-black px-2 py-2"
+              >
+                Taxable
+                <br />
+                Value
+              </th>
+
+              <th
+                colSpan="2"
+                className="border border-black px-2 py-1"
+              >
+                SGST
+              </th>
+
+              <th
+                colSpan="2"
+                className="border border-black px-2 py-1"
+              >
+                CGST
+              </th>
+
+              <th
+                colSpan="2"
+                className="border border-black px-2 py-1"
+              >
+                IGST
+              </th>
+            </tr>
+
+            <tr className="font-bold text-center">
+              <th className="border border-black px-2 py-1">
+                Rate
+              </th>
+
+              <th className="border border-black px-2 py-1">
                 Amount
               </th>
 
-              <th className="border p-2">
-                Taxable
+              <th className="border border-black px-2 py-1">
+                Rate
               </th>
 
-            </tr>
+              <th className="border border-black px-2 py-1">
+                Amount
+              </th>
 
+              <th className="border border-black px-2 py-1">
+                Rate
+              </th>
+
+              <th className="border border-black px-2 py-1">
+                Amount
+              </th>
+            </tr>
           </thead>
 
           <tbody>
-
+            {/* Item */}
             <tr>
-
-              <td className="border p-2">
-                {data.rechargePackName}
+              <td className="border border-black px-2 py-2">
+                Purchase of AT-Money via Razorpay
               </td>
 
-              <td className="border p-2 text-center">
-                {data.coins}
+              <td className="border border-black px-2 py-2 text-right">
+                ₹{money(data.amount)}
               </td>
 
-              <td className="border p-2 text-center">
-                ₹{data.amount}
+              <td className="border border-black px-2 py-2 text-right">
+                ₹{money(data.discount)}
               </td>
 
-              <td className="border p-2 text-center">
-                ₹{data.taxableAmount}
+              <td className="border border-black px-2 py-2 text-right">
+                ₹{money(data.taxableAmount)}
               </td>
 
+              <td className="border border-black px-2 py-2 text-center">
+                {data.sgstRate || 0}%
+              </td>
+
+              <td className="border border-black px-2 py-2 text-right">
+                ₹{money(data.sgst)}
+              </td>
+
+              <td className="border border-black px-2 py-2 text-center">
+                {data.cgstRate || 0}%
+              </td>
+
+              <td className="border border-black px-2 py-2 text-right">
+                ₹{money(data.cgst)}
+              </td>
+
+              <td className="border border-black px-2 py-2 text-center">
+                {data.igstRate || data.gstRate || 0}%
+              </td>
+
+              <td className="border border-black px-2 py-2 text-right">
+                ₹{money(data.igst || data.totalTax)}
+              </td>
             </tr>
 
+            {/* Total */}
+            <tr className="font-bold">
+              <td
+                colSpan="4"
+                className="border border-black px-2 py-1 text-right"
+              >
+                Total
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                ₹{money(data.sgst)}
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                ₹{money(data.cgst)}
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                ₹{money(data.igst || data.totalTax)}
+              </td>
+            </tr>
+
+            {/* Total Tax */}
+            <tr className="font-bold">
+              <td
+                colSpan="8"
+                className="border border-black px-2 py-1 text-right"
+              >
+                Total Tax
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                INR {money(data.totalTax)}
+              </td>
+            </tr>
+
+            {/* Total Amount */}
+            <tr className="font-bold">
+              <td
+                colSpan="8"
+                className="border border-black px-2 py-1 text-right"
+              >
+                Total amount
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                INR {money(data.totalAmount || data.amount)}
+              </td>
+            </tr>
+
+            {/* Amount in words */}
+            <tr className="font-bold">
+              <td
+                colSpan="8"
+                className="border border-black px-2 py-1 text-right"
+              >
+                Total amount (in words)
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                {data.amountInWords || "-"}
+              </td>
+            </tr>
+
+            {/* Received */}
+            <tr className="font-bold">
+              <td
+                colSpan="8"
+                className="border border-black px-2 py-1 text-right"
+              >
+                Total amount received
+              </td>
+
+              <td
+                colSpan="2"
+                className="border border-black px-2 py-1 text-right"
+              >
+                INR{" "}
+                {money(
+                  data.amountReceived ||
+                    data.totalAmount ||
+                    data.amount
+                )}
+              </td>
+            </tr>
           </tbody>
-
         </table>
-
       </div>
 
-      {/* GST */}
+      {/* =========================================================
+          TRANSACTION HISTORY NOTE
+      ========================================================= */}
 
-      <div className="mt-8">
-
-        <table className="w-full border border-collapse">
-
-          <tbody>
-
-            <tr>
-
-              <td className="border p-2">
-                GST Rate
-              </td>
-
-              <td className="border p-2">
-                {data.gstRate}%
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                CGST
-              </td>
-
-              <td className="border p-2">
-                ₹{data.cgst}
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                SGST
-              </td>
-
-              <td className="border p-2">
-                ₹{data.sgst}
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                IGST
-              </td>
-
-              <td className="border p-2">
-                ₹{data.igst}
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                Total GST
-              </td>
-
-              <td className="border p-2">
-                ₹{data.totalTax}
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
+      <div className="mt-[35px] text-[11px]">
+        To view your transaction history, please visit:{" "}
+        <span className="underline">
+          {data.transactionHistoryUrl || "-"}
+        </span>
       </div>
 
-      {/* PG Charges */}
+      {/* =========================================================
+          OTHER DETAILS
+      ========================================================= */}
 
-      <div className="mt-8">
+      <div className="mt-[35px]">
+        <p className="font-bold mb-1">
+          Other details:
+        </p>
 
-        <table className="w-full border border-collapse">
+        <div className="grid grid-cols-[220px_20px_1fr] leading-6">
+          <span>HSN/SAC</span>
+          <span>:</span>
+          <span>{data.hsnSac || "999799"}</span>
 
-          <tbody>
+          <span>
+            Whether tax is payable on reverse charge basis
+          </span>
+          <span>:</span>
+          <span>
+            {data.reverseCharge === true ? "Yes" : "No"}
+          </span>
 
-            <tr>
-
-              <td className="border p-2">
-                PG Charge Rate
-              </td>
-
-              <td className="border p-2">
-                {data.pgChargeRate}%
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                PG Charge
-              </td>
-
-              <td className="border p-2">
-                ₹{data.pgCharge}
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                PG IGST
-              </td>
-
-              <td className="border p-2">
-                ₹{data.pgIgst}
-              </td>
-
-            </tr>
-
-            <tr>
-
-              <td className="border p-2">
-                PG Total
-              </td>
-
-              <td className="border p-2">
-                ₹{data.pgTotal}
-              </td>
-
-            </tr>
-
-            <tr className="bg-gray-100 font-bold">
-
-              <td className="border p-2">
-                Receivable Amount
-              </td>
-
-              <td className="border p-2">
-                ₹{data.receivableAmount}
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
+          <span>PAN Number</span>
+          <span>:</span>
+          <span>{data.panNumber || "-"}</span>
+        </div>
       </div>
 
-      {/* Footer */}
+      {/* =========================================================
+          FOOTER
+      ========================================================= */}
 
-      <div className="mt-12 border-t pt-5 text-center text-gray-500 text-xs">
-
-        This is a computer generated invoice.
-
+      <div className="mt-[45px] text-[11px]">
+        This is a computer generated invoice voucher, no
+        signatures required
       </div>
-
     </div>
   );
 });

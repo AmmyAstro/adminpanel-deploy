@@ -71,14 +71,14 @@ export default function WalletTab({ userId }) {
       },
 
       {
-        header: "Amount",
-        render: (row) => `₹${row.amount || 0}`,
+        header: "Wallet",
+        render: (row) => `₹${row.updatedBalance || 0}`,
       },
 
       {
         header: "Description",
         render: (row) => (
-          <div className="max-w-[260px] truncate">
+          <div className="max-w-65 truncate">
             {row.description || "-"}
           </div>
         ),
