@@ -1203,7 +1203,7 @@ export const GET_REFUND_REQUESTS = gql`
 
         transactionId
         orderId
-
+sessionDate
         sessionDuration
         ratePerMin
 
