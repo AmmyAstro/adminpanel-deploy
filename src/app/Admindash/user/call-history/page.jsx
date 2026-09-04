@@ -558,7 +558,7 @@ const refundStatusMap = useMemo(() => {
   },
 },
     ],
-    [],
+    [refundStatusMap],
   );
 
   if (error) {
