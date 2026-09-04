@@ -170,17 +170,7 @@ export default function RefundList() {
         ),
       },
 
-      {
-        header: "Transaction ID",
-        accessor: "transactionId",
-        width: "150px",
-
-        render: (row) => (
-          <span className="break-all text-gray-600">
-            {row.transactionId || "-"}
-          </span>
-        ),
-      },
+  
 
       {
         header: "Order ID",
@@ -189,7 +179,7 @@ export default function RefundList() {
 
         render: (row) => (
           <span className="break-all text-gray-600">
-            {row.orderId || "-"}
+            {row.sessionId?.slice(0,8) || "-"}
           </span>
         ),
       },
@@ -209,11 +199,6 @@ export default function RefundList() {
               ID: {row.userId?.slice(0,8) || "-"}
             </p>
 
-            {row.userMobile && (
-              <p className="text-[10px] text-gray-500">
-                {row.userMobile}
-              </p>
-            )}
           </div>
         ),
       },
@@ -436,7 +421,7 @@ export default function RefundList() {
           type="button"
           disabled={approving || rejecting}
           onClick={() => handleApprove(row)}
-          className="rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-green-500 px-3 py-1 text-[10px] font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {approving ? "..." : "Approve"}
         </button>
@@ -445,7 +430,7 @@ export default function RefundList() {
           type="button"
           disabled={approving || rejecting}
           onClick={() => handleRejectClick(row)}
-          className="rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-red-500 px-3 py-1 text-[10px] font-semibold text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Reject
         </button>

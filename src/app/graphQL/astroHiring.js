@@ -1250,7 +1250,7 @@ export const CREATE_REFUND_REQUEST = gql`
       refundDuration
       refundAmount
       refundReason
-
+sessionDate
       requestedByStaffId
       requestedByStaffName
 
