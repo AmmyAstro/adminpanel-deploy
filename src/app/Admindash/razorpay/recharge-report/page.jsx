@@ -592,7 +592,7 @@ export default function RazorpayReports() {
         <div className="flex gap-1 items-center">
           <p className="font-semibold text-[10px]">{row.invoiceNo || "-"}</p>
 
-          <button
+          <button className="cursor-pointer"
             onClick={() => {
               setSelectedInvoice(row);
 

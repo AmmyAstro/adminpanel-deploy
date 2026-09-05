@@ -256,10 +256,10 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-8 gap-5 mb-8">
         {cards.map((item) => (
-          <div key={item.title} className="bg-violet-300 rounded-xl p-5 shadow">
-            <p className="text-gray-900 text-xl font-semibold">{item.title}</p>
+          <div key={item.title} className="bg-violet-300 rounded-xl p-3 shadow">
+            <p className="text-gray-900 text-md font-semibold">{item.title}</p>
 
-            <h2 className="text-3xl font-bold mt-2 text-[#2c0a4d]">
+            <h2 className="text-xl font-bold mt-2 text-[#2c0a4d]">
               {item.value}
             </h2>
           </div>
